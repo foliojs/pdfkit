@@ -1,0 +1,27 @@
+{
+  "name": "pdfkit",
+  "description": "A PDF generation library for Node.js inspired by Prawn.",
+  "keywords": ["pdf", "pdf writer", "pdf generator"],
+  "version": "0.1",
+  "homepage": "http://devongovett.github.com/pdfkit",
+  "author": {
+      "name": "Devon Govett",
+      "email": "devongovett@gmail.com",
+      "url": "http://badassjs.com/"
+  },
+  "repository": {
+      "type": "git",
+      "url": "https://github.com/devongovett/pdfkit.git"
+  },
+  "bugs": "http://github.com/devongovett/pdf/issues",
+  "directories": {
+      "lib": "./lib",
+      "example": "./demo",
+  },
+  "dependencies": {
+      "coffee-script": ">=1.0.1",
+      "zlib": ">=1.0.2"
+  },
+  "main": "./lib/document.coffee",
+  "engine": [ "node >= v0.4.0" ]
+}
