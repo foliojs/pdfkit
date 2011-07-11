@@ -1,4 +1,4 @@
-PDFDocument = require '../lib/document'
+PDFDocument = require 'pdfkit'
 tiger = require './tiger'
 
 # Create a new PDFDocument
