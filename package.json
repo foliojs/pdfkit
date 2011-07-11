@@ -1,8 +1,8 @@
 {
   "name": "pdfkit",
-  "description": "A PDF generation library for Node.js inspired by Prawn.",
+  "description": "A PDF generation library for Node.js",
   "keywords": ["pdf", "pdf writer", "pdf generator", "graphics", "document", "vector"],
-  "version": "0.1",
+  "version": "0.1.0",
   "homepage": "http://devongovett.github.com/pdfkit/",
   "author": {
       "name": "Devon Govett",
