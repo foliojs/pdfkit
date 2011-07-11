@@ -34,7 +34,7 @@ module.exports =
         BEVEL: 2
         
     lineJoin: (j) ->
-        j = @_JOIN_STYLES[j.toUpperCase()] if typeof c is 'string'
+        j = @_JOIN_STYLES[j.toUpperCase()] if typeof j is 'string'
         @addContent "#{j} j"
         
     miterLimit: (m) ->
@@ -132,7 +132,7 @@ module.exports =
         @addContent 'B' + @_windingRule(rule)
 
     clip: (rule) ->
-        @addContent 'W' + @_windingRule(rule)
+        @addContent 'W' + @_windingRule(rule) + ' n'
         
     transform: (m11, m12, m21, m22, dx, dy) ->
         values = [m11, m12, m21, m22, dx, dy].join ' '
@@ -145,22 +145,27 @@ module.exports =
         rad = angle * Math.PI / 180
         cos = Math.cos(rad)
         sin = Math.sin(rad)
+        x = y = 0
 
         if options.origin?
             x = options.origin[0]
             y = @page.height - options.origin[1]
             x1 = x * cos - y * sin
             y1 = x * sin + y * cos
-            @translate x - x1, y - y1
+            x -= x1
+            y -= y1
 
-        @transform cos, sin, -sin, cos, 0, 0
+        @transform cos, sin, -sin, cos, x, y
         
     scale: (factor, options = {}) ->
+        x = y = 0
+        
         if options.origin?
             x = options.origin[0]
             y = @page.height - options.origin[1]
             x1 = factor * x
             y1 = factor * y
-            @translate x - x1, y - y1
+            x -= x1
+            y -= y1
             
-        @transform factor, 0, 0, factor, 0, 0
+        @transform factor, 0, 0, factor, x, y

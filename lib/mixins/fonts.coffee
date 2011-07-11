@@ -8,7 +8,6 @@ module.exports =
         
         # Font state
         @_fontSize = 12
-        @_lineGap = 0
         @_font = null
         
         @_registeredFonts = {}

@@ -6,7 +6,6 @@ module.exports =
         # Current coordinates
         @x = 0
         @y = 0
-        
         @_lineGap = 0
         
     lineGap: (@_lineGap) ->
@@ -40,7 +39,7 @@ module.exports =
             return this
             
         # text alignment support
-        if options.lineWidth and not options.lastLine
+        if options.lineWidth
             switch align
                 when 'right'
                     x += (options.lineWidth or 0) - @widthOfString text
@@ -49,6 +48,8 @@ module.exports =
                     x += options.lineWidth / 2 - @widthOfString(text) / 2
                 
                 when 'justify'
+                    break if options.lastLine
+                
                     words = text.match(WORD_RE)
                     break unless words
                                     
