@@ -103,7 +103,7 @@ module.exports =
         # end the text object
         @addContent "ET"
         
-        @y += @currentLineHeight() + lineGap
+        @y += @currentLineHeight(true) + lineGap
         return this
         
     _escape: (text) ->
@@ -129,7 +129,7 @@ module.exports =
         
         spaceLeft = lineWidth - (options.indent or 0)
         words = text.match(WORD_RE)
-        lineHeight = @currentLineHeight()
+        lineHeight = @currentLineHeight(true)
         wordWidths = {}
         len = words.length
         buffer = ''
@@ -164,11 +164,11 @@ module.exports =
         @text buffer.trim(), options
         
     moveDown: (lines = 1) ->
-        @y += @currentLineHeight() * lines + @_lineGap
+        @y += @currentLineHeight(true) * lines + @_lineGap
         return this
         
     moveUp: (lines = 1) ->
-        @y -= @currentLineHeight() * lines + @_lineGap
+        @y -= @currentLineHeight(true) * lines + @_lineGap
         return this
         
     list: (array, @x, @y) ->

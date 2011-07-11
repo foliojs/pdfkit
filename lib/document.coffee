@@ -34,8 +34,8 @@ class PDFDocument
         
         # Create the metadata
         @_info = @ref
-            Producer: 'Testing'
-            Creator: 'Testing'
+            Producer: 'PDFKit'
+            Creator: 'PDFKit'
             CreationDate: new Date()
                 
         @info = @_info.data

@@ -42,8 +42,8 @@ module.exports =
     widthOfString: (string) ->
         @_font.widthOfString string, @_fontSize
         
-    currentLineHeight: ->
-        @_font.lineHeight @_fontSize
+    currentLineHeight: (includeGap = false) ->
+        @_font.lineHeight @_fontSize, includeGap
         
     registerFont: (name, path, family) ->
         @_registeredFonts[name] = 

@@ -133,7 +133,8 @@ class PDFFont
         scale = size / 1000    
         return width * scale
         
-    lineHeight: (size) ->
-        (@ascender + @lineGap - @decender) / 1000 * size
+    lineHeight: (size, includeGap = false) ->
+        gap = if includeGap then @lineGap else 0
+        (@ascender + gap - @decender) / 1000 * size
         
 module.exports = PDFFont

@@ -56,7 +56,6 @@ module.exports =
         options.Subtype = 'Line'
         options.Contents = PDFObject.s ''
         options.L = [x1, @page.height - y1, x2, @page.height - y2]
-        #options.LE = ["None", 'ClosedArrow']
         @annotate x1, y1, x2, y2, options
         
     rectAnnotation: (x, y, w, h, options = {}) ->
