@@ -1,0 +1,120 @@
+body {
+    font-family: 'News Cycle', sans-serif;
+    margin: 0;
+}
+
+h1 {
+    font-size: 40px;
+    margin-bottom: 0;
+}
+
+header h3 {
+    margin-top: 0;
+}
+
+body > nav {
+    display: block;
+    position: fixed;
+    width: 200px;
+    height: 100%;
+    background: #ddd;
+    box-shadow: #aaa -5px 0 20px inset;
+    -webkit-box-shadow: #aaa -5px 0 20px inset;
+    -moz-box-shadow: #aaa -5px 0 20px inset;
+}
+
+nav > ul {
+    padding-top: 25px;
+    padding-left: 15px;
+    list-style-type: none;
+}
+
+nav li > ul {
+    padding-left: 20px;
+    list-style-type: none;
+}
+
+body > nav a {
+    text-decoration: none;
+    color: #555;
+    text-shadow: #eee 0 1px 0;
+}
+
+body > nav > ul > li > a {
+    font-weight: bold;
+}
+
+nav a.selected {
+    color: #AA0000;
+}
+
+.main {
+    position: absolute;
+    left: 250px;
+    top: 0;
+    width: 800px;
+    padding-bottom: 20px;
+}
+
+.main a[href] {
+    color: #AA0000;
+}
+
+.main a[href]:active {
+    text-shadow: rgba(170, 0, 0, 0.5) 0 0 20px;
+}
+
+code {
+    font-size: 14px;
+}
+
+pre {
+    padding: 15px;
+    background: #F8F8FF;
+    border-radius: 5px;
+    font-size: 14px;
+    box-shadow: #ccc 0 0 10px inset;
+    -webkit-box-shadow: #ccc 0 0 10px inset;
+    -moz-box-shadow: #ccc 0 0 10px inset;
+}
+
+.gist-file, .gist-data {
+    border: none !important;
+}
+
+.gist pre div {
+    padding: 0 15px;
+}
+
+.gist pre div:first-child {
+    padding-top: 15px;
+}
+
+.gist pre div:last-child {
+    padding-bottom: 15px;
+}
+
+.gist-meta {
+  display: none;
+}
+
+ul span {
+    color: gray;
+}
+
+.main nav {
+    display: block;
+    position: relative;
+    height: 24px;
+}
+
+.main nav .next {
+    position: absolute;
+    right: 0;
+    top: 0;
+}
+
+p > code, li > code {
+    background: #eee;
+    padding: 2px;
+}

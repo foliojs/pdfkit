@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>PDFKit &mdash; A PDF Generation Library for Node</title>
+    <link href='http://fonts.googleapis.com/css?family=News+Cycle' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="index.css">
+</head>
+<body>
+    <nav class="sidebar">
+        <ul>
+            <li><a href="index.html" class="selected">Home</a></li>
+            <li><a href="docs/getting_started.html">Documentation</a>
+                <ul>
+                    <li><a href="docs/getting_started.html">Getting Started</a></li>
+                    <li><a href="docs/vector.html">Vector Graphics</a></li>
+                    <li><a href="docs/text.html">Text</a></li>
+                    <li><a href="docs/images.html">Images</a></li>
+                    <li><a href="docs/annotations.html">Annotations</a></li>
+                </ul>
+            </li>
+            <li><a href="example.pdf">Example PDF</a></li>
+            <li><a href="http://github.com/devongovett/pdfkit">Source Code</a></li>
+        </ul>
+    </nav>
+    
+    <a href="http://github.com/devongovett/pdfkit"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://gs1.wac.edgecastcdn.net/80460E/assets/img/e6bef7a091f5f3138b8cd40bc3e114258dd68ddf/687474703a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f7265645f6161303030302e706e67" alt="Fork me on GitHub"></a>
+    
+    <div class="main">
+        <header>
+            <h1>PDFKit</h1>
+            <h3>A PDF generation library for Node.js.</h3>
+        </header>
+
+        <h2>Description</h2>
+        <p>PDFKit is a PDF document generation library for Node that makes creating complex, multi-page, printable documents easy.
+           It is written in pure <a href="http://coffeescript.org/">CoffeeScript</a>, but you can choose to use the API in plain 'ol
+           JavaScript if you like.  The API embraces chainability, and includes both low level functions as well as abstractions for
+           higher level functionality.  The PDFKit API is designed to be simple, so generating complex documents is often as simple
+           as a few function calls.  Check out some of the <a href="docs/getting_started.html">documentation and examples</a> 
+           to see for yourself!
+        </p>
+        
+        <h2>Installation</h2>
+        <p>Installation uses the <a href="http://npmjs.org/">npm</a> package manager.  Just type the following command after installing npm.</p>
+        <pre><code>npm install pdfkit</code></pre>
+
+        <h2>Features</h2>
+        <ul>
+            <li>
+                Vector graphics
+                <ul>
+                    <li>HTML5 canvas-like API</li>
+                    <li>Path operations</li>
+                    <li>SVG path parser for easy path creation</li>
+                    <li>Transformations</li>
+                </ul>
+            </li>
+            <li>
+                Text
+                <ul>
+                    <li>Line wrapping</li>
+                    <li>Text alignments</li>
+                    <li>Bulleted lists</li>
+                </ul>
+            </li>
+            <li>
+                Font embedding
+                <ul>
+                    <li>Supports TrueType (<code>.ttf</code>), TrueType Collections (<code>.ttc</code>), 
+                        and Datafork TrueType (<code>.dfont</code>) fonts</li>
+                </ul>
+            </li>
+            <li>
+                Image embedding
+                <ul>
+                    <li>Supports JPEG and PNG files (including indexed PNGs, and PNGs with transparency)</li>
+                </ul>
+            </li>
+            <li>
+                Annotations
+                <ul>
+                    <li>Links</li>
+                    <li>Notes</li>
+                    <li>Highlights</li>
+                    <li>Underlines</li>
+                    <li>etc.</li>
+                </ul>
+            </li>
+        </ul>
+
+        <h2>Coming soon!</h2>
+
+        <ul>
+            <li>Gradients and patterns</li>
+            <li>Outlines</li>
+            <li>PDF Security</li>
+            <li>Font subsetting</li>
+            <li>Higher level APIs for creating tables and laying out content</li>
+            <li>More performance optimizations</li>
+            <li>Even more awesomeness, perhaps written by you! Please fork <a href="http://github.com/devongovett/pdfkit">the repository</a> 
+                and send me pull requests.</li>
+        </ul>
+
+        <h2>Example</h2>
+        <script src="https://gist.github.com/1074209.js?file=pdfkit_demo.coffee"></script>
+        <p><a href="example.pdf">The PDF output from this example</a> (with a few additions) shows the power of PDFKit &mdash; producing complex
+            documents with a very small amount of code.</p>
+
+        <h2>License</h2>
+        <p>PDFKit is licensed under the MIT license.</p>
+        
+        <nav>
+            <a href="docs/getting_started.html" class="next">Read the documentation</a>
+        </nav>
+    </div>
+</body>
+</html>

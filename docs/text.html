@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Text in PDFKit</title>
+    <link href='http://fonts.googleapis.com/css?family=News+Cycle' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="../index.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
+    <script src="../index.js"></script>
+</head>
+<body>
+    <nav class="sidebar">
+        <ul>
+            <li><a href="../index.html">Home</a></li>
+            <li><a href="getting_started.html">Documentation</a>
+                <ul>
+                    <li><a href="getting_started.html">Getting Started</a></li>
+                    <li><a href="vector.html">Vector Graphics</a></li>
+                    <li><a href="#top" class="selected">Text</a>
+                        <ul>
+                            <li><a href="#basics">The basics</a></li>
+                            <li><a href="#line_wrapping">Line wrapping</a></li>
+                            <li><a href="#styling">Text styling</a></li>
+                            <li><a href="#fonts">Fonts</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="images.html">Images</a></li>
+                    <li><a href="annotations.html">Annotations</a></li>
+                </ul>
+            </li>
+            <li><a href="../example.pdf">Example PDF</a></li>
+            <li><a href="http://github.com/devongovett/pdfkit">Source Code</a></li>
+        </ul>
+    </nav>
+    
+    <a href="http://github.com/devongovett/pdfkit"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://gs1.wac.edgecastcdn.net/80460E/assets/img/e6bef7a091f5f3138b8cd40bc3e114258dd68ddf/687474703a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f7265645f6161303030302e706e67" alt="Fork me on GitHub"></a>
+    
+    <div class="main">
+        <h1><a name="top">Text in PDFKit</a></h1>
+        
+        <h2><a name="basics">The basics</a></h2>
+        <p>PDFKit makes adding text to documents quite simple, and includes many options to customize the display of the output.  Adding text to
+            a document is as simple as calling the <code>text</code> method.</p>
+        <script src="https://gist.github.com/1074963.js?file=text.coffee"></script>
+        <p>Internally, PDFKit keeps track of the current X and Y position of text as it is added to the document.  This way, subsequent calls to
+            the <code>text</code> method will automatically appear as new lines below the previous line.  However, you can modify the position of
+            text by passing X and Y coordinates to the <code>text</code> method after the text itself.</p>
+        <script src="https://gist.github.com/1074963.js?file=text_position.coffee"></script>
+        <p>If you want to move down or up by lines, just call the <code>moveDown</code> or <code>moveUp</code> method with the number of lines you'd
+            like to move (1 by default).</p>
+        
+        <h2><a name="line_wrapping">Line wrapping and justification</a></h2>
+        <p>PDFKit includes support for line wrapping out of the box, and it is as simple to enable as setting the <code>width</code> option to the
+            width that the text should be wrapped to.  If you set the <code>maxHeight</code> option, the 
+            text will be clipped to the number of lines that can fit in that height.</p>
+        <p>Once you've enabled line wrapping, you can choose a text justification.  There are four options: <code>left</code> (the default), 
+            <code>center</code>, <code>right</code>, and <code>justify</code>.  They work just as they do in your favorite word processor, but
+            here is an example showing their use.</p>
+        <script src="https://gist.github.com/1074963.js?file=alignments.coffee"></script>
+        <p>The output of this example, looks like this:</p>
+        <img src="images/alignments.png">
+        
+        <h2><a name="styling">Text styling</a></h2>
+        <p>PDFKit has many options for controlling the look of text added to PDF documents.  They are enumerated below.</p>
+        <ul>
+            <li><code>indent</code> <span>- the amount in PDF points (72 per inch) to indent each paragraph of text</span></li>
+            <li><code>paragraphGap</code> <span>- the amount of space between each paragraph of text</span></li>
+            <li><code>lineGap</code> <span>- the amount of space between each line of text</span></li>
+            <li><code>fill</code> <span>- whether to fill the text (<code>true</code> by default)</span></li>
+            <li><code>stroke</code> <span>- whether to stroke the text</span></li>
+        </ul>
+        <p>Additionally, the fill and stroke color and opacity methods described in the <a href="vector.html">vector graphics section</a> are 
+            applied to text content as well.</p>
+            
+        <h2><a name="fonts">Fonts</a></h2>
+        <p>The PDF format defines 14 standard fonts that can be used in PDF documents (4 styles of Helvetica, Courier, and Times, as well as 
+            Symbol and Zapf Dingbats), but also allows fonts to be embedded right in the document.  PDFKit supports embedding font files in the 
+            TrueType (<code>.ttf</code>), TrueType Collection (<code>.ttc</code>), and Datafork TrueType (<code>.dfont</code>) formats.</p> 
+            
+        <p>To change the font used to render text, just call the <code>font</code> method.  If you are using a standard PDF font, just pass 
+            the name to the <code>font</code> method.  Otherwise, pass the path to the font file, and if the font is a collection font 
+            (<code>.ttc</code> and <code>.dfont</code> files), meaning that they contain multiple styles in the same file, you should pass 
+            the name of the style to be extracted from the collection.</p>
+            
+        <p>Here is an example showing how to set the font in each case.</p>
+        <script src="https://gist.github.com/1074963.js?file=fonts.coffee"></script>
+        <p>The output of this example looks like this:</p>
+        <img src="images/fonts.png">
+        
+        <p>Another nice feature of the PDFKit font support, is the ability to register a font file under a name for use later rather than entering
+            the path to the font every time you want to use it.</p>
+        <script src="https://gist.github.com/1074963.js?file=register_font.coffee"></script>
+        
+        <p>That's about all there is too it for text in PDFKit.  Let's move on now to images.</p>
+            
+        <nav>
+            <a href="vector.html" class="previous">Previous</a>
+            <a href="images.html" class="next">Next</a>
+        </nav>
+    </div>
+</body>
+</html>
