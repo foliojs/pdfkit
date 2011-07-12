@@ -15,7 +15,14 @@ module.exports =
                 color = namedColors[color]
 
         if Array.isArray color
-            color = (part / 255 for part in color)
+            # RGB
+            if color.length is 3
+                color = (part / 255 for part in color)
+            
+            # CMYK
+            else if color.length is 4
+                color = (part / 100 for part in color)
+            
             return color
 
         return null
@@ -26,7 +33,8 @@ module.exports =
        
        @fillOpacity opacity if opacity?
        color = color.join ' '
-       @addContent "#{color} rg"
+       op = if color.length is 4 then 'k' else 'rg'
+       @addContent "#{color} #{op}"
 
     strokeColor: (color, opacity) ->
        color = @_normalizeColor(color)
@@ -34,7 +42,8 @@ module.exports =
 
        @strokeOpacity opacity if opacity?
        color = color.join ' '
-       @addContent "#{color} RG"
+       op = if color.length is 4 then 'K' else 'RG'
+       @addContent "#{color} #{op}"
        
     opacity: (opacity) ->
        @_doOpacity opacity, opacity
