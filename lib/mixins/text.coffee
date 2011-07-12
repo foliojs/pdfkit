@@ -8,6 +8,16 @@ module.exports =
         @y = 0
         @_lineGap = 0
         
+        # Keeps track of what has been set in the document
+        @_textState = 
+            font: null
+            fontSize: null
+            mode: 0
+            wordSpacing: 0
+            
+        # state of the wrapping algorithm
+        @_wrapState = {}
+        
     lineGap: (@_lineGap) ->
         return this
         
@@ -16,95 +26,44 @@ module.exports =
             options = x
             x = null
         
+        # Update the current position    
         @x = x or options.x or @x
         @y = y or options.y or @y
-        {x, y} = this
-        
-        # More options: characterSpacing, wordSpacing, etc.
-        lineGap = options.lineGap ? @_lineGap
-        
-        align = options.align or 'left'
-        text = '' + text
         
         # add current font to page if necessary
         @page.fonts[@_font.id] ?= @_font.ref
         
         # word wrapping
         if options.width
-            return @_wrap text, options
+            @_wrap text, options
+        
+        # newlines    
+        else if (matches = text.split '\n').length > 1
+            @_line match, options for match in matches
+        
+        # single line    
+        else
+            @_line text, options
             
-        # support newlines in text
-        if (matches = text.split '\n').length > 1
-            @text match, { align } for match in matches
-            return this
-            
-        # text alignment support
-        if options.lineWidth
-            switch align
-                when 'right'
-                    x += (options.lineWidth or 0) - @widthOfString text
-                
-                when 'center'
-                    x += options.lineWidth / 2 - @widthOfString(text) / 2
-                
-                when 'justify'
-                    break if options.lastLine
-                
-                    words = text.match(WORD_RE)
-                    break unless words
-                                    
-                    textWidth = @widthOfString text.replace(/\s+/g, '')
-                    lineWidth = options.lineWidth
-                    lineWidth -= options.indent or 0 if options.firstLine
-                    wordSpacing = (lineWidth - textWidth) / (words.length - 1)
-                    
-                    # configure options for fragments
-                    fragmentOptions = {}
-                    for key, val of options when key not in ['align', 'lineWidth', 'lastLine']
-                        fragmentOptions[key] = val
-                    
-                    # render each word individually for now; might want to set temporary word spacing...
-                    originalX = x
-                    for word in words
-                        word = word.trim()
-                        @text word, x, y, fragmentOptions
-                        x += @widthOfString(word) + wordSpacing
-                    
-                    @x = originalX
-                    return this
-                    
-        # indentation support
-        if options.firstLine
-            x += options.indent if options.indent
-            @y = y += options.paragraphGap if options.paragraphGap and not options.firstParagraph
-        
-        y = @page.height - y - (@_font.ascender / 1000 * @_fontSize)
-        text = @_escape text
-        
-        # begin the text object
-        @addContent "BT"
-        
-        # text position
-        @addContent "#{x} #{y} Td"
-        
-        # font and font size
-        @addContent "/#{@_font.id} #{@_fontSize} Tf"
-        
-        # rendering mode
-        mode = if options.fill and options.stroke then 2 else if options.stroke then 1 else 0
-        @addContent "#{mode} Tr" unless mode is 0
-        
-        # add the actual text
-        @addContent "(#{text}) Tj"
-        
-        # reset rendering mode so that it doesn't affect the next text object
-        @addContent '0 Tr' unless mode is 0
-        
-        # end the text object
-        @addContent "ET"
-        
-        @y += @currentLineHeight(true) + lineGap
         return this
+        
+    moveDown: (lines = 1) ->
+        @y += @currentLineHeight(true) * lines + @_lineGap
+        return this
+
+    moveUp: (lines = 1) ->
+        @y -= @currentLineHeight(true) * lines + @_lineGap
+        return this
+
+    list: (array, @x, @y) ->
+        gap = Math.round (@_font.ascender / 1000 * @_fontSize) / 2
+
+        for item in array
+            @circle x + 3, @y + gap + 3, 3
+            @text item, x + 15
+            @y += 3
+
+        @fill()
         
     _escape: (text) ->
         ('' + text)
@@ -114,69 +73,145 @@ module.exports =
             .replace(/&lt;/g, '<')
             .replace(/&gt;/g, '>')
             .replace(/&amp;/g, '&')
-    
+            
+    _line: (text, options) ->
+        wrap = @_wrapState
+        paragraphGap = (wrap.firstLine and not wrap.firstParagraph and options.paragraphGap) or 0
+        lineGap = options.lineGap or @_lineGap or 0
+        
+        @_fragment text, @x, @y + paragraphGap, options
+        @y += @currentLineHeight(true) + lineGap + paragraphGap
+            
+    _fragment: (text, x, y, options = {}) ->
+        state = @_textState
+        wrap = @_wrapState
+        align = options.align or 'left'
+        text = '' + text
+        indent = (wrap.firstLine and options.indent) or 0
+        wordSpacing = 0
+        
+        # text alignments
+        if options.width
+            lineWidth = options.width - indent
+            
+            switch align
+                when 'right'
+                    x += lineWidth - @widthOfString(text)
+                
+                when 'center'
+                    x += lineWidth / 2 - @widthOfString(text) / 2
+                
+                when 'justify'
+                    # don't justify the last line of paragraphs
+                    break if wrap.lastLine
+                    
+                    # split the line into words
+                    words = text.match(WORD_RE)
+                    break unless words
+                     
+                    # calculate the word spacing value                
+                    textWidth = @widthOfString text.replace(/\s+/g, '')
+                    wordSpacing = (lineWidth - textWidth) / (words.length - 1) - @widthOfString(' ')
+                    
+                    # Remove double spaces
+                    text = text.replace(/\s+/g, ' ')
+                    
+        # indentation support
+        x += indent
+        
+        # flip coordinate system
+        y = @page.height - y - (@_font.ascender / 1000 * @_fontSize)
+        
+        # escape the text for inclusion in PDF
+        text = @_escape text
+        
+        # begin the text object
+        @addContent "BT"
+        
+        # text position
+        @addContent "#{x} #{y} Td"
+        
+        # font and font size
+        @addContent "/#{@_font.id} #{@_fontSize} Tf"# unless @_font is state.font and @_fontSize is state.fontSize
+        
+        # rendering mode
+        mode = if options.fill and options.stroke then 2 else if options.stroke then 1 else 0
+        @addContent "#{mode} Tr" unless mode is state.mode
+        
+        # Word spacing
+        @addContent wordSpacing + ' Tw' unless wordSpacing is state.wordSpacing
+        
+        # add the actual text
+        @addContent "(#{text}) Tj"
+        
+        # end the text object
+        @addContent "ET"
+        
+        # keep track of text states
+        state.font = @_font
+        state.fontSize = @_fontSize
+        state.mode = mode
+        state.wordSpacing = wordSpacing
+
     _wrap: (text, options) ->
-        {_font: font, _fontSize: size} = this
-        {width:lineWidth, height:maxHeight, align} = options
+        wrap = @_wrapState
+        lineWidth = options.width
+        maxY = @y + options.height
         width = @widthOfString.bind this
-        maxY = @y + maxHeight
+        indent = options.indent or 0
         
-        options.lineWidth = lineWidth
-        options.firstLine = true
-        options.firstParagraph = true
-        delete options.width
-        delete options.height
+        # initial settings
+        wrap.firstLine = true
+        wrap.firstParagraph = true
         
-        spaceLeft = lineWidth - (options.indent or 0)
+        # split the line into words
         words = text.match(WORD_RE)
-        lineHeight = @currentLineHeight(true)
+        
+        # space left on the line to fill with words
+        spaceLeft = lineWidth - (options.indent or 0)
+        
+        # word width cache
         wordWidths = {}
         len = words.length
         buffer = ''
         
         for word, i in words
             w = wordWidths[word] ?= width(word)
-
+            
             if w > spaceLeft or word is '\n'
-                if options.lastLine
-                    options.firstParagraph = false
-                    options.firstLine = true
-                    options.lastLine = false
+                # keep track of the wrapping state
+                if wrap.lastLine
+                    wrap.firstParagraph = false
+                    wrap.firstLine = true
+                    wrap.lastLine = false
                 
+                # if we've got a newline, mark it
                 if word is '\n'
-                    options.lastLine = true
+                    wrap.lastLine = true
+                    w += indent
                 
+                # render the line
                 lastLine = buffer.trim()
-                @text lastLine, options
+                @_line lastLine, options
                 
-                options.firstLine = false
+                # we're no longer on the first line...
+                wrap.firstLine = false
+                
+                # if we've reached the maximum height provided, don't render any more
                 return if @y > maxY
                 
+                # reset the space left and buffer
                 spaceLeft = lineWidth - w
                 buffer = if word is '\n' then '' else word
-                
+
             else
+                # add the word to the buffer
                 spaceLeft -= w
                 buffer += word
-        
+
         # add the last line
-        options.lastLine = true
-        @text buffer.trim(), options
+        wrap.lastLine = true
+        @_line buffer.trim(), options
         
-    moveDown: (lines = 1) ->
-        @y += @currentLineHeight(true) * lines + @_lineGap
-        return this
-        
-    moveUp: (lines = 1) ->
-        @y -= @currentLineHeight(true) * lines + @_lineGap
-        return this
-        
-    list: (array, @x, @y) ->
-        gap = Math.round (@_font.ascender / 1000 * @_fontSize) / 2
-        
-        for item in array
-            @circle x + 3, @y + gap + 3, 3
-            @text item, x + 15
-            @y += 3
-            
-        @fill()
+        # reset wrap state
+        @_wrapState = {}
