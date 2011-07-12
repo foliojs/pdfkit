@@ -41,7 +41,7 @@ doc.scale(0.6)
    .fill('red', 'even-odd') # fill using the even-odd winding rule
    .restore()
    
-lorumIpsum = '''
+loremIpsum = '''
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam in suscipit purus. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Vivamus nec hendrerit felis. Morbi aliquam facilisis risus eu lacinia. Sed eu leo in turpis fringilla hendrerit. Ut nec accumsan nisl. Suspendisse rhoncus nisl posuere tortor tempus et dapibus elit porta. Cras leo neque, elementum a rhoncus ut, vestibulum non nibh. Phasellus pretium justo turpis. Etiam vulputate, odio vitae tincidunt ultricies, eros odio dapibus nisi, ut tincidunt lacus arcu eu elit. Aenean velit erat, vehicula eget lacinia ut, dignissim non tellus. Aliquam nec lacus mi, sed vestibulum nunc. Suspendisse potenti. Curabitur vitae sem turpis. Vestibulum sed neque eget dolor dapibus porttitor at sit amet sem. Fusce a turpis lorem. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae;
 Mauris at ante tellus. Vestibulum a metus lectus. Praesent tempor purus a lacus blandit eget gravida ante hendrerit. Cras et eros metus. Sed commodo malesuada eros, vitae interdum augue semper quis. Fusce id magna nunc. Curabitur sollicitudin placerat semper. Cras et mi neque, a dignissim risus. Nulla venenatis porta lacus, vel rhoncus lectus tempor vitae. Duis sagittis venenatis rutrum. Curabitur tempor massa tortor.
 '''
@@ -50,7 +50,7 @@ Mauris at ante tellus. Vestibulum a metus lectus. Praesent tempor purus a lacus 
 doc.text('And here is some wrapped text...', 100, 300)
    .font('Helvetica', 13)
    .moveDown() # move down 1 line
-   .text(lorumIpsum, width: 412, align: 'justify', indent: 30, paragraphGap: 5)
+   .text(loremIpsum, width: 412, align: 'justify', indent: 30, paragraphGap: 5)
 
 # Add another page, and set the font back   
 doc.addPage()
