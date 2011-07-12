@@ -68,11 +68,22 @@ module.exports =
     quadraticCurveTo: (cpx, cpy, x, y) ->
         cpy = @page.height - cpy
         y = @page.height - y
-        @addContent "#{cpx} #{cpy} #{x} #{y} c"
+        @addContent "#{cpx} #{cpy} #{x} #{y} v"
         
     rect: (x, y, w, h) ->
         y = @page.height - y - h
         @addContent "#{x} #{y} #{w} #{h} re"
+        
+    roundedRect: (x, y, w, h, r = 0) ->
+        @moveTo x + r, y
+        @lineTo x + w - r, y
+        @quadraticCurveTo x + w, y, x + w, y + r
+        @lineTo x + w, y + h - r
+        @quadraticCurveTo x + w, y + h, x + w - r, y + h
+        @lineTo x + r, y + h
+        @quadraticCurveTo x, y + h, x, y + h - r
+        @lineTo x, y + r
+        @quadraticCurveTo x, y, x + r, y
         
     ellipse: (x, y, r1, r2 = r1) ->
         l1 = r1 * KAPPA
