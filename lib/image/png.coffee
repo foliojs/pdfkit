@@ -73,7 +73,7 @@ class PNG
                         when 1 then 'DeviceGray'
                         when 3 then 'DeviceRGB'
                     
-                    @imgData = new Buffer @imgData                        
+                    @imgData = new Buffer @imgData
                     return
                     
                 else
@@ -135,13 +135,14 @@ class PNG
             # Create a transparency SMask for the image based on the data 
             # in the PLTE and tRNS sections. See below for details on SMasks.
             @loadIndexedAlphaChannel()
-        
+            
         # For PNG color types 4 and 6, the transparency data is stored as a alpha
         # channel mixed in with the main image data. Separate this data out into an
         # SMask object store separately in the PDF.
         if @hasAlphaChannel
             @splitAlphaChannel()
-            
+            obj.data['Length'] = @imgData.length
+        
         if @alphaChannel
             sMask = document.ref
                 Type: 'XObject'
@@ -156,7 +157,8 @@ class PNG
                 
             sMask.add @alphaChannel
             obj.data['SMask'] = sMask
-
+        
+        # add the actual image data    
         obj.add @imgData
         return obj
         
@@ -197,6 +199,7 @@ class PNG
                     while i < scanlineLength
                         byte = data[pos++]
                         col = (i - (i % pixelBytes)) / pixelBytes
+                        left = if i < pixelBytes then 0 else rowData[i - pixelBytes]
                         upper = if row is 0 then 0 else pixels[row - 1][col][i % pixelBytes]
                         rowData[i++] = (byte + Math.floor((left + upper) / 2)) % 256
 
@@ -247,13 +250,13 @@ class PNG
         pixelCount = @width * @height
         imgData = new Buffer(pixelCount * colorByteSize)
         alphaChannel = new Buffer(pixelCount)
-
+        
         p = a = 0
         for row in pixels
             for pixel in row
                 imgData[p++] = pixel[i] for i in [0...colorByteSize]
                 alphaChannel[a++] = pixel[colorByteSize]
-
+        
         @imgData = zlib.deflate imgData
         @alphaChannel = zlib.deflate alphaChannel
         
