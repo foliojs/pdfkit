@@ -8,7 +8,6 @@ class PDFPage
         @size = options.size or "letter"
         @layout = options.layout or "portrait"
         
-        # fixed to portrait letter for now
         dimensions = if Array.isArray(@size) then @size else SIZES[@size.toUpperCase()]
         @width = dimensions[if @layout is 'portrait' then 0 else 1]
         @height = dimensions[if @layout is 'portrait' then 1 else 0]
