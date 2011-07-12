@@ -30,8 +30,8 @@ class PDFReference
         
     finalize: (compress = false) ->
         # cache the finalized stream
-        data = @stream.join '\n'
         if @stream
+            data = @stream.join '\n'
             if compress
                 compressedData = zlib.deflate new Buffer(data)
                 @finalizedStream = compressedData.toString 'binary'
