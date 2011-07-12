@@ -80,8 +80,8 @@ class PDFDocument
         @page.content.add str
         return this # make chaining possible
         
-    write: (filename) ->
-         fs.writeFile filename, @output(), 'binary'
+    write: (filename, callback) ->
+         fs.writeFile filename, @output(), 'binary', callback
         
     output: ->
        out = []
