@@ -138,7 +138,7 @@ class PNG
             
         # For PNG color types 4 and 6, the transparency data is stored as a alpha
         # channel mixed in with the main image data. Separate this data out into an
-        # SMask object store separately in the PDF.
+        # SMask object and store it separately in the PDF.
         if @hasAlphaChannel
             @splitAlphaChannel()
             obj.data['Length'] = @imgData.length
