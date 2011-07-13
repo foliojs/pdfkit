@@ -14,6 +14,7 @@ module.exports =
             fontSize: null
             mode: 0
             wordSpacing: 0
+            characterSpacing: 0
             
         # state of the wrapping algorithm
         @_wrapState = {}
@@ -32,6 +33,10 @@ module.exports =
         
         # add current font to page if necessary
         @page.fonts[@_font.id] ?= @_font.ref
+        
+        # if the wordSpacing option is specified, remove multiple consecutive spaces
+        if options.wordSpacing
+            text = text.replace(/\s+/g, ' ')
         
         # word wrapping
         if options.width
@@ -85,14 +90,17 @@ module.exports =
     _fragment: (text, x, y, options = {}) ->
         state = @_textState
         wrap = @_wrapState
-        align = options.align or 'left'
+        
+        # handle options
         text = '' + text
+        align = options.align or 'left'
         indent = (wrap.firstLine and options.indent) or 0
-        wordSpacing = 0
+        wordSpacing = options.wordSpacing or 0
+        characterSpacing = options.characterSpacing or 0
         
         # text alignments
         if options.width
-            lineWidth = options.width - indent
+            lineWidth = options.width - indent - wrap.extraSpace
             
             switch align
                 when 'right'
@@ -112,9 +120,6 @@ module.exports =
                     # calculate the word spacing value                
                     textWidth = @widthOfString text.replace(/\s+/g, '')
                     wordSpacing = (lineWidth - textWidth) / (words.length - 1) - @widthOfString(' ')
-                    
-                    # Remove double spaces
-                    text = text.replace(/\s+/g, ' ')
                     
         # indentation support
         x += indent
@@ -140,6 +145,9 @@ module.exports =
         
         # Word spacing
         @addContent wordSpacing + ' Tw' unless wordSpacing is state.wordSpacing
+        
+        # Character spacing
+        @addContent characterSpacing + ' Tc' unless characterSpacing is state.characterSpacing
         
         # add the actual text
         @addContent "(#{text}) Tj"
@@ -167,8 +175,12 @@ module.exports =
         # split the line into words
         words = text.match(WORD_RE)
         
+        # calculate the extra width
+        wrap.extraSpace = (options.wordSpacing or 0) * (words.length - 1) +   # wordSpacing
+                          (options.characterSpacing or 0) * (text.length - 1) # characterSpacing
+        
         # space left on the line to fill with words
-        spaceLeft = lineWidth - (options.indent or 0)
+        spaceLeft = lineWidth - indent - wrap.extraSpace
         
         # word width cache
         wordWidths = {}
@@ -201,7 +213,7 @@ module.exports =
                 return if @y > maxY
                 
                 # reset the space left and buffer
-                spaceLeft = lineWidth - w
+                spaceLeft = lineWidth - w - wrap.extraSpace
                 buffer = if word is '\n' then '' else word
 
             else
