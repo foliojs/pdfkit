@@ -10,13 +10,13 @@ class PDFObject
     @convert: (object) ->
         if Array.isArray object
             items = (PDFObject.convert e for e in object).join(' ')
-            return "[" + items + "]"
+            "[" + items + "]"
             
         else if typeof object is 'string'
-            return '/' + object
+            '/' + object
 
         else if object?.isString
-            return '(' + object + ')'
+            '(' + object + ')'
             
         else if object instanceof PDFReference
             return object.toString()
@@ -36,10 +36,10 @@ class PDFObject
                 out.push '/' + key + ' ' + PDFObject.convert(val)
                 
             out.push '>>'
-            return out.join '\n'
+            out.join '\n'
             
         else 
-            return '' + object
+            '' + object
             
     @s: (string) ->
         string = string.replace(/\\/g, '\\\\\\\\')
@@ -48,7 +48,7 @@ class PDFObject
             .replace(/&lt;/g, '<')
             .replace(/&gt;/g, '>')
             .replace(/&amp;/g, '&')
-    
+        
         isString: yes
         toString: -> string
         
