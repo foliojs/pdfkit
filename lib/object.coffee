@@ -19,7 +19,7 @@ class PDFObject
             '(' + object + ')'
             
         else if object instanceof PDFReference
-            return object.toString()
+            object.toString()
             
         else if object instanceof Date
             '(D:' + pad(object.getUTCFullYear(), 4) + 
