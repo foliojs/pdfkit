@@ -60,14 +60,17 @@ module.exports =
         @y -= @currentLineHeight(true) * lines + @_lineGap
         return this
 
-    list: (array, @x, @y) ->
+    list: (array, ox, oy) ->
         gap = Math.round (@_font.ascender / 1000 * @_fontSize) / 2
+        @x = x = ox or @x
+        @y = y = oy or @y
 
         for item in array
             @circle x + 3, @y + gap + 3, 3
             @text item, x + 15
             @y += 3
-
+            
+        @x = x
         @fill()
         
     _escape: (text) ->
