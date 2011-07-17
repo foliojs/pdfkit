@@ -10,7 +10,7 @@ class PDFObject
     @convert: (object) ->
         if Array.isArray object
             items = (PDFObject.convert e for e in object).join(' ')
-            "[" + items + "]"
+            '[' + items + ']'
             
         else if typeof object is 'string'
             '/' + object
