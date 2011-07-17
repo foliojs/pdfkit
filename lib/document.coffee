@@ -97,6 +97,10 @@ class PDFDocument
         for key, val of @info when typeof val is 'string'
             @info[key] = PDFObject.s val
         
+        # embed the subsetted fonts
+        for family, font of @_fontFamilies
+            font.embed()
+        
         # finalize each page
         for page in @pages
             page.finalize()

@@ -1,4 +1,5 @@
 Table = require '../table'
+Data = require '../../data'
 
 class MaxpTable extends Table
     parse: (data) ->
@@ -19,5 +20,26 @@ class MaxpTable extends Table
         @maxSizeOfInstructions = data.readUInt16()
         @maxComponentElements = data.readUInt16()
         @maxComponentDepth = data.readUInt16()
+        
+    encode: (ids) ->
+        table = new Data
+        
+        table.writeInt @version
+        table.writeUInt16 ids.length # numGlyphs
+        table.writeUInt16 @maxPoints
+        table.writeUInt16 @maxContours
+        table.writeUInt16 @maxCompositePoints
+        table.writeUInt16 @maxComponentContours
+        table.writeUInt16 @maxZones
+        table.writeUInt16 @maxTwilightPoints
+        table.writeUInt16 @maxStorage
+        table.writeUInt16 @maxFunctionDefs
+        table.writeUInt16 @maxInstructionDefs
+        table.writeUInt16 @maxStackElements
+        table.writeUInt16 @maxSizeOfInstructions
+        table.writeUInt16 @maxComponentElements
+        table.writeUInt16 @maxComponentDepth
+        
+        return table.data
         
 module.exports = MaxpTable

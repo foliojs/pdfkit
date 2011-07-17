@@ -1,4 +1,5 @@
 Table = require '../table'
+Data = require '../../data'
 
 class HmtxTable extends Table
     parse: (data) ->
@@ -17,4 +18,20 @@ class HmtxTable extends Table
         last = @widths[@widths.length - 1]
         @widths.push(last) for i in [0...lsbCount]
         
+    forGlyph: (id) ->
+        return @metrics[id] if id of @metrics
+        metrics = 
+            advance: @metrics[@metrics.length - 1].advance
+            lsb: @leftSideBearings[id - @metrics.length]
+        
+    encode: (mapping) ->
+        table = new Data
+        for id in mapping
+            metric = @forGlyph id
+            table.writeUInt16 metric.advance
+            table.writeUInt16 metric.lsb
+            
+        return table.data
+        
+             
 module.exports = HmtxTable

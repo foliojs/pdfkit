@@ -34,6 +34,9 @@ module.exports =
         # add current font to page if necessary
         @page.fonts[@_font.id] ?= @_font.ref
         
+        # tell the font subset to use the characters
+        @_font.use text
+        
         # if the wordSpacing option is specified, remove multiple consecutive spaces
         if options.wordSpacing
             text = text.replace(/\s+/g, ' ')
@@ -130,7 +133,8 @@ module.exports =
         # flip coordinate system
         y = @page.height - y - (@_font.ascender / 1000 * @_fontSize)
         
-        # escape the text for inclusion in PDF
+        # encode and escape the text for inclusion in PDF
+        text = @_font.encode text
         text = @_escape text
         
         # begin the text object

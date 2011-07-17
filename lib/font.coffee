@@ -5,6 +5,7 @@ By Devon Govett
 
 TTFFont = require './font/ttf'
 AFMFont = require './font/afm'
+Subset = require './font/subset'
 zlib = require 'zlib'
 
 class PDFFont
@@ -14,20 +15,29 @@ class PDFFont
             
         else if /\.(ttf|ttc)$/i.test @filename
             @ttf = TTFFont.open @filename, @family
-            @embedTTF()
+            @subset = new Subset @ttf
+            @registerTTF()
             
         else if /\.dfont$/i.test @filename
             @ttf = TTFFont.fromDFont @filename, @family
-            @embedTTF()
+            @subset = new Subset @ttf
+            @registerTTF()
             
         else
             throw new Error 'Not a supported font format or standard PDF font.'
             
-    embedTTF: ->
+    use: (characters) ->
+        @subset?.use characters
+        
+    embed: ->
+        @embedTTF() unless @isAFM
+        
+    encode: (text) ->
+        @subset?.encodeText(text) or text
+        
+    registerTTF: ->
         @scaleFactor = 1000.0 / @ttf.head.unitsPerEm
         @bbox = (Math.round e * @scaleFactor for e in @ttf.bbox)
-        
-        @basename = @ttf.name.postscriptName
         @stemV = 0 # not sure how to compute this for true-type fonts...
         
         if @ttf.post.exists
@@ -62,8 +72,14 @@ class PDFFont
 
         @hmtx = @ttf.hmtx
         @charWidths = (Math.round @hmtx.widths[gid] * @scaleFactor for i, gid of @cmap.codeMap when i >= 32)
-
-        data = @ttf.rawData
+        
+        # Create a placeholder reference to be filled in embedTTF.
+        @ref = @document.ref
+            Type: 'Font'
+            Subtype: 'TrueType'
+            
+    embedTTF: ->
+        data = @subset.encode()
         compressedData = zlib.deflate(data)
         
         @fontfile = @document.ref
@@ -73,9 +89,13 @@ class PDFFont
             
         @fontfile.add compressedData
         
+        cmap = @subset.cmap
+        widths = @subset.charWidths
+        charWidths = (Math.round widths[gid] * @scaleFactor for gid, i in cmap when i >= 32)
+        
         @descriptor = @document.ref
             Type: 'FontDescriptor'
-            FontName: @basename
+            FontName: @subset.postscriptName
             FontFile2: @fontfile
             FontBBox: @bbox
             Flags: @flags
@@ -86,15 +106,18 @@ class PDFFont
             CapHeight: @capHeight
             XHeight: @xHeight
             
-        @ref = @document.ref
+        ref = 
             Type: 'Font'
-            BaseFont: @basename
+            BaseFont: @subset.postscriptName
             Subtype: 'TrueType'
             FontDescriptor: @descriptor
             FirstChar: 32
             LastChar: 255
-            Widths: @document.ref @charWidths
+            Widths: @document.ref charWidths
             Encoding: 'MacRomanEncoding'
+            
+        for key, val of ref
+            @ref.data[key] = val
             
     embedStandard: ->
         @isAFM = true

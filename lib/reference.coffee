@@ -33,7 +33,10 @@ class PDFReference
         if @stream
             data = @stream.join '\n'
             if compress
-                compressedData = zlib.deflate new Buffer(data)
+                # create a byte array instead of passing a string to the Buffer
+                # fixes a weird unicode bug.
+                data = new Buffer(data.charCodeAt(i) for i in [0...data.length])
+                compressedData = zlib.deflate(data)
                 @finalizedStream = compressedData.toString 'binary'
             else
                 @finalizedStream = data

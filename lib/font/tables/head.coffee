@@ -1,4 +1,5 @@
 Table = require '../table'
+Data = require '../../data'
 
 class HeadTable extends Table
     parse: (data) ->
@@ -22,5 +23,29 @@ class HeadTable extends Table
         @fontDirectionHint = data.readShort()
         @indexToLocFormat = data.readShort()
         @glyphDataFormat = data.readShort()
+    
+    encode: (loca) ->
+        table = new Data
+        
+        table.writeInt @version
+        table.writeInt @revision
+        table.writeInt @checkSumAdjustment
+        table.writeInt @magicNumber
+        table.writeShort @flags
+        table.writeShort @unitsPerEm
+        table.writeLongLong @created
+        table.writeLongLong @modified
+        
+        table.writeShort @xMin
+        table.writeShort @yMin
+        table.writeShort @xMax
+        table.writeShort @yMax
+        table.writeShort @macStyle
+        table.writeShort @lowestRecPPEM
+        table.writeShort @fontDirectionHint
+        table.writeShort loca.type
+        table.writeShort @glyphDataFormat
+        
+        return table.data
         
 module.exports = HeadTable

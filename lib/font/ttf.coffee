@@ -11,6 +11,8 @@ HheaTable = require './tables/hhea'
 MaxpTable = require './tables/maxp'
 PostTable = require './tables/post'
 OS2Table  = require './tables/os2'
+LocaTable = require './tables/loca'
+GlyfTable = require './tables/glyf'
 
 class TTFFont
     @open: (filename, name) ->
@@ -56,7 +58,8 @@ class TTFFont
         @hmtx = new HmtxTable(this)
         @post = new PostTable(this)
         @os2  = new OS2Table(this)
-        #kern, loca, glyf, etc.
+        @loca = new LocaTable(this)
+        @glyf = new GlyfTable(this)
         
         @ascender = (@os2.exists and @os2.ascender) or @hhea.ascender
         @decender = (@os2.exists and @os2.decender) or @hhea.decender

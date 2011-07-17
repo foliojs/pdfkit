@@ -1,10 +1,13 @@
 class Data    
-    constructor: (@data) ->
+    constructor: (@data = []) ->
         @pos = 0
         @length = @data.length
                 
     readByte: ->
         @data[@pos++]
+        
+    writeByte: (byte) ->
+        @data[@pos++] = byte
         
     byteAt: (index) ->
         @data[index]
@@ -12,61 +15,46 @@ class Data
     readBool: ->
         return !!@readByte()
         
+    writeBool: (val) ->
+        @writeByte if val then 1 else 0
+        
     readUInt32: ->
         b1 = @readByte() << 24
         b2 = @readByte() << 16
         b3 = @readByte() << 8
         b4 = @readByte()
         b1 | b2 | b3 | b4
+    
+    writeUInt32: (val) ->
+        @writeByte (val >>> 24) & 0xff
+        @writeByte (val >> 16) & 0xff
+        @writeByte (val >> 8) & 0xff
+        @writeByte val & 0xff
         
     readInt32: ->
         int = @readUInt32()
-        if int >= 2147483648 then int - 4294967296 else int
+        if int >= 0x80000000 then int - 0x100000000 else int
+        
+    writeInt32: (val) ->
+        val += 0x100000000 if val < 0
+        @writeUInt32 val
         
     readUInt16: ->
         b1 = @readByte() << 8
         b2 = @readByte()
         b1 | b2
         
+    writeUInt16: (val) ->
+        @writeByte (val >> 8) & 0xff
+        @writeByte val & 0xff
+        
     readInt16: ->
         int = @readUInt16()
-        if int >= 32768 then int - 65536 else int
+        if int >= 0x8000 then int - 0x10000 else int
         
-    readFloat32: ->
-        b1 = @readByte()
-        b2 = @readByte()
-        b3 = @readByte()
-        b4 = @readByte()
-        
-        sign = 1 - ((b1 >> 7) << 1) # sign = bit 0
-        exp = (((b1 << 1) & 0xFF) | (b2 >> 7)) - 127 # exponent = bits 1..8
-        sig = ((b2 & 0x7F) << 16) | (b3 << 8) | 4 # significand = bits 9..31
-        
-        return 0.0 if sig is 0 and exp is -127
-        return sign * (1 + 2e-23 * sig) * Math.pow(2, exp)
-        
-    readFloat64: ->
-        b1 = @readByte()
-        b2 = @readByte()
-        b3 = @readByte()
-        b4 = @readByte()
-        b5 = @readByte()
-        b6 = @readByte()
-        b7 = @readByte()
-        b8 = @readByte()
-        
-        sign = 1 - ((b1 >> 7) << 1) # sign = bit 0
-        exp = (((b1 << 4) & 0x7FF) | (b2 >> 4)) - 0123 # exponent = bits 1..11
-         
-        # This crazy toString() stuff works around the fact that js ints are
-        # only 32 bits and signed, giving us 31 bits to work with
-        sig = (((b2 & 0xF) << 16) | (b3 << 8) | b4).toString(2) +
-                (if b5 >> 7 then '1' else '0') + 
-                (((b5 & 0x7F) << 24) | (b6 << 16) | (b7 << 8) | b8).toString(2) # significand = bits 12..63
-                
-        sig = parseInt(sig, 2)
-        return 0.0 if sig is 0 and exp is -1023
-        return sign * (1.0 + 2e-52 * sig) * Math.pow(2, exp)
+    writeInt16: (val) ->
+        val += 0x10000 if val < 0
+        @writeUInt16 val
         
     readString: (length) ->
         ret = []
@@ -75,22 +63,19 @@ class Data
             
         return ret.join ''
         
+    writeString: (val) ->
+        for i in [0...val.length]
+            @writeByte val.charCodeAt(i)
+        
     stringAt: (@pos, length) ->
         @readString length
         
     readShort: ->
         @readInt16()
         
-    readLong: ->
-        b1 = @readByte()
-        b2 = @readByte()
-        b3 = @readByte()
-        b4 = @readByte()
-        
-        long = (((((b1 << 8) + b2) << 8) + b3) << 8) + b4
-        long += 4294967296 if long < 0
-        return long
-        
+    writeShort: (val) ->
+        @writeInt16 val
+    
     readLongLong: ->
         b1 = @readByte()
         b2 = @readByte()
@@ -100,16 +85,43 @@ class Data
         b6 = @readByte()
         b7 = @readByte()
         b8 = @readByte()
-        b1 << 56 + b2 << 48 + b3 << 40 | b4 << 32 + b5 << 24 + b6 << 16 + b7 << 8 + b8
+        
+        if b1 & 0x80 # sign -> avoid overflow
+            return ((b1 ^ 0xff) * 0x100000000000000 +
+                    (b2 ^ 0xff) *   0x1000000000000 +
+                    (b3 ^ 0xff) *     0x10000000000 +
+                    (b4 ^ 0xff) *       0x100000000 +
+                    (b5 ^ 0xff) *         0x1000000 +
+                    (b6 ^ 0xff) *           0x10000 +
+                    (b7 ^ 0xff) *             0x100 +
+                    (b8 ^ 0xff) + 1) * -1
+                    
+        return b1 * 0x100000000000000 +
+               b2 *   0x1000000000000 +
+               b3 *     0x10000000000 +
+               b4 *       0x100000000 +
+               b5 *         0x1000000 +
+               b6 *           0x10000 +
+               b7 *             0x100 +
+               b8
+        
+    writeLongLong: (val) ->
+        high = Math.floor(val / 0x100000000)
+        low = val & 0xffffffff
+        @writeByte (high >> 24) & 0xff
+        @writeByte (high >> 16) & 0xff
+        @writeByte (high >> 8) & 0xff
+        @writeByte high & 0xff
+        @writeByte (low >> 24) & 0xff
+        @writeByte (low >> 16) & 0xff
+        @writeByte (low >> 8) & 0xff
+        @writeByte low & 0xff
         
     readInt: ->
         @readInt32()
         
-    readFloat: ->
-        @readFloat32()
-        
-    readDouble: ->
-        @readFloat64()
+    writeInt: (val) ->
+        @writeInt32 val
         
     slice: (start, end) ->
         @data.slice start, end
@@ -120,5 +132,9 @@ class Data
             buf.push @readByte()
             
         return buf
+        
+    write: (bytes) ->
+        for byte in bytes
+            @writeByte byte
         
 module.exports = Data

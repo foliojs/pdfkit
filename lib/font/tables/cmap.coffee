@@ -1,4 +1,5 @@
 Table = require '../table'
+Data = require '../../data'
 
 class CmapTable extends Table
     parse: (data) ->
@@ -15,6 +16,16 @@ class CmapTable extends Table
             @unicode ?= entry if entry.isUnicode
             
         return true
+        
+    @encode: (charmap, encoding = 0) ->
+        result = CmapEntry.encode(charmap, encoding)
+        table = new Data
+        
+        table.writeUInt16 0 # version
+        table.writeUInt16 1 # tableCount
+        
+        result.table = table.data.concat(result.subtable)
+        return result
             
 class CmapEntry
     constructor: (data, offset) ->
@@ -32,7 +43,8 @@ class CmapEntry
         @codeMap = {}
         switch @format
             when 0
-                @codeMap[i] = data.readByte() for i in [0...256]
+                for i in [0...256]
+                    @codeMap[i] = data.readByte()
             
             when 4
                 segCountX2 = data.readUInt16()
@@ -60,5 +72,39 @@ class CmapEntry
                             glyphId += idDelta[i] if glyphId isnt 0
                             
                         @codeMap[code] = glyphId & 0xFFFF
+                        
+    @encode: (charmap, format) ->
+        subtable = new Data
+        switch format
+            when 0 # Mac Roman
+                id = 0
+                indexes = (0 for i in [0...256])
+                map = { 0: 0 }
+                codeMap = {}
+                
+                for code in Object.keys(charmap).sort()
+                    map[charmap[code]] ?= ++id
+                    codeMap[code] = 
+                        old: charmap[code]
+                        new: map[charmap[code]]
+                        
+                    indexes[code] = map[charmap[code]]
+                    
+                subtable.writeUInt16 1   # platformID
+                subtable.writeUInt16 0   # encodingID
+                subtable.writeUInt32 12  # offset
+                subtable.writeUInt16 0   # format
+                subtable.writeUInt16 262 # length
+                subtable.writeUInt16 0   # language
+                subtable.write indexes   # glyph indexes
+                
+                result = 
+                    charMap: codeMap
+                    indexes: indexes
+                    subtable: subtable.data
+                    maxGlyphID: id + 1
+                
+            when 4 # Unicode - TODO: implement
+                return
         
 module.exports = CmapTable
