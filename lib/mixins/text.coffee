@@ -140,7 +140,7 @@ module.exports =
         @addContent "#{x} #{y} Td"
         
         # font and font size
-        @addContent "/#{@_font.id} #{@_fontSize} Tf"# unless @_font is state.font and @_fontSize is state.fontSize
+        @addContent "/#{@_font.id} #{@_fontSize} Tf"
         
         # rendering mode
         mode = if options.fill and options.stroke then 2 else if options.stroke then 1 else 0
@@ -159,8 +159,6 @@ module.exports =
         @addContent "ET"
         
         # keep track of text states
-        state.font = @_font
-        state.fontSize = @_fontSize
         state.mode = mode
         state.wordSpacing = wordSpacing
 
