@@ -88,11 +88,7 @@ class PDFFont
             Filter: 'FlateDecode'
             
         @fontfile.add compressedData
-        
-        cmap = @subset.cmap
-        widths = @subset.charWidths
-        charWidths = (Math.round widths[gid] * @scaleFactor for gid, i in cmap when i >= 32)
-        
+                
         @descriptor = @document.ref
             Type: 'FontDescriptor'
             FontName: @subset.postscriptName
@@ -105,14 +101,18 @@ class PDFFont
             Descent: @decender
             CapHeight: @capHeight
             XHeight: @xHeight
+                
+        firstChar = +Object.keys(@subset.cmap)[0]
+        charWidths = for code, glyph of @subset.cmap
+            Math.round @ttf.hmtx.forGlyph(glyph).advance * @scaleFactor
             
         ref = 
             Type: 'Font'
             BaseFont: @subset.postscriptName
             Subtype: 'TrueType'
             FontDescriptor: @descriptor
-            FirstChar: 32
-            LastChar: 255
+            FirstChar: firstChar
+            LastChar: firstChar + charWidths.length - 1
             Widths: @document.ref charWidths
             Encoding: 'MacRomanEncoding'
             

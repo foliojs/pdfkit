@@ -1,30 +1,37 @@
 CmapTable = require './tables/cmap'
-MacRoman = require './macroman'
 utils = require './utils'
 
 class Subset
     constructor: (@font) ->
         @subset = {}
+        @unicodes = {}
+        @next = 33 # PDFs don't like character codes between 0 and 32
         
     use: (character) ->
         # if given a string, add each character
         if typeof character is 'string'
             for i in [0...character.length]
                 @use character.charCodeAt(i)
-        else
-            @subset[MacRoman.FROM_UNICODE[character]] = character
+                
+            return
+
+        if not @unicodes[character]
+            @subset[@next] = character
+            @unicodes[character] = @next++
         
     encodeText: (text) ->
+        # encodes UTF-8 text for this subset. Returned 
+        # text may not look correct, but it is.
         string = ''
         for i in [0...text.length]
-            char = MacRoman.FROM_UNICODE[text.charCodeAt(i)]
+            char = @unicodes[text.charCodeAt(i)]
             string += String.fromCharCode(char)
             
         return string
         
     cmap: ->
         # generate the cmap table for this subset
-        unicodeCmap = @font.cmap.unicode.codeMap
+        unicodeCmap = @font.cmap.tables[0].codeMap
         mapping = {}
         for roman, unicode of @subset
             mapping[roman] = unicodeCmap[unicode]
@@ -33,7 +40,7 @@ class Subset
         
     glyphIDs: ->
         # collect glyph ids for this subset
-        unicodeCmap = @font.cmap.unicode.codeMap
+        unicodeCmap = @font.cmap.tables[0].codeMap
         ret = [0]
         for roman, unicode of @subset
             val = unicodeCmap[unicode]
@@ -60,7 +67,7 @@ class Subset
         
     encode: ->
         # generate the Cmap for this subset
-        cmap = CmapTable.encode @cmap()
+        cmap = CmapTable.encode @cmap(), 'unicode'
         glyphs = @glyphsFor @glyphIDs()
                 
         # compute old2new and new2old mapping tables
@@ -82,9 +89,10 @@ class Subset
         name = @font.name.encode()
         
         # store for use later
-        @cmap = cmap.indexes
         @postscriptName = name.postscriptName
-        @charWidths = (@font.hmtx.forGlyph(id).advance for id in oldIDs)
+        @cmap = {}
+        for code, ids of cmap.charMap
+            @cmap[code] = ids.old
         
         tables =
             cmap: cmap.table

@@ -17,7 +17,7 @@ class CmapTable extends Table
             
         return true
         
-    @encode: (charmap, encoding = 0) ->
+    @encode: (charmap, encoding = 'macroman') ->
         result = CmapEntry.encode(charmap, encoding)
         table = new Data
         
@@ -73,16 +73,18 @@ class CmapEntry
                             
                         @codeMap[code] = glyphId & 0xFFFF
                         
-    @encode: (charmap, format) ->
+    @encode: (charmap, encoding) ->
         subtable = new Data
-        switch format
-            when 0 # Mac Roman
+        codes = Object.keys(charmap).sort (a, b) -> a - b
+        
+        switch encoding
+            when 'macroman'
                 id = 0
                 indexes = (0 for i in [0...256])
                 map = { 0: 0 }
                 codeMap = {}
                 
-                for code in Object.keys(charmap).sort()
+                for code in codes
                     map[charmap[code]] ?= ++id
                     codeMap[code] = 
                         old: charmap[code]
@@ -100,11 +102,88 @@ class CmapEntry
                 
                 result = 
                     charMap: codeMap
-                    indexes: indexes
                     subtable: subtable.data
                     maxGlyphID: id + 1
                 
-            when 4 # Unicode - TODO: implement
-                return
+            when 'unicode'
+                startCodes = []
+                endCodes = []
+                nextID = 0
+                map = {}
+                charMap = {}
+                last = diff = null
+                
+                for code in codes
+                    old = charmap[code]
+                    map[old] ?= ++nextID
+                    charMap[code] = 
+                        old: old
+                        new: map[old]
+                    
+                    delta = map[old] - code
+                    if not last? or delta isnt diff
+                        endCodes.push last if last
+                        startCodes.push code
+                        diff = delta
+
+                    last = code
+                    
+                endCodes.push last if last
+                endCodes.push 0xFFFF
+                startCodes.push 0xFFFF
+                
+                segCount = startCodes.length
+                segCountX2 = segCount * 2
+                searchRange = 2 * Math.pow(Math.log(segCount) / Math.LN2, 2)
+                entrySelector = Math.log(searchRange / 2) / Math.LN2
+                rangeShift = 2 * segCount - searchRange
+                
+                deltas = []
+                rangeOffsets = []
+                glyphIDs = []
+                
+                for startCode, i in startCodes
+                    endCode = endCodes[i]
+                    
+                    if startCode is 0xFFFF
+                        deltas.push 0
+                        rangeOffsets.push 0
+                        break
+                        
+                    startGlyph = charMap[startCode].new
+                    if startCode - startGlyph >= 0x8000
+                        deltas.push 0
+                        rangeOffsets.push 2 * (glyphIDs.length + segCount - i)
+                        
+                        for code in [startCode..endCode]
+                            glyphIDs.push charMap[code].new
+                            
+                    else
+                        deltas.push startGlyph - startCode
+                        rangeOffsets.push 0
+                                                
+                subtable.writeUInt16 3  # platformID
+                subtable.writeUInt16 1  # encodingID
+                subtable.writeUInt32 12 # offset
+                subtable.writeUInt16 4  # format
+                subtable.writeUInt16 16 + segCount * 8 + glyphIDs.length * 2 # length
+                subtable.writeUInt16 0  # language
+                subtable.writeUInt16 segCountX2
+                subtable.writeUInt16 searchRange
+                subtable.writeUInt16 entrySelector
+                subtable.writeUInt16 rangeShift
+                
+                subtable.writeUInt16 code for code in endCodes
+                subtable.writeUInt16 0  # reserved value
+                subtable.writeUInt16 code for code in startCodes
+                
+                subtable.writeUInt16 delta for delta in deltas
+                subtable.writeUInt16 offset for offset in rangeOffsets
+                subtable.writeUInt16 id for id in glyphIDs
+                
+                result = 
+                    charMap: charMap
+                    subtable: subtable.data
+                    maxGlyphID: nextID + 1
         
 module.exports = CmapTable
