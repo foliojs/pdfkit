@@ -106,6 +106,11 @@ class PDFFont
         charWidths = for code, glyph of @subset.cmap
             Math.round @ttf.hmtx.forGlyph(glyph).advance * @scaleFactor
             
+        
+        cmap = @document.ref()
+        cmap.add toUnicodeCmap(@subset.subset)
+        cmap.finalize(true) # compress it
+            
         ref = 
             Type: 'Font'
             BaseFont: @subset.postscriptName
@@ -115,10 +120,47 @@ class PDFFont
             LastChar: firstChar + charWidths.length - 1
             Widths: @document.ref charWidths
             Encoding: 'MacRomanEncoding'
+            ToUnicode: cmap
             
         for key, val of ref
             @ref.data[key] = val
             
+    toUnicodeCmap = (map) ->
+        unicodeMap = '''
+            /CIDInit /ProcSet findresource begin
+            12 dict begin
+            begincmap
+            /CIDSystemInfo <<
+              /Registry (Adobe)
+              /Ordering (UCS)
+              /Supplement 0
+            >> def
+            /CMapName /Adobe-Identity-UCS def
+            /CMapType 2 def
+            1 begincodespacerange
+            <00><ff>
+            endcodespacerange
+        '''
+    
+        codes = Object.keys(map).sort (a, b) -> a - b
+        range = []
+        for code in codes
+            if range.length >= 100
+                unicodeMap += "\n#{range.length} beginbfchar\n#{range.join('\n')}\nendbfchar"
+                range = []
+                
+            unicode = ('0000' + map[code].toString(16)).slice(-4)
+            code = (+code).toString(16)
+            range.push "<#{code}><#{unicode}>"
+            
+        unicodeMap += "\n#{range.length} beginbfchar\n#{range.join('\n')}\nendbfchar\n" if range.length
+        unicodeMap += '''
+            endcmap
+            CMapName currentdict /CMap defineresource pop
+            end
+            end
+        '''
+                    
     embedStandard: ->
         @isAFM = true
         font = AFMFont.open __dirname + "/font/data/#{@filename}.afm"

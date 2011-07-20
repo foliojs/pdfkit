@@ -13,10 +13,7 @@ class PDFPage
         @height = dimensions[if @layout is 'portrait' then 1 else 0]
         
         # A reference to the content of this page
-        @content = @document.ref
-            Length: 0
-        
-        @content.data['Filter'] = 'FlateDecode' if @document.compress
+        @content = @document.ref()        
                     
         # The page dictionary
         @dictionary = @document.ref
@@ -44,7 +41,7 @@ class PDFPage
                 get: => @dictionary.data['Annots'] ?= []
         
     finalize: ->
-        @content.data['Length'] = @content.finalize(@document.compress).length
+        @content.finalize(@document.compress)
         
     SIZES =
         '4A0': [4767.87, 6740.79]

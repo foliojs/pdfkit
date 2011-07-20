@@ -6,17 +6,17 @@ By Devon Govett
 zlib = require 'zlib'
 
 class PDFReference
-    constructor: (@id, @data) ->
+    constructor: (@id, @data = {}) ->
         @gen = 0
         @stream = null
         @finalizedStream = null
         
     object: ->
+        @finalize() if not @finalizedStream
         out = ["#{@id} #{@gen} obj"]
         out.push PDFObject.convert(@data)
         
         if @stream
-            @finalize() if not @finalizedStream
             out.push "stream"
             out.push @finalizedStream
             out.push "endstream"
@@ -38,6 +38,9 @@ class PDFReference
                 data = new Buffer(data.charCodeAt(i) for i in [0...data.length])
                 compressedData = zlib.deflate(data)
                 @finalizedStream = compressedData.toString 'binary'
+                
+                @data.Filter = 'FlateDecode'
+                @data.Length ?= @finalizedStream.length
             else
                 @finalizedStream = data
         else
