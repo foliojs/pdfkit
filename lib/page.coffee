@@ -8,6 +8,18 @@ class PDFPage
         @size = options.size or "letter"
         @layout = options.layout or "portrait"
         
+        # if margin was passed as a single number
+        if typeof options.margin is 'number'
+            @margins = 
+                top: options.margin
+                left: options.margin
+                bottom: options.margin
+                right: options.margin
+        
+        # default to 1 inch margins
+        else
+            @margins = options.margins or DEFAULT_MARGINS
+        
         dimensions = if Array.isArray(@size) then @size else SIZES[@size.toUpperCase()]
         @width = dimensions[if @layout is 'portrait' then 0 else 1]
         @height = dimensions[if @layout is 'portrait' then 1 else 0]
@@ -42,6 +54,12 @@ class PDFPage
         
     finalize: ->
         @content.finalize(@document.compress)
+        
+    DEFAULT_MARGINS = 
+        top: 72
+        left: 72
+        bottom: 72
+        right: 72
         
     SIZES =
         '4A0': [4767.87, 6740.79]

@@ -24,10 +24,17 @@ module.exports =
         if typeof x is 'object'
             options = x
             x = null
+            
+        # Update the current position
+        if x? and y?
+            @x = x
+            @y = y
         
-        # Update the current position    
-        @x = x or @x
-        @y = y or @y
+        # wrap to margins if no x or y position passed
+        else
+            margins = @page.margins
+            options.width = @page.width - margins.left - margins.right
+            options.height = @page.height - margins.top - margins.bottom
         
         # add current font to page if necessary
         @page.fonts[@_font.id] ?= @_font.ref

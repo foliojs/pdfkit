@@ -68,8 +68,8 @@ class PDFDocument
         @pages.push @page
         
         # reset x and y coordinates
-        @x = 0
-        @y = 0
+        @x = @page.margins.left
+        @y = @page.margins.top
         
         return this
         
