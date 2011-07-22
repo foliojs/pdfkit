@@ -51,6 +51,9 @@ class PDFPage
                 get: => @resources['ExtGState'] ?= {}
             annotations:
                 get: => @dictionary.data['Annots'] ?= []
+                
+    maxY: ->
+        @height - @margins.top - @margins.bottom
         
     finalize: ->
         @content.finalize(@document.compress)

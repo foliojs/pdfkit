@@ -26,21 +26,15 @@ module.exports =
             x = null
             
         # Update the current position
-        if x? and y?
-            @x = x
-            @y = y
+        if x? or y?
+            @x = x or @x
+            @y = y or @y
         
         # wrap to margins if no x or y position passed
         else
             margins = @page.margins
-            options.width = @page.width - margins.left - margins.right
-            options.height = @page.height - margins.top - margins.bottom
-        
-        # add current font to page if necessary
-        @page.fonts[@_font.id] ?= @_font.ref
-        
-        # tell the font subset to use the characters
-        @_font.use text
+            options.width ?= @page.width - @x - margins.right
+            options.height ?= @page.height - @y - margins.bottom
         
         # if the wordSpacing option is specified, remove multiple consecutive spaces
         if options.wordSpacing
@@ -99,11 +93,13 @@ module.exports =
         @y += @currentLineHeight(true) + lineGap + paragraphGap
             
     _fragment: (text, x, y, options = {}) ->
+        text = '' + text
+        return if text.length is 0
+        
         state = @_textState
         wrap = @_wrapState
         
         # handle options
-        text = '' + text
         align = options.align or 'left'
         indent = (wrap.firstLine and options.indent) or 0
         wordSpacing = options.wordSpacing or 0
@@ -137,6 +133,12 @@ module.exports =
         
         # flip coordinate system
         y = @page.height - y - (@_font.ascender / 1000 * @_fontSize)
+        
+        # add current font to page if necessary
+        @page.fonts[@_font.id] ?= @_font.ref
+        
+        # tell the font subset to use the characters
+        @_font.use text
         
         # encode and escape the text for inclusion in PDF
         text = @_font.encode text
@@ -174,7 +176,7 @@ module.exports =
     _wrap: (text, options) ->
         wrap = @_wrapState
         lineWidth = options.width
-        maxY = @y + options.height
+        maxY = @y + options.height - @currentLineHeight()
         width = @widthOfString.bind this
         indent = options.indent or 0
         
@@ -219,8 +221,14 @@ module.exports =
                 # we're no longer on the first line...
                 wrap.firstLine = false
                 
-                # if we've reached the maximum height provided, don't render any more
-                return if @y > maxY
+                # if we've reached the maximum height provided
+                if @y > maxY
+                    return unless @y >= @page.maxY()
+                    
+                    # if we've reached the edge of the page, 
+                    # continue on a new page
+                    @addPage()
+                    maxY = @page.maxY()
                 
                 # reset the space left and buffer
                 spaceLeft = lineWidth - w - wrap.extraSpace
