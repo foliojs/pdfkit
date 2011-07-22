@@ -221,8 +221,10 @@ module.exports =
                 # we're no longer on the first line...
                 wrap.firstLine = false
                 
-                # if we've reached the maximum height provided
-                if @y > maxY
+                # if we've reached the maximum height and make sure
+                # that the first line of a paragraph is never by itself
+                # at the bottom of a page
+                if @y > maxY or (wrap.lastLine and @y + @currentLineHeight(true) > maxY)
                     return unless @y >= @page.maxY()
                     
                     # if we've reached the edge of the page, 
