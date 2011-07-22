@@ -10,8 +10,6 @@ module.exports =
         
         # Keeps track of what has been set in the document
         @_textState = 
-            font: null
-            fontSize: null
             mode: 0
             wordSpacing: 0
             characterSpacing: 0
@@ -28,8 +26,8 @@ module.exports =
             x = null
         
         # Update the current position    
-        @x = x or options.x or @x
-        @y = y or options.y or @y
+        @x = x or @x
+        @y = y or @y
         
         # add current font to page if necessary
         @page.fonts[@_font.id] ?= @_font.ref
