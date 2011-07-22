@@ -90,7 +90,7 @@ module.exports =
             
     _line: (text, options) ->
         wrap = @_wrapState
-        paragraphGap = (wrap.firstLine and not wrap.firstParagraph and options.paragraphGap) or 0
+        paragraphGap = (wrap.firstLine and @y isnt wrap.startY and options.paragraphGap) or 0
         lineGap = options.lineGap or @_lineGap or 0
         
         @_fragment text, @x, @y + paragraphGap, options
@@ -189,7 +189,6 @@ module.exports =
         wrap.startY = @y            # the initial Y position
         wrap.lineWidth = lineWidth  # the maximum width of each line
         wrap.firstLine = true       # whether we are on the first line of a paragraph
-        wrap.firstParagraph = true  # whether we are on the first paragraph of a page or column
         
         # split the line into words
         words = text.match(WORD_RE)
@@ -212,7 +211,6 @@ module.exports =
             if w > spaceLeft or word is '\n'
                 # keep track of the wrapping state
                 if wrap.lastLine
-                    wrap.firstParagraph = false
                     wrap.firstLine = true
                     wrap.lastLine = false
                 
@@ -233,7 +231,7 @@ module.exports =
                 # itself at the bottom of a page
                 nextY = @y + @currentLineHeight(true)
                 if @y > maxY or (wrap.lastLine and nextY > maxY)
-                    return unless nextY >= @page.maxY()
+                    return unless maxY + @currentLineHeight() is @page.maxY()
                     
                     # if we've reached the edge of the page, 
                     # continue on a new page or column
@@ -257,7 +255,6 @@ module.exports =
         
     _nextSection: (options) ->
         wrap = @_wrapState
-        wrap.firstParagraph = true
         
         if ++wrap.column > options.columns
             @addPage()
