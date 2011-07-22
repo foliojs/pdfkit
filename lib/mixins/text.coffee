@@ -35,6 +35,10 @@ module.exports =
             margins = @page.margins
             options.width ?= @page.width - @x - margins.right
             options.height ?= @page.height - @y - margins.bottom
+            
+        # wrap to columns
+        options.columns ||= 1
+        options.columnGap ?= 18 # 1/4 inch
         
         # if the wordSpacing option is specified, remove multiple consecutive spaces
         if options.wordSpacing
@@ -107,7 +111,7 @@ module.exports =
         
         # text alignments
         if options.width
-            lineWidth = options.width - indent - wrap.extraSpace
+            lineWidth = wrap.lineWidth - indent - wrap.extraSpace
             
             switch align
                 when 'right'
@@ -175,14 +179,17 @@ module.exports =
 
     _wrap: (text, options) ->
         wrap = @_wrapState
-        lineWidth = options.width
         maxY = @y + options.height - @currentLineHeight()
         width = @widthOfString.bind this
         indent = options.indent or 0
+        lineWidth = (options.width - (options.columnGap * (options.columns - 1))) / options.columns
         
         # initial settings
-        wrap.firstLine = true
-        wrap.firstParagraph = true
+        wrap.column = 1             # the current column
+        wrap.startY = @y            # the initial Y position
+        wrap.lineWidth = lineWidth  # the maximum width of each line
+        wrap.firstLine = true       # whether we are on the first line of a paragraph
+        wrap.firstParagraph = true  # whether we are on the first paragraph of a page or column
         
         # split the line into words
         words = text.match(WORD_RE)
@@ -224,13 +231,13 @@ module.exports =
                 # if we've reached the maximum height and make sure
                 # that the first line of a paragraph is never by itself
                 # at the bottom of a page
-                if @y > maxY or (wrap.lastLine and @y + @currentLineHeight(true) > maxY)
-                    return unless @y >= @page.maxY()
+                nextY = @y + @currentLineHeight(true)
+                if @y > maxY or (wrap.lastLine and nextY > maxY)
+                    return unless nextY >= @page.maxY()
                     
                     # if we've reached the edge of the page, 
-                    # continue on a new page
-                    @addPage()
-                    maxY = @page.maxY()
+                    # continue on a new page or column
+                    maxY = @_nextSection options
                 
                 # reset the space left and buffer
                 spaceLeft = lineWidth - w - wrap.extraSpace
@@ -247,3 +254,17 @@ module.exports =
         
         # reset wrap state
         @_wrapState = {}
+        
+    _nextSection: (options) ->
+        wrap = @_wrapState
+        wrap.firstParagraph = true
+        
+        if ++wrap.column > options.columns
+            @addPage()
+            wrap.column = 1
+            return @page.maxY()
+        
+        else
+            @x += wrap.lineWidth + options.columnGap
+            @y = wrap.startY
+            return @y + options.height - @currentLineHeight()

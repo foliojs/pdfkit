@@ -53,7 +53,7 @@ class PDFPage
                 get: => @dictionary.data['Annots'] ?= []
                 
     maxY: ->
-        @height - @margins.top - @margins.bottom
+        @height - @margins.bottom
         
     finalize: ->
         @content.finalize(@document.compress)
