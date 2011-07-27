@@ -189,6 +189,7 @@ module.exports =
         wrap.startY = @y            # the initial Y position
         wrap.lineWidth = lineWidth  # the maximum width of each line
         wrap.firstLine = true       # whether we are on the first line of a paragraph
+        wrap.lastLine = false       # whether we are on the last line of a paragraph
         
         # split the line into words
         words = text.match(WORD_RE)
