@@ -1,5 +1,5 @@
 Table = require '../table'
-Data = require '../../Data'
+Data = require '../../data'
 
 class LocaTable extends Table
     parse: (data) ->
