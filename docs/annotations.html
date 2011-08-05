@@ -71,16 +71,22 @@
         </nav>
     </div>
     
+    <script>if(location.host !== "pdfkit.org")location.href='http://pdfkit.org' + location.pathname</script>
     <!-- Start of Woopra Code -->
     <script type="text/javascript">
-    var woo_settings = {idle_timeout:'300000', domain:'devongovett.github.com'};
-    (function(){
-    var wsc = document.createElement('script');
-    wsc.src = document.location.protocol+'//static.woopra.com/js/woopra.js';
-    wsc.type = 'text/javascript';
-    wsc.async = true;
-    var ssc = document.getElementsByTagName('script')[0];
-    ssc.parentNode.insertBefore(wsc, ssc);
+    function woopraReady(tracker) {
+        tracker.setDomain('pdfkit.org');
+        tracker.setIdleTimeout(300000);
+        tracker.track();
+        return false;
+    }
+    (function() {
+        var wsc = document.createElement('script');
+        wsc.src = document.location.protocol+'//static.woopra.com/js/woopra.js';
+        wsc.type = 'text/javascript';
+        wsc.async = true;
+        var ssc = document.getElementsByTagName('script')[0];
+        ssc.parentNode.insertBefore(wsc, ssc);
     })();
     </script>
     <!-- End of Woopra Code -->
