@@ -2,6 +2,9 @@
 <html>
 <head>
     <title>Text in PDFKit</title>
+    <script>
+    if(location.host !== "pdfkit.org") location.href='http://pdfkit.org' + location.pathname.slice(7)
+    </script>
     <link href='http://fonts.googleapis.com/css?family=News+Cycle' rel='stylesheet' type='text/css'>
     <link rel="stylesheet" href="../index.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
@@ -100,10 +103,6 @@
         </nav>
     </div>
     
-    <script>
-    if(location.host !== "pdfkit.org")
-        location.href='http://pdfkit.org' + location.pathname.slice(7)
-    </script>
     <!-- Start of Woopra Code -->
     <script type="text/javascript">
     function woopraReady(tracker) {
