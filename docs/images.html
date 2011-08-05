@@ -55,7 +55,10 @@
         </nav>
     </div>
     
-    <script>if(location.host !== "pdfkit.org")location.href='http://pdfkit.org' + location.pathname</script>
+    <script>
+    if(location.host !== "pdfkit.org")
+        location.href='http://pdfkit.org' + location.pathname.slice(7)
+    </script>
     <!-- Start of Woopra Code -->
     <script type="text/javascript">
     function woopraReady(tracker) {
