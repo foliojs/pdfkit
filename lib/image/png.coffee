@@ -260,9 +260,9 @@ class PNG
         @imgData = zlib.deflate imgData
         @alphaChannel = zlib.deflate alphaChannel
         
-    decodingPalette: ->
+    decodePalette: ->
         palette = @palette
-        transparency = @transparency.indexed
+        transparency = @transparency.indexed ? []
         decodingMap = []
         index = 0
         
@@ -274,7 +274,7 @@ class PNG
         return decodingMap
         
     loadIndexedAlphaChannel: ->
-        palette = @decodingPalette()
+        palette = @decodePalette()
         pixels = @decodePixels()
         
         pixelCount = @width * @height
