@@ -52,19 +52,25 @@
             like to move (1 by default).</p>
         
         <h2><a name="line_wrapping">Line wrapping and justification</a></h2>
-        <p>PDFKit includes support for line wrapping out of the box, and it is as simple to enable as setting the <code>width</code> option to the
-            width that the text should be wrapped to.  If you set the <code>height</code> option, the 
+        <p>PDFKit includes support for line wrapping out of the box!  If no options are given, text is  automatically wrapped within the page margins and placed in the document flow below any previous text, or at the top of the page.  PDFKit automatically inserts new pages as necessary so you don't have to worry about doing that for long pieces of text.  PDFKit can also automatically wrap text into multiple columns.</p>
+        <p>Here is an example of wrapping a piece of text into two columns within the page margins and across multiple pages if the text is long enough:</p>
+        <script src="https://gist.github.com/1150625.js?file=columns.coffee"></script>
+        <p>If you pass a specific X and Y position for the text, it will not wrap unless you also pass the <code>width</code> option, setting the width the text should be wrapped to.  If you set the <code>height</code> option, the 
             text will be clipped to the number of lines that can fit in that height.</p>
-        <p>Once you've enabled line wrapping, you can choose a text justification.  There are four options: <code>left</code> (the default), 
+        <p>When line wrapping is enabled, you can choose a text justification.  There are four options: <code>left</code> (the default), 
             <code>center</code>, <code>right</code>, and <code>justify</code>.  They work just as they do in your favorite word processor, but
-            here is an example showing their use.</p>
+            here is an example showing their use in a text box.</p>
         <script src="https://gist.github.com/1074963.js?file=alignments.coffee"></script>
         <p>The output of this example, looks like this:</p>
         <img src="images/alignments.png">
         
         <h2><a name="styling">Text styling</a></h2>
-        <p>PDFKit has many options for controlling the look of text added to PDF documents.  They are enumerated below.</p>
+        <p>PDFKit has many options for controlling the look of text added to PDF documents, which can be passed to the <code>text</code> method.  They are enumerated below.</p>
         <ul>
+            <li><code>width</code> <span>- the width that text should be wrapped to (by default, the page width minus the left and right margin)</span></li>
+            <li><code>height</code> <span>- the maximum height that text should be clipped to</span></li>
+            <li><code>columns</code> <span>- the number of columns to flow the text into</span></li>
+            <li><code>columnGap</code> <span>- the amount of space between each column (1/4 inch by default)</span></li>
             <li><code>indent</code> <span>- the amount in PDF points (72 per inch) to indent each paragraph of text</span></li>
             <li><code>paragraphGap</code> <span>- the amount of space between each paragraph of text</span></li>
             <li><code>lineGap</code> <span>- the amount of space between each line of text</span></li>
