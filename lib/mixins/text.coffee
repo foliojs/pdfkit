@@ -179,7 +179,6 @@ module.exports =
 
     _wrap: (text, options) ->
         wrap = @_wrapState
-        maxY = @y + options.height - @currentLineHeight()
         width = @widthOfString.bind this
         indent = options.indent or 0
         lineWidth = (options.width - (options.columnGap * (options.columns - 1))) / options.columns
@@ -190,6 +189,9 @@ module.exports =
         wrap.lineWidth = lineWidth  # the maximum width of each line
         wrap.firstLine = true       # whether we are on the first line of a paragraph
         wrap.lastLine = false       # whether we are on the last line of a paragraph
+        
+        # calculate the maximum Y position the text can appear at
+        wrap.maxY = @y + options.height - @currentLineHeight()
         
         # split the line into words
         words = text.match(WORD_RE)
@@ -231,12 +233,10 @@ module.exports =
                 # that the first line of a paragraph is never by 
                 # itself at the bottom of a page
                 nextY = @y + @currentLineHeight(true)
-                if @y > maxY or (wrap.lastLine and nextY > maxY)
-                    return unless maxY + @currentLineHeight() is @page.maxY()
-                    
+                if @y > wrap.maxY or (wrap.lastLine and nextY > wrap.maxY)
                     # if we've reached the edge of the page, 
                     # continue on a new page or column
-                    maxY = @_nextSection options
+                    @_nextSection options
                 
                 # reset the space left and buffer
                 spaceLeft = lineWidth - w - wrap.extraSpace
@@ -260,9 +260,9 @@ module.exports =
         if ++wrap.column > options.columns
             @addPage()
             wrap.column = 1
-            return @page.maxY()
+            wrap.startY = @page.margins.top
+            wrap.maxY = @page.maxY()
         
         else
             @x += wrap.lineWidth + options.columnGap
             @y = wrap.startY
-            return @y + options.height - @currentLineHeight()
