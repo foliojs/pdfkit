@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>PDFKit &mdash; A PDF Generation Library for Node</title>
+    <title>PDFKit &mdash; Predefined Paper Sizes</title>
     <script>
     if(location.host !== "pdfkit.org") location.href='http://pdfkit.org' + location.pathname.slice(7)
     </script>
@@ -31,60 +31,64 @@
     <div class="main">
         <h1>PDFKit Predefined Paper Sizes</h1>
         <p>Here is a list of paper sizes that you can pass as a string (in either upper or lower case) as the <code>size</code> property to
-            the <code>PDFDocument#addPage</code> method.</p>
+            the <code>PDFDocument#addPage</code> method.  The following sizes are listed in PDF points, where <code>72 points = 1 inch</code>.</p>
         
-        <ul>
-            <li>4A0</li>
-            <li>2A0</li>
-            <li>A0</li>
-            <li>A1</li>
-            <li>A2</li>
-            <li>A3</li>
-            <li>A4</li>
-            <li>A5</li>
-            <li>A6</li>
-            <li>A7</li>
-            <li>A8</li>
-            <li>A9</li>
-            <li>A10</li>
-            <li>B0</li>
-            <li>B1</li>
-            <li>B2</li>
-            <li>B3</li>
-            <li>B4</li>
-            <li>B5</li>
-            <li>B6</li>
-            <li>B7</li>
-            <li>B8</li>
-            <li>B9</li>
-            <li>B10</li>
-            <li>C0</li>
-            <li>C1</li>
-            <li>C2</li>
-            <li>C3</li>
-            <li>C4</li>
-            <li>C5</li>
-            <li>C6</li>
-            <li>C7</li>
-            <li>C8</li>
-            <li>C9</li>
-            <li>C10</li>
-            <li>RA0</li>
-            <li>RA1</li>
-            <li>RA2</li>
-            <li>RA3</li>
-            <li>RA4</li>
-            <li>SRA0</li>
-            <li>SRA1</li>
-            <li>SRA2</li>
-            <li>SRA3</li>
-            <li>SRA4</li>
-            <li>EXECUTIVE</li>
-            <li>FOLIO</li>
-            <li>LEGAL</li>
-            <li>LETTER</li>
-            <li>TABLOID</li>
-        </ul>
+        <style>
+        td { border: 1px solid gray }
+        table {  border-collapse: collapse }
+        </style>
+        <pre><table cellspacing=0 cellpadding=3>
+            <tr><td>4A0</td>      <td>4767.87 x 6740.79</td></tr>
+            <tr><td>2A0</td>      <td>3370.39 x 4767.87</td></tr>
+            <tr><td>A0</td>       <td>2383.94 x 3370.39</td></tr>
+            <tr><td>A1</td>       <td>1683.78 x 2383.94</td></tr>
+            <tr><td>A2</td>       <td>1190.55 x 1683.78</td></tr>
+            <tr><td>A3</td>       <td>841.89  x 1190.55</td></tr>
+            <tr><td>A4</td>       <td>595.28  x 841.89</td></tr>
+            <tr><td>A5</td>       <td>419.53  x 595.28</td></tr>
+            <tr><td>A6</td>       <td>297.64  x 419.53</td></tr>
+            <tr><td>A7</td>       <td>209.76  x 297.64</td></tr>
+            <tr><td>A8</td>       <td>147.40  x 209.76</td></tr>
+            <tr><td>A9</td>       <td>104.88  x 147.40</td></tr>
+            <tr><td>A10</td>      <td>73.70   x 104.88</td></tr>
+            <tr><td>B0</td>       <td>2834.65 x 4008.19</td></tr>
+            <tr><td>B1</td>       <td>2004.09 x 2834.65</td></tr>
+            <tr><td>B2</td>       <td>1417.32 x 2004.09</td></tr>
+            <tr><td>B3</td>       <td>1000.63 x 1417.32</td></tr>
+            <tr><td>B4</td>       <td>708.66  x 1000.63</td></tr>
+            <tr><td>B5</td>       <td>498.90  x 708.66</td></tr>
+            <tr><td>B6</td>       <td>354.33  x 498.90</td></tr>
+            <tr><td>B7</td>       <td>249.45  x 354.33</td></tr>
+            <tr><td>B8</td>       <td>175.75  x 249.45</td></tr>
+            <tr><td>B9</td>       <td>124.72  x 175.75</td></tr>
+            <tr><td>B10</td>      <td>87.87   x 124.72</td></tr>
+            <tr><td>C0</td>       <td>2599.37 x 3676.54</td></tr>
+            <tr><td>C1</td>       <td>1836.85 x 2599.37</td></tr>
+            <tr><td>C2</td>       <td>1298.27 x 1836.85</td></tr>
+            <tr><td>C3</td>       <td>918.43  x 1298.27</td></tr>
+            <tr><td>C4</td>       <td>649.13  x 918.43</td></tr>
+            <tr><td>C5</td>       <td>459.21  x 649.13</td></tr>
+            <tr><td>C6</td>       <td>323.15  x 459.21</td></tr>
+            <tr><td>C7</td>       <td>229.61  x 323.15</td></tr>
+            <tr><td>C8</td>       <td>161.57  x 229.61</td></tr>
+            <tr><td>C9</td>       <td>113.39  x 161.57</td></tr>
+            <tr><td>C10</td>      <td>79.37   x 113.39</td></tr>
+            <tr><td>RA0</td>      <td>2437.80 x 3458.27</td></tr>
+            <tr><td>RA1</td>      <td>1729.13 x 2437.80</td></tr>
+            <tr><td>RA2</td>      <td>1218.90 x 1729.13</td></tr>
+            <tr><td>RA3</td>      <td>864.57  x 1218.90</td></tr>
+            <tr><td>RA4</td>      <td>609.45  x 864.57</td></tr>
+            <tr><td>SRA0</td>     <td>2551.18 x 3628.35</td></tr>
+            <tr><td>SRA1</td>     <td>1814.17 x 2551.18</td></tr>
+            <tr><td>SRA2</td>     <td>1275.59 x 1814.17</td></tr>
+            <tr><td>SRA3</td>     <td>907.09  x 1275.59</td></tr>
+            <tr><td>SRA4</td>     <td>637.80  x 907.09</td></tr>
+            <tr><td>EXECUTIVE</td><td>521.86  x 756.00</td></tr>
+            <tr><td>FOLIO</td>    <td>612.00  x 936.00</td></tr>
+            <tr><td>LEGAL</td>    <td>612.00  x 1008.00</td></tr>
+            <tr><td>LETTER</td>   <td>612.00  x 792.00</td></tr>
+            <tr><td>TABLOID</td>  <td>792.00  x 1224.00</td></tr>
+        </table></pre>
     </div>
     
     <!-- Start of Woopra Code -->
