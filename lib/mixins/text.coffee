@@ -25,6 +25,9 @@ module.exports =
             options = x
             x = null
             
+        # Convert text to a string
+        text = '' + text
+            
         # Update the current position
         if x? or y?
             @x = x or @x
