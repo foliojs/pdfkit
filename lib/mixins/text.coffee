@@ -81,15 +81,6 @@ module.exports =
             
         @x = x
         @fill()
-        
-    _escape: (text) ->
-        ('' + text)
-            .replace(/\\/g, '\\\\\\\\')
-            .replace(/\(/g, '\\(')
-            .replace(/\)/g, '\\)')
-            .replace(/&lt;/g, '<')
-            .replace(/&gt;/g, '>')
-            .replace(/&amp;/g, '&')
             
     _line: (text, options) ->
         wrap = @_wrapState
@@ -147,9 +138,10 @@ module.exports =
         # tell the font subset to use the characters
         @_font.use text
         
-        # encode and escape the text for inclusion in PDF
+        # encode the text based on the font subset,
+        # and then convert it to hex
         text = @_font.encode text
-        text = @_escape text
+        text = (text.charCodeAt(i).toString(16) for i in [0...text.length]).join('')
         
         # begin the text object
         @addContent "BT"
@@ -171,7 +163,7 @@ module.exports =
         @addContent characterSpacing + ' Tc' unless characterSpacing is state.characterSpacing
         
         # add the actual text
-        @addContent "(#{text}) Tj"
+        @addContent "<#{text}> Tj"
         
         # end the text object
         @addContent "ET"
