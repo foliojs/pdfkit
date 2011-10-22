@@ -1,6 +1,6 @@
 fs = require 'fs'
 Data = '../data'
-zlib = require 'zlib'
+zlib = require 'flate'
 
 class PNG
     @open: (filename) ->

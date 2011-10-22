@@ -6,7 +6,7 @@ By Devon Govett
 TTFFont = require './font/ttf'
 AFMFont = require './font/afm'
 Subset = require './font/subset'
-zlib = require 'zlib'
+zlib = require 'flate'
 
 class PDFFont
     constructor: (@document, @filename, @family, @id) ->

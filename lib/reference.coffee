@@ -3,7 +3,7 @@ PDFReference - represents a reference to another object in the PDF object heirar
 By Devon Govett
 ###
 
-zlib = require 'zlib'
+zlib = require 'flate'
 
 class PDFReference
     constructor: (@id, @data = {}) ->
