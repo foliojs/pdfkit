@@ -81,7 +81,7 @@ Installation uses the [npm](http://npmjs.org/) package manager.  Just type the f
        .link(100, 100, 160, 27, 'http://google.com/')
 
     # Write the PDF file to disk
-    doc.write 'output.pdf'
+    doc.write('output.pdf')
      
 [The PDF output from this example](http://devongovett.github.com/pdfkit/example.pdf) (with a few additions) shows the power of PDFKit — producing 
 complex documents with a very small amount of code.  For more, see the `demo` folder and the 
