@@ -75,22 +75,11 @@ class PDFFont
 
         @hmtx = @ttf.hmtx
         @charWidths = {}
-        for i, gid of @cmap.codeMap
-          @charWidths[i] = Math.round @hmtx.widths[gid] * @scaleFactor
-          #console.log(i)
-        #@charWidths = ( @hmtx.widths[gid] * @scaleFactor for i, gid of @cmap.codeMap when i >= 32)
-        #@charWidths = (Math.round @hmtx.widths[gid] * @scaleFactor for i, gid of @cmap.codeMap when i >= 32)
-        #console.log(@scaleFactor)
-        
-        ### for i, j of @charWidths
-          console.log(i)
-          console.log(j)
-          console.log(typeof i)
-          console.log(typeof j)
-        console.log(@charWidths) # when i == 1000)
-        #console.log(typeof @hmtx.widths[gid] for i, gid of @cmap.codeMap)
-        console.log(@charWidths.length)
-        ###
+        if @isCIDFont
+            for i, gid of @cmap.codeMap
+              @charWidths[i] = Math.round @hmtx.widths[gid] * @scaleFactor
+        else
+            @charWidths = ( @hmtx.widths[gid] * @scaleFactor for i, gid of @cmap.codeMap when i >= 32)
         
         # Create a placeholder reference to be filled in embedTTF.
         @ref = @document.ref
@@ -259,10 +248,10 @@ class PDFFont
     widthOfString: (string, size) ->
         string = '' + string
         width = 0
+        minWidth=0
         for i in [0...string.length]
             charCode = string.charCodeAt(i) - if @isAFM then 0 else 32
             width += @charWidths[charCode] or 0
-            #console.log("charCode #{charCode} , @charWidths[] #{@charWidths[charCode]}") if not @charWidths[charCode]
         
         scale = size / 1000    
         return width * scale
