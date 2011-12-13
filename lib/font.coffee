@@ -97,9 +97,11 @@ class PDFFont
             
         @fontfile.add compressedData
                 
+        # Font names in PDF must not contain space character
+        fontName = @subset.postscriptName.replace(/\ /g, '_')
         @descriptor = @document.ref
             Type: 'FontDescriptor'
-            FontName: @subset.postscriptName
+            FontName: fontName
             FontFile2: @fontfile
             FontBBox: @bbox
             Flags: @flags
@@ -129,7 +131,7 @@ class PDFFont
                 'Supplement': 0
 
             descendantFont = @document.ref
-                BaseFont: @subset.postscriptName
+                BaseFont: fontName
                 CIDSystemInfo: cIDSystemInfo
                 Type: 'Font'
                 Subtype: 'CIDFontType2'
@@ -140,7 +142,7 @@ class PDFFont
             ref = 
                 DescendantFonts: [descendantFont]
                 Type: 'Font'
-                BaseFont: @subset.postscriptName
+                BaseFont: fontName
                 Subtype: 'Type0'
                 Encoding: 'Identity-H'
                 ToUnicode: cmap
@@ -148,7 +150,7 @@ class PDFFont
         else
             ref =
                 Type: 'Font'
-                BaseFont: @subset.postscriptName
+                BaseFont: fontName
                 Subtype: 'TrueType'
                 FontDescriptor: @descriptor
                 FirstChar: firstChar
