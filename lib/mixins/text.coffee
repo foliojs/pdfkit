@@ -1,5 +1,7 @@
 # This regular expression is used for splitting a string into wrappable words
-WORD_RE = /([^ ,\/!.?:;\-\n]+[ ,\/!.?:;\-]*)|\n/g
+#WORD_RE = /([^ ,\/!.?:;\-\n]+[ ,\/!.?:;\-]*)|\n/g
+# With CJK chars, every character is itself a word
+WORD_RE = /([\u0080-\uFFFF]|[^ ,\/!.?:;\-\n]+[ ,\/!.?:;\-]*)|\n/g
 
 module.exports = 
     initText: ->
@@ -82,6 +84,15 @@ module.exports =
         @x = x
         @fill()
             
+    _escape: (text) ->
+        ('' + text)
+            .replace(/\\/g, '\\\\')
+            .replace(/\(/g, '\\(')
+            .replace(/\)/g, '\\)')
+            .replace(/&lt;/g, '<')
+            .replace(/&gt;/g, '>')
+            .replace(/&amp;/g, '&')
+
     _line: (text, options) ->
         wrap = @_wrapState
         paragraphGap = (wrap.firstLine and @y isnt wrap.startY and options.paragraphGap) or 0
@@ -139,9 +150,12 @@ module.exports =
         @_font.use text
         
         # encode the text based on the font subset,
-        # and then convert it to hex
+        # and then escape it or convert it to hex
         text = @_font.encode text
-        text = (text.charCodeAt(i).toString(16) for i in [0...text.length]).join('')
+        if @_font.isCIDFont
+            text = @_escape text
+        else
+            text = (text.charCodeAt(i).toString(16) for i in [0...text.length]).join('')
         
         # begin the text object
         @addContent "BT"
@@ -163,8 +177,11 @@ module.exports =
         @addContent characterSpacing + ' Tc' unless characterSpacing is state.characterSpacing
         
         # add the actual text
-        @addContent "<#{text}> Tj"
-        
+        if @_font.isCIDFont
+            @addContent "(#{text}) Tj"
+        else
+            @addContent "<#{text}> Tj"
+          
         # end the text object
         @addContent "ET"
         
