@@ -144,9 +144,27 @@ module.exports =
 
     clip: (rule) ->
         @addContent 'W' + @_windingRule(rule) + ' n'
-        
+    
+    matrix: [1, 0, 0, 1, 0, 0]
+
     transform: (m11, m12, m21, m22, dx, dy) ->
         values = [m11, m12, m21, m22, dx, dy].join ' '
+        m = @matrix
+        #
+        # (m[0] m[2]) x (m11  -m21)
+        # (m[1] m[3])   (-m12  m22)   
+        # 
+        # (m[0] m[1] m[4]) x (dx)
+        # (m[2] m[3] m[5])   (dy)   
+        #                    (1 )
+        # 
+        @matrix = [
+            m[0] * m11 + m[2] * -m12, 
+            m[1] * m11 + m[3] * -m12, 
+            m[0] * -m21 + m[2] * m22, 
+            m[1] * -m21 + m[3] * m22, 
+            m[0] * dx + m[1] * dy + m[4], 
+            m[2] * dx + m[3] * dy + m[5]]
         @addContent "#{values} cm"
         
     translate: (x, y) ->
