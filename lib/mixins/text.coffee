@@ -102,6 +102,7 @@ module.exports =
         indent = (wrap.firstLine and options.indent) or 0
         wordSpacing = options.wordSpacing or 0
         characterSpacing = options.characterSpacing or 0
+        usedWidth = @widthOfString(text)
         
         # text alignments
         if options.width
@@ -109,10 +110,10 @@ module.exports =
             
             switch align
                 when 'right'
-                    x += lineWidth - @widthOfString(text)
+                    x += lineWidth - usedWidth
                 
                 when 'center'
-                    x += lineWidth / 2 - @widthOfString(text) / 2
+                    x += lineWidth / 2 - usedWidth / 2
                 
                 when 'justify'
                     # don't justify the last line of paragraphs
@@ -171,6 +172,11 @@ module.exports =
         # keep track of text states
         state.mode = mode
         state.wordSpacing = wordSpacing
+
+        if options.underlineColor and options.width
+            @underline @x, @y, usedWidth, @currentLineHeight(false), color: options.underlineColor
+        if options.url and options.width
+            @link @x, @y, usedWidth, @currentLineHeight(false), options.url
 
     _wrap: (text, options) ->
         wrap = @_wrapState
