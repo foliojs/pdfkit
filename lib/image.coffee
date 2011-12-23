@@ -9,8 +9,8 @@ JPEG = require './image/jpeg'
 PNG = require './image/png'
 
 class PDFImage
-    @open: (filename) ->
-        @contents = fs.readFileSync filename
+    @open: (src) ->
+        @contents = if typeof src is 'string' then fs.readFileSync src else src
         return unless @contents
         
         @data = new Data @contents
