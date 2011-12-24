@@ -43,6 +43,8 @@ class PDFDocument
             @info[key] = val for key, val of @options.info
             delete @options.info
         
+        @temp = @ref()
+        
         # Add the first page
         @addPage()
     
@@ -77,7 +79,11 @@ class PDFDocument
         @store.ref(data)
         
     addContent: (str) ->
-        @page.content.add str
+        if @haveTemp is true
+            @temp.add str
+        else
+          @page.content.add str
+          
         return this # make chaining possible
         
     write: (filename, callback) ->
@@ -149,5 +155,14 @@ class PDFDocument
         
     toString: ->
         "[object PDFDocument]"
+    
+    haveTemp: false
+    
+    startTemp: ->
+        @haveTemp = true
+        
+    endTemp: ->
+        @temp.finalize @compress
+        @haveTemp = false
         
 module.exports = PDFDocument
