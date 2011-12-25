@@ -79,7 +79,9 @@ class PDFDocument
         @store.ref(data)
         
     addContent: (str) ->
+        console.log @haveTemp
         if @haveTemp is true
+            console.log 'hi'
             @temp.add str
         else
           @page.content.add str
@@ -121,14 +123,13 @@ class PDFDocument
         
     generateBody: (out) ->
         offset = out.join('\n').length
-        
         for id, ref of @store.objects
             object = ref.object()
             ref.offset = offset
             out.push object
             
             offset += object.length + 1
-            
+        console.log out
         @xref_offset = offset
         
     generateXRef: (out) ->
@@ -162,7 +163,13 @@ class PDFDocument
         @haveTemp = true
         
     endTemp: ->
-        @temp.finalize @compress
+        @temp.finalize true
         @haveTemp = false
+    
+    outputTemp: ->
+        @temp
+    
+    inputTemp: (input)->
+        @store.objects[5] = input
         
 module.exports = PDFDocument
