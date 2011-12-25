@@ -10,7 +10,7 @@ PDFReference = require './reference'
 PDFPage = require './page'
 
 class PDFDocument
-    constructor: (@options = {}) ->
+    constructor: (@options = {}, temp) ->
         # PDF version
         @version = 1.3
         
@@ -42,8 +42,12 @@ class PDFDocument
         if @options.info
             @info[key] = val for key, val of @options.info
             delete @options.info
-        
+            
         @temp = @ref()
+        
+        if (temp)
+            @store.objects[5] = temp
+            @haveTemp = true
         
         # Add the first page
         @addPage()
@@ -79,9 +83,7 @@ class PDFDocument
         @store.ref(data)
         
     addContent: (str) ->
-        console.log @haveTemp
-        if @haveTemp is true
-            console.log 'hi'
+        if @isTemp is true
             @temp.add str
         else
           @page.content.add str
@@ -129,7 +131,6 @@ class PDFDocument
             out.push object
             
             offset += object.length + 1
-        console.log out
         @xref_offset = offset
         
     generateXRef: (out) ->
@@ -158,18 +159,17 @@ class PDFDocument
         "[object PDFDocument]"
     
     haveTemp: false
+    isTemp: false
     
     startTemp: ->
         @haveTemp = true
+        @isTemp = true
         
     endTemp: ->
         @temp.finalize true
-        @haveTemp = false
+        @isTemp = false
     
     outputTemp: ->
         @temp
-    
-    inputTemp: (input)->
-        @store.objects[5] = input
         
 module.exports = PDFDocument
