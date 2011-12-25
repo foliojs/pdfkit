@@ -42,12 +42,14 @@ class PDFDocument
         if @options.info
             @info[key] = val for key, val of @options.info
             delete @options.info
-            
+        
         @temp = @ref()
         
         if (temp)
-            @store.objects[5] = temp
+            @store.objects[5].finalizedStream = temp.finalizedStream
+            @store.objects[5].data = temp.data
             @haveTemp = true
+        
         
         # Add the first page
         @addPage()
@@ -170,6 +172,7 @@ class PDFDocument
         @isTemp = false
     
     outputTemp: ->
+        delete @temp.stream
         @temp
         
 module.exports = PDFDocument
