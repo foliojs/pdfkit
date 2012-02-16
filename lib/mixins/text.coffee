@@ -176,15 +176,20 @@ module.exports =
         wrap = @_wrapState
         width = @widthOfString.bind this
         indent = options.indent or 0
-        lineWidth = (options.width - (options.columnGap * (options.columns - 1))) / options.columns
-        
-        # initial settings
-        wrap.column = 1             # the current column
-        wrap.startY = @y            # the initial Y position
-        wrap.lineWidth = lineWidth  # the maximum width of each line
-        wrap.firstLine = true       # whether we are on the first line of a paragraph
-        wrap.lastLine = false       # whether we are on the last line of a paragraph
-        
+
+        if wrap.continuedY
+          @y = wrap.continuedY
+          @x += wrap.continuedX
+          wrap.lastLine = false       # we're continuing, so clear lastLine
+        else
+          wrap.column = 1             # the current column
+          wrap.startY = @y            # the initial Y position
+          wrap.lineWidth = (options.width - (options.columnGap * (options.columns - 1))) / options.columns  # the maximum width of each line
+          wrap.firstLine = true       # whether we are on the first line of a paragraph
+          wrap.lastLine = false       # whether we are on the last line of a paragraph
+          wrap.continuedX = 0         # offset from @x leftover from the previous _wrap call
+          wrap.continuedY = 0         # @y of the last line of the previous _wrap call
+
         # calculate the maximum Y position the text can appear at
         wrap.maxY = @y + options.height - @currentLineHeight()
         
@@ -196,8 +201,8 @@ module.exports =
                           (options.characterSpacing or 0) * (text.length - 1) # characterSpacing
         
         # space left on the line to fill with words
-        spaceLeft = lineWidth - indent - wrap.extraSpace
-        
+        spaceLeft = wrap.lineWidth - indent - wrap.extraSpace - wrap.continuedX
+
         # word width cache
         wordWidths = {}
         len = words.length
@@ -205,13 +210,12 @@ module.exports =
         
         for word, i in words
             w = wordWidths[word] ?= width(word)
-            
+
+            # keep track of the wrapping state
+            if wrap.lastLine
+                wrap.firstLine = true
+                wrap.lastLine = false
             if w > spaceLeft or word is '\n'
-                # keep track of the wrapping state
-                if wrap.lastLine
-                    wrap.firstLine = true
-                    wrap.lastLine = false
-                
                 # if we've got a newline, mark it
                 if word is '\n'
                     wrap.lastLine = true
@@ -220,7 +224,9 @@ module.exports =
                 # render the line
                 lastLine = buffer.trim()
                 @_line lastLine, options
-                
+                @x -= wrap.continuedX
+                wrap.continuedX = 0
+
                 # we're no longer on the first line...
                 wrap.firstLine = false
                 
@@ -234,7 +240,7 @@ module.exports =
                     @_nextSection options
                 
                 # reset the space left and buffer
-                spaceLeft = lineWidth - w - wrap.extraSpace
+                spaceLeft = wrap.lineWidth - w - wrap.extraSpace
                 buffer = if word is '\n' then '' else word
 
             else
@@ -244,11 +250,16 @@ module.exports =
 
         # add the last line
         wrap.lastLine = true
+        wrap.continuedY = @y
         @_line buffer.trim(), options
-        
-        # reset wrap state
-        @_wrapState = {}
-        
+        @x -= wrap.continuedX
+
+        if options.continued
+          wrap.continuedX += width(buffer)
+        else
+          # reset wrap state
+          @_wrapState = {}
+
     _nextSection: (options) ->
         wrap = @_wrapState
         
