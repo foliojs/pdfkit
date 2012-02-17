@@ -190,8 +190,8 @@ module.exports =
           wrap.continuedX = 0         # offset from @x leftover from the previous _wrap call
           wrap.continuedY = 0         # @y of the last line of the previous _wrap call
 
-        # calculate the maximum Y position the text can appear at
-        wrap.maxY = @y + options.height - @currentLineHeight()
+          # calculate the maximum Y position the text can appear at
+          wrap.maxY = @y + options.height - @currentLineHeight()
         
         # split the line into words
         words = text.match(WORD_RE)
