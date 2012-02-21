@@ -131,7 +131,7 @@ module.exports =
         
         # user-accessible hook
         if options.eachLine
-          options.eachLine(text, x, y)
+          options.eachLine.apply(this, [text, x, y])
 
         # flip coordinate system
         y = @page.height - y - (@_font.ascender / 1000 * @_fontSize)
