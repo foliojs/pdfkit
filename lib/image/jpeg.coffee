@@ -1,9 +1,10 @@
+return if not require('streamline/module')(module)
 fs = require 'fs'
 Data = '../data'
 
 class JPEG
-    @open: (filename) ->
-        contents = fs.readFileSync filename
+    @open: (_, filename) ->
+        contents = fs.readFile filename, _
         data = new Data(contents)
         new JPEG(data)
     
@@ -36,7 +37,7 @@ class JPEG
             
         @imgData = @data
         
-    object: (document) ->
+    object: (_, document) ->
         obj = document.ref
             Type: 'XObject'
             Subtype: 'Image'

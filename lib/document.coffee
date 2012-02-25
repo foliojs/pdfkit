@@ -3,6 +3,7 @@ PDFDocument - represents an entire PDF document
 By Devon Govett
 ###
 
+return if not require('streamline/module')(module)
 fs = require 'fs'
 PDFObjectStore = require './store'
 PDFObject = require './object'
@@ -10,7 +11,7 @@ PDFReference = require './reference'
 PDFPage = require './page'
 
 class PDFDocument
-    constructor: (@options = {}) ->
+    constructor: (_, @options = {}) ->
         # PDF version
         @version = 1.3
         
@@ -28,7 +29,7 @@ class PDFDocument
         
         # Initialize mixins
         @initColor()
-        @initFonts()
+        @initFonts(_)
         @initText()
         @initImages()
         
@@ -83,27 +84,27 @@ class PDFDocument
     write: (filename, callback) ->
          fs.writeFile filename, @output(), 'binary', callback
         
-    output: ->
+    output: (_) ->
        out = []
-       @finalize()
+       @finalize(_)
        @generateHeader out
-       @generateBody out
+       @generateBody _, out
        @generateXRef out
        @generateTrailer out
        return out.join('\n')
         
-    finalize: ->
+    finalize: (_) ->
         # convert strings in the info dictionary to literals
         for key, val of @info when typeof val is 'string'
             @info[key] = PDFObject.s val
         
         # embed the subsetted fonts
         for family, font of @_fontFamilies
-            font.embed()
+            font.embed(_)
         
         # finalize each page
         for page in @pages
-            page.finalize()
+            page.finalize(_)
         
     generateHeader: (out) ->
         # PDF version
@@ -113,11 +114,11 @@ class PDFDocument
         out.push "%\xFF\xFF\xFF\xFF\n"
         return out
         
-    generateBody: (out) ->
+    generateBody: (_, out) ->
         offset = out.join('\n').length
         
         for id, ref of @store.objects
-            object = ref.object()
+            object = ref.object(_)
             ref.offset = offset
             out.push object
             

@@ -1,3 +1,4 @@
+return if not require('streamline/module')(module)
 PDFImage = require '../image'
 
 module.exports =
@@ -5,7 +6,7 @@ module.exports =
         @_imageRegistry = {}
         @_imageCount = 0
         
-    image: (src, x, y, options = {}) ->
+    image: (_, src, x, y, options = {}) ->
         if typeof x is 'object'
             options = x
             x = null
@@ -17,8 +18,8 @@ module.exports =
             [image, obj, label] = @_imageRegistry[src]
 
         else
-            image = PDFImage.open(src)
-            obj = image.object(this)
+            image = PDFImage.open(_, src)
+            obj = image.object(_, this)
             label = "I" + (++@_imageCount)
             @_imageRegistry[src] = [image, obj, label]
 

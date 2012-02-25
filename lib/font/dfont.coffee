@@ -1,9 +1,10 @@
+return if not require('streamline/module')(module)
 fs = require 'fs'
 Data = require '../data'
 
 class DFont
-    @open: (filename) ->
-        contents = fs.readFileSync filename
+    @open: (_, filename) ->
+        contents = fs.readFile filename, _
         new DFont(contents)
         
     constructor: (contents) ->

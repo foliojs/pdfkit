@@ -1,3 +1,4 @@
+return if not require('streamline/module')(module)
 fs = require 'fs'
 Data = require '../data'
 DFont = require './dfont'
@@ -15,12 +16,12 @@ LocaTable = require './tables/loca'
 GlyfTable = require './tables/glyf'
 
 class TTFFont
-    @open: (filename, name) ->
-        contents = fs.readFileSync filename
+    @open: (_, filename, name) ->
+        contents = fs.readFile filename, _
         new TTFFont(contents, name)
         
-    @fromDFont: (filename, family) ->
-        dfont = DFont.open(filename)
+    @fromDFont: (_, filename, family) ->
+        dfont = DFont.open(_, filename)
         new TTFFont dfont.getNamedFont(family)
     
     constructor: (@rawData, name) ->

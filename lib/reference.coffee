@@ -3,7 +3,8 @@ PDFReference - represents a reference to another object in the PDF object heirar
 By Devon Govett
 ###
 
-zlib = require 'flate'
+return if not require('streamline/module')(module)
+zlib = require 'zlib'
 
 class PDFReference
     constructor: (@id, @data = {}) ->
@@ -11,8 +12,8 @@ class PDFReference
         @stream = null
         @finalizedStream = null
         
-    object: ->
-        @finalize() if not @finalizedStream
+    object: (_) ->
+        @finalize(_) if not @finalizedStream
         out = ["#{@id} #{@gen} obj"]
         out.push PDFObject.convert(@data)
         
@@ -28,7 +29,7 @@ class PDFReference
         @stream ?= []
         @stream.push if Buffer.isBuffer(s) then s.toString('binary') else s
         
-    finalize: (compress = false) ->
+    finalize: (_, compress = false) ->
         # cache the finalized stream
         if @stream
             data = @stream.join '\n'
@@ -36,7 +37,7 @@ class PDFReference
                 # create a byte array instead of passing a string to the Buffer
                 # fixes a weird unicode bug.
                 data = new Buffer(data.charCodeAt(i) for i in [0...data.length])
-                compressedData = zlib.deflate(data)
+                compressedData = zlib.deflate(data, _)
                 @finalizedStream = compressedData.toString 'binary'
                 
                 @data.Filter = 'FlateDecode'
