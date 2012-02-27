@@ -12,17 +12,19 @@ class JPEG
         len = data.length
         
         if data.readUInt16() isnt 0xFFD8
-            throw "SOI not found in JPEG"
+            throw new Error "SOI not found in JPEG"
         
         markers = [0xFFC0, 0xFFC1, 0xFFC2, 0xFFC3, 0xFFC4, 0xFFC5, 0xFFC6, 0xFFC7,
                    0xFFC8, 0xFFC9, 0xFFCA, 0xFFCB, 0xFFCC, 0xFFCD, 0xFFCE, 0xFFCF]
-                
+
         while data.pos < len
             marker = data.readUInt16()
             break if marker in markers
-            data.pos += data.readUInt16()
-        
-        throw "Invalid JPEG." unless marker in markers
+            # was ambiguous: data.pos += data.readUInt16()
+            pos = data.pos
+            data.pos = pos + data.readUInt16()
+
+        throw new Error "Invalid JPEG." unless marker in markers
         data.pos += 2
          
         @bits = data.readByte()
