@@ -44,9 +44,9 @@ class AFMFont
                         @attributes[key] = value
                     
                 when 'CharMetrics'
-                    if /^CH?\s/.test(line)
-                        name = line.match(/\bN\s+(\.?\w+)\s*;/)[1]
-                        @glyphWidths[name] = +line.match(/\bWX\s+(\d+)\s*;/)[1]
+                    continue unless /^CH?\s/.test(line)
+                    name = line.match(/\bN\s+(\.?\w+)\s*;/)[1]
+                    @glyphWidths[name] = +line.match(/\bWX\s+(\d+)\s*;/)[1]
                     
     characters = '''
         .notdef       .notdef        .notdef        .notdef

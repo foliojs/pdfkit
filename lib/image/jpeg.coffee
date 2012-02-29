@@ -20,9 +20,7 @@ class JPEG
         while data.pos < len
             marker = data.readUInt16()
             break if marker in markers
-            # was ambiguous: data.pos += data.readUInt16()
-            pos = data.pos
-            data.pos = pos + data.readUInt16()
+            data.pos += data.readUInt16()
 
         throw new Error "Invalid JPEG." unless marker in markers
         data.pos += 2
