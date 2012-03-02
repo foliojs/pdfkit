@@ -47,6 +47,9 @@ class PDFDocument
         # Add the first page
         @addPage()
     
+    @create: (_, options) ->
+        new PDFDocument(_, options)
+
     mixin = (name) =>
         methods = require './mixins/' + name
         for name, method of methods
