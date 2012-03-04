@@ -25,14 +25,19 @@ class PDFPage
         @height = dimensions[if @layout is 'portrait' then 1 else 0]
         
         # A reference to the content of this page
-        @content = @document.ref()        
-                    
+        @content = @document.ref()
+        
+        if @document.haveTemp
+            contents = [@content, @document.temp] 
+        else 
+            contents =  @content
+       
         # The page dictionary
         @dictionary = @document.ref
             Type: 'Page'
             Parent: @document.store.pages
             MediaBox: [0, 0, @width, @height]
-            Contents: @content
+            Contents: contents
         
         # The resource dictionary
         @dictionary.data['Resources'] = @document.ref

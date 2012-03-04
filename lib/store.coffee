@@ -23,8 +23,8 @@ class PDFObjectStore
     ref: (data) ->
         @push ++@length, data
         
-    push: (id, data) ->
-        ref = new PDFReference(id, data)
+    push: (id, data, fStream) ->
+        ref = new PDFReference id, data
         @objects[id] = ref
         return ref
             

@@ -10,7 +10,7 @@ PDFReference = require './reference'
 PDFPage = require './page'
 
 class PDFDocument
-    constructor: (@options = {}) ->
+    constructor: (@options = {}, temp) ->
         # PDF version
         @version = 1.3
         
@@ -42,6 +42,14 @@ class PDFDocument
         if @options.info
             @info[key] = val for key, val of @options.info
             delete @options.info
+        
+        @temp = @ref()
+        
+        if (temp)
+            @store.objects[5].finalizedStream = temp.finalizedStream
+            @store.objects[5].data = temp.data
+            @haveTemp = true
+        
         
         # Add the first page
         @addPage()
@@ -77,7 +85,11 @@ class PDFDocument
         @store.ref(data)
         
     addContent: (str) ->
-        @page.content.add str
+        if @isTemp is true
+            @temp.add str
+        else
+          @page.content.add str
+          
         return this # make chaining possible
         
     write: (filename, callback) ->
@@ -115,14 +127,12 @@ class PDFDocument
         
     generateBody: (out) ->
         offset = out.join('\n').length
-        
         for id, ref of @store.objects
             object = ref.object()
             ref.offset = offset
             out.push object
             
             offset += object.length + 1
-            
         @xref_offset = offset
         
     generateXRef: (out) ->
@@ -149,5 +159,20 @@ class PDFDocument
         
     toString: ->
         "[object PDFDocument]"
+    
+    haveTemp: false
+    isTemp: false
+    
+    startTemp: ->
+        @haveTemp = true
+        @isTemp = true
+        
+    endTemp: ->
+        @temp.finalize true
+        @isTemp = false
+    
+    outputTemp: ->
+        delete @temp.stream
+        @temp
         
 module.exports = PDFDocument

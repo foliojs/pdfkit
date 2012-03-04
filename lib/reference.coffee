@@ -10,13 +10,12 @@ class PDFReference
         @gen = 0
         @stream = null
         @finalizedStream = null
-        
     object: ->
         @finalize() if not @finalizedStream
         out = ["#{@id} #{@gen} obj"]
         out.push PDFObject.convert(@data)
         
-        if @stream
+        if @stream || @finalizedStream
             out.push "stream"
             out.push @finalizedStream
             out.push "endstream"
