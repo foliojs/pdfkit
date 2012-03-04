@@ -40,9 +40,10 @@ class PDFReference
                 @finalizedStream = compressedData.toString 'binary'
                 
                 @data.Filter = 'FlateDecode'
-                @data.Length ?= @finalizedStream.length
             else
                 @finalizedStream = data
+                
+            @data.Length ?= @finalizedStream.length
         else
             @finalizedStream = ''
         
