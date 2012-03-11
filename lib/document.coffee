@@ -75,8 +75,8 @@ class PDFDocument
 
     removePage: ->
       # remove a page
-      @store.removePage
-      @pages.pop
+      @store.removePage()
+      @pages.pop()
       return this
 
     ref: (data) ->

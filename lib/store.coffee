@@ -33,7 +33,7 @@ class PDFObjectStore
         @pages.data['Count']++
 
     removePage: ->
-        @pages.data['Kids'].pop
+        @pages.data['Kids'].pop()
         @pages.data['Count']--
 
 module.exports = PDFObjectStore
