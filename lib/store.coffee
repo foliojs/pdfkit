@@ -32,7 +32,7 @@ class PDFObjectStore
         @pages.data['Kids'].push(page.dictionary)
         @pages.data['Count']++
 
-    removePage: (page) ->
+    removePage: ->
         @pages.data['Kids'].pop
         @pages.data['Count']--
 

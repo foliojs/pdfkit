@@ -73,9 +73,9 @@ class PDFDocument
 
         return this
 
-    removePage: (options = @options) ->
+    removePage: ->
       # remove a page
-      @store.removePage @page
+      @store.removePage
       @pages.pop
       return this
 
