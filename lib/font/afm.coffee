@@ -1,11 +1,12 @@
+return if not require('streamline/module')(module)
 fs = require 'fs'
 
 class AFMFont
-    @open: (filename) ->
-        new AFMFont(filename)
+    @open: (_, filename) ->
+        new AFMFont(fs.readFile(filename, 'utf8', _))
     
-    constructor: (filename) ->
-        @contents = fs.readFileSync filename, 'utf8'
+    constructor: (contents) ->
+        @contents = contents
         
         @attributes = {}
         @glyphWidths = {}

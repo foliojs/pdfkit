@@ -1,7 +1,8 @@
+return if not require('streamline/module')(module)
 PDFFont = require '../font'
 
 module.exports = 
-    initFonts: ->
+    initFonts: (_) ->
         # Lookup table for embedded fonts
         @_fontFamilies = {}
         @_fontCount = 0
@@ -13,9 +14,9 @@ module.exports =
         @_registeredFonts = {}
         
         # Set the default font
-        @font 'Helvetica'
+        @font _, 'Helvetica'
         
-    font: (filename, family, size) ->
+    font: (_, filename, family, size) ->
         if typeof family is 'number'
             size = family
             family = null
@@ -31,7 +32,7 @@ module.exports =
             return this
             
         id = 'F' + (++@_fontCount)
-        @_font = new PDFFont(this, filename, family, id)
+        @_font = new PDFFont(_, this, filename, family, id)
         @_fontFamilies[family] = @_font
         
         return this

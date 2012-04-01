@@ -78,4 +78,15 @@ module.exports =
         rect[1] = @page.height - rect[1] - rect[3]
         rect[2] += rect[0]
         rect[3] += rect[1]
-        return rect
+        m = @matrix
+        #
+        # (m[0] m[1] m[4])   (x)
+        # (m[2] m[3] m[5]) x (y)
+        #                    (1)
+        #
+        return [
+            m[0] * rect[0] + m[1] * rect[1] + m[4],
+            m[2] * rect[0] + m[3] * rect[1] + m[5],
+            m[0] * rect[2] + m[1] * rect[3] + m[4],
+            m[2] * rect[2] + m[3] * rect[3] + m[5]]
+

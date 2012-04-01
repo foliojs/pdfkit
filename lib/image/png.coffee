@@ -1,10 +1,11 @@
+return if not require('streamline/module')(module)
 fs = require 'fs'
 Data = '../data'
-zlib = require 'flate'
+zlib = require 'zlib'
 
 class PNG
-    @open: (filename) ->
-        contents = fs.readFileSync filename
+    @open: (_, filename) ->
+        contents = fs.readFile filename, _
         data = new Data(contents)
         new PNG(data)
     
@@ -84,7 +85,7 @@ class PNG
         
         return
         
-    object: (document) ->
+    object: (_, document) ->
         obj = document.ref
             Type: 'XObject'
             Subtype: 'Image'
@@ -134,13 +135,13 @@ class PNG
         else if @transparency.indexed
             # Create a transparency SMask for the image based on the data 
             # in the PLTE and tRNS sections. See below for details on SMasks.
-            @loadIndexedAlphaChannel()
+            @loadIndexedAlphaChannel(_)
             
         # For PNG color types 4 and 6, the transparency data is stored as a alpha
         # channel mixed in with the main image data. Separate this data out into an
         # SMask object and store it separately in the PDF.
         if @hasAlphaChannel
-            @splitAlphaChannel()
+            @splitAlphaChannel(_)
             obj.data['Length'] = @imgData.length
         
         if @alphaChannel
@@ -162,8 +163,8 @@ class PNG
         obj.add @imgData
         return obj
         
-    decodePixels: ->
-        data = zlib.inflate @imgData
+    decodePixels: (_) ->
+        data = zlib.inflate @imgData, _
         pixelBytes = @pixelBitlength / 8
         scanlineLength = pixelBytes * @width
 
@@ -241,8 +242,8 @@ class PNG
             
         return pixels
         
-    splitAlphaChannel: ->
-        pixels = @decodePixels()
+    splitAlphaChannel:(_)  ->
+        pixels = @decodePixels(_)
 
         colorByteSize = @colors * @bits / 8
         alphaByteSize = 1
@@ -257,8 +258,8 @@ class PNG
                 imgData[p++] = pixel[i] for i in [0...colorByteSize]
                 alphaChannel[a++] = pixel[colorByteSize]
         
-        @imgData = zlib.deflate imgData
-        @alphaChannel = zlib.deflate alphaChannel
+        @imgData = zlib.deflate imgData, _
+        @alphaChannel = zlib.deflate alphaChannel, _
         
     decodePalette: ->
         palette = @palette
@@ -273,9 +274,9 @@ class PNG
             
         return decodingMap
         
-    loadIndexedAlphaChannel: ->
+    loadIndexedAlphaChannel:(_) ->
         palette = @decodePalette()
-        pixels = @decodePixels()
+        pixels = @decodePixels(_)
         
         pixelCount = @width * @height
         alphaChannel = new Buffer(pixelCount)
@@ -286,6 +287,6 @@ class PNG
                 pixel = pixel[0]
                 alphaChannel[i++] = palette[pixel][3]
             
-        @alphaChannel = zlib.deflate alphaChannel
+        @alphaChannel = zlib.deflate alphaChannel, _
         
 module.exports = PNG

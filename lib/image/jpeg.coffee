@@ -1,9 +1,10 @@
+return if not require('streamline/module')(module)
 fs = require 'fs'
 Data = '../data'
 
 class JPEG
-    @open: (filename) ->
-        contents = fs.readFileSync filename
+    @open: (_, filename) ->
+        contents = fs.readFile filename, _
         data = new Data(contents)
         new JPEG(data)
     
@@ -11,17 +12,17 @@ class JPEG
         len = data.length
         
         if data.readUInt16() isnt 0xFFD8
-            throw "SOI not found in JPEG"
+            throw new Error "SOI not found in JPEG"
         
         markers = [0xFFC0, 0xFFC1, 0xFFC2, 0xFFC3, 0xFFC4, 0xFFC5, 0xFFC6, 0xFFC7,
                    0xFFC8, 0xFFC9, 0xFFCA, 0xFFCB, 0xFFCC, 0xFFCD, 0xFFCE, 0xFFCF]
-                
+
         while data.pos < len
             marker = data.readUInt16()
             break if marker in markers
             data.pos += data.readUInt16()
-        
-        throw "Invalid JPEG." unless marker in markers
+
+        throw new Error "Invalid JPEG." unless marker in markers
         data.pos += 2
          
         @bits = data.readByte()
@@ -36,7 +37,7 @@ class JPEG
             
         @imgData = @data
         
-    object: (document) ->
+    object: (_, document) ->
         obj = document.ref
             Type: 'XObject'
             Subtype: 'Image'

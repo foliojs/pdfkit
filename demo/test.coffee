@@ -1,8 +1,15 @@
-PDFDocument = require 'pdfkit'
+return if not require('streamline/module')(module)
+PDFDocument = require 'streamline-pdfkit'
 tiger = require './tiger'
 
+console.log('test2')
 # Create a new PDFDocument
-doc = new PDFDocument
+#doc = new PDFDocument
+#doc = PDFDocument.create(_, )
+
+
+doc = PDFDocument.create(_, {})
+
 
 # Set some meta data
 doc.info['Title'] = 'Test Document'
@@ -12,13 +19,13 @@ doc.info['Author'] = 'Devon Govett'
 doc.registerFont('Palatino', 'fonts/PalatinoBold.ttf')
 
 # Set the font, draw some text, and embed an image
-doc.font('Palatino')
+doc.font(_,'Palatino')
    .fontSize(25)
    .text('Some text with an embedded font!', 100, 100)
    .fontSize(18)
    .text('PNG and JPEG images:')
-   .image('images/test.png', 100, 160, width: 412)
-   .image('images/test.jpeg', 190, 400, height: 300)
+   .image(_,'images/test.png', 100, 160, width: 412)
+   .image(_,'images/test.jpeg', 190, 400, height: 300)
 
 # Add another page
 doc.addPage()
@@ -48,13 +55,13 @@ Mauris at ante tellus. Vestibulum a metus lectus. Praesent tempor purus a lacus 
 
 # Draw some text wrapped to 412 points wide
 doc.text('And here is some wrapped text...', 100, 300)
-   .font('Helvetica', 13)
+   .font(_,'Helvetica', 13)
    .moveDown() # move down 1 line
    .text(loremIpsum, width: 412, align: 'justify', indent: 30, paragraphGap: 5)
 
 # Add another page, and set the font back   
 doc.addPage()
-   .font('Palatino', 25)
+   .font(_,'Palatino', 25)
    .text('Rendering some SVG paths...', 100, 100)
    .translate(220, 300)
 
@@ -86,7 +93,8 @@ doc.addPage()
 
 # Add a list with a font loaded from a TrueType collection file   
 doc.fillColor('#000')
-   .font('fonts/Chalkboard.ttc', 'Chalkboard', 16)
+   .font(_,'fonts/Chalkboard.ttc', 'Chalkboard', 16)
    .list(['One', 'Two', 'Three'], 100, 150)
-        
-doc.write 'out.pdf'
+ 
+
+doc.write 'out2.pdf',_

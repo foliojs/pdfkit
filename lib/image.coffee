@@ -3,14 +3,15 @@ PDFImage - embeds images in PDF documents
 By Devon Govett
 ###
 
+return if not require('streamline/module')(module)
 fs = require 'fs'
 Data = require './data'
 JPEG = require './image/jpeg'
 PNG = require './image/png'
 
 class PDFImage
-    @open: (filename) ->
-        @contents = fs.readFileSync filename
+    @open: (_, src) ->
+        @contents = if typeof src is 'string' then fs.readFile src, _ else src
         return unless @contents
         
         @data = new Data @contents

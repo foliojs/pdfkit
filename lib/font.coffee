@@ -3,23 +3,24 @@ PDFFont - embeds fonts in PDF documents
 By Devon Govett
 ###
 
+return if not require('streamline/module')(module)
 TTFFont = require './font/ttf'
 AFMFont = require './font/afm'
 Subset = require './font/subset'
-zlib = require 'flate'
+zlib = require 'zlib'
 
 class PDFFont
-    constructor: (@document, @filename, @family, @id) ->
+    constructor: (_, @document, @filename, @family, @id) ->
         if @filename in @_standardFonts
-            @embedStandard()
+            @embedStandard(_)
             
         else if /\.(ttf|ttc)$/i.test @filename
-            @ttf = TTFFont.open @filename, @family
+            @ttf = TTFFont.open _, @filename, @family
             @subset = new Subset @ttf
             @registerTTF()
             
         else if /\.dfont$/i.test @filename
-            @ttf = TTFFont.fromDFont @filename, @family
+            @ttf = TTFFont.fromDFont _, @filename, @family
             @subset = new Subset @ttf
             @registerTTF()
             
@@ -29,8 +30,8 @@ class PDFFont
     use: (characters) ->
         @subset?.use characters
         
-    embed: ->
-        @embedTTF() unless @isAFM
+    embed: (_) ->
+        @embedTTF(_) unless @isAFM
         
     encode: (text) ->
         @subset?.encodeText(text) or text
@@ -78,9 +79,9 @@ class PDFFont
             Type: 'Font'
             Subtype: 'TrueType'
             
-    embedTTF: ->
+    embedTTF: (_) ->
         data = @subset.encode()
-        compressedData = zlib.deflate(data)
+        compressedData = zlib.deflate(data, _)
         
         @fontfile = @document.ref
             Length: compressedData.length
@@ -109,7 +110,7 @@ class PDFFont
         
         cmap = @document.ref()
         cmap.add toUnicodeCmap(@subset.subset)
-        cmap.finalize(true) # compress it
+        cmap.finalize(_, true) # compress it
             
         ref = 
             Type: 'Font'
@@ -161,9 +162,9 @@ class PDFFont
             end
         '''
                     
-    embedStandard: ->
+    embedStandard: (_) ->
         @isAFM = true
-        font = AFMFont.open __dirname + "/font/data/#{@filename}.afm"
+        font = AFMFont.open _, __dirname + "/font/data/#{@filename}.afm"
         {@ascender,@decender,@bbox,@lineGap,@charWidths} = font
         
         @ref = @document.ref
