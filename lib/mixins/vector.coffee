@@ -148,7 +148,14 @@ module.exports =
     matrix: [1, 0, 0, 1, 0, 0]
 
     transform: (m11, m12, m21, m22, dx, dy) ->
-        values = [m11, m12, m21, m22, dx, dy].join ' '
+        values = [m11, m12, m21, m22, dx, dy].map (v) ->
+          str = v.toFixed 20
+          v = +str
+          if (v >= 1 || v <= -1 || v == 0)
+            return v.toString()
+          else
+            return str
+        values = values.join ' '
         m = @matrix
         #
         # (m[0] m[1] m[4])   (m11  m21 dx)
