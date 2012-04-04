@@ -1,5 +1,7 @@
 fs = require 'fs'
 Data = require '../data'
+Directory = require './directory'
+NameTable = require './tables/name'
 
 class DFont
     @open: (filename) ->
@@ -25,7 +27,7 @@ class DFont
         data.pos = typeListOffset
         maxIndex = data.readShort()
         
-        for i in [0..maxIndex]
+        for i in [0..maxIndex] by 1
             type = data.readString(4)
             maxTypeIndex = data.readShort()
             refListOffset = data.readShort()
@@ -37,7 +39,7 @@ class DFont
             pos = data.pos
             data.pos = typeListOffset + refListOffset
             
-            for i in[0..maxTypeIndex]
+            for j in [0..maxTypeIndex] by 1
                 id = data.readShort()
                 nameOfs = data.readShort()
                 attr = data.readByte()
@@ -53,15 +55,26 @@ class DFont
                     attributes: attr
                     offset: dataOfs
                     handle: handle
-                    
-                if nameListOffset + nameOfs < mapOffset + mapLength
-                    p = data.pos
-                    data.pos = nameOfs + nameListOffset
-                    
+                
+                p = data.pos
+                
+                # if the name is easily accessible, parse it
+                if nameOfs isnt -1 and (nameListOffset + nameOfs < mapOffset + mapLength)
+                    data.pos = nameListOffset + nameOfs
                     len = data.readByte()
                     entry.name = data.readString(len)
-                    
-                    data.pos = p
+                
+                # otherwise jump into the actual ttf and grab it from the 'name' table    
+                else if type is 'sfnt'
+                    data.pos = entry.offset
+                    length = data.readUInt32()
+                    font = {}
+                    font.contents = new Data(data.slice(data.pos, data.pos + length))
+                    font.directory = new Directory(font.contents)
+                    name = new NameTable(font)
+                    entry.name = name.fontName[0].raw
+                
+                data.pos = p
                 
                 @map[type].list.push entry
                 @map[type].named[entry.name] = entry if entry.name
@@ -78,6 +91,7 @@ class DFont
         throw new Error "Font #{name} not found in DFont file." unless entry
         
         data.pos = entry.offset
+        
         length = data.readUInt32()
         ret = data.slice(data.pos, data.pos + length)
         
