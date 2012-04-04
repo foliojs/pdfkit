@@ -19,8 +19,7 @@
       "example": "./demo"
   },
   "dependencies": {
-      "coffee-script": ">=1.0.1",
-      "flate": ">=1.0.2"
+      "coffee-script": ">=1.0.1"
   },
   "engine": [ "node >= v0.4.0" ]
 }
