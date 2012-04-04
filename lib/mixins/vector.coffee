@@ -146,7 +146,7 @@ module.exports =
         @addContent 'W' + @_windingRule(rule) + ' n'
         
     transform: (m11, m12, m21, m22, dx, dy) ->
-        values = [m11, m12, m21, m22, dx, dy].join ' '
+        values = (+v.toFixed(5) for v in [m11, m12, m21, m22, dx, dy]).join(' ')
         @addContent "#{values} cm"
         
     translate: (x, y) ->
@@ -174,9 +174,7 @@ module.exports =
         if options.origin?
             x = options.origin[0]
             y = @page.height - options.origin[1]
-            x1 = factor * x
-            y1 = factor * y
-            x -= x1
-            y -= y1
+            x -= factor * x
+            y -= factor * y
             
         @transform factor, 0, 0, factor, x, y
