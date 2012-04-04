@@ -2,7 +2,7 @@
   "name": "pdfkit",
   "description": "A PDF generation library for Node.js",
   "keywords": ["pdf", "pdf writer", "pdf generator", "graphics", "document", "vector"],
-  "version": "0.1.6",
+  "version": "0.1.7",
   "homepage": "http://devongovett.github.com/pdfkit/",
   "author": {
       "name": "Devon Govett",
@@ -18,8 +18,13 @@
       "lib": "./lib",
       "example": "./demo"
   },
-  "dependencies": {
+  "devDependencies": {
       "coffee-script": ">=1.0.1"
   },
-  "engine": [ "node >= v0.4.0" ]
+  "scripts": {
+      "prepublish": "coffee -o js -c lib/ && cp -r lib/font/data js/font/data",
+      "postpublish": "rm -rf ./js"
+  },
+  "main": "./js/document",
+  "engine": [ "node >= v0.6.0" ]
 }
