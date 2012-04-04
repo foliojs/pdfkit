@@ -144,9 +144,17 @@ module.exports =
 
     clip: (rule) ->
         @addContent 'W' + @_windingRule(rule) + ' n'
-        
+
     transform: (m11, m12, m21, m22, dx, dy) ->
-        values = [m11, m12, m21, m22, dx, dy].join ' '
+        values = [m11, m12, m21, m22, dx, dy].map (v) ->
+          str = v.toFixed(20);
+          v = +str;
+          if (v >= 1 || v <= -1 || v == 0)
+            return v.toString();
+          else
+            return str;
+          
+        values = values.join ' '
         @addContent "#{values} cm"
         
     translate: (x, y) ->
