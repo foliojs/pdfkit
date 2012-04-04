@@ -14,13 +14,12 @@ module.exports =
         y = y ? options.y ? @y
 
         if @_imageRegistry[src]
-            [image, obj, label] = @_imageRegistry[src]
+            [image, @page, label] = @_imageRegistry[src]
 
         else
             image = PDFImage.open(src)
-            obj = image.object(this)
             label = "I" + (++@_imageCount)
-            @_imageRegistry[src] = [image, obj, label]
+            @_imageRegistry[src] = [image, @page, label]
 
         w = options.width or image.width
         h = options.height or image.height
@@ -52,9 +51,7 @@ module.exports =
         
         # Set the current y position to below the image if it is in the document flow            
         @y += h if @y is y
-
         y = @page.height - y - h
-        @page.xobjects[label] ?= obj
 
         @save()
         @addContent "#{w} 0 0 #{h} #{x} #{y} cm"
@@ -62,3 +59,14 @@ module.exports =
         @restore()
 
         return this
+        
+    embedImages: (fn) ->
+        images = (item for src, item of @_imageRegistry)
+        do proceed = =>
+            if images.length
+                [image, page, label] = images.shift()
+                image.object this, (obj) ->
+                    page.xobjects[label] ?= obj
+                    proceed()
+            else
+                fn()

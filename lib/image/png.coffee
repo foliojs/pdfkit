@@ -1,13 +1,8 @@
 fs = require 'fs'
 Data = '../data'
-zlib = require 'flate'
+zlib = require 'zlib'
 
 class PNG
-    @open: (filename) ->
-        contents = fs.readFileSync filename
-        data = new Data(contents)
-        new PNG(data)
-    
     constructor: (@data) ->
         data.pos = 8 # Skip the default header
         
@@ -84,7 +79,22 @@ class PNG
         
         return
         
-    object: (document) ->
+    object: (document, fn) ->
+        # get the async stuff out of the way first
+        if not @alphaChannel
+            if @transparency.indexed
+                # Create a transparency SMask for the image based on the data 
+                # in the PLTE and tRNS sections. See below for details on SMasks.
+                @loadIndexedAlphaChannel => @object document, fn
+                return
+            
+            else if @hasAlphaChannel
+                # For PNG color types 4 and 6, the transparency data is stored as a alpha
+                # channel mixed in with the main image data. Separate this data out into an
+                # SMask object and store it separately in the PDF.
+                @splitAlphaChannel => @object document, fn
+                return
+        
         obj = document.ref
             Type: 'XObject'
             Subtype: 'Image'
@@ -130,18 +140,6 @@ class PNG
                 mask.push x, x
                 
             obj.data['Mask'] = mask
-            
-        else if @transparency.indexed
-            # Create a transparency SMask for the image based on the data 
-            # in the PLTE and tRNS sections. See below for details on SMasks.
-            @loadIndexedAlphaChannel()
-            
-        # For PNG color types 4 and 6, the transparency data is stored as a alpha
-        # channel mixed in with the main image data. Separate this data out into an
-        # SMask object and store it separately in the PDF.
-        if @hasAlphaChannel
-            @splitAlphaChannel()
-            obj.data['Length'] = @imgData.length
         
         if @alphaChannel
             sMask = document.ref
@@ -160,105 +158,112 @@ class PNG
         
         # add the actual image data    
         obj.add @imgData
-        return obj
+        fn obj
         
-    decodePixels: ->
-        data = zlib.inflate @imgData
-        pixelBytes = @pixelBitlength / 8
-        scanlineLength = pixelBytes * @width
-
-        row = 0
-        pixels = []
-        length = data.length
-        pos = 0
-
-        while pos < length
-            filter = data[pos++]
-            i = 0
-            rowData = []
-
-            switch filter
-                when 0 # None
-                    while i < scanlineLength
-                        rowData[i++] = data[pos++]
-
-                when 1 # Sub
-                    while i < scanlineLength
-                        byte = data[pos++]
-                        left = if i < pixelBytes then 0 else rowData[i - pixelBytes]
-                        rowData[i++] = (byte + left) % 256
-
-                when 2 # Up
-                    while i < scanlineLength
-                        byte = data[pos++]
-                        col = (i - (i % pixelBytes)) / pixelBytes
-                        upper = if row is 0 then 0 else pixels[row - 1][col][i % pixelBytes]
-                        rowData[i++] = (upper + byte) % 256
-
-                when 3 # Average
-                    while i < scanlineLength
-                        byte = data[pos++]
-                        col = (i - (i % pixelBytes)) / pixelBytes
-                        left = if i < pixelBytes then 0 else rowData[i - pixelBytes]
-                        upper = if row is 0 then 0 else pixels[row - 1][col][i % pixelBytes]
-                        rowData[i++] = (byte + Math.floor((left + upper) / 2)) % 256
-
-                when 4 # Paeth
-                    while i < scanlineLength
-                        byte = data[pos++]
-                        col = (i - (i % pixelBytes)) / pixelBytes
-                        left = if i < pixelBytes then 0 else rowData[i - pixelBytes]
-
-                        if row is 0
-                            upper = upperLeft = 0
-                        else
-                            upper = pixels[row - 1][col][i % pixelBytes]
-                            upperLeft = if col is 0 then 0 else pixels[row - 1][col - 1][i % pixelBytes]
-
-                        p = left + upper - upperLeft
-                        pa = Math.abs(p - left)
-                        pb = Math.abs(p - upper)
-                        pc = Math.abs(p - upperLeft)
-
-                        if pa <= pb and pa <= pc
-                            paeth = left
-                        else if pb <= pc
-                            paeth = upper
-                        else
-                            paeth = upperLeft
-
-                        rowData[i++] = (byte + paeth) % 256
-
-                else
-                    throw new Error "Invalid filter algorithm: " + filter 
-
-            s = []
-            for i in [0...rowData.length] by pixelBytes
-                s.push rowData.slice(i, i + pixelBytes)
-
-            pixels.push(s)
-            row += 1
+    decodePixels: (fn) ->
+        zlib.inflate @imgData, (err, data) =>
+            throw err if err
             
-        return pixels
-        
-    splitAlphaChannel: ->
-        pixels = @decodePixels()
+            pixelBytes = @pixelBitlength / 8
+            scanlineLength = pixelBytes * @width
 
-        colorByteSize = @colors * @bits / 8
-        alphaByteSize = 1
+            row = 0
+            pixels = []
+            length = data.length
+            pos = 0
 
-        pixelCount = @width * @height
-        imgData = new Buffer(pixelCount * colorByteSize)
-        alphaChannel = new Buffer(pixelCount)
+            while pos < length
+                filter = data[pos++]
+                i = 0
+                rowData = []
+
+                switch filter
+                    when 0 # None
+                        while i < scanlineLength
+                            rowData[i++] = data[pos++]
+
+                    when 1 # Sub
+                        while i < scanlineLength
+                            byte = data[pos++]
+                            left = if i < pixelBytes then 0 else rowData[i - pixelBytes]
+                            rowData[i++] = (byte + left) % 256
+
+                    when 2 # Up
+                        while i < scanlineLength
+                            byte = data[pos++]
+                            col = (i - (i % pixelBytes)) / pixelBytes
+                            upper = if row is 0 then 0 else pixels[row - 1][col][i % pixelBytes]
+                            rowData[i++] = (upper + byte) % 256
+
+                    when 3 # Average
+                        while i < scanlineLength
+                            byte = data[pos++]
+                            col = (i - (i % pixelBytes)) / pixelBytes
+                            left = if i < pixelBytes then 0 else rowData[i - pixelBytes]
+                            upper = if row is 0 then 0 else pixels[row - 1][col][i % pixelBytes]
+                            rowData[i++] = (byte + Math.floor((left + upper) / 2)) % 256
+
+                    when 4 # Paeth
+                        while i < scanlineLength
+                            byte = data[pos++]
+                            col = (i - (i % pixelBytes)) / pixelBytes
+                            left = if i < pixelBytes then 0 else rowData[i - pixelBytes]
+
+                            if row is 0
+                                upper = upperLeft = 0
+                            else
+                                upper = pixels[row - 1][col][i % pixelBytes]
+                                upperLeft = if col is 0 then 0 else pixels[row - 1][col - 1][i % pixelBytes]
+
+                            p = left + upper - upperLeft
+                            pa = Math.abs(p - left)
+                            pb = Math.abs(p - upper)
+                            pc = Math.abs(p - upperLeft)
+
+                            if pa <= pb and pa <= pc
+                                paeth = left
+                            else if pb <= pc
+                                paeth = upper
+                            else
+                                paeth = upperLeft
+
+                            rowData[i++] = (byte + paeth) % 256
+
+                    else
+                        throw new Error "Invalid filter algorithm: " + filter 
+
+                s = []
+                for i in [0...rowData.length] by pixelBytes
+                    s.push rowData.slice(i, i + pixelBytes)
+
+                pixels.push(s)
+                row += 1
+            
+            fn pixels
         
-        p = a = 0
-        for row in pixels
-            for pixel in row
-                imgData[p++] = pixel[i] for i in [0...colorByteSize]
-                alphaChannel[a++] = pixel[colorByteSize]
+    splitAlphaChannel: (fn) ->
+        @decodePixels (pixels) =>
+            colorByteSize = @colors * @bits / 8
+            alphaByteSize = 1
+
+            pixelCount = @width * @height
+            imgData = new Buffer(pixelCount * colorByteSize)
+            alphaChannel = new Buffer(pixelCount)
         
-        @imgData = zlib.deflate imgData
-        @alphaChannel = zlib.deflate alphaChannel
+            p = a = 0
+            for row in pixels
+                for pixel in row
+                    imgData[p++] = pixel[i] for i in [0...colorByteSize]
+                    alphaChannel[a++] = pixel[colorByteSize]
+            
+            done = 0
+            zlib.deflate imgData, (err, @imgData) =>
+                throw err if err
+                fn() if ++done is 2
+                
+            zlib.deflate alphaChannel, (err, @alphaChannel) =>
+                throw err if err
+                fn() if ++done is 2
         
     decodePalette: ->
         palette = @palette
@@ -273,19 +278,20 @@ class PNG
             
         return decodingMap
         
-    loadIndexedAlphaChannel: ->
+    loadIndexedAlphaChannel: (fn) ->
         palette = @decodePalette()
-        pixels = @decodePixels()
+        @decodePixels (pixels) =>
+            pixelCount = @width * @height
+            alphaChannel = new Buffer(pixelCount)
         
-        pixelCount = @width * @height
-        alphaChannel = new Buffer(pixelCount)
-        
-        i = 0
-        for row in pixels
-            for pixel in row
-                pixel = pixel[0]
-                alphaChannel[i++] = palette[pixel][3]
+            i = 0
+            for row in pixels
+                for pixel in row
+                    pixel = pixel[0]
+                    alphaChannel[i++] = palette[pixel][3]
             
-        @alphaChannel = zlib.deflate alphaChannel
+            zlib.deflate alphaChannel, (err, @alphaChannel) =>
+                throw err if err
+                fn()
         
 module.exports = PNG

@@ -48,4 +48,10 @@ module.exports =
     registerFont: (name, path, family) ->
         @_registeredFonts[name] = 
             filename: path
-            family: family
+            family: family            
+            
+    embedFonts: (fn) ->
+        fonts = (font for family, font of @_fontFamilies)
+        do proceed = =>
+            return fn() if fonts.length is 0
+            fonts.shift().embed(proceed)

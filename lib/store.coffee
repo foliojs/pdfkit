@@ -9,14 +9,13 @@ class PDFObjectStore
     constructor: ->
         @objects = {}
         @length = 0
-        
+                
         @root = @ref
             Type: 'Catalog'
-            
-        @root.data['Pages'] = @ref
-            Type: 'Pages'
-            Count: 0
-            Kids: []
+            Pages: @ref
+                Type: 'Pages'
+                Count: 0
+                Kids: []
             
         @pages = @root.data['Pages']
             

@@ -6,7 +6,7 @@ By Devon Govett
 TTFFont = require './font/ttf'
 AFMFont = require './font/afm'
 Subset = require './font/subset'
-zlib = require 'flate'
+zlib = require 'zlib'
 
 class PDFFont
     constructor: (@document, @filename, @family, @id) ->
@@ -29,8 +29,9 @@ class PDFFont
     use: (characters) ->
         @subset?.use characters
         
-    embed: ->
-        @embedTTF() unless @isAFM
+    embed: (fn) ->
+        return fn() if @isAFM
+        @embedTTF fn
         
     encode: (text) ->
         @subset?.encodeText(text) or text
@@ -78,52 +79,54 @@ class PDFFont
             Type: 'Font'
             Subtype: 'TrueType'
             
-    embedTTF: ->
+    embedTTF: (fn) ->
         data = @subset.encode()
-        compressedData = zlib.deflate(data)
+        zlib.deflate data, (err, compressedData) =>
+            throw err if err
         
-        @fontfile = @document.ref
-            Length: compressedData.length
-            Length1: data.length
-            Filter: 'FlateDecode'
+            @fontfile = @document.ref
+                Length: compressedData.length
+                Length1: data.length
+                Filter: 'FlateDecode'
             
-        @fontfile.add compressedData
+            @fontfile.add compressedData
                 
-        @descriptor = @document.ref
-            Type: 'FontDescriptor'
-            FontName: @subset.postscriptName
-            FontFile2: @fontfile
-            FontBBox: @bbox
-            Flags: @flags
-            StemV: @stemV
-            ItalicAngle: @italicAngle
-            Ascent: @ascender
-            Descent: @decender
-            CapHeight: @capHeight
-            XHeight: @xHeight
+            @descriptor = @document.ref
+                Type: 'FontDescriptor'
+                FontName: @subset.postscriptName
+                FontFile2: @fontfile
+                FontBBox: @bbox
+                Flags: @flags
+                StemV: @stemV
+                ItalicAngle: @italicAngle
+                Ascent: @ascender
+                Descent: @decender
+                CapHeight: @capHeight
+                XHeight: @xHeight
                 
-        firstChar = +Object.keys(@subset.cmap)[0]
-        charWidths = for code, glyph of @subset.cmap
-            Math.round @ttf.hmtx.forGlyph(glyph).advance * @scaleFactor
+            firstChar = +Object.keys(@subset.cmap)[0]
+            charWidths = for code, glyph of @subset.cmap
+                Math.round @ttf.hmtx.forGlyph(glyph).advance * @scaleFactor
             
         
-        cmap = @document.ref()
-        cmap.add toUnicodeCmap(@subset.subset)
-        cmap.finalize(true) # compress it
+            cmap = @document.ref()
+            cmap.add toUnicodeCmap(@subset.subset)
             
-        ref = 
-            Type: 'Font'
-            BaseFont: @subset.postscriptName
-            Subtype: 'TrueType'
-            FontDescriptor: @descriptor
-            FirstChar: firstChar
-            LastChar: firstChar + charWidths.length - 1
-            Widths: @document.ref charWidths
-            Encoding: 'MacRomanEncoding'
-            ToUnicode: cmap
+            ref = 
+                Type: 'Font'
+                BaseFont: @subset.postscriptName
+                Subtype: 'TrueType'
+                FontDescriptor: @descriptor
+                FirstChar: firstChar
+                LastChar: firstChar + charWidths.length - 1
+                Widths: @document.ref charWidths
+                Encoding: 'MacRomanEncoding'
+                ToUnicode: cmap
             
-        for key, val of ref
-            @ref.data[key] = val
+            for key, val of ref
+                @ref.data[key] = val
+                
+            cmap.finalize(@document.compress, fn) # compress it
             
     toUnicodeCmap = (map) ->
         unicodeMap = '''

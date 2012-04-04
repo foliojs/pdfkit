@@ -15,7 +15,7 @@ class PDFDocument
         @version = 1.3
         
         # Whether streams should be compressed
-        @compress = true
+        @compress = yes
         
         # The PDF object store
         @store = new PDFObjectStore
@@ -80,30 +80,34 @@ class PDFDocument
         @page.content.add str
         return this # make chaining possible
         
-    write: (filename, callback) ->
-         fs.writeFile filename, @output(), 'binary', callback
+    write: (filename, fn) ->
+        @output (out) ->
+            fs.writeFile filename, out, 'binary', fn
         
-    output: ->
-       out = []
-       @finalize()
-       @generateHeader out
-       @generateBody out
-       @generateXRef out
-       @generateTrailer out
-       return out.join('\n')
+    output: (fn) ->
+       @finalize =>
+           out = []
+           @generateHeader out
+           @generateBody out, =>
+               @generateXRef out
+               @generateTrailer out
+               fn out.join('\n')
         
-    finalize: ->
+    finalize: (fn) ->
         # convert strings in the info dictionary to literals
         for key, val of @info when typeof val is 'string'
             @info[key] = PDFObject.s val
         
         # embed the subsetted fonts
-        for family, font of @_fontFamilies
-            font.embed()
-        
-        # finalize each page
-        for page in @pages
-            page.finalize()
+        @embedFonts =>
+            # embed the images
+            @embedImages =>
+                done = 0
+                cb = => fn() if ++done is @pages.length
+            
+                # finalize each page
+                for page in @pages
+                    page.finalize(cb)
         
     generateHeader: (out) ->
         # PDF version
@@ -113,17 +117,20 @@ class PDFDocument
         out.push "%\xFF\xFF\xFF\xFF\n"
         return out
         
-    generateBody: (out) ->
+    generateBody: (out, fn) ->
         offset = out.join('\n').length
         
-        for id, ref of @store.objects
-            object = ref.object()
-            ref.offset = offset
-            out.push object
-            
-            offset += object.length + 1
-            
-        @xref_offset = offset
+        refs = (ref for id, ref of @store.objects)
+        do proceed = =>
+            if ref = refs.shift()
+                ref.object @compress, (object) ->
+                    ref.offset = offset
+                    out.push object
+                    offset += object.length + 1
+                    proceed()
+            else
+                @xref_offset = offset
+                fn()
         
     generateXRef: (out) ->
         len = @store.length + 1

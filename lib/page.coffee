@@ -5,8 +5,8 @@ By Devon Govett
 
 class PDFPage
     constructor: (@document, options = {}) ->
-        @size = options.size or "letter"
-        @layout = options.layout or "portrait"
+        @size = options.size or 'letter'
+        @layout = options.layout or 'portrait'
         
         # if margin was passed as a single number
         if typeof options.margin is 'number'
@@ -55,8 +55,8 @@ class PDFPage
     maxY: ->
         @height - @margins.bottom
         
-    finalize: ->
-        @content.finalize(@document.compress)
+    finalize: (fn) ->
+        @content.finalize(@document.compress, fn)
         
     DEFAULT_MARGINS = 
         top: 72

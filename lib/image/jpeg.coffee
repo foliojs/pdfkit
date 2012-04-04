@@ -2,11 +2,6 @@ fs = require 'fs'
 Data = '../data'
 
 class JPEG
-    @open: (filename) ->
-        contents = fs.readFileSync filename
-        data = new Data(contents)
-        new JPEG(data)
-    
     constructor: (@data) ->
         len = data.length
         
@@ -36,7 +31,7 @@ class JPEG
             
         @imgData = @data
         
-    object: (document) ->
+    object: (document, fn) ->
         obj = document.ref
             Type: 'XObject'
             Subtype: 'Image'
@@ -54,6 +49,6 @@ class JPEG
             obj.data['Decode'] = [1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0]
             
         obj.add @data.data
-        return obj
+        fn obj
         
 module.exports = JPEG
