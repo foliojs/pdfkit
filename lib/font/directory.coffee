@@ -66,7 +66,8 @@ class Directory
                 
         return new Buffer(directory.data)
             
-    checksum = ([data...]) ->
+    checksum = (data) ->
+        data = [data...]
         while data.length % 4
             data.push 0
                 
