@@ -3,7 +3,6 @@ PDFImage - embeds images in PDF documents
 By Devon Govett
 ###
 
-return if not require('streamline/module')(module)
 fs = require 'fs'
 Data = require './data'
 JPEG = require './image/jpeg'

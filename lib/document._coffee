@@ -3,7 +3,6 @@ PDFDocument - represents an entire PDF document
 By Devon Govett
 ###
 
-return if not require('streamline/module')(module)
 fs = require 'fs'
 PDFObjectStore = require './store'
 PDFObject = require './object'

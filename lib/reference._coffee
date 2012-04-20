@@ -3,7 +3,6 @@ PDFReference - represents a reference to another object in the PDF object heirar
 By Devon Govett
 ###
 
-return if not require('streamline/module')(module)
 zlib = require 'zlib'
 
 class PDFReference

@@ -1,4 +1,3 @@
-return if not require('streamline/module')(module)
 fs = require 'fs'
 Data = '../data'
 zlib = require 'zlib'

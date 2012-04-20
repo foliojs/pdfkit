@@ -1,4 +1,3 @@
-return if not require('streamline/module')(module)
 PDFImage = require '../image'
 
 module.exports =

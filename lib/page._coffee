@@ -3,8 +3,6 @@ PDFPage - represents a single page in the PDF document
 By Devon Govett
 ###
 
-return if not require('streamline/module')(module)
-
 class PDFPage
     constructor: (@document, options = {}) ->
         @size = options.size or "letter"

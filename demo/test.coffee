@@ -2,7 +2,6 @@ return if not require('streamline/module')(module)
 PDFDocument = require 'streamline-pdfkit'
 tiger = require './tiger'
 
-console.log('test2')
 # Create a new PDFDocument
 #doc = new PDFDocument
 #doc = PDFDocument.create(_, )
@@ -95,6 +94,5 @@ doc.addPage()
 doc.fillColor('#000')
    .font(_,'fonts/Chalkboard.ttc', 'Chalkboard', 16)
    .list(['One', 'Two', 'Three'], 100, 150)
- 
 
-doc.write 'out2.pdf',_
+doc.write 'test.pdf',_

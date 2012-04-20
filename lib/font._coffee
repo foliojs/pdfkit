@@ -3,7 +3,6 @@ PDFFont - embeds fonts in PDF documents
 By Devon Govett
 ###
 
-return if not require('streamline/module')(module)
 TTFFont = require './font/ttf'
 AFMFont = require './font/afm'
 Subset = require './font/subset'
