@@ -74,9 +74,10 @@ class SVGPath
         
         return ret
     
-    cx = cy = px = py = 0
+    cx = cy = px = py = sx = sy = 0
     apply = (commands, doc) ->
-        cx = cy = px = py = 0
+        # current point, control point, and subpath starting point
+        cx = cy = px = py = sx = sy = 0
 
         # run the commands
         for c, i in commands
@@ -89,12 +90,16 @@ class SVGPath
             cx = a[0]
             cy = a[1]
             px = py = null
+            sx = cx
+            sy = cy
             doc.moveTo cx, cy
 
         m: (doc, a) ->
             cx += a[0]
             cy += a[1]
             px = py = null
+            sx = cx
+            sy = cy
             doc.moveTo cx, cy
 
         C: (doc, a) ->
@@ -215,16 +220,20 @@ class SVGPath
 
         Z: (doc) ->
             doc.closePath()
+            cx = sx
+            cy = sy
 
         z: (doc) ->
             doc.closePath()
+            cx = sx
+            cy = sy
 
     solveArc = (doc, x, y, coords) ->
         [rx,ry,rot,large,sweep,ex,ey] = coords
         segs = arcToSegments(ex, ey, rx, ry, large, sweep, rot, x, y)
 
         for seg in segs
-            bez = segmentToBezier segs...
+            bez = segmentToBezier seg...
             doc.bezierCurveTo bez...
 
     # from Inkscape svgtopdf, thanks!
