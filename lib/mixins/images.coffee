@@ -14,12 +14,13 @@ module.exports =
         y = y ? options.y ? @y
 
         if @_imageRegistry[src]
-            [image, @page, label] = @_imageRegistry[src]
+            [image, label, pages] = @_imageRegistry[src]
+            pages.push @page unless @page in pages
 
         else
             image = PDFImage.open(src)
             label = "I" + (++@_imageCount)
-            @_imageRegistry[src] = [image, @page, label]
+            @_imageRegistry[src] = [image, label, [@page]]
 
         w = options.width or image.width
         h = options.height or image.height
@@ -64,9 +65,11 @@ module.exports =
         images = (item for src, item of @_imageRegistry)
         do proceed = =>
             if images.length
-                [image, page, label] = images.shift()
+                [image, label, pages] = images.shift()
                 image.object this, (obj) ->
-                    page.xobjects[label] ?= obj
+                    for page in pages
+                        page.xobjects[label] ?= obj
+                        
                     proceed()
             else
                 fn()
