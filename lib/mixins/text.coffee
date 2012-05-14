@@ -1,5 +1,5 @@
 # This regular expression is used for splitting a string into wrappable words
-WORD_RE = /([^ ,\/!.?:;\-\n]+[ ,\/!.?:;\-]*)|\n/g
+WORD_RE = /(\S+\s*)|\n/g
 
 module.exports = 
     initText: ->
