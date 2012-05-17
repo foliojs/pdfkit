@@ -10,9 +10,6 @@ module.exports =
     restore: ->
         @addContent 'Q'
         
-    beginPath: ->
-        @addContent 'm'
-        
     closePath: ->
         @addContent 'h'
     
