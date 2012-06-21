@@ -46,7 +46,7 @@ module.exports =
         @addContent "[#{length} #{space}] #{phase} d"
         
     undash: ->
-        @addContent "[null null] 0 d"
+        @addContent "[] 0 d"
         
     moveTo: (x, y) ->
         y = @page.height - y
