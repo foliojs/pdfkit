@@ -129,6 +129,10 @@ module.exports =
         # indentation support
         x += indent
         
+        # user-accessible hook
+        if options.eachLine
+          options.eachLine.apply(this, [text, x, y])
+
         # flip coordinate system
         y = @page.height - y - (@_font.ascender / 1000 * @_fontSize)
         
