@@ -30,5 +30,8 @@ class PDFObjectStore
     addPage: (page) ->
         @pages.data['Kids'].push(page.dictionary)
         @pages.data['Count']++
-        
+
+    openAction: (action) ->
+        @root.data.OpenAction = @ref (action)
+
 module.exports = PDFObjectStore

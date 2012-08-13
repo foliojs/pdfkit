@@ -7,6 +7,7 @@ fs = require 'fs'
 PDFObjectStore = require './store'
 PDFObject = require './object'
 PDFReference = require './reference'
+PDFJavaScript = require './javascript'
 PDFPage = require './page'
 
 class PDFDocument
@@ -58,7 +59,13 @@ class PDFDocument
     mixin 'text'
     mixin 'images'
     mixin 'annotations'
-        
+
+    openAction: (data) ->
+        @store.openAction data
+
+    javaScript: (data) ->
+        return new PDFJavaScript data
+
     addPage: (options = @options) ->
         # create a page object
         @page = new PDFPage(this, options)
