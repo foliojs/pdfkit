@@ -20,7 +20,10 @@ class PDFObject
             
         else if object instanceof PDFReference
             object.toString()
-            
+
+        else if object instanceof PDFJavaScript
+            object.toString()
+
         else if object instanceof Date
             '(D:' + pad(object.getUTCFullYear(), 4) + 
                     pad(object.getUTCMonth(), 2) + 
@@ -54,3 +57,4 @@ class PDFObject
         
 module.exports = PDFObject
 PDFReference = require './reference'
+PDFJavaScript = require './javascript'
