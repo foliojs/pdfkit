@@ -189,7 +189,7 @@ module.exports =
         wrap.maxY = @y + options.height - @currentLineHeight()
         
         # split the line into words
-        words = text.match(WORD_RE)
+        words = text.match(WORD_RE) || [text]
         
         # calculate the extra width
         wrap.extraSpace = (options.wordSpacing or 0) * (words.length - 1) +   # wordSpacing
