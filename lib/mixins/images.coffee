@@ -63,13 +63,9 @@ module.exports =
         
     embedImages: (fn) ->
         images = (item for src, item of @_imageRegistry)
-        do proceed = =>
-            if images.length
-                [image, label, pages] = images.shift()
-                image.object this, (obj) ->
-                    for page in pages
-                        page.xobjects[label] ?= obj
-                        
-                    proceed()
-            else
-                fn()
+        for imobj in images
+            [image, label, pages] = imobj
+            image.object this, (obj) ->
+                for page in pages
+                    page.xobjects[label] ?= obj
+        setTimeout(fn,0)
