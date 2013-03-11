@@ -75,9 +75,12 @@ module.exports =
         @y = y = oy or @y
 
         for item in array
-            @circle x + 3, @y + gap + 3, 3
-            @text item, x + 15
-            @y += 3
+            if item instanceof Array
+                @list item, x + 15
+            else
+                @circle x + 3, @y + gap + 3, 3
+                @text item, x + 15
+                @y += 3
 
         @x = x
         @fill()
