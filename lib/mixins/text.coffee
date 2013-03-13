@@ -27,6 +27,10 @@ module.exports =
             
         # Convert text to a string
         text = '' + text
+
+        # If a height is set, save it as a cutHeight for wrap function
+        if options.height
+            options.cutHeight = options.height
             
         # Update the current position
         if x? or y?
@@ -187,6 +191,9 @@ module.exports =
         
         # calculate the maximum Y position the text can appear at
         wrap.maxY = @y + options.height - @currentLineHeight()
+
+        # calculate the maximum Y position for the text when a height has been set
+        wrap.cutY = this.y + (options.cutHeight || 0) - this.currentLineHeight()
         
         # split the line into words
         words = text.match(WORD_RE) || [text]
@@ -223,19 +230,23 @@ module.exports =
                 
                 # we're no longer on the first line...
                 wrap.firstLine = false
-                
-                # if we've reached the maximum height, make sure
-                # that the first line of a paragraph is never by 
-                # itself at the bottom of a page
-                nextY = @y + @currentLineHeight(true)
-                if @y > wrap.maxY or (wrap.lastLine and nextY > wrap.maxY)
-                    # if we've reached the edge of the page, 
-                    # continue on a new page or column
-                    @_nextSection options
-                
-                # reset the space left and buffer
-                spaceLeft = lineWidth - w - wrap.extraSpace
-                buffer = if word is '\n' then '' else word
+
+                # if we've reached the maximum set height, stop processing this text
+                if options.cutHeight and nextY > wrap.cutY
+                    break
+                else
+                    # if we've reached the maximum height, make sure
+                    # that the first line of a paragraph is never by 
+                    # itself at the bottom of a page
+                    nextY = @y + @currentLineHeight(true)
+                    if @y > wrap.maxY or (wrap.lastLine and nextY > wrap.maxY)
+                        # if we've reached the edge of the page, 
+                        # continue on a new page or column
+                        @_nextSection options
+                    
+                    # reset the space left and buffer
+                    spaceLeft = lineWidth - w - wrap.extraSpace
+                    buffer = if word is '\n' then '' else word
 
             else
                 # add the word to the buffer
