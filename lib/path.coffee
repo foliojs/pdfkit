@@ -45,7 +45,7 @@ class SVGPath
 
                 cmd = c
 
-            else if c in [" ", ","] or (c is "-" and curArg.length > 0) or (c is "." and foundDecimal)
+            else if c in [" ", ","] or (c is "-" and curArg.length > 0 and curArg[curArg.length-1]!='e') or (c is "." and foundDecimal)
                 continue if curArg.length is 0
 
                 if args.length is params # handle reused commands
