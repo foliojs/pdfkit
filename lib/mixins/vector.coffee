@@ -4,10 +4,17 @@ SVGPath = require '../path'
 # Bezier curve.
 KAPPA = 4.0 * ((Math.sqrt(2) - 1.0) / 3.0)
 module.exports =
+    initVector: ->
+        @_ctm = [1, 0, 0, 1, 0, 0] # current transformation matrix
+        @_ctmStack = []
+        
     save: ->
+        @_ctmStack.push @_ctm.slice()
+        # TODO: save/restore colorspace and styles so not setting it unnessesarily all the time?
         @addContent 'q'
         
     restore: ->
+        @_ctm = @_ctmStack.pop() or [1, 0, 0, 1, 0, 0]
         @addContent 'Q'
         
     closePath: ->
@@ -49,26 +56,18 @@ module.exports =
         @addContent "[] 0 d"
         
     moveTo: (x, y) ->
-        y = @page.height - y
         @addContent "#{x} #{y} m"
 
     lineTo: (x, y) ->
-        y = @page.height - y
         @addContent "#{x} #{y} l"
         
     bezierCurveTo: (cp1x, cp1y, cp2x, cp2y, x, y) ->
-        cp1y = @page.height - cp1y
-        cp2y = @page.height - cp2y
-        y = @page.height - y
         @addContent "#{cp1x} #{cp1y} #{cp2x} #{cp2y} #{x} #{y} c"
         
     quadraticCurveTo: (cpx, cpy, x, y) ->
-        cpy = @page.height - cpy
-        y = @page.height - y
         @addContent "#{cpx} #{cpy} #{x} #{y} v"
         
     rect: (x, y, w, h) ->
-        y = @page.height - y - h
         @addContent "#{x} #{y} #{w} #{h} re"
         
     roundedRect: (x, y, w, h, r = 0) ->
@@ -143,11 +142,21 @@ module.exports =
         @addContent 'W' + @_windingRule(rule) + ' n'
         
     transform: (m11, m12, m21, m22, dx, dy) ->
+        # keep track of the current transformation matrix
+        m = @_ctm
+        [m0, m1, m2, m3, m4, m5] = m
+        m[0] = m0 * m11 + m2 * m12
+        m[1] = m1 * m11 + m3 * m12
+        m[2] = m0 * m21 + m2 * m22
+        m[3] = m1 * m21 + m3 * m22
+        m[4] = m0 * dx + m2 * dy + m4
+        m[5] = m1 * dx + m3 * dy + m5
+        
         values = (+v.toFixed(5) for v in [m11, m12, m21, m22, dx, dy]).join(' ')
         @addContent "#{values} cm"
         
     translate: (x, y) ->
-        @transform 1, 0, 0, 1, x, -y
+        @transform 1, 0, 0, 1, x, y
         
     rotate: (angle, options = {}) ->
         rad = angle * Math.PI / 180
@@ -156,8 +165,7 @@ module.exports =
         x = y = 0
 
         if options.origin?
-            x = options.origin[0]
-            y = @page.height - options.origin[1]
+            [x, y] = options.origin
             x1 = x * cos - y * sin
             y1 = x * sin + y * cos
             x -= x1
@@ -165,13 +173,15 @@ module.exports =
 
         @transform cos, sin, -sin, cos, x, y
         
-    scale: (factor, options = {}) ->
-        x = y = 0
-        
-        if options.origin?
-            x = options.origin[0]
-            y = @page.height - options.origin[1]
-            x -= factor * x
-            y -= factor * y
+    scale: (xFactor, yFactor = xFactor, options = {}) ->
+        if arguments.length is 2
+            yFactor = xFactor
+            options = yFactor
             
-        @transform factor, 0, 0, factor, x, y
+        x = y = 0
+        if options.origin?
+            [x, y] = options.origin
+            x -= xFactor * x
+            y -= yFactor * y
+        
+        @transform xFactor, 0, 0, yFactor, x, y

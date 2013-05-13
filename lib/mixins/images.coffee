@@ -52,13 +52,12 @@ module.exports =
         
         # Set the current y position to below the image if it is in the document flow            
         @y += h if @y is y
-        y = @page.height - y - h
 
         @save()
-        @addContent "#{w} 0 0 #{h} #{x} #{y} cm"
+        @transform w, 0, 0, -h, x, y + h
         @addContent "/#{label} Do"
         @restore()
-
+            
         return this
         
     embedImages: (fn) ->

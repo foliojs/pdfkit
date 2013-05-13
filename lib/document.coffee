@@ -28,6 +28,7 @@ class PDFDocument
         
         # Initialize mixins
         @initColor()
+        @initVector()
         @initFonts()
         @initText()
         @initImages()
@@ -71,6 +72,11 @@ class PDFDocument
         @x = @page.margins.left
         @y = @page.margins.top
         
+        # flip PDF coordinate system so that the origin is in
+        # the top left rather than the bottom left
+        @_ctm = [1, 0, 0, 1, 0, 0]
+        @transform 1, 0, 0, -1, 0, @page.height
+        
         return this
         
     ref: (data) ->
@@ -91,7 +97,12 @@ class PDFDocument
            @generateBody out, =>
                @generateXRef out
                @generateTrailer out
-               fn out.join('\n')
+               
+               ret = ''
+               for k in out
+                   ret += k + '\n'
+                   
+               fn ret
         
     finalize: (fn) ->
         # convert strings in the info dictionary to literals
