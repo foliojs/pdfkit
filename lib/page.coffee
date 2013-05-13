@@ -49,6 +49,8 @@ class PDFPage
                 get: => @resources['XObject'] ?= {}
             ext_gstates:
                 get: => @resources['ExtGState'] ?= {}
+            patterns:
+                get: => @resources['Pattern'] ?= {}
             annotations:
                 get: => @dictionary.data['Annots'] ?= []
                 

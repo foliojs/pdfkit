@@ -1,10 +1,16 @@
+{PDFGradient, PDFLinearGradient, PDFRadialGradient} = require '../gradient'
+
 module.exports =
     initColor: ->
         # The opacity dictionaries
         @_opacityRegistry = {}
         @_opacityCount = 0
-
+        @_gradCount = 0
+        
     _normalizeColor: (color) ->
+        if color instanceof PDFGradient
+            return color
+        
         if typeof color is 'string'
             if color.charAt(0) is '#'
                 color = color.replace(/#([0-9A-F])([0-9A-F])([0-9A-F])/i, "#$1$1$2$2$3$3") if color.length is 4
@@ -13,46 +19,73 @@ module.exports =
                
             else if namedColors[color]
                 color = namedColors[color]
-
+                
         if Array.isArray color
             # RGB
             if color.length is 3
                 color = (part / 255 for part in color)
-            
+
             # CMYK
             else if color.length is 4
-                color = (part / 100 for part in color)
-            
+                color = (part / 100 for part in color)        
+        
             return color
-
+            
         return null
 
+    _setColor: (color, stroke) ->
+        color = @_normalizeColor color
+        return no unless color
+        
+        # clear sMask
+        if @_sMasked
+            gstate = @ref
+                Type: 'ExtGState'
+                SMask: 'None'
+                
+            name = "Gs#{++@_opacityCount}"
+            @page.ext_gstates[name] = gstate
+            @addContent "/#{name} gs"
+        
+        op = if stroke then 'SCN' else 'scn'
+
+        if color instanceof PDFGradient
+            @_setColorSpace 'Pattern', stroke
+            color.apply(op)
+        else
+            space = if color.length is 4 then 'DeviceCMYK' else 'DeviceRGB'
+            @_setColorSpace space, stroke
+            
+            color = color.join ' '
+            @addContent "#{color} #{op}"
+        
+        return yes
+        
+    _setColorSpace: (space, stroke) ->
+        op = if stroke then 'CS' else 'cs'
+        @addContent "/#{space} #{op}"
+
     fillColor: (color, opacity) ->
-       color = @_normalizeColor(color)
-       return this unless color
-       
-       @fillOpacity opacity if opacity?
-       color = color.join ' '
-       op = if color.length is 4 then 'k' else 'rg'
-       @addContent "#{color} #{op}"
+        set = @_setColor color, no
+        @fillOpacity opacity if set and opacity?
+        return this
 
     strokeColor: (color, opacity) ->
-       color = @_normalizeColor(color)
-       return this unless color
-
-       @strokeOpacity opacity if opacity?
-       color = color.join ' '
-       op = if color.length is 4 then 'K' else 'RG'
-       @addContent "#{color} #{op}"
+        set = @_setColor color, yes
+        @strokeOpacity opacity if set and opacity?
+        return this
        
     opacity: (opacity) ->
        @_doOpacity opacity, opacity
+       return this
        
     fillOpacity: (opacity) ->
        @_doOpacity opacity, null
+       return this
 
     strokeOpacity: (opacity) ->
        @_doOpacity null, opacity
+       return this
 
     _doOpacity: (fillOpacity, strokeOpacity) ->
        return unless fillOpacity or strokeOpacity
@@ -63,7 +96,6 @@ module.exports =
 
        if @_opacityRegistry[key]
            [dictionary, name] = @_opacityRegistry[key]
-
        else
            dictionary = 
                Type: 'ExtGState'
@@ -78,6 +110,12 @@ module.exports =
 
        @page.ext_gstates[name] = dictionary
        @addContent "/#{name} gs"
+       
+    linearGradient: (x1, y1, x2, y2) ->
+        return new PDFLinearGradient(this, x1, y1, x2, y2)
+        
+    radialGradient: (x1, y1, r1, x2, y2, r2) ->
+        return new PDFRadialGradient(this, x1, y1, r1, x2, y2, r2)
        
 namedColors =
     aliceblue: [240, 248, 255]
