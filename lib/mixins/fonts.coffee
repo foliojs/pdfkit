@@ -39,9 +39,6 @@ module.exports =
     fontSize: (@_fontSize) ->
         return this
         
-    widthOfString: (string) ->
-        @_font.widthOfString string, @_fontSize
-        
     currentLineHeight: (includeGap = false) ->
         @_font.lineHeight @_fontSize, includeGap
         
