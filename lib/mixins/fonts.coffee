@@ -45,7 +45,8 @@ module.exports =
     registerFont: (name, path, family) ->
         @_registeredFonts[name] = 
             filename: path
-            family: family            
+            family: family 
+        return this
             
     embedFonts: (fn) ->
         fonts = (font for family, font of @_fontFamilies)
