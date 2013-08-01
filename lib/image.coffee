@@ -9,10 +9,13 @@ JPEG = require './image/jpeg'
 PNG = require './image/png'
 
 class PDFImage
-    @open: (filename) ->
-        @contents = fs.readFileSync filename
-        return unless @contents
-        
+    @open: (filenameOrBuffer) ->
+        if typeof filenameOrBuffer is 'object' and filenameOrBuffer instanceof Buffer
+            @contents = filenameOrBuffer
+        else
+            @contents = fs.readFileSync filenameOrBuffer
+            return unless @contents
+            
         @data = new Data @contents
         @filter = null
         
