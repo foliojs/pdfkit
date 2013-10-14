@@ -134,8 +134,8 @@ class CmapEntry
                 
                 segCount = startCodes.length
                 segCountX2 = segCount * 2
-                searchRange = 2 * Math.pow(Math.log(segCount) / Math.LN2, 2)
-                entrySelector = Math.log(searchRange / 2) / Math.LN2
+                searchRange = 2 * Math.pow(2, Math.floor(Math.log(segCount) / Math.LN2))
+                entrySelector = Math.log(segCount) / Math.LN2
                 rangeShift = 2 * segCount - searchRange
                 
                 deltas = []
@@ -146,7 +146,7 @@ class CmapEntry
                     endCode = endCodes[i]
                     
                     if startCode is 0xFFFF
-                        deltas.push 0
+                        deltas.push 1
                         rangeOffsets.push 0
                         break
                         
