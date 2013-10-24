@@ -98,11 +98,11 @@ class PDFDocument
                @generateXRef out
                @generateTrailer out
                
-               ret = ''
+               ret = []
                for k in out
-                   ret += k + '\n'
+                   ret.push(k + '\n')
                    
-               fn ret
+               fn new Buffer(ret.join(''),'binary')
         
     finalize: (fn) ->
         # convert strings in the info dictionary to literals
