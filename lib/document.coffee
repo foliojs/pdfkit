@@ -45,8 +45,8 @@ class PDFDocument
             delete @options.info
         
         # Add the first page
-        @addPage()
     
+        @addPage(@options.page or {})
     mixin = (name) =>
         methods = require './mixins/' + name
         for name, method of methods
