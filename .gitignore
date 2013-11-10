@@ -6,3 +6,4 @@ lib/font/tables/.DS_Store
 /node_modules/
 /tests/
 node-zlib/
+src/
