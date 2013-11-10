@@ -42,6 +42,20 @@ class PDFObject
             '' + object
             
     @s: (string) ->
+        
+        # Convert Big-endian UCS-2 to Little-endian to support most PDFRreaders
+        swapBytes = (buff) ->
+            l = buff.length
+            if l & 0x01
+                throw new Error("Buffer length must be even")
+            else
+                for i in [0...l - 1] by 2
+                    a = buff[i]
+                    buff[i] = buff[i+1]
+                    buff[i+1] = a 
+            buff
+        string = swapBytes(new Buffer('\ufeff' + string, 'ucs-2')).toString('binary')
+
         string = string.replace(/\\/g, '\\\\\\\\')
             .replace(/\(/g, '\\(')
             .replace(/\)/g, '\\)')
