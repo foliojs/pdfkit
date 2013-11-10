@@ -64,7 +64,7 @@ class LineWrapper extends EventEmitter
             for word, wi in words
                 w = wordWidths[word] ?= width(word, options) + charSpacing + wordSpacing
 
-                if w > spaceLeft
+                if w > spaceLeft or word is '\n'
                     options.textWidth = width(buffer.trim(), options) + wordSpacing * (wc - 1)
                     @emit 'line', buffer.trim(), options, this
                                         
