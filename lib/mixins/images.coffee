@@ -50,11 +50,10 @@ module.exports =
                 h = bh
                 w = bh * ip
             
-            if options.align
-                if 'center' == options.align
-                    x = x + bw / 2 - w / 2
-                else if 'right' == options.align
-                    x = x + bw - w
+            if options.align is 'center'
+                x = x + bw / 2 - w / 2
+            else if options.align is 'right'
+                x = x + bw - w
         
         # Set the current y position to below the image if it is in the document flow            
         @y += h if @y is y
