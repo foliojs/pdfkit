@@ -1,4 +1,4 @@
-WORD_RE = /([^ ,\/!.?:;\-\n]+[ ,\/!.?:;\-]*)|\n/g
+WORD_RE = /([^ ,\/!.?:;\-\n]*[ ,\/!.?:;\-]*)|\n/g
 LineWrapper = require '../line_wrapper'
 
 module.exports = 
