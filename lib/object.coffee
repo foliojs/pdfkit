@@ -61,7 +61,9 @@ class PDFObject
             .replace(/&gt;/g, '>')
             .replace(/&amp;/g, '&')
             
-        string = swapBytes(new Buffer('\ufeff' + string, 'ucs-2')).toString('binary')
+        # If we are on a Big-endian machine, we convert to Little-Endian
+        if os.endianness() == 'BE'
+            string = swapBytes(new Buffer('\ufeff' + string, 'ucs-2')).toString('binary')
         
         return {
             isString: yes
@@ -70,3 +72,4 @@ class PDFObject
         
 module.exports = PDFObject
 PDFReference = require './reference'
+os = require 'os'
