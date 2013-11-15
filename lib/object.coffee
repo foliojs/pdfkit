@@ -53,7 +53,7 @@ class PDFObject
                 buff[i+1] = a 
         return buff
             
-    @s: (string) ->
+    @s: (string, swap = false) ->
         string = string.replace(/\\/g, '\\\\\\\\')
             .replace(/\(/g, '\\(')
             .replace(/\)/g, '\\)')
@@ -61,7 +61,8 @@ class PDFObject
             .replace(/&gt;/g, '>')
             .replace(/&amp;/g, '&')
             
-        string = swapBytes(new Buffer('\ufeff' + string, 'ucs-2')).toString('binary')
+        if swap
+            string = swapBytes(new Buffer('\ufeff' + string, 'ucs-2')).toString('binary')
         
         return {
             isString: yes

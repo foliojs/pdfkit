@@ -107,7 +107,7 @@ class PDFDocument
     finalize: (fn) ->
         # convert strings in the info dictionary to literals
         for key, val of @info when typeof val is 'string'
-            @info[key] = PDFObject.s val
+            @info[key] = PDFObject.s val, true
         
         # embed the subsetted fonts
         @embedFonts =>
