@@ -13,6 +13,7 @@ module.exports =
             mode: 0
             wordSpacing: 0
             characterSpacing: 0
+            link: 0
         
     lineGap: (@_lineGap) ->
         return this
@@ -35,6 +36,14 @@ module.exports =
         if options.wordSpacing
             text = text.replace(/\s{2,}/g, ' ')
             
+        # extract/store markdown style links to be injected as annotations later
+        options.links =
+            labels: text.match /\[(.*)\]\(/g
+            urls: text.match /\]\((.*)\)/g
+
+        # remove url portion from text so wrapping is correct (as closely as possible)
+        text = text.replace /\]\((.*)\)/g, ']'
+
         paragraphs = text.split '\n'
         
         # word wrapping
@@ -171,6 +180,29 @@ module.exports =
                     textWidth = @widthOfString(text.replace(/\s+/g, ''), options)
                     spaceWidth = @widthOfString(' ') + characterSpacing
                     wordSpacing = (options.lineWidth - textWidth) / (words.length - 1) - spaceWidth
+
+        # look for the next link and annotate (if they haven't all been found)
+        if options.links.labels and state.link < options.links.labels.length
+            # cleanup label
+            linkLabel = options.links.labels[state.link].replace /\[(.*)\]\(/, '$1'
+
+            # if found then remove from text and update state to search for next link
+            if !!~ text.indexOf linkLabel
+                text = text.replace '[' + linkLabel + ']', linkLabel
+                state.link = state.link + 1
+
+                # cleanup url
+                linkUrl = options.links.urls[state.link].replace /\]\((.*)\)/, '$1'
+                
+                # let pdf viewer handle emails
+                if linkUrl.indexOf 'mailto:' isnt 0
+                    # add annotation at the point where link starts
+                    linkX = x + @widthOfString(text.substr 0, text.indexOf linkLabel)
+                    @link linkX, y, @widthOfString(linkLabel), @currentLineHeight(true), linkUrl
+
+        # manually add link (if option is set)
+        if options.link
+            @link x, y, @widthOfString(text), @currentLineHeight(true), options.link
 
         # flip coordinate system
         @save()
