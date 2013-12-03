@@ -196,7 +196,7 @@ class PDFFont
         width = 0
         for i in [0...string.length]
             charCode = string.charCodeAt(i) - if @isAFM then 0 else 32
-            width += @charWidths[charCode] or 0
+            width += @charWidths[charCode] or @charWidths[if @isAFM then 48 else 16] or 0
         
         scale = size / 1000    
         return width * scale
