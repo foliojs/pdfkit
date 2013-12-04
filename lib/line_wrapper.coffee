@@ -33,7 +33,7 @@ class LineWrapper extends EventEmitter
         @column = 1
         
         # calculate the maximum Y position the text can appear at
-        @maxY = @startY + options.height - @document.currentLineHeight()
+        @maxY = @startY + options.height
         
         # make sure we're actually on the page 
         # and that the first line of is never by 
