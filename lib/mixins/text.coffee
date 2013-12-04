@@ -126,9 +126,10 @@ module.exports =
             return opts
 
         # Update the current position
-        if x? or y?
-            @x = x or @x
-            @y = y or @y
+        if x?
+            @x = x
+        if y?
+            @y = y
 
         # wrap to margins if no x or y position passed
         unless options.lineBreak is false
