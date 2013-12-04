@@ -2,3 +2,5 @@ node-zlib/
 node-modules/
 demo/
 src/
+lib/
+index.js
