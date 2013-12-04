@@ -35,14 +35,17 @@ module.exports =
         # if the wordSpacing option is specified, remove multiple consecutive spaces
         if options.wordSpacing
             text = text.replace(/\s{2,}/g, ' ')
-            
-        # extract/store markdown style links to be injected as annotations later
-        options.links =
-            labels: text.match /\[(.*)\]\(/g
-            urls: text.match /\]\((.*)\)/g
+        
+        if options.parseLinks
+            # extract/store markdown style links to be injected as annotations later
+            linkPattern = /\[(.*?)\]\((.*?)\)/g
+            if linkPattern.test text
+                options.links = text.match linkPattern
 
-        # remove url portion from text so wrapping is correct (as closely as possible)
-        text = text.replace /\]\((.*)\)/g, ']'
+                # remove url portion from text and wrap with vertical ellipses
+                # vertical ellipses are used to prevent accidentally matching the same text in the wrong place
+                # and because they *mostly* have an undefined character width which causes the wrapper to ignore them
+                text = text.replace linkPattern, '⋮$1⋮'
 
         paragraphs = text.split '\n'
         
@@ -136,6 +139,8 @@ module.exports =
         options.columns ||= 0
         options.columnGap ?= 18 # 1/4 inch
 
+        options.parseLinks ||= false
+
         return options
     
     widthOfString: (string, options = {}) ->
@@ -181,20 +186,19 @@ module.exports =
                     wordSpacing = (options.lineWidth - textWidth) / (words.length - 1) - spaceWidth
 
         # look for the next link and annotate (if they haven't all been found)
-        if options.links.labels and state.link < options.links.labels.length
-            # cleanup label/url
-            linkLabel = options.links.labels[state.link].replace /\[(.*)\]\(/, '$1'
-            linkUrl = options.links.urls[state.link].replace /\]\((.*)\)/, '$1'
+        if options.links and state.link < options.links.length
+            [match, linkLabel, linkUrl] = options.links[state.link].match /\[(.*?)\]\((.*?)\)/
 
             # if found then remove from text and update state to search for next link
-            if !!~ text.indexOf linkLabel
-                text = text.replace '[' + linkLabel + ']', linkLabel
+            linkIndex = text.indexOf '⋮' + linkLabel + '⋮'
+            if !!~ linkIndex
+                text = text.replace '⋮' + linkLabel + '⋮', linkLabel
                 state.link = state.link + 1
 
                 # let pdf viewer handle emails
                 if linkUrl.indexOf 'mailto:' isnt 0
                     # add annotation at the point where link starts
-                    linkX = x + @widthOfString(text.substr 0, text.indexOf linkLabel)
+                    linkX = x + @widthOfString(text.substr 0, linkIndex)
                     @link linkX, y, @widthOfString(linkLabel), @currentLineHeight(true), linkUrl
 
         # manually add link (if option is set)
