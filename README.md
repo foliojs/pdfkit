@@ -19,12 +19,14 @@ Installation uses the [npm](http://npmjs.org/) package manager.  Just type the f
   * Path operations
   * SVG path parser for easy path creation
   * Transformations
+  * Linear and radial gradients
 * Text
   * Line wrapping
   * Text alignments
   * Bulleted lists
 * Font embedding
   * Supports TrueType (.ttf), TrueType Collections (.ttc), and Datafork TrueType (.dfont) fonts
+  * Font subsetting
 * Image embedding
   * Supports JPEG and PNG files (including indexed PNGs, and PNGs with transparency)
 * Annotations
@@ -36,10 +38,9 @@ Installation uses the [npm](http://npmjs.org/) package manager.  Just type the f
   
 ## Coming soon!
 
-* Gradients and patterns
+* Patterns fills
 * Outlines
 * PDF Security
-* Font subsetting
 * Higher level APIs for creating tables and laying out content
 * More performance optimizations
 * Even more awesomeness, perhaps written by you! Please fork this repository and send me pull requests.
