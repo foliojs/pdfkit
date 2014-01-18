@@ -33,8 +33,8 @@ class PDFFont
         return fn() if @isAFM
         @embedTTF fn
         
-    _WinAnsiMap: {
-        402: 131
+    WIN_ANSI_MAP =
+        402:  131
         8211: 150
         8212: 151
         8216: 145
@@ -51,30 +51,29 @@ class PDFFont
         8240: 137
         8249: 139
         8250: 155
-        710: 136
+        710:  136
         8482: 153
-        338: 140
-        339: 156
-        732: 152
-        352: 138
-        353: 154
-        376: 159
-        381: 142
-        382: 158
-    }
+        338:  140
+        339:  156
+        732:  152
+        352:  138
+        353:  154
+        376:  159
+        381:  142
+        382:  158
 
-    _encodeWinAnsi: (text) ->
+    encodeWinAnsi = (text) ->
         string = ''
         for i in [0...text.length]
             char = text.charCodeAt(i)
-            char = @_WinAnsiMap[char] || char
+            char = WIN_ANSI_MAP[char] || char
             string += String.fromCharCode(char)
         
         return string
 
     encode: (text) ->
         if @isAFM
-            @_encodeWinAnsi text
+            encodeWinAnsi text
         else
             @subset?.encodeText(text) or text
         
