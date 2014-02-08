@@ -6,19 +6,34 @@ By Devon Govett
 PDFReference = require './reference'
 
 class PDFObjectStore
-    constructor: ->
+    constructor: (@options = {})->
+
         @objects = {}
         @length = 0
-                
-        @root = @ref
-            Type: 'Catalog'
-            Pages: @ref
-                Type: 'Pages'
-                Count: 0
-                Kids: []
-            
+        
+        if @options? and @options.hasOutlines
+            @root = @ref
+                Type: 'Catalog'
+                Pages: @ref
+                    Type: 'Pages'
+                    Count: 0
+                    Kids: []
+                Outlines: @ref
+                    Type: 'Outlines'
+                    Count: 0
+                PageMode: 'UseOutlines'
+        else
+            @root = @ref
+                Type: 'Catalog'
+                Pages: @ref
+                    Type: 'Pages'
+                    Count: 0
+                    Kids: []
+        
         @pages = @root.data['Pages']
-            
+
+        @outlines = @root.data['Outlines']        
+    
     ref: (data) ->
         @push ++@length, data
         
@@ -30,5 +45,9 @@ class PDFObjectStore
     addPage: (page) ->
         @pages.data['Kids'].push(page.dictionary)
         @pages.data['Count']++
+
+    addOutline: (outline) ->
+        @outlines.data['Count']++
+
         
 module.exports = PDFObjectStore

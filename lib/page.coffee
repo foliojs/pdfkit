@@ -5,8 +5,11 @@ By Devon Govett
 
 class PDFPage
     constructor: (@document, options = {}) ->
+
         @size = options.size or 'letter'
         @layout = options.layout or 'portrait'
+        
+        @title = options.title
         
         # if margin was passed as a single number
         if typeof options.margin is 'number'

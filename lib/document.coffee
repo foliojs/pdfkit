@@ -8,6 +8,7 @@ PDFObjectStore = require './store'
 PDFObject = require './object'
 PDFReference = require './reference'
 PDFPage = require './page'
+PDFOutline = require './outline'
 
 class PDFDocument
     constructor: (@options = {}) ->
@@ -15,17 +16,20 @@ class PDFDocument
         @version = 1.3
         
         # Whether streams should be compressed
-        @compress = yes
+        @compress = no
         
         # The PDF object store
-        @store = new PDFObjectStore
+        @store = new PDFObjectStore(@options)
         
         # A list of pages in this document
         @pages = []
         
         # The current page
         @page = null
-        
+         
+        # A list of outlines in this document
+        @outlines = []
+
         # Initialize mixins
         @initColor()
         @initVector()
@@ -78,6 +82,31 @@ class PDFDocument
         @transform 1, 0, 0, -1, 0, @page.height
         
         return this
+
+    addOutline: (title, dest, options = @options) ->
+
+        if not options.hasOutlines
+            console.log "this document does not have outlines"
+            return this
+
+        # create an outline object
+        @outline = new PDFOutline(this, title, dest, options)
+
+        # insert into outlines store list
+        if @outlines.length == 0
+            @store.outlines.data['First'] = @outline.dictionary
+        else
+            prev = @outlines[@outlines.length-1]
+            prev.dictionary.data['Next'] = @outline.dictionary
+            @store.outlines.data['Last'] = @outline.dictionary
+
+        # add to the outlines list
+        @outlines.push @outline
+
+        # add the outline to the object store
+        @store.addOutline @outline
+
+        return this
         
     ref: (data) ->
         @store.ref(data)
@@ -85,7 +114,7 @@ class PDFDocument
     addContent: (str) ->
         @page.content.add str
         return this # make chaining possible
-        
+           
     write: (filename, fn) ->
         @output (out) ->
             fs.writeFile filename, out, 'binary', fn
@@ -127,7 +156,7 @@ class PDFDocument
         # 4 binary chars, as recommended by the spec
         out.push "%\xFF\xFF\xFF\xFF\n"
         return out
-        
+
     generateBody: (out, fn) ->
         offset = out.join('\n').length
         
