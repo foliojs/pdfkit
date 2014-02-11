@@ -102,10 +102,12 @@ class LineWrapper extends EventEmitter
         @emit 'sectionEnd', options, this
         
         if ++@column > @columns
+            var x = @document.x
             @document.addPage()
             @column = 1
             @startY = @document.page.margins.top
             @maxY = @document.page.maxY()
+            @document.x = x 
             @emit 'pageBreak', options, this
             
         else
