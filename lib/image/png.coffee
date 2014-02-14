@@ -1,5 +1,6 @@
 zlib = require 'zlib'
 PNG = require 'png-js'
+setImmediate = setImmediate ? process.nextTick # backfill for node <0.10
 
 class PNGImage
     constructor: (data) ->
@@ -87,7 +88,7 @@ class PNGImage
 
         # add the actual image data    
         obj.add @imgData
-        fn obj
+        setImmediate -> fn(obj)
         
     splitAlphaChannel: (fn) ->
         @image.decodePixels (pixels) =>

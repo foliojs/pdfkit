@@ -1,5 +1,6 @@
 fs = require 'fs'
 Data = '../data'
+setImmediate = setImmediate ? process.nextTick # backfill for node <0.10
 
 class JPEG
     constructor: (@data) ->
@@ -49,6 +50,6 @@ class JPEG
             obj.data['Decode'] = [1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0]
             
         obj.add @data.data
-        fn obj
+        setImmediate -> fn(obj)
         
 module.exports = JPEG
