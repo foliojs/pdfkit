@@ -4,6 +4,7 @@ By Devon Govett
 ###
 
 zlib = require 'zlib'
+setImmediate = setImmediate ? process.nextTick # backfill for node <0.10
 
 class PDFReference
     constructor: (@id, @data = {}) ->
@@ -47,10 +48,10 @@ class PDFReference
             else
                 @finalizedStream = data
                 @data.Length = @finalizedStream.length
-                fn()
+                setImmediate fn
         else
             @finalizedStream = ''
-            fn()
+            setImmediate fn
         
     toString: ->
         "#{@id} #{@gen} R"
