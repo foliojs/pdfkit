@@ -43,7 +43,11 @@ class PDFDocument
         if @options.info
             @info[key] = val for key, val of @options.info
             delete @options.info
-        
+
+        # setting this to no will disable adding generated data
+        # useful for generating text etc. only to determine size
+        @visible = yes
+
         # Add the first page
         @addPage()
     
@@ -81,11 +85,16 @@ class PDFDocument
         
     ref: (data) ->
         @store.ref(data)
-        
+
+    # set @visible
+    setVisibility: (@visible) ->
+        return this
+
     addContent: (str) ->
-        @page.content.add str
+        if @visible
+            @page.content.add str
         return this # make chaining possible
-        
+
     write: (filename, fn) ->
         @output (out) ->
             fs.writeFile filename, out, 'binary', fn
