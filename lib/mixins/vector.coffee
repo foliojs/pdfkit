@@ -47,7 +47,7 @@ module.exports =
     dash: (length, options = {}) ->
         return this unless length?
         
-        space = options.space or length
+        space = options.space ? length
         phase = options.phase or 0
         
         @addContent "[#{length} #{space}] #{phase} d"
