@@ -137,7 +137,7 @@ class PDFDocument
                 ref.object @compress, (object) ->
                     ref.offset = offset
                     out.push object
-                    offset += object.length + 1
+                    offset += object.length + 1 # plus one for newline
                     proceed()
             else
                 @xref_offset = offset
