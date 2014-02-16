@@ -21,14 +21,14 @@ class LineWrapper extends EventEmitter
             # if this is the first line of the text segment, and
             # we're continuing where we left off, indent that much
             # otherwise use the user specified indent option
-            indent = @document._continuedX ? @indent
+            indent = @continuedX ? @indent
             @document.x += indent
             @lineWidth -= indent
             
             @once 'line', =>
                 @document.x -= indent
                 @lineWidth += indent
-                @document._continuedX = null
+                @continuedX = null
         
         # handle left aligning last lines of paragraphs
         @on 'lastLine', (options) =>
@@ -122,7 +122,7 @@ class LineWrapper extends EventEmitter
         # to start the first line of the next segment at, and reset
         # the y position
         if options.continued is yes
-            @document._continuedX = textWidth
+            @continuedX = textWidth
             @document.y = y
                     
     nextSection: (options) ->

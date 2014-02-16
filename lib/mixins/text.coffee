@@ -6,7 +6,6 @@ module.exports =
         @x = 0
         @y = 0
         @_lineGap = 0
-        @_continuedX = null
         
         # Keeps track of what has been set in the document
         @_textState = 
