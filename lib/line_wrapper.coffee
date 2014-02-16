@@ -59,11 +59,10 @@ class LineWrapper extends EventEmitter
             options.lineWidth = @lineWidth
             @emit 'line', buffer, options, this
         
-        spaceLeft = @lineWidth - indent
-        
         while bk = breaker.nextBreak()
             if not last? or last.required
                 @emit 'firstLine', options, this
+                spaceLeft = @lineWidth
                 
             word = text.slice(last?.position or 0, bk.position)
             w = wordWidths[word] ?= width(word, options) + charSpacing + wordSpacing
@@ -86,7 +85,6 @@ class LineWrapper extends EventEmitter
                 
                 # reset the space left and buffer
                 if bk.required
-                    spaceLeft = @lineWidth - indent                    
                     buffer = ''
                     lineWidth = 0
                     wc = 0
