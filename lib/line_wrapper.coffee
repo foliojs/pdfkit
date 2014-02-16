@@ -40,6 +40,47 @@ class LineWrapper extends EventEmitter
                 @document.y += options.paragraphGap or 0
                 options.align = align
                 @lastLine = false
+                
+    wordWidth: (word) ->
+        return @document.widthOfString(word, this) + @charSpacing + @wordSpacing
+                
+    eachWord: (text, fn) ->
+        # setup a unicode line breaker
+        breaker = new LineBreaker(text)
+        last = null
+        wordWidths = {}
+        
+        while bk = breaker.nextBreak()
+            word = text.slice(last?.position or 0, bk.position)
+            w = wordWidths[word] ?= @wordWidth word
+            
+            # if the word is longer than the whole line, chop it up
+            if w > @lineWidth
+                # make some fake break objects
+                lbk = last
+                fbk = {}
+                
+                while word.length
+                    # fit as much of the word as possible into the space we have
+                    l = word.length
+                    while w > @spaceLeft
+                        w = @wordWidth word.slice(0, --l)
+                        
+                    # send a required break unless this is the last piece
+                    fbk.required = l < word.length
+                    fn word.slice(0, l), w, fbk, lbk
+                    lbk = required: false
+                    
+                    # get the remaining piece of the word
+                    word = word.slice(l)
+                    w = @wordWidth word
+            else
+                # otherwise just emit the break as it was given to us
+                fn word, w, bk, last
+                
+            last = bk
+            
+        return
         
     wrap: (text, options) ->
         # override options from previous continued fragments
@@ -53,13 +94,7 @@ class LineWrapper extends EventEmitter
         nextY = @document.y + @document.currentLineHeight(true)
         if @document.y > @maxY or nextY > @maxY
             @nextSection()
-        
-        # word width cache
-        wordWidths = {}
-        @emit 'sectionStart', options, this
-        
-        breaker = new LineBreaker(text)
-        last = null
+                
         buffer = ''
         textWidth = 0
         wc = 0
@@ -71,21 +106,20 @@ class LineWrapper extends EventEmitter
             options.lineWidth = @lineWidth
             y = @document.y
             @emit 'line', buffer, options, this
+            
+        @emit 'sectionStart', options, this
         
-        while bk = breaker.nextBreak()
+        @eachWord text, (word, w, bk, last) =>
             if not last? or last.required
                 @emit 'firstLine', options, this
-                spaceLeft = @lineWidth
-                
-            word = text.slice(last?.position or 0, bk.position)
-            w = wordWidths[word] ?= @document.widthOfString(word, this) + @charSpacing + @wordSpacing
+                @spaceLeft = @lineWidth
             
-            if w <= spaceLeft
+            if w <= @spaceLeft
                 buffer += word
                 textWidth += w
                 wc++
                             
-            if bk.required or w > spaceLeft
+            if bk.required or w > @spaceLeft
                 if bk.required
                     @emit 'lastLine', options, this
                 
@@ -98,19 +132,18 @@ class LineWrapper extends EventEmitter
                 
                 # reset the space left and buffer
                 if bk.required
+                    @spaceLeft = @lineWidth
                     buffer = ''
                     textWidth = 0
                     wc = 0
                 else
                     # reset the space left and buffer
-                    spaceLeft = @lineWidth - w
+                    @spaceLeft = @lineWidth - w
                     buffer = word
                     textWidth = w
                     wc = 1
             else
-                spaceLeft -= w
-                
-            last = bk
+                @spaceLeft -= w
             
         if wc > 0
             @emit 'lastLine', options, this
