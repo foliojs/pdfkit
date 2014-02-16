@@ -89,7 +89,7 @@ class LineWrapper extends EventEmitter
                 
                 # if we've reached the edge of the page, 
                 # continue on a new page or column
-                if @document.y > @maxY
+                if @document.y + @document.currentLineHeight(true) > @maxY
                     @nextSection()
                 
                 # reset the space left and buffer
