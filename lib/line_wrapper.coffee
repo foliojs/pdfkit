@@ -69,7 +69,7 @@ class LineWrapper extends EventEmitter
             
             if w <= spaceLeft
                 buffer += word
-                lineWidth += w
+                textWidth += w
                 wc++
                             
             if bk.required or w > spaceLeft
@@ -86,13 +86,13 @@ class LineWrapper extends EventEmitter
                 # reset the space left and buffer
                 if bk.required
                     buffer = ''
-                    lineWidth = 0
+                    textWidth = 0
                     wc = 0
                 else
                     # reset the space left and buffer
                     spaceLeft = @lineWidth - w
                     buffer = word
-                    lineWidth = w
+                    textWidth = w
                     wc = 1
             else
                 spaceLeft -= w
