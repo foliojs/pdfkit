@@ -36,6 +36,7 @@ class LineWrapper extends EventEmitter
         @columns = options.columns or 1
         @columnGap = options.columnGap ? 18 # 1/4 inch
         @lineWidth =  (options.width - (@columnGap * (@columns - 1))) / @columns
+        @startX = @document.x
         @startY = @document.y
         @column = 1
         
@@ -124,12 +125,11 @@ class LineWrapper extends EventEmitter
         @emit 'sectionEnd', options, this
         
         if ++@column > @columns
-            x = @document.x
             @document.addPage()
             @column = 1
             @startY = @document.page.margins.top
             @maxY = @document.page.maxY()
-            @document.x = x
+            @document.x = @startX
             @document.fillColor @document._fillColor... if @document._fillColor
             @emit 'pageBreak', options, this
             
