@@ -65,14 +65,14 @@ module.exports =
         op = if stroke then 'CS' else 'cs'
         @addContent "/#{space} #{op}"
 
-    fillColor: (color, opacity) ->
+    fillColor: (color, opacity = 1) ->
         set = @_setColor color, no
-        @fillOpacity opacity if set and opacity?
+        @fillOpacity opacity if set
         return this
 
-    strokeColor: (color, opacity) ->
+    strokeColor: (color, opacity = 1) ->
         set = @_setColor color, yes
-        @strokeOpacity opacity if set and opacity?
+        @strokeOpacity opacity if set
         return this
        
     opacity: (opacity) ->
