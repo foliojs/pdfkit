@@ -37,8 +37,12 @@ module.exports =
 
         # word wrapping
         if options.width
-            wrapper = new LineWrapper(this)
-            wrapper.on 'line', @_line.bind(this)
+            wrapper = @_wrapper
+            unless wrapper
+                wrapper = new LineWrapper(this, options)
+                wrapper.on 'line', @_line.bind(this)
+                
+            @_wrapper = if options.continued then wrapper else null                
             wrapper.wrap text, options
             
         # render paragraphs as single lines
@@ -70,7 +74,7 @@ module.exports =
                     
         flatten(list)
                 
-        wrapper = new LineWrapper(this)
+        wrapper = new LineWrapper(this, options)
         wrapper.on 'line', @_line.bind(this)
         
         level = 1

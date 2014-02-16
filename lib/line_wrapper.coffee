@@ -2,13 +2,26 @@
 LineBreaker = require 'linebreak'
 
 class LineWrapper extends EventEmitter
-    constructor: (@document) ->
+    constructor: (@document, options) ->
+        @indent      = options.indent or 0
+        @charSpacing = options.characterSpacing or 0
+        @wordSpacing = options.wordSpacing is 0
+        @columns     = options.columns or 1
+        @columnGap   = options.columnGap ? 18 # 1/4 inch
+        @lineWidth   =  (options.width - (@columnGap * (@columns - 1))) / @columns
+        @startX      = @document.x
+        @startY      = @document.y
+        @column      = 1
+        
+        # calculate the maximum Y position the text can appear at
+        @maxY = @startY + options.height
+        
         # handle paragraph indents
         @on 'firstLine', (options) =>
             # if this is the first line of the text segment, and
             # we're continuing where we left off, indent that much
             # otherwise use the user specified indent option
-            indent = @document._continuedX ? options.indent or 0
+            indent = @document._continuedX ? @indent
             @document.x += indent
             @lineWidth -= indent
             
@@ -29,19 +42,10 @@ class LineWrapper extends EventEmitter
                 @lastLine = false
         
     wrap: (text, options) ->
-        width = @document.widthOfString.bind(@document)
-        indent = options.indent or 0
-        charSpacing = options.characterSpacing or 0
-        wordSpacing = options.wordSpacing is 0
-        @columns = options.columns or 1
-        @columnGap = options.columnGap ? 18 # 1/4 inch
-        @lineWidth =  (options.width - (@columnGap * (@columns - 1))) / @columns
-        @startX = @document.x
-        @startY = @document.y
-        @column = 1
-        
-        # calculate the maximum Y position the text can appear at
-        @maxY = @startY + options.height
+        # override options from previous continued fragments
+        @indent      = options.indent           if options.indent?
+        @charSpacing = options.characterSpacing if options.characterSpacing?
+        @wordSpacing = options.wordSpacing      if options.wordSpacing?
         
         # make sure we're actually on the page 
         # and that the first line of is never by 
@@ -62,7 +66,7 @@ class LineWrapper extends EventEmitter
         
         y = @document.y # used to reset Y pos if options.continued (below)
         emitLine = =>
-            options.textWidth = textWidth + wordSpacing * (wc - 1)
+            options.textWidth = textWidth + @wordSpacing * (wc - 1)
             options.wordCount = wc
             options.lineWidth = @lineWidth
             y = @document.y
@@ -74,7 +78,7 @@ class LineWrapper extends EventEmitter
                 spaceLeft = @lineWidth
                 
             word = text.slice(last?.position or 0, bk.position)
-            w = wordWidths[word] ?= width(word, options) + charSpacing + wordSpacing
+            w = wordWidths[word] ?= @document.widthOfString(word, this) + @charSpacing + @wordSpacing
             
             if w <= spaceLeft
                 buffer += word
