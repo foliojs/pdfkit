@@ -6,6 +6,7 @@ module.exports =
         @x = 0
         @y = 0
         @_lineGap = 0
+        @_continuedX = null
         
         # Keeps track of what has been set in the document
         @_textState = 
@@ -134,7 +135,7 @@ module.exports =
         @_fragment text, @x, @y, options
         lineGap = options.lineGap or @_lineGap or 0
         
-        if not wrapper or (wrapper.lastLine and options.lineBreak is no)
+        if not wrapper
             @x += @widthOfString text
         else
             @y += @currentLineHeight(true) + lineGap

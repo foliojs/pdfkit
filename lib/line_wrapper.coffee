@@ -3,15 +3,21 @@ LineBreaker = require 'linebreak'
 
 class LineWrapper extends EventEmitter
     constructor: (@document) ->
+        # handle paragraph indents
         @on 'firstLine', (options) =>
-            indent = options.indent or 0
+            # if this is the first line of the text segment, and
+            # we're continuing where we left off, indent that much
+            # otherwise use the user specified indent option
+            indent = @document._continuedX ? options.indent or 0
             @document.x += indent
             @lineWidth -= indent
             
             @once 'line', =>
                 @document.x -= indent
                 @lineWidth += indent
+                @document._continuedX = null
         
+        # handle left aligning last lines of paragraphs
         @on 'lastLine', (options) =>
             align = options.align
             options.align = 'left' if align is 'justify'
@@ -53,10 +59,12 @@ class LineWrapper extends EventEmitter
         textWidth = 0
         wc = 0
         
+        y = @document.y # used to reset Y pos if options.continued (below)
         emitLine = =>
             options.textWidth = textWidth + wordSpacing * (wc - 1)
             options.wordCount = wc
             options.lineWidth = @lineWidth
+            y = @document.y
             @emit 'line', buffer, options, this
         
         while bk = breaker.nextBreak()
@@ -104,6 +112,13 @@ class LineWrapper extends EventEmitter
             emitLine()
                 
         @emit 'sectionEnd', options, this
+        
+        # if the wrap is set to be continued, save the X position
+        # to start the first line of the next segment at, and reset
+        # the y position
+        if options.continued is yes
+            @document._continuedX = textWidth
+            @document.y = y
                     
     nextSection: (options) ->
         @emit 'sectionEnd', options, this
