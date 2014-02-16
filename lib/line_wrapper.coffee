@@ -7,19 +7,21 @@ class LineWrapper extends EventEmitter
         @on 'firstLine', (options) =>
             indent = options.indent or 0
             @document.x += indent
-            options.lineWidth -= indent
+            @lineWidth -= indent
             
             @once 'line', =>
                 @document.x -= indent
-                options.lineWidth += indent
+                @lineWidth += indent
         
         @on 'lastLine', (options) =>
             align = options.align
             options.align = 'left' if align is 'justify'
+            @lastLine = true
             
             @once 'line', =>
                 @document.y += options.paragraphGap or 0
                 options.align = align
+                @lastLine = false
         
     wrap: (paragraphs, options) ->
         width = @document.widthOfString.bind(@document)
