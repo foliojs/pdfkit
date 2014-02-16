@@ -167,7 +167,7 @@ module.exports =
                     # calculate the word spacing value  
                     textWidth = @widthOfString(text.replace(/\s+/g, ''), options)
                     spaceWidth = @widthOfString(' ') + characterSpacing
-                    wordSpacing = (options.lineWidth - textWidth) / (options.wordCount - 1) - spaceWidth
+                    wordSpacing = (options.lineWidth - textWidth) / Math.max(1, options.wordCount - 1) - spaceWidth
 
         # flip coordinate system
         @save()
