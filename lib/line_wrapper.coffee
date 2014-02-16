@@ -1,6 +1,5 @@
-# This regular expression is used for splitting a string into wrappable words
-WORD_RE = /([^ ,\/!.?:;\-\n]*[ ,\/!.?:;\-]*)|\n/g
 {EventEmitter} = require 'events'
+LineBreaker = require 'linebreak'
 
 class LineWrapper extends EventEmitter
     constructor: (@document) ->
@@ -23,7 +22,7 @@ class LineWrapper extends EventEmitter
                 options.align = align
                 @lastLine = false
         
-    wrap: (paragraphs, options) ->
+    wrap: (text, options) ->
         width = @document.widthOfString.bind(@document)
         indent = options.indent or 0
         charSpacing = options.characterSpacing or 0
@@ -46,57 +45,65 @@ class LineWrapper extends EventEmitter
         
         # word width cache
         wordWidths = {}
-        
         @emit 'sectionStart', options, this
         
-        for text, i in paragraphs
-            @emit 'firstLine', options, this
+        breaker = new LineBreaker(text)
+        last = null
+        buffer = ''
+        textWidth = 0
+        wc = 0
+        
+        emitLine = =>
+            options.textWidth = textWidth + wordSpacing * (wc - 1)
+            options.wordCount = wc
+            options.lineWidth = @lineWidth
+            @emit 'line', buffer, options, this
+        
+        spaceLeft = @lineWidth - indent
+        
+        while bk = breaker.nextBreak()
+            if not last? or last.required
+                @emit 'firstLine', options, this
+                
+            word = text.slice(last?.position or 0, bk.position)
+            w = wordWidths[word] ?= width(word, options) + charSpacing + wordSpacing
             
-            # split the line into words
-            words = text.match(WORD_RE) or [text]
-                          
-            # space left on the line to fill with words
-            spaceLeft = @lineWidth - indent
-            options.lineWidth = spaceLeft
-            
-            len = words.length
-            buffer = ''
-            wc = 0
-            
-            for word, wi in words
-                w = wordWidths[word] ?= width(word, options) + charSpacing + wordSpacing
-
-                if w > spaceLeft or word is '\n'
-                    options.textWidth = width(buffer.trim(), options) + wordSpacing * (wc - 1)
-                    @emit 'line', buffer.trim(), options, this
-                                        
-                    # if we've reached the edge of the page, 
-                    # continue on a new page or column
-                    if @document.y > @maxY
-                        @nextSection()
+            if w <= spaceLeft
+                buffer += word
+                lineWidth += w
+                wc++
                             
+            if bk.required or w > spaceLeft
+                if bk.required
+                    @emit 'lastLine', options, this
+                
+                emitLine()
+                
+                # if we've reached the edge of the page, 
+                # continue on a new page or column
+                if @document.y > @maxY
+                    @nextSection()
+                
+                # reset the space left and buffer
+                if bk.required
+                    spaceLeft = @lineWidth - indent                    
+                    buffer = ''
+                    lineWidth = 0
+                    wc = 0
+                else
                     # reset the space left and buffer
                     spaceLeft = @lineWidth - w
-                    buffer = if word is '\n' then '' else word
+                    buffer = word
+                    lineWidth = w
                     wc = 1
-                            
-                else
-                    # add the word to the buffer
-                    spaceLeft -= w
-                    buffer += word
-                    wc++
-                        
-            # add the last line
-            @lastLine = true
-            @emit 'lastLine', options, this
-            options.textWidth = width(buffer.trim(), options) + wordSpacing * (wc - 1)
-            @emit 'line', buffer.trim(), options, this
+            else
+                spaceLeft -= w
+                
+            last = bk
             
-            # make sure that the first line of a paragraph is never by 
-            # itself at the bottom of a page (orphans)
-            nextY = @document.y + @document.currentLineHeight(true)
-            if i < paragraphs.length - 1 and nextY > @maxY
-                @nextSection()
+        if wc > 0
+            @emit 'lastLine', options, this
+            emitLine()
                 
         @emit 'sectionEnd', options, this
                     

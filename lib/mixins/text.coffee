@@ -1,4 +1,3 @@
-WORD_RE = /([^ ,\/!.?:;\-\n]*[ ,\/!.?:;\-]*)|\n/g
 LineWrapper = require '../line_wrapper'
 
 module.exports = 
@@ -34,18 +33,16 @@ module.exports =
         # if the wordSpacing option is specified, remove multiple consecutive spaces
         if options.wordSpacing
             text = text.replace(/\s{2,}/g, ' ')
-            
-        paragraphs = text.split '\n'
-        
+
         # word wrapping
         if options.width
             wrapper = new LineWrapper(this)
             wrapper.on 'line', @_line.bind(this)
-            wrapper.wrap(paragraphs, options)
+            wrapper.wrap text, options
             
         # render paragraphs as single lines
         else
-            @_line line, options for line in paragraphs
+            @_line line, options for line in text.split '\n'
         
         return this
         
@@ -97,7 +94,7 @@ module.exports =
             @x -= pos
             wrapper.lineWidth += pos
                     
-        wrapper.wrap(items, options)
+        wrapper.wrap items.join('\n'), options
         
         @x -= indent
         return this
