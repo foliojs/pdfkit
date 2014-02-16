@@ -68,6 +68,10 @@ module.exports =
     fillColor: (color, opacity = 1) ->
         set = @_setColor color, no
         @fillOpacity opacity if set
+        
+        # save this for text wrapper, which needs to reset 
+        # the fill color on new pages
+        @_fillColor = [color, opacity]
         return this
 
     strokeColor: (color, opacity = 1) ->
