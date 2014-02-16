@@ -177,11 +177,6 @@ module.exports =
         # tell the font subset to use the characters
         @_font.use(text)
 
-        # encode the text based on the font subset,
-        # and then convert it to hex
-        text = @_font.encode(text)
-        text = (text.charCodeAt(i).toString(16) for i in [0...text.length]).join('')
-
         # begin the text object
         @addContent "BT"
 
@@ -195,14 +190,33 @@ module.exports =
         mode = if options.fill and options.stroke then 2 else if options.stroke then 1 else 0
         @addContent "#{mode} Tr" unless mode is state.mode
 
-        # Word spacing
-        @addContent wordSpacing + ' Tw' unless wordSpacing is state.wordSpacing
-
         # Character spacing
         @addContent characterSpacing + ' Tc' unless characterSpacing is state.characterSpacing
-
-        # add the actual text
-        @addContent "<#{text}> Tj"
+        
+        # Add the actual text
+        # If we have a word spacing value, we need to encode each word separately
+        # since the normal Tw operator only works on character code 32, which isn't
+        # used for embedded fonts.
+        if wordSpacing
+            words = text.split(/\s+/)
+            wordSpacing += @widthOfString(' ') + characterSpacing
+            wordSpacing *= 1000 / @_fontSize
+            
+            commands = []
+            for word in words
+                # encode the text based on the font subset,
+                # and then convert it to hex
+                encoded = @_font.encode(word)
+                encoded = (encoded.charCodeAt(i).toString(16) for i in [0...encoded.length] by 1).join('')
+                commands.push "<#{encoded}> #{-wordSpacing}"
+            
+            @addContent "[#{commands.join ' '}] TJ"
+        else
+            # encode the text based on the font subset,
+            # and then convert it to hex
+            encoded = @_font.encode(text)
+            encoded = (encoded.charCodeAt(i).toString(16) for i in [0...encoded.length] by 1).join('')
+            @addContent "<#{encoded}> Tj"
 
         # end the text object
         @addContent "ET"
@@ -212,4 +226,4 @@ module.exports =
 
         # keep track of text states
         state.mode = mode
-        state.wordSpacing = wordSpacing
+        state.characterSpacing = characterSpacing
