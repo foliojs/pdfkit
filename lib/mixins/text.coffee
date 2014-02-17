@@ -169,10 +169,10 @@ module.exports =
                     x += options.lineWidth / 2 - options.textWidth / 2
 
                 when 'justify'
-                    # calculate the word spacing value  
+                    # calculate the word spacing value
                     textWidth = @widthOfString(text.replace(/\s+/g, ''), options)
                     spaceWidth = @widthOfString(' ') + characterSpacing
-                    wordSpacing = (options.lineWidth - textWidth) / Math.max(1, options.wordCount - 1) - spaceWidth
+                    wordSpacing = Math.max 0, (options.lineWidth - textWidth) / Math.max(1, options.wordCount - 1) - spaceWidth
 
         # flip coordinate system
         @save()
