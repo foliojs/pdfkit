@@ -27,7 +27,7 @@ class LineWrapper extends EventEmitter
             # if this is the first line of the text segment, and
             # we're continuing where we left off, indent that much
             # otherwise use the user specified indent option
-            indent = @continuedX ? @indent
+            indent = @continuedX or @indent
             @document.x += indent
             @lineWidth -= indent
             
@@ -109,6 +109,7 @@ class LineWrapper extends EventEmitter
         buffer = ''
         textWidth = 0
         wc = 0
+        lc = 0
         
         y = @document.y # used to reset Y pos if options.continued (below)
         emitLine = =>
@@ -117,6 +118,7 @@ class LineWrapper extends EventEmitter
             options.lineWidth = @lineWidth
             y = @document.y
             @emit 'line', buffer, options, this
+            lc++
             
         @emit 'sectionStart', options, this
         
@@ -187,7 +189,8 @@ class LineWrapper extends EventEmitter
         # to start the first line of the next segment at, and reset
         # the y position
         if options.continued is yes
-            @continuedX += textWidth
+            @continuedX = 0 if lc > 1
+            @continuedX += options.textWidth
             @document.y = y
         else
             @document.x = @startX
