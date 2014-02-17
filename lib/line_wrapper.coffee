@@ -8,7 +8,7 @@ class LineWrapper extends EventEmitter
         @wordSpacing = options.wordSpacing is 0
         @columns     = options.columns or 1
         @columnGap   = options.columnGap ? 18 # 1/4 inch
-        @lineWidth   =  (options.width - (@columnGap * (@columns - 1))) / @columns
+        @lineWidth   = (options.width - (@columnGap * (@columns - 1))) / @columns
         @startX      = @document.x
         @startY      = @document.y
         @column      = 1
@@ -157,6 +157,8 @@ class LineWrapper extends EventEmitter
         if options.continued is yes
             @continuedX = textWidth
             @document.y = y
+        else
+            @document.x = @startX
                     
     nextSection: (options) ->
         @emit 'sectionEnd', options, this
