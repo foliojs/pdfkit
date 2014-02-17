@@ -65,5 +65,12 @@ class TTFFont
         @decender = (@os2.exists and @os2.decender) or @hhea.decender
         @lineGap = (@os2.exists and @os2.lineGap) or @hhea.lineGap
         @bbox = [@head.xMin, @head.yMin, @head.xMax, @head.yMax]
+        
+    characterToGlyph: (character) ->
+        return @cmap.unicode?.codeMap[character] or 0
+        
+    widthOfGlyph: (glyph) ->
+        scale = 1000.0 / @head.unitsPerEm
+        return @hmtx.forGlyph(glyph).advance * scale
 
 module.exports = TTFFont

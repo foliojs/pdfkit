@@ -86,6 +86,13 @@ class AFMFont
             string += String.fromCharCode(char)
         
         return string
+                    
+    characterToGlyph: (character) ->
+        return characters[WIN_ANSI_MAP[character] or character]
+                    
+    widthOfGlyph: (glyph) ->
+        return @glyphWidths[glyph]
+                    
     characters = '''
         .notdef       .notdef        .notdef        .notdef
         .notdef       .notdef        .notdef        .notdef
