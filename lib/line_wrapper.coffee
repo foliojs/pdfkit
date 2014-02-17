@@ -13,6 +13,7 @@ class LineWrapper extends EventEmitter
         @startY      = @document.y
         @column      = 1
         @ellipsis    = options.ellipsis
+        @continuedX  = 0
         
         # calculate the maximum Y position the text can appear at
         if options.height?
@@ -33,7 +34,7 @@ class LineWrapper extends EventEmitter
             @once 'line', =>
                 @document.x -= indent
                 @lineWidth += indent
-                @continuedX = null
+                @continuedX = 0 unless options.continued
         
         # handle left aligning last lines of paragraphs
         @on 'lastLine', (options) =>
@@ -186,7 +187,7 @@ class LineWrapper extends EventEmitter
         # to start the first line of the next segment at, and reset
         # the y position
         if options.continued is yes
-            @continuedX = textWidth
+            @continuedX += textWidth
             @document.y = y
         else
             @document.x = @startX
