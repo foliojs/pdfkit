@@ -12,9 +12,14 @@ class LineWrapper extends EventEmitter
         @startX      = @document.x
         @startY      = @document.y
         @column      = 1
+        @ellipsis    = options.ellipsis
         
         # calculate the maximum Y position the text can appear at
-        @maxY = @startY + options.height
+        if options.height?
+            @height = options.height
+            @maxY = @startY + options.height
+        else
+            @maxY = @document.page.maxY()
         
         # handle paragraph indents
         @on 'firstLine', (options) =>
@@ -55,6 +60,7 @@ class LineWrapper extends EventEmitter
             w = wordWidths[word] ?= @wordWidth word
             
             # if the word is longer than the whole line, chop it up
+            # TODO: break by grapheme clusters, not JS string characters
             if w > @lineWidth
                 # make some fake break objects
                 lbk = last
@@ -68,16 +74,19 @@ class LineWrapper extends EventEmitter
                         
                     # send a required break unless this is the last piece
                     fbk.required = l < word.length
-                    fn word.slice(0, l), w, fbk, lbk
+                    shouldContinue = fn word.slice(0, l), w, fbk, lbk
                     lbk = required: false
                     
                     # get the remaining piece of the word
                     word = word.slice(l)
                     w = @wordWidth word
+                    
+                    break if shouldContinue is no
             else
                 # otherwise just emit the break as it was given to us
-                fn word, w, bk, last
+                shouldContinue = fn word, w, bk, last
                 
+            break if shouldContinue is no
             last = bk
             
         return
@@ -87,6 +96,7 @@ class LineWrapper extends EventEmitter
         @indent      = options.indent           if options.indent?
         @charSpacing = options.characterSpacing if options.characterSpacing?
         @wordSpacing = options.wordSpacing      if options.wordSpacing?
+        @ellipsis    = options.ellipsis         if options.ellipsis?
         
         # make sure we're actually on the page 
         # and that the first line of is never by 
@@ -122,13 +132,34 @@ class LineWrapper extends EventEmitter
             if bk.required or w > @spaceLeft
                 if bk.required
                     @emit 'lastLine', options, this
+                    
+                # if the user specified a max height and an ellipsis, and is about to pass the
+                # max height and max columns after the next line, append the ellipsis
+                lh = @document.currentLineHeight(true)
+                if @height? and @ellipsis and @document.y + lh * 2 > @maxY and @column >= @columns
+                    @ellipsis = '…' if @ellipsis is true # map default ellipsis character
+                    buffer = buffer.trimRight()
+                    textWidth = @wordWidth buffer + @ellipsis
+                    
+                    # remove characters from the buffer until the ellipsis fits
+                    while w > @lineWidth
+                        buffer = buffer.slice(0, -1).trimRight()
+                        textWidth = @wordWidth buffer + @ellipsis
                 
+                    buffer = buffer + @ellipsis
+                    
                 emitLine()
                 
                 # if we've reached the edge of the page, 
                 # continue on a new page or column
-                if @document.y + @document.currentLineHeight(true) > @maxY
-                    @nextSection()
+                if @document.y + lh > @maxY
+                    shouldContinue = @nextSection()
+                    
+                    # stop if we reached the maximum height
+                    unless shouldContinue
+                        wc = 0
+                        buffer = ''
+                        return no
                 
                 # reset the space left and buffer
                 if bk.required
@@ -164,6 +195,10 @@ class LineWrapper extends EventEmitter
         @emit 'sectionEnd', options, this
         
         if ++@column > @columns
+            # if a max height was specified by the user, we're done.
+            # otherwise, the default is to make a new page at the bottom.
+            return false if @height?
+                           
             @document.addPage()
             @column = 1
             @startY = @document.page.margins.top
@@ -171,12 +206,12 @@ class LineWrapper extends EventEmitter
             @document.x = @startX
             @document.fillColor @document._fillColor... if @document._fillColor
             @emit 'pageBreak', options, this
-            
         else
             @document.x += @lineWidth + @columnGap
             @document.y = @startY
             @emit 'columnBreak', options, this
         
         @emit 'sectionStart', options, this
+        return true
             
 module.exports = LineWrapper
