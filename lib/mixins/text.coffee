@@ -173,6 +173,28 @@ module.exports =
                     textWidth = @widthOfString(text.replace(/\s+/g, ''), options)
                     spaceWidth = @widthOfString(' ') + characterSpacing
                     wordSpacing = Math.max 0, (options.lineWidth - textWidth) / Math.max(1, options.wordCount - 1) - spaceWidth
+                    
+        # calculate the actual rendered width of the string after word and character spacing
+        renderedWidth = options.textWidth + (wordSpacing * (options.wordCount - 1)) + (characterSpacing * (text.length - 1))
+                    
+        # create link annotations if the link option is given
+        if options.link
+            @link x, y, renderedWidth, @currentLineHeight(), options.link
+            
+        # create underline or strikethrough line
+        if options.underline or options.strike
+            @save()
+            @strokeColor @_fillColor... unless options.stroke
+            @lineWidth 2
+            
+            d = if options.underline then 1 else 2
+            lineY = y + @currentLineHeight() / d
+            lineY -= 2 if options.underline
+            
+            @moveTo x, lineY
+            @lineTo x + renderedWidth, lineY
+            @stroke()
+            @restore()
 
         # flip coordinate system
         @save()
