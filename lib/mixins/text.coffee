@@ -41,7 +41,8 @@ module.exports =
                 wrapper = new LineWrapper(this, options)
                 wrapper.on 'line', @_line.bind(this)
                 
-            @_wrapper = if options.continued then wrapper else null                
+            @_wrapper = if options.continued then wrapper else null
+            @_textOptions = if options.continued then options else null
             wrapper.wrap text, options
             
         # render paragraphs as single lines
@@ -113,6 +114,11 @@ module.exports =
             opts = {}
             opts[k] = v for k, v of options
             return opts
+            
+        # extend options with previous values for continued text
+        if @_textOptions
+            for key, val of @_textOptions when key isnt 'continued'
+                options[key] ?= val
 
         # Update the current position
         if x?
