@@ -185,11 +185,13 @@ module.exports =
         if options.underline or options.strike
             @save()
             @strokeColor @_fillColor... unless options.stroke
-            @lineWidth 2
+            
+            lineWidth = if @_fontSize >= 20 then 2 else 1
+            @lineWidth lineWidth
             
             d = if options.underline then 1 else 2
             lineY = y + @currentLineHeight() / d
-            lineY -= 2 if options.underline
+            lineY -= lineWidth if options.underline
             
             @moveTo x, lineY
             @lineTo x + renderedWidth, lineY
