@@ -137,8 +137,7 @@ should do. This is best illustrated by an example.
        .rect(250, 100, 50, 50)
        .stroke()
 
-The output of this example, with some text labeling each style, looks like
-this.
+The output of this example looks like this.
 
 ![3](images/line_styles.png "220")
 

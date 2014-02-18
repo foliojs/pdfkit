@@ -82,7 +82,7 @@ The output is as you'd expect:
 
 # You made it!
 
-That's all there is too creating PDF documents in PDFKit. It's really quite
+That's all there is to creating PDF documents in PDFKit. It's really quite
 simple to create beautiful multi-page printable documents using Node.js!
 
 This guide was actually generated from Markdown/Literate CoffeeScript files using a 
