@@ -1,6 +1,6 @@
 zlib = require 'zlib'
 PNG = require 'png-js'
-setImmediate = setImmediate ? process.nextTick # backfill for node <0.10
+setImmediate = global.setImmediate ? process.nextTick # backfill for node <0.10
 
 class PNGImage
     constructor: (data) ->

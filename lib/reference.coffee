@@ -4,7 +4,7 @@ By Devon Govett
 ###
 
 zlib = require 'zlib'
-setImmediate = setImmediate ? process.nextTick # backfill for node <0.10
+setImmediate = global.setImmediate ? process.nextTick # backfill for node <0.10
 
 class PDFReference
     constructor: (@id, @data = {}) ->

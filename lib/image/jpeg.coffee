@@ -1,6 +1,6 @@
 fs = require 'fs'
 Data = '../data'
-setImmediate = setImmediate ? process.nextTick # backfill for node <0.10
+setImmediate = global.setImmediate ? process.nextTick # backfill for node <0.10
 
 class JPEG
     constructor: (@data) ->
