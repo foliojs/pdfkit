@@ -22,7 +22,9 @@
   },
   "bugs": "http://github.com/devongovett/pdfkit/issues",
   "devDependencies": {
-    "coffee-script": ">=1.0.1"
+    "coffee-script": ">=1.0.1",
+    "codemirror": "~3.21.0",
+    "markdown": "~0.5.0"
   },
   "dependencies": {
     "png-js": ">=0.1.0",
