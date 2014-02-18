@@ -3,4 +3,5 @@ node-modules/
 demo/
 src/
 lib/
+playground/
 index.js

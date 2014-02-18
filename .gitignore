@@ -7,3 +7,4 @@ lib/font/tables/.DS_Store
 /tests/
 node-zlib/
 src/
+playground/
