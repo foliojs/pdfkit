@@ -149,7 +149,7 @@ class Node
       
     options = {}
     options.align = @style.align
-    options.link  = @attrs.href
+    options.link  = @attrs.href or false # override continued link
     options.continued = @attrs.continued if @attrs.continued?
     return options
       
