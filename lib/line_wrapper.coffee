@@ -145,7 +145,7 @@ class LineWrapper extends EventEmitter
                     textWidth = @wordWidth buffer + @ellipsis
                     
                     # remove characters from the buffer until the ellipsis fits
-                    while w > @lineWidth
+                    while textWidth > @lineWidth
                         buffer = buffer.slice(0, -1).trimRight()
                         textWidth = @wordWidth buffer + @ellipsis
                 
