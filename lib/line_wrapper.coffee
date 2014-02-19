@@ -165,7 +165,7 @@ class LineWrapper extends EventEmitter
                         return no
                 
                 # reset the space left and buffer
-                if bk.required
+                if bk.required and w <= @spaceLeft
                     @spaceLeft = @lineWidth
                     buffer = ''
                     textWidth = 0
