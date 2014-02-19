@@ -74,8 +74,19 @@ module.exports =
         options.DA = PDFObject.s ''
         @annotate x, y, w, h, options
         
-    _convertRect: (rect...) ->
-        rect[1] = @page.height - rect[1] - rect[3]
-        rect[2] += rect[0]
-        rect[3] += rect[1]
-        return rect
+    _convertRect: (x1, y1, w, h) ->
+        # flip y1 and y2
+        y2 = y1
+        y1 += h
+        
+        # make x2
+        x2 = x1 + w
+        
+        # apply current transformation matrix to points
+        [m0, m1, m2, m3, m4, m5] = @_ctm
+        x1 = m0 * x1 + m2 * y1 + m4
+        y1 = m1 * x1 + m3 * y1 + m5
+        x2 = m0 * x2 + m2 * y2 + m4
+        y2 = m1 * x2 + m3 * y2 + m5
+        
+        return [x1, y1, x2, y2]

@@ -11,16 +11,18 @@ zlib = require 'zlib'
 class PDFFont
     constructor: (@document, @filename, @family, @id) ->
         if @filename in @_standardFonts
-            @embedStandard()
+            @isAFM = true
+            @font = AFMFont.open __dirname + "/font/data/#{@filename}.afm"
+            @registerStandard()
             
         else if /\.(ttf|ttc)$/i.test @filename
-            @ttf = TTFFont.open @filename, @family
-            @subset = new Subset @ttf
+            @font = TTFFont.open @filename, @family
+            @subset = new Subset @font
             @registerTTF()
             
         else if /\.dfont$/i.test @filename
-            @ttf = TTFFont.fromDFont @filename, @family
-            @subset = new Subset @ttf
+            @font = TTFFont.fromDFont @filename, @family
+            @subset = new Subset @font
             @registerTTF()
             
         else
@@ -33,57 +35,19 @@ class PDFFont
         return fn() if @isAFM
         @embedTTF fn
         
-    WIN_ANSI_MAP =
-        402:  131
-        8211: 150
-        8212: 151
-        8216: 145
-        8217: 146
-        8218: 130
-        8220: 147
-        8221: 148
-        8222: 132
-        8224: 134
-        8225: 135
-        8226: 149
-        8230: 133
-        8364: 128
-        8240: 137
-        8249: 139
-        8250: 155
-        710:  136
-        8482: 153
-        338:  140
-        339:  156
-        732:  152
-        352:  138
-        353:  154
-        376:  159
-        381:  142
-        382:  158
-
-    encodeWinAnsi = (text) ->
-        string = ''
-        for i in [0...text.length]
-            char = text.charCodeAt(i)
-            char = WIN_ANSI_MAP[char] || char
-            string += String.fromCharCode(char)
-        
-        return string
-
     encode: (text) ->
         if @isAFM
-            encodeWinAnsi text
+            @font.encodeText text
         else
             @subset?.encodeText(text) or text
         
     registerTTF: ->
-        @scaleFactor = 1000.0 / @ttf.head.unitsPerEm
-        @bbox = (Math.round e * @scaleFactor for e in @ttf.bbox)
+        @scaleFactor = 1000.0 / @font.head.unitsPerEm
+        @bbox = (Math.round e * @scaleFactor for e in @font.bbox)
         @stemV = 0 # not sure how to compute this for true-type fonts...
         
-        if @ttf.post.exists
-            raw = @ttf.post.italic_angle
+        if @font.post.exists
+            raw = @font.post.italic_angle
             hi = raw >> 16
             low = raw & 0xFF
             hi = -((hi ^ 0xFFFF) + 1) if hi & 0x8000 isnt 0
@@ -91,29 +55,25 @@ class PDFFont
         else
             @italicAngle = 0
             
-        @ascender = Math.round @ttf.ascender * @scaleFactor
-        @decender = Math.round @ttf.decender * @scaleFactor
-        @lineGap = Math.round @ttf.lineGap * @scaleFactor
+        @ascender = Math.round @font.ascender * @scaleFactor
+        @decender = Math.round @font.decender * @scaleFactor
+        @lineGap = Math.round @font.lineGap * @scaleFactor
 
-        @capHeight = (@ttf.os2.exists and @ttf.os2.capHeight) or @ascender
-        @xHeight = (@ttf.os2.exists and @ttf.os2.xHeight) or 0
+        @capHeight = (@font.os2.exists and @font.os2.capHeight) or @ascender
+        @xHeight = (@font.os2.exists and @font.os2.xHeight) or 0
 
-        @familyClass = (@ttf.os2.exists and @ttf.os2.familyClass or 0) >> 8
+        @familyClass = (@font.os2.exists and @font.os2.familyClass or 0) >> 8
         @isSerif = @familyClass in [1,2,3,4,5,7]
         @isScript = @familyClass is 10
 
         @flags = 0
-        @flags |= 1 << 0 if @ttf.post.isFixedPitch
+        @flags |= 1 << 0 if @font.post.isFixedPitch
         @flags |= 1 << 1 if @isSerif
         @flags |= 1 << 3 if @isScript
         @flags |= 1 << 6 if @italicAngle isnt 0
         @flags |= 1 << 5 # assume the font is nonsymbolic...
 
-        @cmap = @ttf.cmap.unicode
-        throw new Error 'No unicode cmap for font' if not @cmap
-
-        @hmtx = @ttf.hmtx
-        @charWidths = (Math.round @hmtx.widths[gid] * @scaleFactor for i, gid of @cmap.codeMap when i >= 32)
+        throw new Error 'No unicode cmap for font' if not @font.cmap.unicode
         
         # Create a placeholder reference to be filled in embedTTF.
         @ref = @document.ref
@@ -147,8 +107,7 @@ class PDFFont
                 
             firstChar = +Object.keys(@subset.cmap)[0]
             charWidths = for code, glyph of @subset.cmap
-                Math.round @ttf.hmtx.forGlyph(glyph).advance * @scaleFactor
-            
+                Math.round @font.widthOfGlyph(glyph)
         
             cmap = @document.ref()
             cmap.add toUnicodeCmap(@subset.subset)
@@ -205,10 +164,8 @@ class PDFFont
             end
         '''
                     
-    embedStandard: ->
-        @isAFM = true
-        font = AFMFont.open __dirname + "/font/data/#{@filename}.afm"
-        {@ascender,@decender,@bbox,@lineGap,@charWidths} = font
+    registerStandard: ->
+        {@ascender,@decender,@bbox,@lineGap} = @font
         
         @ref = @document.ref
             Type: 'Font'
@@ -237,8 +194,8 @@ class PDFFont
         string = '' + string
         width = 0
         for i in [0...string.length]
-            charCode = string.charCodeAt(i) - if @isAFM then 0 else 32
-            width += @charWidths[charCode] or 0
+            charCode = string.charCodeAt(i)                
+            width += @font.widthOfGlyph(@font.characterToGlyph(charCode)) or 0
         
         scale = size / 1000    
         return width * scale

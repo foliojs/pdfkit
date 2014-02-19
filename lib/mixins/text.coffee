@@ -1,4 +1,3 @@
-WORD_RE = /([^ ,\/!.?:;\-\n]*[ ,\/!.?:;\-]*)|\n/g
 LineWrapper = require '../line_wrapper'
 
 module.exports = 
@@ -34,18 +33,21 @@ module.exports =
         # if the wordSpacing option is specified, remove multiple consecutive spaces
         if options.wordSpacing
             text = text.replace(/\s{2,}/g, ' ')
-            
-        paragraphs = text.split '\n'
-        
+
         # word wrapping
         if options.width
-            wrapper = new LineWrapper(this)
-            wrapper.on 'line', @_line.bind(this)
-            wrapper.wrap(paragraphs, options)
+            wrapper = @_wrapper
+            unless wrapper
+                wrapper = new LineWrapper(this, options)
+                wrapper.on 'line', @_line.bind(this)
+                
+            @_wrapper = if options.continued then wrapper else null
+            @_textOptions = if options.continued then options else null
+            wrapper.wrap text, options
             
         # render paragraphs as single lines
         else
-            @_line line, options for line in paragraphs
+            @_line line, options for line in text.split '\n'
         
         return this
         
@@ -72,7 +74,7 @@ module.exports =
                     
         flatten(list)
                 
-        wrapper = new LineWrapper(this)
+        wrapper = new LineWrapper(this, options)
         wrapper.on 'line', @_line.bind(this)
         
         level = 1
@@ -97,7 +99,7 @@ module.exports =
             @x -= pos
             wrapper.lineWidth += pos
                     
-        wrapper.wrap(items, options)
+        wrapper.wrap items.join('\n'), options
         
         @x -= indent
         return this
@@ -112,6 +114,11 @@ module.exports =
             opts = {}
             opts[k] = v for k, v of options
             return opts
+            
+        # extend options with previous values for continued text
+        if @_textOptions
+            for key, val of @_textOptions when key isnt 'continued'
+                options[key] ?= val
 
         # Update the current position
         if x?
@@ -123,7 +130,6 @@ module.exports =
         unless options.lineBreak is false
             margins = @page.margins
             options.width ?= @page.width - @x - margins.right
-            options.height ?= @page.height - @y - margins.bottom
 
         options.columns ||= 0
         options.columnGap ?= 18 # 1/4 inch
@@ -137,7 +143,7 @@ module.exports =
         @_fragment text, @x, @y, options
         lineGap = options.lineGap or @_lineGap or 0
         
-        if not wrapper or (wrapper.lastLine and options.lineBreak is no)
+        if not wrapper
             @x += @widthOfString text
         else
             @y += @currentLineHeight(true) + lineGap
@@ -157,20 +163,41 @@ module.exports =
         if options.width
             switch align
                 when 'right'
-                    x += options.lineWidth - options.textWidth
+                    textWidth = @widthOfString text.trimRight(), options
+                    x += options.lineWidth - textWidth
 
                 when 'center'
                     x += options.lineWidth / 2 - options.textWidth / 2
 
                 when 'justify'
-                    # split the line into words
-                    words = text.match(WORD_RE) or [text]
-                    break unless words
-
-                    # calculate the word spacing value  
+                    # calculate the word spacing value
                     textWidth = @widthOfString(text.replace(/\s+/g, ''), options)
                     spaceWidth = @widthOfString(' ') + characterSpacing
-                    wordSpacing = (options.lineWidth - textWidth) / (words.length - 1) - spaceWidth
+                    wordSpacing = Math.max 0, (options.lineWidth - textWidth) / Math.max(1, options.wordCount - 1) - spaceWidth
+                    
+        # calculate the actual rendered width of the string after word and character spacing
+        renderedWidth = options.textWidth + (wordSpacing * (options.wordCount - 1)) + (characterSpacing * (text.length - 1))
+                    
+        # create link annotations if the link option is given
+        if options.link
+            @link x, y, renderedWidth, @currentLineHeight(), options.link
+            
+        # create underline or strikethrough line
+        if options.underline or options.strike
+            @save()
+            @strokeColor @_fillColor... unless options.stroke
+            
+            lineWidth = if @_fontSize >= 20 then 2 else 1
+            @lineWidth lineWidth
+            
+            d = if options.underline then 1 else 2
+            lineY = y + @currentLineHeight() / d
+            lineY -= lineWidth if options.underline
+            
+            @moveTo x, lineY
+            @lineTo x + renderedWidth, lineY
+            @stroke()
+            @restore()
 
         # flip coordinate system
         @save()
@@ -182,11 +209,6 @@ module.exports =
 
         # tell the font subset to use the characters
         @_font.use(text)
-
-        # encode the text based on the font subset,
-        # and then convert it to hex
-        text = @_font.encode(text)
-        text = (text.charCodeAt(i).toString(16) for i in [0...text.length]).join('')
 
         # begin the text object
         @addContent "BT"
@@ -201,14 +223,33 @@ module.exports =
         mode = if options.fill and options.stroke then 2 else if options.stroke then 1 else 0
         @addContent "#{mode} Tr" unless mode is state.mode
 
-        # Word spacing
-        @addContent wordSpacing + ' Tw' unless wordSpacing is state.wordSpacing
-
         # Character spacing
         @addContent characterSpacing + ' Tc' unless characterSpacing is state.characterSpacing
-
-        # add the actual text
-        @addContent "<#{text}> Tj"
+        
+        # Add the actual text
+        # If we have a word spacing value, we need to encode each word separately
+        # since the normal Tw operator only works on character code 32, which isn't
+        # used for embedded fonts.
+        if wordSpacing
+            words = text.split(/\s+/)
+            wordSpacing += @widthOfString(' ') + characterSpacing
+            wordSpacing *= 1000 / @_fontSize
+            
+            commands = []
+            for word in words
+                # encode the text based on the font subset,
+                # and then convert it to hex
+                encoded = @_font.encode(word)
+                encoded = (encoded.charCodeAt(i).toString(16) for i in [0...encoded.length] by 1).join('')
+                commands.push "<#{encoded}> #{-wordSpacing}"
+            
+            @addContent "[#{commands.join ' '}] TJ"
+        else
+            # encode the text based on the font subset,
+            # and then convert it to hex
+            encoded = @_font.encode(text)
+            encoded = (encoded.charCodeAt(i).toString(16) for i in [0...encoded.length] by 1).join('')
+            @addContent "<#{encoded}> Tj"
 
         # end the text object
         @addContent "ET"
@@ -218,4 +259,4 @@ module.exports =
 
         # keep track of text states
         state.mode = mode
-        state.wordSpacing = wordSpacing
+        state.characterSpacing = characterSpacing

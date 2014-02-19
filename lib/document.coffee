@@ -158,7 +158,7 @@ class PDFDocument
         return out
 
     generateBody: (out, fn) ->
-        offset = out.join('\n').length
+        offset = out.join('\n').length + 1
         
         refs = (ref for id, ref of @store.objects)
         do proceed = =>
@@ -166,7 +166,7 @@ class PDFDocument
                 ref.object @compress, (object) ->
                     ref.offset = offset
                     out.push object
-                    offset += object.length + 1
+                    offset += object.length + 1 # plus one for newline
                     proceed()
             else
                 @xref_offset = offset
@@ -184,7 +184,7 @@ class PDFDocument
             
     generateTrailer: (out) ->
         trailer = PDFObject.convert
-            Size: @store.length
+            Size: @store.length + 1
             Root: @store.root
             Info: @_info
 
