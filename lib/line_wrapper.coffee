@@ -170,7 +170,9 @@ class LineWrapper extends EventEmitter
                     if w > @spaceLeft
                         buffer = word
                         textWidth = w
+                        wc = 1
                         emitLine()
+                        
                     @spaceLeft = @lineWidth
                     buffer = ''
                     textWidth = 0
