@@ -28,18 +28,30 @@ You can also set some options for the page, such as it's size and orientation.
 
 The `layout` property can be either `portrait` (the default) or `landscape`.
 The `size` property can be either an array specifying `[width, height]` in PDF
-points (72 per inch), or a string specifying a predefined size. All of the
-standard paper sizes (and more) are predefined, so generally you can just use
-the standard name of the paper size you want and it will just work. However, a
+points (72 per inch), or a string specifying a predefined size. A
 list of the predefined paper sizes can be seen [here](http://pdfkit.org/docs/paper_sizes.html). The
-default paper size is `letter`.
+default is `letter`.
 
-Passing a page options object (as above) to the `PDFDocument` constructor will
+Passing a page options object to the `PDFDocument` constructor will
 set the default paper size and layout for every page in the document, which is
 then overridden by individual options passed to the `addPage` method.
 
-You can also set the page `margins` option to either a number to make them all
-equal, or an object with `top`, `bottom`, `left` and `right` values.
+You can set the page margins in two ways. The first is by setting the `margin` 
+property (singular) to a number, which applies that margin to all edges. The
+other way is to set the `margins` property (plural) to an object with `top`,
+`bottom`, `left`, and `right` values.  The default is a 1 inch (72 point) margin
+on all sides.
+
+For example:
+
+    # Add a 50 point margin on all sides
+    doc.addPage
+      margin: 50
+
+      
+    # Add different margins on each side
+    doc.addPage
+      margins: { top: 50, bottom: 50, left: 72, right: 72 }
 
 * * *
 
