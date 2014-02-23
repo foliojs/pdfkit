@@ -4,6 +4,7 @@ lib/font/tables/.DS_Store
 /tests/
 node-zlib/
 src/
+<<<<<<< HEAD
 playground/
 build/
 js/

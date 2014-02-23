@@ -31,6 +31,7 @@ folder.</p>
 <h2 id="example">Example</h2>
 
 <pre><code>PDFDocument = require &#39;pdfkit&#39;
+<<<<<<< HEAD
 
 # Create a document
 doc = new PDFDocument
@@ -38,6 +39,10 @@ doc = new PDFDocument
 # Pipe it&#39;s output somewhere, like to a file or HTTP response
 doc.pipe fs.createWriteStream(&#39;output.pdf&#39;)
 
+=======
+doc = new PDFDocument
+
+>>>>>>> Add generated docs for Github pages
 # Embed a font, set the font size, and render some text
 doc.font(&#39;fonts/PalatinoBold.ttf&#39;)
    .fontSize(25)
@@ -69,10 +74,17 @@ doc.addPage()
    .underline(100, 100, 160, 27, color: &quot;#0000FF&quot;)
    .link(100, 100, 160, 27, &#39;http://google.com/&#39;)
 
+<<<<<<< HEAD
 # Finalize PDF file
 doc.end()</code></pre>
 
 <p><a href="http://pdfkit.org/demo/out.pdf">The PDF output from this example</a> (with a few additions) shows the power of PDFKit — producing 
+=======
+# Write the PDF file to disk
+doc.write &#39;output.pdf&#39;</code></pre>
+
+<p><a href="http://pdfkit.org/example.pdf">The PDF output from this example</a> (with a few additions) shows the power of PDFKit — producing 
+>>>>>>> Add generated docs for Github pages
 complex documents with a very small amount of code.  For more, see the <code>demo</code> folder and the 
 <a href="http://pdfkit.org/docs/getting_started.html">PDFKit programming guide</a>.</p>
 
@@ -82,9 +94,13 @@ complex documents with a very small amount of code.  For more, see the <code>dem
 
 <h2 id="license">License</h2>
 
+<<<<<<< HEAD
 <p>PDFKit is available under the MIT license.</p><nav><a href="/docs/getting_started.html" class="next">Next</a></nav></div><script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script><script src="/docs/js/scroll.js"></script><script src="/docs/js/highlight.pack.js"></script><script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
 (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
 m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
 })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 ga('create', 'UA-48340245-1', 'pdfkit.org');
 ga('send', 'pageview');</script></body></html>
+=======
+<p>PDFKit is available under the MIT license.</p><nav><a href="/docs/getting_started.html" class="next">Next</a></nav></div><script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script><script src="/docs/js/scroll.js"></script><script src="/docs/js/highlight.pack.js"></script></body></html>
+>>>>>>> Add generated docs for Github pages
