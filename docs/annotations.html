@@ -1,0 +1,89 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>Annotations in PDFKit</title><link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Source+Code+Pro:400,700|Alegreya:700|Merriweather"><link rel="stylesheet" href="/docs/css/index.css"><link rel="stylesheet" href="/docs/css/github.css"></head><body><nav class="sidebar"><ul><li><a href="/">Home</a></li><li><a href="/docs/../index.html">Documentation</a><ul><li><a href="/docs/getting_started.html">Getting Started </a></li><li><a href="/docs/vector.html">Vector Graphics </a></li><li><a href="/docs/text.html">Text </a></li><li><a href="/docs/images.html">Images </a></li><li><a href="/docs/annotations.html" class="selected">Annotations </a></li></ul></li><li><a href="/docs/guide.pdf">PDF Guide</a></li><li><a href="/demo/out.pdf">Example PDF</a></li><li><a href="http://github.com/devongovett/pdfkit">Source Code</a></li></ul></nav><div class="main"><h1 id="annotations_in_pdfkit">Annotations in PDFKit</h1>
+
+<p>Annotations are interactive features of the PDF format, and they make it
+possible to include things like links and attached notes, or to highlight,
+underline or strikeout portions of text. Annotations are added using the
+various helper methods, and each type of annotation is defined by a rectangle
+and some other properties. Here is a list of the available annotation methods:</p>
+
+<ul><li><code>note(x, y, width, height, contents, options)</code></li><li><code>link(x, y, width, height, url, options)</code></li><li><code>highlight(x, y, width, height, options)</code></li><li><code>underline(x, y, width, height, options)</code></li><li><code>strike(x, y, width, height, options)</code></li><li><code>lineAnnotation(x1, y1, x2, y2, options)</code></li><li><code>rectAnnotation(x, y, width, height, options)</code></li><li><code>ellipseAnnotation(x, y, width, height, options)</code></li><li><code>textAnnotation(x, y, width, height, text, options)</code></li></ul>
+
+<p>Many of the annotations have a <code>color</code> option that you can specify. You can
+use an array of RGB values, a hex color, or a named CSS color value for that
+option.</p>
+
+<p>If you are adding an annotation to a piece of text, such as a link or
+underline, you will need to know the width and height of the text in order to
+create the required rectangle for the annotation. There are two methods that
+you can use to do that. To get the width of any piece of text in the current
+font, just call the <code>widthOfString</code> method with the string you want to
+measure. To get the line height in the current font, just call the
+<code>currentLineHeight</code> method.</p>
+
+<p>You must remember that annotations have a stacking order. If you are putting
+more than one annotation on a single area and one of those annotations is a
+link, make sure that the link is the last one you add, otherwise it will be
+covered by another annotation and the user won&#39;t be able to click it.</p>
+
+<hr/>
+
+<p>Here is an example that uses a few of the annotation types.</p>
+
+<pre><code># Add the link text
+doc.fontSize(25)
+   .fillColor(&#39;blue&#39;)
+   .text(&#39;This is a link!&#39;, 20, 0)
+
+# Measure the text
+width = doc.widthOfString(&#39;This is a link!&#39;)
+height = doc.currentLineHeight()   
+
+# Add the underline and link annotations
+doc.underline(20, 0, width, height, color: &#39;blue&#39;)
+   .link(20, 0, width, height, &#39;http://google.com/&#39;)
+
+# Create the highlighted text   
+doc.moveDown()
+   .fillColor(&#39;black&#39;)
+   .highlight(20, doc.y, doc.widthOfString(&#39;This text is highlighted!&#39;), height)
+   .text(&#39;This text is highlighted!&#39;)
+
+# Create the crossed out text   
+doc.moveDown()
+   .strike(20, doc.y, doc.widthOfString(&#39;STRIKE!&#39;), height)
+   .text(&#39;STRIKE!&#39;)</code></pre>
+
+<p>The output of this example looks like this.</p>
+
+<p><img src="img/15.png"/></p>
+
+<p>Annotations are currently not the easiest things to add to PDF documents, but
+that is the fault of the PDF spec itself. Calculating a rectangle manually isn&#39;t
+fun, but PDFKit makes it easier for a few common annotations applied to text, including
+links, underlines, and strikes.  Here&#39;s an example showing two of them:</p>
+
+<pre><code>doc.fontSize 20
+   .fillColor &#39;red&#39;
+   .text &#39;Another link!&#39;, 20, 0,
+     link: &#39;http://apple.com/&#39;,
+     underline: true</code></pre>
+
+<p>The output is as you&#39;d expect:</p>
+
+<p><img src="img/16.png"/></p>
+
+<h1>You made it!</h1>
+
+<p>That&#39;s all there is to creating PDF documents in PDFKit. It&#39;s really quite
+simple to create beautiful multi-page printable documents using Node.js!</p>
+
+<p>This guide was actually generated from Markdown/Literate CoffeeScript files using a 
+PDFKit generation script. The examples are actually run to generate the output shown
+inline. The script generates both the website and the PDF guide, and 
+can be found <a href="http://github.com/devongovett/pdfkit/tree/master/docs/generate.coffee">on Github</a>.
+Check it out if you want to see an example of a slightly more complicated renderer using
+a parser for Markdown and a syntax highlighter.</p>
+
+<p>If you have any questions about what you&#39;ve learned in this guide, please don&#39;t
+hesitate to <a href="http://twitter.com/devongovett">ask the author</a> or post an issue
+on <a href="http://github.com/devongovett/pdfkit/issues">Github</a>. Enjoy!</p><nav><a href="/docs/images.html" class="previous">Previous</a></nav></div><script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script><script src="/docs/js/scroll.js"></script><script src="/docs/js/highlight.pack.js"></script></body></html>

@@ -1,0 +1,170 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>Text in PDFKit</title><link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Source+Code+Pro:400,700|Alegreya:700|Merriweather"><link rel="stylesheet" href="/docs/css/index.css"><link rel="stylesheet" href="/docs/css/github.css"></head><body><nav class="sidebar"><ul><li><a href="/">Home</a></li><li><a href="/docs/../index.html">Documentation</a><ul><li><a href="/docs/getting_started.html">Getting Started </a></li><li><a href="/docs/vector.html">Vector Graphics </a></li><li><a href="/docs/text.html" class="selected">Text </a><ul><li><a href="#the_basics">The basics</a></li><li><a href="#line_wrapping_and_justification">Line wrapping and justification</a></li><li><a href="#text_styling">Text styling</a></li><li><a href="#rich_text">Rich Text</a></li><li><a href="#fonts">Fonts</a></li></ul></li><li><a href="/docs/images.html">Images </a></li><li><a href="/docs/annotations.html">Annotations </a></li></ul></li><li><a href="/docs/guide.pdf">PDF Guide</a></li><li><a href="/demo/out.pdf">Example PDF</a></li><li><a href="http://github.com/devongovett/pdfkit">Source Code</a></li></ul></nav><div class="main"><h1 id="text_in_pdfkit">Text in PDFKit</h1>
+
+<h2 id="the_basics">The basics</h2>
+
+<p>PDFKit makes adding text to documents quite simple, and includes many options
+to customize the display of the output. Adding text to a document is as simple
+as calling the <code>text</code> method.</p>
+
+<pre><code>doc.text &#39;Hello world!&#39;</code></pre>
+
+<p>Internally, PDFKit keeps track of the current X and Y position of text as it
+is added to the document. This way, subsequent calls to the <code>text</code> method will
+automatically appear as new lines below the previous line. However, you can
+modify the position of text by passing X and Y coordinates to the <code>text</code>
+method after the text itself.</p>
+
+<pre><code>doc.text &#39;Hello world!&#39;, 100, 100</code></pre>
+
+<p>If you want to move down or up by lines, just call the <code>moveDown</code> or <code>moveUp</code>
+method with the number of lines you&#39;d like to move (1 by default).</p>
+
+<h2 id="line_wrapping_and_justification">Line wrapping and justification</h2>
+
+<p>PDFKit includes support for line wrapping out of the box! If no options are
+given, text is automatically wrapped within the page margins and placed in the
+document flow below any previous text, or at the top of the page. PDFKit
+automatically inserts new pages as necessary so you don&#39;t have to worry about
+doing that for long pieces of text. PDFKit can also automatically wrap text
+into multiple columns.</p>
+
+<p>If you pass a specific X and Y position for the text, it will not wrap unless
+you also pass the <code>width</code> option, setting the width the text should be wrapped
+to. If you set the <code>height</code> option, the text will be clipped to the number of
+lines that can fit in that height.</p>
+
+<p>When line wrapping is enabled, you can choose a text justification. There are
+four options: <code>left</code> (the default), <code>center</code>, <code>right</code>, and <code>justify</code>. They
+work just as they do in your favorite word processor, but here is an example
+showing their use in a text box.</p>
+
+<pre><code>lorem = &#39;Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam in suscipit purus.  Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Vivamus nec hendrerit felis. Morbi aliquam facilisis risus eu lacinia. Sed eu leo in turpis fringilla hendrerit. Ut nec accumsan nisl.&#39;
+
+doc.fontSize 8
+doc.text &#39;This text is left aligned. &#39; + lorem,
+  width: 410
+  align: &#39;left&#39;
+
+doc.moveDown()
+doc.text &#39;This text is centered. &#39; + lorem,
+  width: 410
+  align: &#39;center&#39;
+
+doc.moveDown()
+doc.text &#39;This text is right aligned. &#39; + lorem, 
+  width: 410
+  align: &#39;right&#39;
+
+doc.moveDown()
+doc.text &#39;This text is justified. &#39; + lorem, 
+  width: 410
+  align: &#39;justify&#39;
+
+# draw bounding rectangle
+doc.rect(doc.x, 0, 410, doc.y).stroke()</code></pre>
+
+<p>The output of this example, looks like this:</p>
+
+<p><img src="img/10.png"/></p>
+
+<h2 id="text_styling">Text styling</h2>
+
+<p>PDFKit has many options for controlling the look of text added to PDF
+documents, which can be passed to the <code>text</code> method. They are enumerated
+below.</p>
+
+<ul><li><code>lineBreak</code> - set to <code>false</code> to disable line wrapping all together</li><li><code>width</code> - the width that text should be wrapped to (by default, the page width minus the left and right margin)</li><li><code>height</code> - the maximum height that text should be clipped to</li><li><code>ellipsis</code> - the character to display at the end of the text when it is too long. Set to <code>true</code> to use the default character.</li><li><code>columns</code> - the number of columns to flow the text into</li><li><code>columnGap</code> - the amount of space between each column (1/4 inch by default)</li><li><code>indent</code> - the amount in PDF points (72 per inch) to indent each paragraph of text</li><li><code>paragraphGap</code> - the amount of space between each paragraph of text</li><li><code>lineGap</code> - the amount of space between each line of text</li><li><code>wordSpacing</code> - the amount of space between each word in the text</li><li><code>characterSpacing</code> - the amount of space between each character in the text</li><li><code>fill</code> - whether to fill the text (<code>true</code> by default)</li><li><code>stroke</code> - whether to stroke the text</li><li><code>link</code> - a URL to link this text to (shortcut to create an annotation)</li><li><code>underline</code> - whether to underline the text</li><li><code>strike</code> - whether to strike out the text</li><li><code>continued</code> - whether the text segment will be followed immediately by another segment. Useful for changing styling in the middle of a paragraph.</li></ul>
+
+<p>Additionally, the fill and stroke color and opacity methods described in the
+<a href="vector.html">vector graphics section</a> are applied to text content as well.</p>
+
+<hr/>
+
+<p>Here is an example combining some of the options above, wrapping a piece of text into three columns, in a specified width and height.</p>
+
+<pre><code>lorem = &#39;Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam in suscipit purus. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Vivamus nec hendrerit felis. Morbi aliquam facilisis risus eu lacinia. Sed eu leo in turpis fringilla hendrerit. Ut nec accumsan nisl. Suspendisse rhoncus nisl posuere tortor tempus et dapibus elit porta. Cras leo neque, elementum a rhoncus ut, vestibulum non nibh. Phasellus pretium justo turpis. Etiam vulputate, odio vitae tincidunt ultricies, eros odio dapibus nisi, ut tincidunt lacus arcu eu elit. Aenean velit erat, vehicula eget lacinia ut, dignissim non tellus. Aliquam nec lacus mi, sed vestibulum nunc. Suspendisse potenti. Curabitur vitae sem turpis. Vestibulum sed neque eget dolor dapibus porttitor at sit amet sem. Fusce a turpis lorem. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae;&#39;   
+
+doc.text lorem,
+  columns: 3
+  columnGap: 15
+  height: 100
+  width: 465
+  align: &#39;justify&#39;</code></pre>
+
+<p>The output looks like this:</p>
+
+<p><img src="img/11.png"/></p>
+
+<h2 id="rich_text">Rich Text</h2>
+
+<p>As mentioned above, PDFKit supports a simple form of rich text via the <code>continued</code> option.
+When set to true, PDFKit will retain the text wrapping state between <code>text</code> calls. This way,
+when you call text again after changing the text styles, the wrapping will continue right
+where it left off.</p>
+
+<p>The options given to the first <code>text</code> call are also retained for subsequent calls after a 
+<code>continued</code> one, but of course you can override them.  In the following example, the <code>width</code>
+option from the first <code>text</code> call is retained by the second call.</p>
+
+<pre><code>doc.fillColor &#39;green&#39;
+   .text lorem.slice(0, 500),
+     width: 465
+     continued: yes
+   .fillColor &#39;red&#39;
+   .text lorem.slice(500)</code></pre>
+
+<p>Here is the output:</p>
+
+<p><img src="img/12.png"/></p>
+
+<h2 id="fonts">Fonts</h2>
+
+<p>The PDF format defines 14 standard fonts that can be used in PDF documents (4
+styles of Helvetica, Courier, and Times, as well as Symbol and Zapf Dingbats),
+but also allows fonts to be embedded right in the document. PDFKit supports
+embedding font files in the TrueType (<code>.ttf</code>), TrueType Collection (<code>.ttc</code>),
+and Datafork TrueType (<code>.dfont</code>) formats.</p>
+
+<p>To change the font used to render text, just call the <code>font</code> method. If you
+are using a standard PDF font, just pass the name to the <code>font</code> method.
+Otherwise, pass the path to the font file, and if the font is a collection
+font (<code>.ttc</code> and <code>.dfont</code> files), meaning that they contain multiple styles in
+the same file, you should pass the name of the style to be extracted from the
+collection.</p>
+
+<p>Here is an example showing how to set the font in each case.</p>
+
+<pre><code># Set the font size
+doc.fontSize(18)
+
+# Using a standard PDF font
+doc.font(&#39;Times-Roman&#39;)
+   .text(&#39;Hello from Times Roman!&#39;)
+   .moveDown(0.5)
+
+# Using a TrueType font (.ttf)   
+doc.font(&#39;fonts/GoodDog.ttf&#39;)
+   .text(&#39;This is Good Dog!&#39;)
+   .moveDown(0.5)
+
+# Using a collection font (.ttc or .dfont)   
+doc.font(&#39;fonts/Chalkboard.ttc&#39;, &#39;Chalkboard-Bold&#39;)
+   .text(&#39;This is Chalkboard, not Comic Sans.&#39;)</code></pre>
+
+<p>The output of this example looks like this:</p>
+
+<p><img src="img/13.png"/></p>
+
+<p>Another nice feature of the PDFKit font support, is the ability to register a
+font file under a name for use later rather than entering the path to the font
+every time you want to use it.</p>
+
+<pre><code># Register a font
+doc.registerFont(&#39;Heading Font&#39;, &#39;fonts/Chalkboard.ttc&#39;, &#39;Chalkboard-Bold&#39;)
+
+# Use the font later
+doc.font(&#39;Heading Font&#39;)
+   .text(&#39;This is a heading.&#39;)</code></pre>
+
+<p>That&#39;s about all there is too it for text in PDFKit. Let&#39;s move on now to
+images.</p><nav><a href="/docs/vector.html" class="previous">Previous</a><a href="/docs/images.html" class="next">Next</a></nav></div><script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script><script src="/docs/js/scroll.js"></script><script src="/docs/js/highlight.pack.js"></script></body></html>

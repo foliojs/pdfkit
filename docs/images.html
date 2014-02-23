@@ -1,0 +1,39 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>Images in PDFKit</title><link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Source+Code+Pro:400,700|Alegreya:700|Merriweather"><link rel="stylesheet" href="/docs/css/index.css"><link rel="stylesheet" href="/docs/css/github.css"></head><body><nav class="sidebar"><ul><li><a href="/">Home</a></li><li><a href="/docs/../index.html">Documentation</a><ul><li><a href="/docs/getting_started.html">Getting Started </a></li><li><a href="/docs/vector.html">Vector Graphics </a></li><li><a href="/docs/text.html">Text </a></li><li><a href="/docs/images.html" class="selected">Images </a></li><li><a href="/docs/annotations.html">Annotations </a></li></ul></li><li><a href="/docs/guide.pdf">PDF Guide</a></li><li><a href="/demo/out.pdf">Example PDF</a></li><li><a href="http://github.com/devongovett/pdfkit">Source Code</a></li></ul></nav><div class="main"><h1 id="images_in_pdfkit">Images in PDFKit</h1>
+
+<p>Adding images to PDFKit documents is an easy task. Just pass an image path to
+the <code>image</code> method along with some optional arguments. PDFKit supports the
+JPEG and PNG formats. If an X and Y position are not provided, the image is
+rendered at the current point in the text flow (below the last line of text).
+Otherwise, it is positioned absolutely at the specified point. The image will
+be scaled according to the following options.</p>
+
+<ul><li>Neither <code>width</code> or <code>height</code> provided - image is rendered at full size</li><li><code>width</code> provided but not <code>height</code> - image is scaled proportionally to fit in the provided <code>width</code></li><li><code>height</code> provided but not <code>width</code> - image is scaled proportionally to fit in the provided <code>height</code></li><li>Both <code>width</code> and <code>height</code> provided - image is stretched to the dimensions provided</li><li><code>scale</code> factor provided - image is scaled proportionally by the provided scale factor</li><li><code>fit</code> array provided - image is scaled proportionally to fit within the passed width and height</li></ul>
+
+<p>Here is an example showing some of these options.</p>
+
+<pre><code># Scale proprotionally to the specified width
+doc.image(&#39;images/test.jpeg&#39;, 0, 15, width: 300)
+   .text(&#39;Proprotional to width&#39;, 0, 0)
+
+# Fit the image within the dimensions
+doc.image(&#39;images/test.jpeg&#39;, 320, 15, fit: [100, 100])
+   .rect(320, 15, 100, 100)
+   .stroke()
+   .text(&#39;Fit&#39;, 320, 0)
+
+# Stretch the image
+doc.image(&#39;images/test.jpeg&#39;, 320, 145, width: 200, height: 100)
+   .text(&#39;Stretch&#39;, 320, 130)
+
+# Scale the image
+doc.image(&#39;images/test.jpeg&#39;, 320, 280, scale: 0.25)
+   .text(&#39;Scale&#39;, 320, 265)</code></pre>
+
+<hr/>
+
+<p>This example produces the following output:</p>
+
+<p><img src="img/14.png"/></p>
+
+<p>That is all there is to adding images to your PDF documents with PDFKit. Now
+let&#39;s look at adding annotations.</p><nav><a href="/docs/text.html" class="previous">Previous</a><a href="/docs/annotations.html" class="next">Next</a></nav></div><script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script><script src="/docs/js/scroll.js"></script><script src="/docs/js/highlight.pack.js"></script></body></html>

@@ -1,0 +1,80 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>PDFKit</title><link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Source+Code+Pro:400,700|Alegreya:700|Merriweather"><link rel="stylesheet" href="/docs/css/index.css"><link rel="stylesheet" href="/docs/css/github.css"></head><body><nav class="sidebar"><ul><li><a href="/" class="selected">Home</a></li><li><a href="/docs/../index.html">Documentation</a><ul><li><a href="/docs/getting_started.html">Getting Started </a></li><li><a href="/docs/vector.html">Vector Graphics </a></li><li><a href="/docs/text.html">Text </a></li><li><a href="/docs/images.html">Images </a></li><li><a href="/docs/annotations.html">Annotations </a></li></ul></li><li><a href="/docs/guide.pdf">PDF Guide</a></li><li><a href="/demo/out.pdf">Example PDF</a></li><li><a href="http://github.com/devongovett/pdfkit">Source Code</a></li></ul></nav><div class="main"><h1 id="pdfkit">PDFKit</h1>
+
+<h2 id="a_pdf_generation_library_for_node.js.">A PDF generation library for Node.js.</h2>
+
+<h2 id="description">Description</h2>
+
+<p>PDFKit is a PDF document generation library for Node that makes creating complex, multi-page, printable documents easy. 
+It&#39;s written in CoffeeScript, but you can choose to use the API in plain &#39;ol JavaScript if you like. The API embraces 
+chainability, and includes both low level functions as well as abstractions for higher level functionality. The PDFKit API 
+is designed to be simple, so generating complex documents is often as simple as a few function calls.</p>
+
+<p>Check out some of the <a href="http://pdfkit.org/docs/getting_started.html">documentation and examples</a> to see for yourself!
+You can also read the guide as a <a href="http://pdfkit.org/docs/guide.pdf">self-generated PDF</a> with example output displayed inline.
+If you&#39;d like to see how it was generated, check out the README in the <a href="https://github.com/devongovett/pdfkit/tree/master/docs">docs</a>
+folder.</p>
+
+<h2 id="installation">Installation</h2>
+
+<p>Installation uses the <a href="http://npmjs.org/">npm</a> package manager.  Just type the following command after installing npm.</p>
+
+<pre><code>npm install pdfkit</code></pre>
+
+<h2 id="features">Features</h2>
+
+<ul><li>Vector graphics<ul><li>HTML5 canvas-like API</li><li>Path operations</li><li>SVG path parser for easy path creation</li><li>Transformations</li><li>Linear and radial gradients</li></ul></li><li>Text<ul><li>Line wrapping</li><li>Text alignments</li><li>Bulleted lists</li></ul></li><li>Font embedding<ul><li>Supports TrueType (.ttf), TrueType Collections (.ttc), and Datafork TrueType (.dfont) fonts</li><li>Font subsetting</li></ul></li><li>Image embedding<ul><li>Supports JPEG and PNG files (including indexed PNGs, and PNGs with transparency)</li></ul></li><li>Annotations<ul><li>Links</li><li>Notes</li><li>Highlights</li><li>Underlines</li><li>etc.</li></ul></li></ul>
+
+<h2 id="coming_soon!">Coming soon!</h2>
+
+<ul><li>Patterns fills</li><li>Outlines</li><li>PDF Security</li><li>Higher level APIs for creating tables and laying out content</li><li>More performance optimizations</li><li>Even more awesomeness, perhaps written by you! Please fork this repository and send me pull requests.</li></ul>
+
+<h2 id="example">Example</h2>
+
+<pre><code>PDFDocument = require &#39;pdfkit&#39;
+doc = new PDFDocument
+
+# Embed a font, set the font size, and render some text
+doc.font(&#39;fonts/PalatinoBold.ttf&#39;)
+   .fontSize(25)
+   .text(&#39;Some text with an embedded font!&#39;, 100, 100)
+
+# Add another page
+doc.addPage()
+   .fontSize(25)
+   .text(&#39;Here is some vector graphics...&#39;, 100, 100)
+
+# Draw a triangle
+doc.save()
+   .moveTo(100, 150)
+   .lineTo(100, 250)
+   .lineTo(200, 250)
+   .fill(&quot;#FF3300&quot;)
+
+# Apply some transforms and render an SVG path with the &#39;even-odd&#39; fill rule
+doc.scale(0.6)
+   .translate(470, -380)
+   .path(&#39;M 250,75 L 323,301 131,161 369,161 177,301 z&#39;)
+   .fill(&#39;red&#39;, &#39;even-odd&#39;)
+   .restore()
+
+# Add some text with annotations
+doc.addPage()
+   .fillColor(&quot;blue&quot;)
+   .text(&#39;Here is a link!&#39;, 100, 100)
+   .underline(100, 100, 160, 27, color: &quot;#0000FF&quot;)
+   .link(100, 100, 160, 27, &#39;http://google.com/&#39;)
+
+# Write the PDF file to disk
+doc.write &#39;output.pdf&#39;</code></pre>
+
+<p><a href="http://pdfkit.org/example.pdf">The PDF output from this example</a> (with a few additions) shows the power of PDFKit — producing 
+complex documents with a very small amount of code.  For more, see the <code>demo</code> folder and the 
+<a href="http://pdfkit.org/docs/getting_started.html">PDFKit programming guide</a>.</p>
+
+<h2 id="documentation">Documentation</h2>
+
+<p>For complete API documentation and more examples, see the <a href="http://pdfkit.org/">PDFKit website</a>.</p>
+
+<h2 id="license">License</h2>
+
+<p>PDFKit is available under the MIT license.</p><nav><a href="/docs/getting_started.html" class="next">Next</a></nav></div><script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script><script src="/docs/js/scroll.js"></script><script src="/docs/js/highlight.pack.js"></script></body></html>

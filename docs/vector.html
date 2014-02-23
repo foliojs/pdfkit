@@ -1,0 +1,312 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>Vector Graphics in PDFKit</title><link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Source+Code+Pro:400,700|Alegreya:700|Merriweather"><link rel="stylesheet" href="/docs/css/index.css"><link rel="stylesheet" href="/docs/css/github.css"></head><body><nav class="sidebar"><ul><li><a href="/">Home</a></li><li><a href="/docs/../index.html">Documentation</a><ul><li><a href="/docs/getting_started.html">Getting Started </a></li><li><a href="/docs/vector.html" class="selected">Vector Graphics </a><ul><li><a href="#an_introduction_to_vector_graphics">An introduction to vector graphics</a></li><li><a href="#creating_basic_shapes">Creating basic shapes</a></li><li><a href="#svg_paths">SVG paths</a></li><li><a href="#shape_helpers">Shape helpers</a></li><li><a href="#fill_and_stroke_styles">Fill and stroke styles</a></li><li><a href="#line_cap_and_line_join">Line cap and line join</a></li><li><a href="#dashed_lines">Dashed lines</a></li><li><a href="#color">Color</a></li><li><a href="#gradients">Gradients</a></li><li><a href="#winding_rules">Winding rules</a></li><li><a href="#saving_and_restoring_the_graphics_stack">Saving and restoring the graphics stack</a></li><li><a href="#transformations">Transformations</a></li><li><a href="#clipping">Clipping</a></li></ul></li><li><a href="/docs/text.html">Text </a></li><li><a href="/docs/images.html">Images </a></li><li><a href="/docs/annotations.html">Annotations </a></li></ul></li><li><a href="/docs/guide.pdf">PDF Guide</a></li><li><a href="/demo/out.pdf">Example PDF</a></li><li><a href="http://github.com/devongovett/pdfkit">Source Code</a></li></ul></nav><div class="main"><h1 id="vector_graphics_in_pdfkit">Vector Graphics in PDFKit</h1>
+
+<h2 id="an_introduction_to_vector_graphics">An introduction to vector graphics</h2>
+
+<p>Unlike images which are defined by pixels, vector graphics are defined through
+a series of drawing commands. This makes vector graphics scalable to any size
+without a reduction in quality (pixelization). The PDF format was designed
+with vector graphics in mind, so creating vector drawings is very easy. The
+PDFKit vector graphics APIs are very similar to that of the HTML5 canvas
+element, so if you are familiar at all with that API, you will find PDFKit
+easy to pick up.</p>
+
+<h2 id="creating_basic_shapes">Creating basic shapes</h2>
+
+<p>Shapes are defined by a series of lines and curves. <code>lineTo</code>, <code>bezierCurveTo</code>
+and <code>quadraticCurveTo</code> all draw from the current point (which you can set with
+<code>moveTo</code>) to the specified point (always the last two arguments). Bezier
+curves use two control points and quadratic curves use just one. Here is an
+example that illustrates defining a path.</p>
+
+<pre><code>doc.moveTo(0, 20)                               # set the current point
+   .lineTo(100, 160)                            # draw a line
+   .quadraticCurveTo(130, 200, 150, 120)        # draw a quadratic curve
+   .bezierCurveTo(190, -40, 200, 200, 300, 150) # draw a bezier curve
+   .lineTo(400, 90)                             # draw another line
+   .stroke()                                    # stroke the path</code></pre>
+
+<p>The output of this example looks like this:</p>
+
+<p><img src="img/0.png"/></p>
+
+<p>One thing to notice about this example is the use of method chaining. All
+methods in PDFKit are chainable, meaning that you can call one method right
+after the other without referencing the <code>doc</code> variable again. Of course, this
+is an option, so if you don&#39;t like how the code looks when chained, you don&#39;t
+have to write it that way.</p>
+
+<h2 id="svg_paths">SVG paths</h2>
+
+<p>PDFKit includes an SVG path parser, so you can include paths written in the
+SVG path syntax in your PDF documents. This makes it simple to include vector
+graphics elements produced in many popular editors such as Inkscape or Adobe
+Illustrator. The previous example could also be written using the SVG path
+syntax like this.</p>
+
+<pre><code>doc.path(&#39;M 0,20 L 100,160 Q 130,200 150,120 C 190,-40 200,200 300,150 L 400,90&#39;)
+   .stroke()</code></pre>
+
+<p><img src="img/1.png"/></p>
+
+<p>The PDFKit SVG parser supports all of the command types supported by SVG, so
+any valid SVG path you throw at it should work as expected.</p>
+
+<h2 id="shape_helpers">Shape helpers</h2>
+
+<p>PDFKit also includes some helpers that make defining common shapes much
+easier. Here is a list of the helpers.</p>
+
+<ul><li><code>rect(x, y, width, height)</code></li><li><code>roundedRect(x, y, width, height, cornerRadius)</code></li><li><code>ellipse(centerX, centerY, radiusX, radiusY = radiusX)</code></li><li><code>circle(centerX, centerY, radius)</code></li><li><code>polygon(points...)</code></li></ul>
+
+<p>The last one, <code>polygon</code>, allows you to pass in a list of points (arrays of x,y
+pairs), and it will create the shape by moving to the first point, and then
+drawing lines to each consecutive point. Here is how you&#39;d draw a triangle
+with the polygon helper.</p>
+
+<pre><code>doc.polygon [100, 0], [50, 100], [150, 100]
+doc.stroke()</code></pre>
+
+<p>The output of this example looks like this:</p>
+
+<p><img src="img/2.png"/></p>
+
+<h2 id="fill_and_stroke_styles">Fill and stroke styles</h2>
+
+<p>So far we have only been stroking our paths, but you can also fill them with
+the <code>fill</code> method, and both fill and stroke the same path with the
+<code>fillAndStroke</code> method. Note that calling <code>fill</code> and then <code>stroke</code>
+consecutively will not work because of a limitation in the PDF spec. Use the
+<code>fillAndStroke</code> method if you want to accomplish both operations on the same
+path.</p>
+
+<p>In order to make our drawings interesting, we really need to give them some
+style. PDFKit has many methods designed to do just that.</p>
+
+<ul><li><code>lineWidth</code></li><li><code>lineCap</code></li><li><code>lineJoin</code></li><li><code>miterLimit</code></li><li><code>dash</code></li><li><code>fillColor</code></li><li><code>strokeColor</code></li><li><code>opacity</code></li><li><code>fillOpacity</code></li><li><code>strokeOpacity</code></li></ul>
+
+<p>Some of these are pretty self explanatory, but let&#39;s go through a few of them.</p>
+
+<h2 id="line_cap_and_line_join">Line cap and line join</h2>
+
+<p>The <code>lineCap</code> and <code>lineJoin</code> properties accept constants describing what they
+should do. This is best illustrated by an example.</p>
+
+<pre><code># these examples are easier to see with a large line width
+doc.lineWidth(25)
+
+# line cap settings
+doc.lineCap(&#39;butt&#39;)
+   .moveTo(50, 20)
+   .lineTo(100, 20)
+   .stroke()
+
+doc.lineCap(&#39;round&#39;)
+   .moveTo(150, 20)
+   .lineTo(200, 20)
+   .stroke()
+
+# square line cap shown with a circle instead of a line so you can see it   
+doc.lineCap(&#39;square&#39;)
+   .moveTo(250, 20)
+   .circle(275, 30, 15)
+   .stroke()
+
+# line join settings
+doc.lineJoin(&#39;miter&#39;)
+   .rect(50, 100, 50, 50)
+   .stroke()
+
+doc.lineJoin(&#39;round&#39;)
+   .rect(150, 100, 50, 50)
+   .stroke()
+
+doc.lineJoin(&#39;bevel&#39;)
+   .rect(250, 100, 50, 50)
+   .stroke()</code></pre>
+
+<p>The output of this example looks like this.</p>
+
+<p><img src="img/3.png"/></p>
+
+<h2 id="dashed_lines">Dashed lines</h2>
+
+<p>The <code>dash</code> method allows you to create non-continuous dashed lines. It takes a
+length specifying how long each dash should be, as well as an optional hash
+describing the additional properties <code>space</code> and <code>phase</code>.</p>
+
+<p>The <code>space</code> option defines the length of the space between each dash, and the <code>phase</code> option
+defines the starting point of the sequence of dashes. By default the <code>space</code>
+attribute is equal to the <code>length</code> and the <code>phase</code> attribute is set to <code>0</code>.
+You can use the <code>undash</code> method to make the line solid again.</p>
+
+<p>The following example draws a circle with a dashed line where the space
+between the dashes is double the length of each dash.</p>
+
+<pre><code>doc.circle(100, 50, 50)
+   .dash(5, space: 10)
+   .stroke()</code></pre>
+
+<p>The output of this example looks like this:</p>
+
+<p><img src="img/4.png"/></p>
+
+<h2 id="color">Color</h2>
+
+<p>What is a drawing without color? PDFKit makes it simple to set the fill and
+stroke color and opacity. You can pass an array specifying an RGB or CMYK
+color, a hex color string, or use any of the named CSS colors.</p>
+
+<p>The <code>fillColor</code> and <code>strokeColor</code> methods accept an optional second argument as a shortcut for
+setting the <code>fillOpacity</code> and <code>strokeOpacity</code>. Finally, the <code>opacity</code> method
+is a convenience method that sets both the fill and stroke opacity to the same
+value.</p>
+
+<p>The <code>fill</code> and <code>stroke</code> methods also accept a color as an argument so
+that you don&#39;t have to call <code>fillColor</code> or <code>strokeColor</code> beforehand. The
+<code>fillAndStroke</code> method accepts both fill and stroke colors as arguments.</p>
+
+<pre><code>doc.circle(100, 50, 50)
+   .lineWidth(3)
+   .fillOpacity(0.8)
+   .fillAndStroke(&quot;red&quot;, &quot;#900&quot;)</code></pre>
+
+<p>This example produces the following output:</p>
+
+<p><img src="img/5.png"/></p>
+
+<h2 id="gradients">Gradients</h2>
+
+<p>PDFKit also supports gradient fills.  Gradients can be used just like color fills,
+and are applied with the same methods (e.g. <code>fillColor</code>, or just <code>fill</code>).  Before
+you can apply a gradient with these methods, however, you must create a gradient object.</p>
+
+<p>There are two types of gradients: linear and radial. They are created by the <code>linearGradient</code>
+and <code>radialGradient</code> methods.  Their function signatures are listed below:</p>
+
+<ul><li><code>linearGradient(x1, y1, x2, y2)</code> - <code>x1,y1</code> is the start point, <code>x2,y2</code> is the end point</li><li><code>radialGradient(x1, y2, r1, x2, y2, r2)</code> - <code>r1</code> is the inner radius, <code>r2</code> is the outer radius</li></ul>
+
+<p>Once you have a gradient object, you need to create color stops at points along that gradient.
+Stops are defined at percentage values (0 to 1), and take a color value (any usable by the 
+fillColor method), and an optional opacity.</p>
+
+<p>You can see both linear and radial gradients in the following example:</p>
+
+<pre><code># Create a linear gradient
+grad = doc.linearGradient(50, 0, 150, 100)
+grad.stop(0, &#39;green&#39;)
+    .stop(1, &#39;red&#39;)
+
+doc.rect 50, 0, 100, 100
+doc.fill grad
+
+# Create a radial gradient
+grad = doc.radialGradient(300, 50, 0, 300, 50, 50)
+grad.stop(0, &#39;orange&#39;, 0)
+    .stop(1, &#39;orange&#39;, 1)
+
+doc.circle 300, 50, 50    
+doc.fill grad</code></pre>
+
+<p>Here is the output from the this example: </p>
+
+<p><img src="img/6.png"/></p>
+
+<h2 id="winding_rules">Winding rules</h2>
+
+<p>Winding rules define how a path is filled and are best illustrated by an
+example. The winding rule is an optional attribute to the <code>fill</code> and
+<code>fillAndStroke</code> methods, and there are two values to choose from: <code>non-zero</code>
+and <code>even-odd</code>.</p>
+
+<pre><code># Initial setup
+doc.fillColor(&#39;red&#39;)
+   .translate(-100, -50)
+   .scale(0.8)
+
+# Draw the path with the non-zero winding rule
+doc.path(&#39;M 250,75 L 323,301 131,161 369,161 177,301 z&#39;)
+   .fill(&#39;non-zero&#39;)
+
+# Draw the path with the even-odd winding rule   
+doc.translate(280, 0)
+   .path(&#39;M 250,75 L 323,301 131,161 369,161 177,301 z&#39;)
+   .fill(&#39;even-odd&#39;)</code></pre>
+
+<p>You&#39;ll notice that I used the <code>scale</code> and <code>translate</code> transformations in this
+example. We&#39;ll cover those in a minute. The output of this example, with some
+added labels, is below.</p>
+
+<p><img src="img/7.png"/></p>
+
+<h2 id="saving_and_restoring_the_graphics_stack">Saving and restoring the graphics stack</h2>
+
+<p>Once you start producing more complex vector drawings, you will want to be
+able to save and restore the state of the graphics context. The graphics state
+is basically a snapshot of all the styles and transformations (see below) that
+have been applied, and many states can be created and stored on a stack. Every
+time the <code>save</code> method is called, the current graphics state is pushed onto
+the stack, and when you call <code>restore</code>, the last state on the stack is applied
+to the context again. This way, you can save the state, change some styles,
+and then restore it to how it was before you made those changes.</p>
+
+<h2 id="transformations">Transformations</h2>
+
+<p>Transformations allow you to modify the look of a drawing without modifying
+the drawing itself. There are three types of transformations available, as
+well as a method for setting the transformation matrix yourself. They are
+<code>translate</code>, <code>rotate</code> and <code>scale</code>.</p>
+
+<p>The <code>translate</code> transformation takes two arguments, x and y, and effectively
+moves the origin of the document which is (0, 0) by default, to the left and
+right x and y units.</p>
+
+<p>The <code>rotate</code> transformation takes an angle and optionally, an object with an
+<code>origin</code> property. It rotates the document <code>angle</code> degrees around the passed
+<code>origin</code> or by default, the center of the page.</p>
+
+<p>The <code>scale</code> transformation takes a scale factor and an optional <code>origin</code>
+passed in an options hash as with the <code>rotate</code> transformation. It is used to
+increase or decrease the size of the units in the drawing, or change it&#39;s
+size. For example, applying a scale of <code>0.5</code> would make the drawing appear at
+half size, and a scale of <code>2</code> would make it appear twice as large.</p>
+
+<p>If you are feeling particularly smart, you can modify the transformation
+matrix yourself using the <code>transform</code> method.</p>
+
+<p>We used the <code>scale</code> and <code>translate</code> transformations above, so here is an
+example of using the <code>rotate</code> transformation. We&#39;ll set the origin of the
+rotation to the center of the rectangle.</p>
+
+<pre><code>doc.rotate(20, origin: [150, 70])
+   .rect(100, 20, 100, 100)
+   .fill(&#39;gray&#39;)</code></pre>
+
+<p>This example produces the following effect.</p>
+
+<p><img src="img/8.png"/></p>
+
+<h2 id="clipping">Clipping</h2>
+
+<p>A clipping path is a path defined using the normal path creation methods, but
+instead of being filled or stroked, it becomes a mask that hides unwanted
+parts of the drawing. Everything falling inside the clipping path after it is
+created is visible, and everything outside the path is invisible. Here is an
+example that clips a checkerboard pattern to the shape of a circle.</p>
+
+<pre><code># Create a clipping path   
+doc.circle(100, 100, 100)
+   .clip()
+
+# Draw a checkerboard pattern
+for row in [0...10]
+  for col in [0...10]
+    color = if (col % 2) - (row % 2) then &#39;#eee&#39; else &#39;#4183C4&#39;
+    doc.rect(row * 20, col * 20, 20, 20)
+       .fill(color)</code></pre>
+
+<p>The result of this example is the following:</p>
+
+<p><img src="img/9.png"/></p>
+
+<p>That&#39;s it for vector graphics in PDFKit. Now let&#39;s move on to learning about
+PDFKit&#39;s text support!</p><nav><a href="/docs/getting_started.html" class="previous">Previous</a><a href="/docs/text.html" class="next">Next</a></nav></div><script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script><script src="/docs/js/scroll.js"></script><script src="/docs/js/highlight.pack.js"></script></body></html>

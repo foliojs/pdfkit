@@ -1,0 +1,85 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>Getting Started with PDFKit</title><link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Source+Code+Pro:400,700|Alegreya:700|Merriweather"><link rel="stylesheet" href="/docs/css/index.css"><link rel="stylesheet" href="/docs/css/github.css"></head><body><nav class="sidebar"><ul><li><a href="/">Home</a></li><li><a href="/docs/../index.html">Documentation</a><ul><li><a href="/docs/getting_started.html" class="selected">Getting Started </a><ul><li><a href="#installation">Installation</a></li><li><a href="#creating_a_document">Creating a document</a></li><li><a href="#adding_pages">Adding pages</a></li><li><a href="#setting_document_metadata">Setting document metadata</a></li><li><a href="#adding_content">Adding content</a></li><li><a href="#saving_the_document">Saving the document</a></li></ul></li><li><a href="/docs/vector.html">Vector Graphics </a></li><li><a href="/docs/text.html">Text </a></li><li><a href="/docs/images.html">Images </a></li><li><a href="/docs/annotations.html">Annotations </a></li></ul></li><li><a href="/docs/guide.pdf">PDF Guide</a></li><li><a href="/demo/out.pdf">Example PDF</a></li><li><a href="http://github.com/devongovett/pdfkit">Source Code</a></li></ul></nav><div class="main"><h1 id="getting_started_with_pdfkit">Getting Started with PDFKit</h1>
+
+<h2 id="installation">Installation</h2>
+
+<p>Installation uses the <a href="http://npmjs.org/">npm</a> package manager. Just type the
+following command after installing npm.</p>
+
+<pre><code>npm install pdfkit</code></pre>
+
+<h2 id="creating_a_document">Creating a document</h2>
+
+<p>Creating a PDFKit document is quite simple. Just require the <code>pdfkit</code> module
+in your CoffeeScript or JavaScript source file and create an instance of the
+<code>PDFDocument</code> class.</p>
+
+<pre><code>PDFDocument = require &#39;pdfkit&#39;
+doc = new PDFDocument</code></pre>
+
+<h2 id="adding_pages">Adding pages</h2>
+
+<p>The first page of a PDFKit document is added for you automatically when you
+create the document. Subsequent pages must be added by you. Luckily, it is
+quite simple!</p>
+
+<pre><code>doc.addPage()</code></pre>
+
+<p>You can also set some options for the page, such as it&#39;s size and orientation.</p>
+
+<p>The <code>layout</code> property can be either <code>portrait</code> (the default) or <code>landscape</code>.
+The <code>size</code> property can be either an array specifying <code>[width, height]</code> in PDF
+points (72 per inch), or a string specifying a predefined size. A
+list of the predefined paper sizes can be seen <a href="http://pdfkit.org/docs/paper_sizes.html">here</a>. The
+default is <code>letter</code>.</p>
+
+<p>Passing a page options object to the <code>PDFDocument</code> constructor will
+set the default paper size and layout for every page in the document, which is
+then overridden by individual options passed to the <code>addPage</code> method.</p>
+
+<p>You can set the page margins in two ways. The first is by setting the <code>margin</code> 
+property (singular) to a number, which applies that margin to all edges. The
+other way is to set the <code>margins</code> property (plural) to an object with <code>top</code>,
+<code>bottom</code>, <code>left</code>, and <code>right</code> values.  The default is a 1 inch (72 point) margin
+on all sides.</p>
+
+<p>For example:</p>
+
+<pre><code># Add a 50 point margin on all sides
+doc.addPage
+  margin: 50
+
+
+# Add different margins on each side
+doc.addPage
+  margins: { top: 50, bottom: 50, left: 72, right: 72 }</code></pre>
+
+<hr/>
+
+<h2 id="setting_document_metadata">Setting document metadata</h2>
+
+<p>PDF documents can have various metadata associated with them, such as the
+title, or author of the document. You can add that information by adding it to
+the <code>doc.info</code> object, or by passing an info object into the document at
+creation time.</p>
+
+<p>Here is a list of all of the properties you can add to the document metadata.
+According to the PDF spec, each property must have it&#39;s first letter
+capitalized.</p>
+
+<ul><li><code>Title</code> - the title of the document</li><li><code>Author</code> - the name of the author</li><li><code>Subject</code> - the subject of the document</li><li><code>Keywords</code> - keywords associated with the document</li><li><code>CreationDate</code> - the date the document was created (added automatically by PDFKit)</li><li><code>ModDate</code> - the date the document was last modified</li></ul>
+
+<h2 id="adding_content">Adding content</h2>
+
+<p>Once you&#39;ve created a <code>PDFDocument</code> instance, you can add content to the
+document. Check out the other sections to the left under &quot;Documentation&quot; to
+learn about each type of content you can add.</p>
+
+<h2 id="saving_the_document">Saving the document</h2>
+
+<p>When you are ready to write the PDF document to a file, just call the <code>write</code>
+method with a filename. If you want to send the document in response to an
+HTTP request, or just need a string representation of the document, just call
+the <code>output</code> method.</p>
+
+<p>That&#39;s the basics! Now let&#39;s move on to PDFKit&#39;s powerful vector graphics
+abilities.</p><nav><a href="/docs/../index.html" class="previous">Previous</a><a href="/docs/vector.html" class="next">Next</a></nav></div><script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script><script src="/docs/js/scroll.js"></script><script src="/docs/js/highlight.pack.js"></script></body></html>
