@@ -91,7 +91,7 @@ Installation uses the [npm](http://npmjs.org/) package manager.  Just type the f
     # Write the PDF file to disk
     doc.write 'output.pdf'
      
-[The PDF output from this example](http://pdfkit.org/example.pdf) (with a few additions) shows the power of PDFKit — producing 
+[The PDF output from this example](http://pdfkit.org/demo/out.pdf) (with a few additions) shows the power of PDFKit — producing 
 complex documents with a very small amount of code.  For more, see the `demo` folder and the 
 [PDFKit programming guide](http://pdfkit.org/docs/getting_started.html).
 
