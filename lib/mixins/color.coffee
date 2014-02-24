@@ -92,10 +92,10 @@ module.exports =
        return this
 
     _doOpacity: (fillOpacity, strokeOpacity) ->
-       return unless fillOpacity or strokeOpacity
+       return unless fillOpacity? or strokeOpacity?
 
-       fillOpacity = Math.max 0, Math.min 1, fillOpacity
-       strokeOpacity = Math.max 0, Math.min 1, strokeOpacity
+       fillOpacity = Math.max 0, Math.min 1, fillOpacity      if fillOpacity?
+       strokeOpacity = Math.max 0, Math.min 1, strokeOpacity  if strokeOpacity?
        key = "#{fillOpacity}_#{strokeOpacity}"
 
        if @_opacityRegistry[key]
@@ -104,8 +104,8 @@ module.exports =
            dictionary = 
                Type: 'ExtGState'
 
-           dictionary.ca = fillOpacity if fillOpacity
-           dictionary.CA = strokeOpacity if strokeOpacity
+           dictionary.ca = fillOpacity if fillOpacity?
+           dictionary.CA = strokeOpacity if strokeOpacity?
 
            dictionary = @ref dictionary
            id = ++@_opacityCount
