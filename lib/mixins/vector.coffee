@@ -82,15 +82,22 @@ module.exports =
         @quadraticCurveTo x, y, x + r, y
         
     ellipse: (x, y, r1, r2 = r1) ->
-        l1 = r1 * KAPPA
-        l2 = r2 * KAPPA
-
-        @moveTo x + r1, y
-        @bezierCurveTo x + r1, y + l1, x + l2, y + r2, x, y + r2
-        @bezierCurveTo x - l2, y + r2, x - r1, y + l1, x - r1, y
-        @bezierCurveTo x - r1, y - l1, x - l2, y - r2, x, y - r2
-        @bezierCurveTo x + l2, y - r2, x + r1, y - l1, x + r1, y
-        @moveTo x, y
+        # based on http://stackoverflow.com/questions/2172798/how-to-draw-an-oval-in-html5-canvas/2173084#2173084
+        x -= r1
+        y -= r2
+        ox = r1 * KAPPA
+        oy = r2 * KAPPA
+        xe = x + r1 * 2
+        ye = y + r2 * 2
+        xm = x + r1
+        ym = y + r2
+        
+        @moveTo(x, ym)
+        @bezierCurveTo(x, ym - oy, xm - ox, y, xm, y)
+        @bezierCurveTo(xm + ox, y, xe, ym - oy, xe, ym)
+        @bezierCurveTo(xe, ym + oy, xm + ox, ye, xm, ye)
+        @bezierCurveTo(xm - ox, ye, x, ym + oy, x, ym)
+        @closePath()
         
     circle: (x, y, radius) ->
         @ellipse x, y, radius
