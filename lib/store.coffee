@@ -31,4 +31,8 @@ class PDFObjectStore
         @pages.data['Kids'].push(page.dictionary)
         @pages.data['Count']++
         
+    insertPage: (page, index) ->
+        @pages.data['Kids'].splice(index, 0, page.dictionary)
+        @pages.data['Count']++
+
 module.exports = PDFObjectStore
