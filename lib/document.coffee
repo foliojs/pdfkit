@@ -60,23 +60,39 @@ class PDFDocument
     mixin 'images'
     mixin 'annotations'
         
-    addPage: (options = @options) ->
+    createPage: (options = @options) ->
         # create a page object
         @page = new PDFPage(this, options)
-        
-        # add the page to the object store
-        @store.addPage @page
-        @pages.push @page
-        
+
         # reset x and y coordinates
         @x = @page.margins.left
         @y = @page.margins.top
-        
+
         # flip PDF coordinate system so that the origin is in
         # the top left rather than the bottom left
         @_ctm = [1, 0, 0, 1, 0, 0]
         @transform 1, 0, 0, -1, 0, @page.height
-        
+
+        return @page
+
+    addPage: (options) ->
+        # create a page object
+        @page = this.createPage(options)
+
+        # add the page to the object store
+        @store.addPage @page
+        @pages.push @page
+
+        return this
+
+    insertPage: (index, options) ->
+        # create a page object
+        @page = this.createPage(options)
+
+        # add the page to the object store
+        @store.insertPage @page, index
+        @pages.splice index, 0, @page
+
         return this
         
     ref: (data) ->
