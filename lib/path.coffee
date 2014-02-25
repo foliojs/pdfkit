@@ -69,15 +69,17 @@ class SVGPath
                 foundDecimal = true if c is '.'
 
         # add the last command
-        if args.length is params # handle reused commands
-            ret[ret.length] = {cmd,args}
-            args = [+curArg]
-
-            # handle assumed commands
-            cmd = "L" if cmd is "M"
-            cmd = "l" if cmd is "m"
-
-        args[args.length] = +curArg if curArg.length > 0
+        if curArg.length > 0
+            if args.length is params # handle reused commands
+                ret[ret.length] = {cmd, args}
+                args = [+curArg]
+                
+                # handle assumed commands
+                cmd = "L" if cmd is "M"
+                cmd = "l" if cmd is "m"
+            else
+                args[args.length] = +curArg
+            
         ret[ret.length] = {cmd,args}
         
         return ret
