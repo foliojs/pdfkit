@@ -128,6 +128,10 @@ class SVGPath
             cy = a[3]
 
         s: (doc, a) ->
+            if px is null
+                px = cx
+                py = cy
+                
             doc.bezierCurveTo cx-(px-cx), cy-(py-cy), cx + a[0], cy + a[1], cx + a[2], cy + a[3]
             px = cx + a[0]
             py = cy + a[1]
