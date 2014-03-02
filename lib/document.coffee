@@ -14,7 +14,7 @@ class PDFDocument
     constructor: (@options = {}) ->
         # PDF version
         @version = 1.3
-        
+       
         # Whether streams should be compressed
         @compress = no
         
@@ -83,14 +83,14 @@ class PDFDocument
         
         return this
 
-    addOutline: (title, dest, options = @options) ->
-
-        if not options.hasOutlines
+    addOutline: (title, dest, unicode) ->
+ 
+        if not @options.hasOutlines
             console.log "this document does not have outlines"
             return this
 
         # create an outline object
-        @outline = new PDFOutline(this, title, dest, options)
+        @outline = new PDFOutline(this, title, dest, unicode)
 
         # insert into outlines store list
         if @outlines.length == 0

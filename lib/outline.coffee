@@ -4,31 +4,31 @@ By Alex
 ###
 
 PDFObject = require './object'
+PDFPage   = require './page'
 
 class PDFOutline
-    constructor: (@document, title, dest, options = {}) ->
+    constructor: ( @document, @title, @dest, @unicode ) ->
 
-        @title  = title
-        @dest   = dest
-        @length = @document.outlines.length
+        @length  = @document.outlines.length
+
+        # XY - coordinates of page top left in user space system,
+        # Z  - zoom factor (null for X,Y,Z - value unchanged)
+        y = @document.page.height - @document.y
+        destination = [@dest.dictionary, 'XYZ', 0, y, null]
 
         # The outline dictionary - link to the objects in the document
         if @length == 0
             @dictionary = @document.ref
-                Title:  PDFObject.s @title
+                Title:  PDFObject.s @title, @unicode
                 Parent: @document.store.outlines
-                Dest:   [@dest.dictionary, 'XYZ', 0, 792, 0]
+                Dest:   destination
         else
             @dictionary = @document.ref
-                Title:  PDFObject.s @title
+                Title:  PDFObject.s @title, @unicode
                 Parent: @document.store.outlines
                 Prev:   @document.outlines[@length-1].dictionary
-                Dest:   [@dest.dictionary, 'XYZ', 0, 792, 0]
+                Dest:   destination
 
-        #optional: a link to the nested outline sublevel
-
-    # seems nothing to finalize
-    # finalize: (fn) ->
-    #    @content.finalize(@document.compress, fn)
+        #todo: a link to the nested outline sublevel
 
 module.exports = PDFOutline

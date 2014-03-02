@@ -10,8 +10,8 @@ class PDFObjectStore
 
         @objects = {}
         @length = 0
-        
-        if @options? and @options.hasOutlines
+
+        if @options.hasOutlines 
             @root = @ref
                 Type: 'Catalog'
                 Pages: @ref
