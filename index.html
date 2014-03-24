@@ -31,7 +31,12 @@ folder.</p>
 <h2 id="example">Example</h2>
 
 <pre><code>PDFDocument = require &#39;pdfkit&#39;
+
+# Create a document
 doc = new PDFDocument
+
+# Pipe it&#39;s output somewhere, like to a file or HTTP response
+doc.pipe fs.createWriteStream(&#39;output.pdf&#39;)
 
 # Embed a font, set the font size, and render some text
 doc.font(&#39;fonts/PalatinoBold.ttf&#39;)
@@ -64,8 +69,8 @@ doc.addPage()
    .underline(100, 100, 160, 27, color: &quot;#0000FF&quot;)
    .link(100, 100, 160, 27, &#39;http://google.com/&#39;)
 
-# Write the PDF file to disk
-doc.write &#39;output.pdf&#39;</code></pre>
+# Finalize PDF file
+doc.end()</code></pre>
 
 <p><a href="http://pdfkit.org/demo/out.pdf">The PDF output from this example</a> (with a few additions) shows the power of PDFKit — producing 
 complex documents with a very small amount of code.  For more, see the <code>demo</code> folder and the 
