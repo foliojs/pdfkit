@@ -32,6 +32,7 @@ folder.</p>
 
 <pre><code>PDFDocument = require &#39;pdfkit&#39;
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 # Create a document
 doc = new PDFDocument
@@ -43,6 +44,15 @@ doc.pipe fs.createWriteStream(&#39;output.pdf&#39;)
 doc = new PDFDocument
 
 >>>>>>> Add generated docs for Github pages
+=======
+
+# Create a document
+doc = new PDFDocument
+
+# Pipe it&#39;s output somewhere, like to a file or HTTP response
+doc.pipe fs.createWriteStream(&#39;output.pdf&#39;)
+
+>>>>>>> Doc changes with new streaming API
 # Embed a font, set the font size, and render some text
 doc.font(&#39;fonts/PalatinoBold.ttf&#39;)
    .fontSize(25)
@@ -75,6 +85,7 @@ doc.addPage()
    .link(100, 100, 160, 27, &#39;http://google.com/&#39;)
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 # Finalize PDF file
 doc.end()</code></pre>
 
@@ -82,6 +93,10 @@ doc.end()</code></pre>
 =======
 # Write the PDF file to disk
 doc.write &#39;output.pdf&#39;</code></pre>
+=======
+# Finalize PDF file
+doc.end()</code></pre>
+>>>>>>> Doc changes with new streaming API
 
 <<<<<<< HEAD
 <p><a href="http://pdfkit.org/example.pdf">The PDF output from this example</a> (with a few additions) shows the power of PDFKit — producing 
