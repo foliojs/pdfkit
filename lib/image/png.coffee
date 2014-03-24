@@ -7,8 +7,11 @@ class PNGImage
     @width = @image.width
     @height = @image.height
     @imgData = @image.imgData
+    @obj = null
     
   embed: (@document) ->
+    return if @obj
+    
     @obj = document.ref
       Type: 'XObject'
       Subtype: 'Image'
@@ -90,6 +93,10 @@ class PNGImage
 
     # add the actual image data
     @obj.end @imgData
+    
+    # free memory
+    @image = null
+    @imgData = null
     
   splitAlphaChannel: ->
     @image.decodePixels (pixels) =>

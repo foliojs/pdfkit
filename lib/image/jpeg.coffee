@@ -8,7 +8,7 @@ class JPEG
     if data.readUInt16BE(0) isnt 0xFFD8
       throw "SOI not found in JPEG"
            
-    pos = 2 
+    pos = 2
     while pos < data.length
       marker = data.readUInt16BE(pos)
       pos += 2
@@ -31,7 +31,11 @@ class JPEG
       when 3 then 'DeviceRGB'
       when 4 then 'DeviceCMYK'
       
+    @obj = null
+      
   embed: (document) ->
+    return if @obj
+    
     @obj = document.ref
       Type: 'XObject'
       Subtype: 'Image'
@@ -49,5 +53,8 @@ class JPEG
       @obj.data['Decode'] = [1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0]
       
     @obj.end @data
+    
+    # free memory
+    @data = null
     
 module.exports = JPEG
