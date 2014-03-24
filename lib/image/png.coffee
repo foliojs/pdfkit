@@ -1,31 +1,18 @@
 zlib = require 'zlib'
 PNG = require 'png-js'
-setImmediate = global.setImmediate ? process.nextTick # backfill for node <0.10
 
 class PNGImage
-  constructor: (data) ->
-    @image = new PNG(data.data)
+  constructor: (data, @label) ->
+    @image = new PNG(data)
     @width = @image.width
     @height = @image.height
     @imgData = @image.imgData
+    @obj = null
     
-  object: (document, fn) ->
-    # get the async stuff out of the way first
-    if not @alphaChannel
-      if @image.transparency.indexed
-        # Create a transparency SMask for the image based on the data 
-        # in the PLTE and tRNS sections. See below for details on SMasks.
-        @loadIndexedAlphaChannel => @object document, fn
-        return
-      
-      else if @image.hasAlphaChannel
-        # For PNG color types 4 and 6, the transparency data is stored as a alpha
-        # channel mixed in with the main image data. Separate this data out into an
-        # SMask object and store it separately in the PDF.
-        @splitAlphaChannel => @object document, fn
-        return
-        
-    obj = document.ref
+  embed: (@document) ->
+    return if @obj
+    
+    @obj = document.ref
       Type: 'XObject'
       Subtype: 'Image'
       BitsPerComponent: @image.bits
@@ -33,25 +20,28 @@ class PNGImage
       Height: @height
       Length: @imgData.length
       Filter: 'FlateDecode'
-
+      
     unless @image.hasAlphaChannel
-      obj.data['DecodeParms'] = document.ref
+      params = document.ref
         Predictor: 15
         Colors: @image.colors
         BitsPerComponent: @image.bits
         Columns: @width
         
+      @obj.data['DecodeParms'] = params
+      params.end()
+        
     if @image.palette.length is 0
-      obj.data['ColorSpace'] = @image.colorSpace
+      @obj.data['ColorSpace'] = @image.colorSpace
     else
       # embed the color palette in the PDF as an object stream
       palette = document.ref
         Length: @image.palette.length
 
-      palette.add new Buffer(@image.palette)
+      palette.end @image.palette
 
       # build the color space array for the image
-      obj.data['ColorSpace'] = ['Indexed', 'DeviceRGB', (@image.palette.length / 3) - 1, palette]
+      @obj.data['ColorSpace'] = ['Indexed', 'DeviceRGB', (@image.palette.length / 3) - 1, palette]
       
     # For PNG color types 0, 2 and 3, the transparency data is stored in
     # a dedicated PNG chunk.
@@ -59,7 +49,7 @@ class PNGImage
       # Use Color Key Masking (spec section 4.8.5)
       # An array with N elements, where N is two times the number of color components.
       val = @image.transparency.greyscale
-      obj.data['Mask'] = [val, val]
+      @obj.data['Mask'] = [val, val]
 
     else if @image.transparency.rgb
       # Use Color Key Masking (spec section 4.8.5)
@@ -69,10 +59,25 @@ class PNGImage
       for x in rgb
         mask.push x, x
 
-      obj.data['Mask'] = mask
+      @obj.data['Mask'] = mask
       
+    else if @image.transparency.indexed
+      # Create a transparency SMask for the image based on the data 
+      # in the PLTE and tRNS sections. See below for details on SMasks.
+      @loadIndexedAlphaChannel()
+      
+    else if @image.hasAlphaChannel
+      # For PNG color types 4 and 6, the transparency data is stored as a alpha
+      # channel mixed in with the main image data. Separate this data out into an
+      # SMask object and store it separately in the PDF.
+      @splitAlphaChannel()
+      
+    else
+      @finalize()
+      
+  finalize: ->
     if @alphaChannel
-      sMask = document.ref
+      sMask = @document.ref
         Type: 'XObject'
         Subtype: 'Image'
         Height: @height
@@ -83,14 +88,17 @@ class PNGImage
         ColorSpace: 'DeviceGray'
         Decode: [0, 1]
 
-      sMask.add @alphaChannel
-      obj.data['SMask'] = sMask
+      sMask.end @alphaChannel
+      @obj.data['SMask'] = sMask
 
-    # add the actual image data  
-    obj.add @imgData
-    setImmediate -> fn(obj)
+    # add the actual image data
+    @obj.end @imgData
     
-  splitAlphaChannel: (fn) ->
+    # free memory
+    @image = null
+    @imgData = null
+    
+  splitAlphaChannel: ->
     @image.decodePixels (pixels) =>
       colorByteSize = @image.colors * @image.bits / 8
       pixelCount = @width * @height
@@ -108,11 +116,11 @@ class PNGImage
       done = 0
       zlib.deflate imgData, (err, @imgData) =>
         throw err if err
-        fn() if ++done is 2
+        @finalize() if ++done is 2
 
       zlib.deflate alphaChannel, (err, @alphaChannel) =>
         throw err if err
-        fn() if ++done is 2
+        @finalize() if ++done is 2
         
   loadIndexedAlphaChannel: (fn) ->
     transparency = @image.transparency.indexed
@@ -125,6 +133,6 @@ class PNGImage
 
       zlib.deflate alphaChannel, (err, @alphaChannel) =>
         throw err if err
-        fn()
-        
+        @finalize()
+    
 module.exports = PNGImage

@@ -4,57 +4,67 @@ By Devon Govett
 ###
 
 zlib = require 'zlib'
-setImmediate = global.setImmediate ? process.nextTick # backfill for node < 0.10
 
 class PDFReference
-  constructor: (@id, @data = {}) ->
+  constructor: (@document, @id, @data = {}) ->
     @gen = 0
-    @stream = null
-    @finalizedStream = null
+    @deflate = null
+    @compress = @document.compress and not @data.Filter
+    @uncompressedLength = 0
+    @chunks = []
     
-  object: (compress, fn) ->
-    unless @finalizedStream?
-      return @finalize compress, => @object compress, fn
+  initDeflate: ->
+    @data.Filter = 'FlateDecode'
     
-    out = ["#{@id} #{@gen} obj"]
-    out.push PDFObject.convert(@data)
+    @deflate = zlib.createDeflate()
+    @deflate.on 'data', (chunk) =>
+      @chunks.push chunk
+      @data.Length += chunk.length
+      
+    @deflate.on 'end', @finalize
+  
+  write: (chunk) ->
+    unless Buffer.isBuffer(chunk)
+      chunk = new Buffer(chunk + '\n', 'binary')
+      
+    @uncompressedLength += chunk.length
+    @data.Length ?= 0
     
-    if @stream
-      out.push "stream"
-      out.push @finalizedStream
-      out.push "endstream"
-    
-    out.push "endobj"
-    fn out.join '\n'
-    
-  add: (s) ->
-    @stream ?= []
-    @stream.push if Buffer.isBuffer(s) then s.toString('binary') else s
-    
-  finalize: (compress = false, fn) ->
-    # cache the finalized stream
-    if @stream
-      data = @stream.join '\n'
-      if compress and not @data.Filter
-        # create a byte array instead of passing a string to the Buffer
-        # fixes a weird unicode bug.
-        data = new Buffer(data.charCodeAt(i) for i in [0...data.length])
-        zlib.deflate data, (err, compressedData) =>
-          throw err if err
-          @finalizedStream = compressedData.toString 'binary'
-          @data.Filter = 'FlateDecode'
-          @data.Length = @finalizedStream.length
-          fn()
-      else
-        @finalizedStream = data
-        @data.Length = @finalizedStream.length
-        setImmediate fn
+    if @compress
+      @initDeflate() if not @deflate
+      @deflate.write chunk
     else
-      @finalizedStream = ''
-      setImmediate fn
+      @chunks.push chunk
+      @data.Length += chunk.length
+    
+  end: (chunk) ->
+    if typeof chunk is 'string' or Buffer.isBuffer(chunk)
+      @write chunk
+    
+    if @deflate
+      @deflate.end()
+    else
+      @finalize()
+    
+  finalize: =>
+    @offset = @document._offset
+    
+    @document._write "#{@id} #{@gen} obj"
+    @document._write PDFObject.convert(@data)
+    
+    if @chunks.length
+      @document._write 'stream'
+      for chunk in @chunks
+        @document._write chunk
+        
+      @chunks.length = 0 # free up memory
+      @document._write '\nendstream'
+      
+    @document._write 'endobj'
+    @document._refEnd(this)
     
   toString: ->
-    "#{@id} #{@gen} R"
-    
+    return "#{@id} #{@gen} R"
+      
 module.exports = PDFReference
 PDFObject = require './object'

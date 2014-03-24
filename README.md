@@ -55,7 +55,12 @@ Installation uses the [npm](http://npmjs.org/) package manager.  Just type the f
 ## Example
 
     PDFDocument = require 'pdfkit'
+    
+    # Create a document
     doc = new PDFDocument
+    
+    # Pipe it's output somewhere, like to a file or HTTP response
+    doc.pipe fs.createWriteStream('output.pdf')
 
     # Embed a font, set the font size, and render some text
     doc.font('fonts/PalatinoBold.ttf')
@@ -88,8 +93,8 @@ Installation uses the [npm](http://npmjs.org/) package manager.  Just type the f
        .underline(100, 100, 160, 27, color: "#0000FF")
        .link(100, 100, 160, 27, 'http://google.com/')
 
-    # Write the PDF file to disk
-    doc.write 'output.pdf'
+    # Finalize PDF file
+    doc.end()
      
 [The PDF output from this example](http://pdfkit.org/demo/out.pdf) (with a few additions) shows the power of PDFKit — producing 
 complex documents with a very small amount of code.  For more, see the `demo` folder and the 

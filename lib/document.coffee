@@ -3,14 +3,16 @@ PDFDocument - represents an entire PDF document
 By Devon Govett
 ###
 
+stream = require 'stream'
 fs = require 'fs'
-PDFObjectStore = require './store'
 PDFObject = require './object'
 PDFReference = require './reference'
 PDFPage = require './page'
 
-class PDFDocument
+class PDFDocument extends stream.Readable
   constructor: (@options = {}) ->
+    super
+    
     # PDF version
     @version = 1.3
     
@@ -18,10 +20,17 @@ class PDFDocument
     @compress = yes
     
     # The PDF object store
-    @store = new PDFObjectStore
-    
-    # A list of pages in this document
-    @pages = []
+    @_offsets = []
+    @_waiting = 0
+    @_ended = false
+    @_offset = 0
+            
+    @_root = @ref
+      Type: 'Catalog'
+      Pages: @ref
+        Type: 'Pages'
+        Count: 0
+        Kids: []
     
     # The current page
     @page = null
@@ -33,16 +42,22 @@ class PDFDocument
     @initText()
     @initImages()
     
-    # Create the metadata
-    @_info = @ref
+    # Initialize the metadata
+    @info =
       Producer: 'PDFKit'
       Creator: 'PDFKit'
       CreationDate: new Date()
-        
-    @info = @_info.data
+
     if @options.info
-      @info[key] = val for key, val of @options.info
-      delete @options.info
+      for key, val of @options.info
+        @info[key] = val
+      
+    # Write the header
+    # PDF version
+    @_write "%PDF-#{@version}"
+
+    # 4 binary chars, as recommended by the spec
+    @_write "%\xFF\xFF\xFF\xFF"
     
     # Add the first page
     @addPage()
@@ -61,12 +76,16 @@ class PDFDocument
   mixin 'annotations'
     
   addPage: (options = @options) ->
+    # end the current page if needed
+    @page?.end()
+    
     # create a page object
     @page = new PDFPage(this, options)
     
     # add the page to the object store
-    @store.addPage @page
-    @pages.push @page
+    pages = @_root.data.Pages.data
+    pages.Kids.push @page.dictionary
+    pages.Count++
     
     # reset x and y coordinates
     @x = @page.margins.left
@@ -80,90 +99,98 @@ class PDFDocument
     return this
     
   ref: (data) ->
-    @store.ref(data)
+    ref = new PDFReference(this, @_offsets.length + 1, data)
+    @_offsets.push null # placeholder for this object's offset once it is finalized
+    @_waiting++
+    return ref
     
-  addContent: (str) ->
-    @page.content.add str
-    return this # make chaining possible
+  _read: ->
+      # do nothing, but this method is required by node
+    
+  _write: (data) ->
+    unless Buffer.isBuffer(data)
+      data = new Buffer(data + '\n', 'binary')
+    
+    @push data
+    @_offset += data.length
+        
+  addContent: (data) ->
+    @page.write data
+    return this
+    
+  _refEnd: (ref) ->
+    @_offsets[ref.id - 1] = ref.offset
+    if --@_waiting is 0 and @_ended
+      @_finalize()
+      @_ended = false
     
   write: (filename, fn) ->
-    @output (out) ->
-      fs.writeFile filename, out, 'binary', fn
+    # print a deprecation warning with a stacktrace
+    err = new Error '
+      PDFDocument#write is deprecated, and will be removed in a future version of PDFKit.
+      Please pipe the document into a Node stream.
+    '
+    
+    console.warn err.stack
+    
+    @pipe fs.createWriteStream(filename)
+    @end()
+    @once 'end', fn
     
   output: (fn) ->
-     @finalize =>
-       out = []
-       @generateHeader out
-       @generateBody out, =>
-         @generateXRef out
-         @generateTrailer out
+    # more difficult to support this. It would involve concatenating all the buffers together
+    throw new Error '
+      PDFDocument#output is deprecated, and has been removed from PDFKit.
+      Please pipe the document into a Node stream.
+    '
          
-         ret = []
-         for k in out
-           ret.push(k + '\n')
-           
-         fn new Buffer(ret.join(''),'binary')
+  end: ->
+    @page.end()
     
-  finalize: (fn) ->
-    # convert strings in the info dictionary to literals
-    for key, val of @info when typeof val is 'string'
-      @info[key] = PDFObject.s val, true
+    @_info = @ref()
+    for key, val of @info
+      if typeof val is 'string'
+        val = PDFObject.s val, true
+              
+      @_info.data[key] = val
+        
+    @_info.end()
     
-    # embed the subsetted fonts
-    @embedFonts =>
-      # embed the images
-      @embedImages =>
-        done = 0
-        cb = => fn() if ++done is @pages.length
-      
-        # finalize each page
-        for page in @pages
-          page.finalize(cb)
+    for name, font of @_fontFamilies
+      font.embed()
+        
+    @_root.end()
+    @_root.data.Pages.end()
     
-  generateHeader: (out) ->
-    # PDF version
-    out.push "%PDF-#{@version}"
-
-    # 4 binary chars, as recommended by the spec
-    out.push "%\xFF\xFF\xFF\xFF\n"
-    return out
+    if @_waiting is 0
+      @_finalize()
+    else
+      @_ended = true
     
-  generateBody: (out, fn) ->
-    offset = out.join('\n').length + 1
+  _finalize: (fn) ->    
+    # generate xref
+    xRefOffset = @_offset
+    @_write "xref"
+    @_write "0 #{@_offsets.length + 1}"
+    @_write "0000000000 65535 f "
     
-    refs = (ref for id, ref of @store.objects)
-    do proceed = =>
-      if ref = refs.shift()
-        ref.object @compress, (object) ->
-          ref.offset = offset
-          out.push object
-          offset += object.length + 1 # plus one for newline
-          proceed()
-      else
-        @xref_offset = offset
-        fn()
-    
-  generateXRef: (out) ->
-    len = @store.length + 1
-    out.push "xref"
-    out.push "0 #{len}"
-    out.push "0000000000 65535 f "
-
-    for id, ref of @store.objects
-      offset = ('0000000000' + ref.offset).slice(-10)
-      out.push offset + ' 00000 n '
-      
-  generateTrailer: (out) ->
-    trailer = PDFObject.convert
-      Size: @store.length + 1
-      Root: @store.root
+    for offset in @_offsets
+      offset = ('0000000000' + offset).slice(-10)
+      @_write offset + ' 00000 n '
+        
+    # trailer
+    @_write 'trailer'
+    @_write PDFObject.convert
+      Size: @_offsets.length
+      Root: @_root
       Info: @_info
+        
+    @_write 'startxref'
+    @_write "#{xRefOffset}"
+    @_write '%%EOF'
 
-    out.push 'trailer'
-    out.push trailer
-    out.push 'startxref'
-    out.push @xref_offset
-    out.push '%%EOF'
+    # end the stream
+    @push null
     
   toString: ->
     "[object PDFDocument]"

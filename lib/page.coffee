@@ -8,7 +8,7 @@ class PDFPage
     @size = options.size or 'letter'
     @layout = options.layout or 'portrait'
     
-    # if margin was passed as a single number
+    # process margins
     if typeof options.margin is 'number'
       @margins = 
         top: options.margin
@@ -19,47 +19,50 @@ class PDFPage
     # default to 1 inch margins
     else
       @margins = options.margins or DEFAULT_MARGINS
-    
+      
+    # calculate page dimensions
     dimensions = if Array.isArray(@size) then @size else SIZES[@size.toUpperCase()]
     @width = dimensions[if @layout is 'portrait' then 0 else 1]
     @height = dimensions[if @layout is 'portrait' then 1 else 0]
     
-    # A reference to the content of this page
-    @content = @document.ref()    
-          
-    # The page dictionary
-    @dictionary = @document.ref
-      Type: 'Page'
-      Parent: @document.store.pages
-      MediaBox: [0, 0, @width, @height]
-      Contents: @content
+    @content = @document.ref()
     
-    # The resource dictionary
-    @dictionary.data['Resources'] = @document.ref
+    # Initialize the Font, XObject, and ExtGState dictionaries
+    @resources = @document.ref
       ProcSet: ['PDF', 'Text', 'ImageB', 'ImageC', 'ImageI']
-    
-    # Initialize the Font, XObject, and ExtGState dictionaries  
-    @resources = @dictionary.data['Resources'].data
     
     # Lazily create these dictionaries
     Object.defineProperties this,
       fonts:
-        get: => @resources['Font'] ?= {}
+        get: => @resources.data.Font ?= {}
       xobjects:
-        get: => @resources['XObject'] ?= {}
+        get: => @resources.data.XObject ?= {}
       ext_gstates:
-        get: => @resources['ExtGState'] ?= {}
+        get: => @resources.data.ExtGState ?= {}
       patterns:
-        get: => @resources['Pattern'] ?= {}
+        get: => @resources.data.Pattern ?= {}
       annotations:
-        get: => @dictionary.data['Annots'] ?= []
-        
+        get: => @dictionary.data.Annots ?= []
+    
+    # The page dictionary
+    @dictionary = @document.ref
+      Type: 'Page'
+      Parent: @document._root.data.Pages
+      MediaBox: [0, 0, @width, @height]
+      Contents: @content
+      Resources: @resources
+      
   maxY: ->
     @height - @margins.bottom
-    
-  finalize: (fn) ->
-    @content.finalize(@document.compress, fn)
-    
+        
+  write: (chunk) ->
+    @content.write chunk
+  
+  end: ->
+    @dictionary.end()
+    @resources.end()
+    @content.end()
+      
   DEFAULT_MARGINS = 
     top: 72
     left: 72
@@ -117,5 +120,5 @@ class PDFPage
     LEGAL: [612.00, 1008.00]
     LETTER: [612.00, 792.00]
     TABLOID: [792.00, 1224.00]
-    
+  
 module.exports = PDFPage

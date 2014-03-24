@@ -15,6 +15,20 @@ in your CoffeeScript or JavaScript source file and create an instance of the
 
     PDFDocument = require 'pdfkit'
     doc = new PDFDocument
+    
+`PDFDocument` instances are readable Node streams. They don't get saved anywhere automatically,
+but you can call the `pipe` method to send the output of the PDF document to another
+writable Node stream as it is being written. When you're done with your document, call
+the `end` method to finalize it. Here is an example showing how to pipe to a file or an HTTP response.
+
+    doc.pipe fs.createWriteStream('/path/to/file.pdf') # write to PDF
+    doc.pipe fs.createWriteStream(res)                 # HTTP response
+    
+    # add stuff to PDF here using methods described below...
+    
+    doc.end() # finalize the PDF and end the stream
+    
+The `write` and `output` methods found in PDFKit before version 0.5 are now deprecated.
 
 ### Adding pages
 
@@ -53,8 +67,6 @@ For example:
     doc.addPage
       margins: { top: 50, bottom: 50, left: 72, right: 72 }
 
-* * *
-
 ### Setting document metadata
 
 PDF documents can have various metadata associated with them, such as the
@@ -76,15 +88,8 @@ capitalized.
 ### Adding content
 
 Once you've created a `PDFDocument` instance, you can add content to the
-document. Check out the other sections to the left under "Documentation" to
+document. Check out the other sections described in this document to
 learn about each type of content you can add.
-
-### Saving the document
-
-When you are ready to write the PDF document to a file, just call the `write`
-method with a filename. If you want to send the document in response to an
-HTTP request, or just need a string representation of the document, just call
-the `output` method.
 
 That's the basics! Now let's move on to PDFKit's powerful vector graphics
 abilities.
