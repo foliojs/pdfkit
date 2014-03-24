@@ -43,9 +43,11 @@ module.exports =
         Type: 'ExtGState'
         SMask: 'None'
         
+      gstate.end()
       name = "Gs#{++@_opacityCount}"
       @page.ext_gstates[name] = gstate
       @addContent "/#{name} gs"
+      @_sMasked = false
     
     op = if stroke then 'SCN' else 'scn'
 
@@ -108,6 +110,7 @@ module.exports =
        dictionary.CA = strokeOpacity if strokeOpacity?
 
        dictionary = @ref dictionary
+       dictionary.end()
        id = ++@_opacityCount
        name = "Gs#{id}"
        @_opacityRegistry[key] = [dictionary, name]

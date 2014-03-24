@@ -15,7 +15,9 @@ module.exports =
     for key, val of options
       options[key[0].toUpperCase() + key.slice(1)] = val
       
-    @page.annotations.push @ref options
+    ref = @ref options
+    @page.annotations.push ref
+    ref.end()
     return this
     
   note: (x, y, w, h, contents, options = {}) ->
@@ -31,6 +33,7 @@ module.exports =
       S: 'URI'
       URI: PDFObject.s url
       
+    options.A.end()
     @annotate x, y, w, h, options
     
   _markup: (x, y, w, h, options = {}) ->

@@ -3,6 +3,7 @@ class PDFGradient
     @stops = []
     @embedded = no
     @transform = [1, 0, 0, 1, 0, 0]
+    @_colorSpace = 'DeviceRGB'
     
   stop: (pos, color, opacity = 1) ->
     opacity = Math.max(0, Math.min(1, opacity))
@@ -35,6 +36,7 @@ class PDFGradient
         N: 1
         
       stops.push fn
+      fn.end()
     
     # if there are only two stops, we don't need a stitching function
     if stops.length is 1
@@ -46,6 +48,8 @@ class PDFGradient
         Functions: stops
         Bounds: bounds
         Encode: encode
+        
+      fn.end()
         
     @id = 'Sh' + (++@doc._gradCount)
     
@@ -60,26 +64,40 @@ class PDFGradient
     m[4] = m0 * dx + m2 * dy + m4
     m[5] = m1 * dx + m3 * dy + m5
 
+    shader = @shader fn
+    shader.end()
+    
     pattern = @doc.ref
       Type: 'Pattern'
       PatternType: 2
-      Shading: @shader fn
+      Shading: shader
       Matrix: (+v.toFixed(5) for v in m)
 
     @doc.page.patterns[@id] = pattern
+    pattern.end()
     
     if (@stops.some (stop) -> stop[2] < 1)
       grad = @opacityGradient()
+      grad._colorSpace = 'DeviceGray'
+      
       for stop in @stops
         grad.stop stop[0], [stop[2]]
         
       grad = grad.embed()
-      grad.data.Shading.data.ColorSpace = 'DeviceGray'
               
       group = @doc.ref
         Type: 'Group'
         S: 'Transparency'
         CS: 'DeviceGray'
+        
+      group.end()
+      
+      resources = @doc.ref
+        ProcSet: ['PDF', 'Text', 'ImageB', 'ImageC', 'ImageI']
+        Shading:
+          Sh1: grad.data.Shading
+          
+      resources.end()
       
       form = @doc.ref
         Type: 'XObject'
@@ -87,17 +105,16 @@ class PDFGradient
         FormType: 1
         BBox: [0, 0, @doc.page.width, @doc.page.height]
         Group: group
-        Resources: @doc.ref
-          ProcSet: ['PDF', 'Text', 'ImageB', 'ImageC', 'ImageI']
-          Shading:
-            Sh1: grad.data.Shading
+        Resources: resources
       
-      form.add "/Sh1 sh"
+      form.end "/Sh1 sh"
       
       sMask = @doc.ref
         Type: 'Mask'
         S: 'Luminosity'
         G: form
+          
+      sMask.end()
         
       gstate = @doc.ref
         Type: 'ExtGState'
@@ -107,6 +124,7 @@ class PDFGradient
       name = "Gs#{@opacity_id}"
       
       @doc.page.ext_gstates[name] = gstate
+      gstate.end()
     
     return pattern
       
@@ -115,7 +133,6 @@ class PDFGradient
     @doc.addContent "/#{@id} #{op}"
     
     if @opacity_id
-      @doc.save()
       @doc.addContent "/Gs#{@opacity_id} gs"
       @doc._sMasked = true
     
@@ -126,7 +143,7 @@ class PDFLinearGradient extends PDFGradient
   shader: (fn) ->
     @doc.ref
       ShadingType: 2
-      ColorSpace: 'DeviceRGB'
+      ColorSpace: @_colorSpace
       Coords: [@x1, @y1, @x2, @y2]
       Function: fn
       Extend: [true, true]
@@ -141,7 +158,7 @@ class PDFRadialGradient extends PDFGradient
   shader: (fn) ->
     @doc.ref
       ShadingType: 3
-      ColorSpace: 'DeviceRGB'
+      ColorSpace: @_colorSpace
       Coords: [@x1, @y1, @r1, @x2, @y2, @r2]
       Function: fn
       Extend: [true, true]

@@ -10,10 +10,12 @@ zlib = require 'zlib'
 
 class PDFFont
   constructor: (@document, @filename, @family, @id) ->
+    @ref = @document.ref()
+    
     if @filename in @_standardFonts
       @isAFM = true
       @font = AFMFont.open __dirname + "/font/data/#{@filename}.afm"
-      @registerStandard()
+      @registerAFM()
       
     else if /\.(ttf|ttc)$/i.test @filename
       @font = TTFFont.open @filename, @family
@@ -31,9 +33,11 @@ class PDFFont
   use: (characters) ->
     @subset?.use characters
     
-  embed: (fn) ->
-    return fn() if @isAFM
-    @embedTTF fn
+  embed: ->
+    if @isAFM
+      @embedAFM()
+    else
+      @embedTTF()
     
   encode: (text) ->
     if @isAFM
@@ -74,59 +78,49 @@ class PDFFont
     @flags |= 1 << 5 # assume the font is nonsymbolic...
 
     throw new Error 'No unicode cmap for font' if not @font.cmap.unicode
+      
+  embedTTF: ->
+    data = @subset.encode()    
+    fontfile = @document.ref()
+    fontfile.write data
     
-    # Create a placeholder reference to be filled in embedTTF.
-    @ref = @document.ref
+    fontfile.data.Length1 = fontfile.uncompressedLength
+    fontfile.end()
+      
+    descriptor = @document.ref
+      Type: 'FontDescriptor'
+      FontName: @subset.postscriptName
+      FontFile2: fontfile
+      FontBBox: @bbox
+      Flags: @flags
+      StemV: @stemV
+      ItalicAngle: @italicAngle
+      Ascent: @ascender
+      Descent: @decender
+      CapHeight: @capHeight
+      XHeight: @xHeight
+      
+    descriptor.end()
+      
+    firstChar = +Object.keys(@subset.cmap)[0]
+    charWidths = for code, glyph of @subset.cmap
+      Math.round @font.widthOfGlyph(glyph)
+  
+    cmap = @document.ref()
+    cmap.end toUnicodeCmap(@subset.subset)
+    
+    @ref.data =
       Type: 'Font'
+      BaseFont: @subset.postscriptName
       Subtype: 'TrueType'
-      
-  embedTTF: (fn) ->
-    data = @subset.encode()
-    zlib.deflate data, (err, compressedData) =>
-      throw err if err
+      FontDescriptor: descriptor
+      FirstChar: firstChar
+      LastChar: firstChar + charWidths.length - 1
+      Widths: charWidths
+      Encoding: 'MacRomanEncoding'
+      ToUnicode: cmap
     
-      @fontfile = @document.ref
-        Length: compressedData.length
-        Length1: data.length
-        Filter: 'FlateDecode'
-      
-      @fontfile.add compressedData
-        
-      @descriptor = @document.ref
-        Type: 'FontDescriptor'
-        FontName: @subset.postscriptName
-        FontFile2: @fontfile
-        FontBBox: @bbox
-        Flags: @flags
-        StemV: @stemV
-        ItalicAngle: @italicAngle
-        Ascent: @ascender
-        Descent: @decender
-        CapHeight: @capHeight
-        XHeight: @xHeight
-        
-      firstChar = +Object.keys(@subset.cmap)[0]
-      charWidths = for code, glyph of @subset.cmap
-        Math.round @font.widthOfGlyph(glyph)
-    
-      cmap = @document.ref()
-      cmap.add toUnicodeCmap(@subset.subset)
-      
-      ref = 
-        Type: 'Font'
-        BaseFont: @subset.postscriptName
-        Subtype: 'TrueType'
-        FontDescriptor: @descriptor
-        FirstChar: firstChar
-        LastChar: firstChar + charWidths.length - 1
-        Widths: @document.ref charWidths
-        Encoding: 'MacRomanEncoding'
-        ToUnicode: cmap
-      
-      for key, val of ref
-        @ref.data[key] = val
-        
-      cmap.finalize(@document.compress, fn) # compress it
+    @ref.end()
       
   toUnicodeCmap = (map) ->
     unicodeMap = '''
@@ -164,14 +158,17 @@ class PDFFont
       end
     '''
           
-  registerStandard: ->
+  registerAFM: ->
     {@ascender,@decender,@bbox,@lineGap} = @font
     
-    @ref = @document.ref
+  embedAFM: ->
+    @ref.data =
       Type: 'Font'
       BaseFont: @filename
       Subtype: 'Type1'
       Encoding: 'WinAnsiEncoding'
+      
+    @ref.end()
       
   _standardFonts: [
     "Courier"

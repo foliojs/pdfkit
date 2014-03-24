@@ -9,7 +9,7 @@ JPEG = require './image/jpeg'
 PNG = require './image/png'
 
 class PDFImage
-  @open: (filenameOrBuffer) ->
+  @open: (filenameOrBuffer, label) ->
     if typeof filenameOrBuffer is 'object' and filenameOrBuffer instanceof Buffer
       @contents = filenameOrBuffer
     else
@@ -24,10 +24,10 @@ class PDFImage
     firstByte = data.byteAt(0)
     
     if firstByte is 0xFF and data.byteAt(1) is 0xD8
-      return new JPEG(data)
+      return new JPEG(data, label)
       
     else if firstByte is 0x89 and data.stringAt(1, 3) is "PNG"
-      return new PNG(data)
+      return new PNG(data, label)
       
     else
       throw new Error 'Unknown image format.'

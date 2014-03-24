@@ -1,9 +1,8 @@
 fs = require 'fs'
 Data = '../data'
-setImmediate = global.setImmediate ? process.nextTick # backfill for node <0.10
 
 class JPEG
-  constructor: (@data) ->
+  constructor: (@data, @label) ->
     len = data.length
     
     if data.readUInt16() isnt 0xFFD8
@@ -30,10 +29,8 @@ class JPEG
       when 3 then 'DeviceRGB'
       when 4 then 'DeviceCMYK'
       
-    @imgData = @data
-    
-  object: (document, fn) ->
-    obj = document.ref
+  embed: (document) ->
+    @obj = document.ref
       Type: 'XObject'
       Subtype: 'Image'
       BitsPerComponent: @bits
@@ -47,9 +44,8 @@ class JPEG
     # min and max values from the default, we invert the colors. See
     # section 4.8.4 of the spec.  
     if @colorSpace is 'DeviceCMYK'
-      obj.data['Decode'] = [1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0]
+      @obj.data['Decode'] = [1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0]
       
-    obj.add @data.data
-    setImmediate -> fn(obj)
+    @obj.end @data.data
     
 module.exports = JPEG
