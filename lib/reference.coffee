@@ -61,7 +61,7 @@ class PDFReference
       @document._write '\nendstream'
       
     @document._write 'endobj'
-    @document._refEnd()
+    @document._refEnd(this)
     
   toString: ->
     return "#{@id} #{@gen} R"

@@ -20,7 +20,7 @@ class PDFDocument extends stream.Readable
     @compress = yes
     
     # The PDF object store
-    @_objects = []
+    @_offsets = []
     @_waiting = 0
     @_ended = false
     @_offset = 0
@@ -99,8 +99,8 @@ class PDFDocument extends stream.Readable
     return this
     
   ref: (data) ->
-    ref = new PDFReference(this, @_objects.length + 1, data)
-    @_objects.push ref
+    ref = new PDFReference(this, @_offsets.length + 1, data)
+    @_offsets.push null # placeholder for this object's offset once it is finalized
     @_waiting++
     return ref
     
@@ -118,7 +118,8 @@ class PDFDocument extends stream.Readable
     @page.write data
     return this
     
-  _refEnd: ->
+  _refEnd: (ref) ->
+    @_offsets[ref.id - 1] = ref.offset
     if --@_waiting is 0 and @_ended
       @_finalize()
       @_ended = false
@@ -166,21 +167,21 @@ class PDFDocument extends stream.Readable
     else
       @_ended = true
     
-  _finalize: (fn) ->
+  _finalize: (fn) ->    
     # generate xref
     xRefOffset = @_offset
     @_write "xref"
-    @_write "0 #{@_objects.length + 1}"
+    @_write "0 #{@_offsets.length + 1}"
     @_write "0000000000 65535 f "
     
-    for ref in @_objects
-      offset = ('0000000000' + ref.offset).slice(-10)
+    for offset in @_offsets
+      offset = ('0000000000' + offset).slice(-10)
       @_write offset + ' 00000 n '
         
     # trailer
     @_write 'trailer'
     @_write PDFObject.convert
-      Size: @_objects.length
+      Size: @_offsets.length
       Root: @_root
       Info: @_info
         
