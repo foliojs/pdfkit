@@ -1,8 +1,10 @@
-PDFDocument = require 'pdfkit'
+PDFDocument = require '../'
 tiger = require './tiger'
+fs = require 'fs'
 
 # Create a new PDFDocument
 doc = new PDFDocument
+doc.pipe fs.createWriteStream('out.pdf')
 
 # Set some meta data
 doc.info['Title'] = 'Test Document'
@@ -87,4 +89,4 @@ doc.fillColor('#000')
    .font('fonts/Chalkboard.ttc', 'Chalkboard', 16)
    .list(['One', 'Two', 'Three'], 100, 150)
         
-doc.write 'out.pdf'
+doc.end()
