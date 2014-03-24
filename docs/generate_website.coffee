@@ -49,7 +49,11 @@ generateImages = (tree) ->
       delete attrs.height # used for pdf generation
       
       # create a PDF and run the example
-      doc = new PDFDocument        
+      doc = new PDFDocument
+      f = "img/#{imageIndex++}"
+      file = fs.createWriteStream "#{f}.pdf"
+      doc.pipe file
+      
       doc.translate doc.x, doc.y
       doc.scale 0.8
       doc.x = doc.y = 0
@@ -60,15 +64,17 @@ generateImages = (tree) ->
       
       delete attrs.title
       delete attrs.alt
-      attrs.href = "img/#{imageIndex}.png"
+      attrs.href = "#{f}.png"
       
       # write the PDF, convert to PNG using the mac `sips`
       # command line tool, and trim with graphicsmagick
-      do (f = "img/#{imageIndex++}") ->
-        doc.write "#{f}.pdf", ->
+      do (f) ->
+        file.on 'finish', ->
           exec "sips -s format png #{f}.pdf --out #{f}.png", ->
             fs.unlink "#{f}.pdf"
             exec "gm convert #{f}.png -trim #{f}.png"
+            
+      doc.end()
 
 pages = []
 for file in files
