@@ -1,29 +1,31 @@
 fs = require 'fs'
-Data = '../data'
 
 class JPEG
-  constructor: (@data, @label) ->
-    len = data.length
-    
-    if data.readUInt16() isnt 0xFFD8
+  MARKERS = [0xFFC0, 0xFFC1, 0xFFC2, 0xFFC3, 0xFFC5, 0xFFC6, 0xFFC7,
+             0xFFC8, 0xFFC9, 0xFFCA, 0xFFCB, 0xFFCC, 0xFFCD, 0xFFCE, 0xFFCF]
+  
+  constructor: (@data, @label) ->    
+    if data.readUInt16BE(0) isnt 0xFFD8
       throw "SOI not found in JPEG"
+           
+    pos = 2 
+    while pos < data.length
+      marker = data.readUInt16BE(pos)
+      pos += 2
+      break if marker in MARKERS
+      pos += data.readUInt16BE(pos)
     
-    markers = [0xFFC0, 0xFFC1, 0xFFC2, 0xFFC3, 0xFFC5, 0xFFC6, 0xFFC7,
-               0xFFC8, 0xFFC9, 0xFFCA, 0xFFCB, 0xFFCC, 0xFFCD, 0xFFCE, 0xFFCF]
-        
-    while data.pos < len
-      marker = data.readUInt16()
-      break if marker in markers
-      data.pos += data.readUInt16()
-    
-    throw "Invalid JPEG." unless marker in markers
-    data.pos += 2
+    throw "Invalid JPEG." unless marker in MARKERS
+    pos += 2
      
-    @bits = data.readByte()
-    @height = data.readShort()
-    @width = data.readShort()
+    @bits = data[pos++]
+    @height = data.readUInt16BE(pos)
+    pos += 2
     
-    channels = data.readByte()
+    @width = data.readUInt16BE(pos)
+    pos += 2
+    
+    channels = data[pos++]
     @colorSpace = switch channels
       when 1 then 'DeviceGray'
       when 3 then 'DeviceRGB'
@@ -46,6 +48,6 @@ class JPEG
     if @colorSpace is 'DeviceCMYK'
       @obj.data['Decode'] = [1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0]
       
-    @obj.end @data.data
+    @obj.end @data
     
 module.exports = JPEG

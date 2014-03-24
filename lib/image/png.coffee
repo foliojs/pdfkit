@@ -3,7 +3,7 @@ PNG = require 'png-js'
 
 class PNGImage
   constructor: (data, @label) ->
-    @image = new PNG(data.data)
+    @image = new PNG(data)
     @width = @image.width
     @height = @image.height
     @imgData = @image.imgData
