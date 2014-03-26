@@ -2,7 +2,7 @@
 PDFObjectStore - stores the object heirarchy for the PDF document
 By Devon Govett
 ###
-
+ 
 PDFReference = require './reference'
 
 class PDFObjectStore
@@ -11,27 +11,20 @@ class PDFObjectStore
         @objects = {}
         @length = 0
 
-        if @options.hasOutlines 
-            @root = @ref
-                Type: 'Catalog'
-                Pages: @ref
-                    Type: 'Pages'
-                    Count: 0
-                    Kids: []
-                Outlines: @ref
+        @root = @ref
+            Type: 'Catalog'
+            Pages: @ref
+                Type: 'Pages'
+                Count: 0
+                Kids: []
+
+        if @options.hasOutlines
+            @root.data['PageMode'] = 'UseOutlines'
+            @root.data['Outlines'] = @ref
                     Type: 'Outlines'
                     Count: 0
-                PageMode: 'UseOutlines'
-        else
-            @root = @ref
-                Type: 'Catalog'
-                Pages: @ref
-                    Type: 'Pages'
-                    Count: 0
-                    Kids: []
-        
-        @pages = @root.data['Pages']
 
+        @pages    = @root.data['Pages']
         @outlines = @root.data['Outlines']        
     
     ref: (data) ->
@@ -45,9 +38,5 @@ class PDFObjectStore
     addPage: (page) ->
         @pages.data['Kids'].push(page.dictionary)
         @pages.data['Count']++
-
-    addOutline: (outline) ->
-        @outlines.data['Count']++
-
         
 module.exports = PDFObjectStore

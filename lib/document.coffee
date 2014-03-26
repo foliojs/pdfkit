@@ -27,9 +27,15 @@ class PDFDocument
         # The current page
         @page = null
          
-        # A list of outlines in this document
-        @outlines = []
-
+        # Outlines
+        @outlines = []  # Generally, a list which nodes can be 
+                        # lists itself - sublevel outline containers
+        @root_outlines = @store.outlines
+        @cur       = @outlines  # link to the current  level list
+        @levelHead = @root_outlines  # the head node of current outlines list
+        @levs  = []  # stack of list heads to go up
+        @prevs = []  # stack of nested levels containers to go up
+      
         # Initialize mixins
         @initColor()
         @initVector()
@@ -63,7 +69,7 @@ class PDFDocument
     mixin 'text'
     mixin 'images'
     mixin 'annotations'
-        
+
     addPage: (options = @options) ->
         # create a page object
         @page = new PDFPage(this, options)
@@ -83,28 +89,89 @@ class PDFDocument
         
         return this
 
-    addOutline: (title, dest, unicode) ->
+    isRoot: () ->
+        return @prevs.length == 0
+
+    addOutline: (title, dest, options) ->
  
         if not @options.hasOutlines
-            console.log "this document does not have outlines"
             return this
 
-        # create an outline object
-        @outline = new PDFOutline(this, title, dest, unicode)
-
-        # insert into outlines store list
-        if @outlines.length == 0
-            @store.outlines.data['First'] = @outline.dictionary
+        prevNode = null
+        if @isRoot()
+            parent = @root_outlines
         else
-            prev = @outlines[@outlines.length-1]
-            prev.dictionary.data['Next'] = @outline.dictionary
-            @store.outlines.data['Last'] = @outline.dictionary
+            parent = @levelHead.dictionary
 
-        # add to the outlines list
-        @outlines.push @outline
+        if @cur.length > 0  # can be on Root level
+            prevNode = @cur[@cur.length-1]
+            if prevNode instanceof Array # prev is a sublevel list
+                prevNode = @cur[@cur.length-2]  # there *must* be an element before
 
-        # add the outline to the object store
-        @store.addOutline @outline
+        # create an outline object
+        outline = new PDFOutline(this, parent, title, dest, options)
+        
+        # update list header info
+        if @outlines.length == 0  # init root level list
+            @root_outlines.data['First'] = outline.dictionary
+
+        parent.data['Last'] = outline.dictionary   # can be root level
+        parent.data['Count']++
+
+        if prevNode != null   # not first in the list
+            outline.dictionary.data['Prev']  = prevNode.dictionary
+            prevNode.dictionary.data['Next'] = outline.dictionary
+
+        # add to the current level list
+        @cur.push outline
+
+        return this
+
+    addSublevelOutline: (title, dest, options) ->
+
+        if not @options.hasOutlines
+            return this
+
+        if @cur.length == 0 or ( @cur[@cur.length-1] instanceof Array )
+            console.log("add current level outline first")
+            return this
+
+        @levs.push @levelHead
+
+        @levelHead = @cur[@cur.length-1]  # head of sublevel list
+        @prevs.push @cur  # remember up level container
+        @cur.push []      # add sublevel container
+        @cur = @cur[@cur.length-1]
+
+        outline = new PDFOutline(this, @levelHead.dictionary, title, dest, options)
+
+        @cur.push outline
+        @levelHead.dictionary.data['First'] = outline.dictionary
+        @levelHead.dictionary.data['Last']  = outline.dictionary
+        @levelHead.dictionary.data['Count'] = 1  # important: not ++ (field is absent now)
+
+        return this
+
+    endOutlineSublevel: () ->
+
+        if not @options.hasOutlines
+            return this
+
+        if @isRoot()
+            console.log("cannot end root level")
+            return this
+
+        # restore previous list as current
+        @cur  = @prevs.pop()
+
+        count = @levelHead.dictionary.data['Count']
+        @levelHead = @levs.pop()
+
+        # add child sublist counter (will contain all child counters)
+        if @isRoot()
+            @levelHead.data['Count'] += count
+        else
+            @levelHead.dictionary.data['Count'] += count
 
         return this
         
