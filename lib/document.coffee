@@ -18,7 +18,7 @@ class PDFDocument extends stream.Readable
     @version = 1.3
     
     # Whether streams should be compressed
-    @compress = no  # yes
+    @compress = yes
     
     # The PDF object store
     @_offsets = []
