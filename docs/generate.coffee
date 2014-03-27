@@ -242,10 +242,11 @@ renderTitlePage = (doc) ->
 # render all sections of the guide and write the pdf file
 do ->
   doc = new PDFDocument
+  doc.pipe fs.createWriteStream('guide.pdf')
   renderTitlePage doc
   render doc, 'getting_started.coffee.md'
   render doc, 'vector.coffee.md'
   render doc, 'text.coffee.md'
   render doc, 'images.coffee.md'
   render doc, 'annotations.coffee.md'
-  doc.write 'guide.pdf'
+  doc.end()

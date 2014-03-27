@@ -3,265 +3,304 @@ PDFDocument - represents an entire PDF document
 By Devon Govett
 ###
 
+stream = require 'stream'
 fs = require 'fs'
-PDFObjectStore = require './store'
 PDFObject = require './object'
 PDFReference = require './reference'
 PDFPage = require './page'
 PDFOutline = require './outline'
 
-class PDFDocument
-    constructor: (@options = {}) ->
-        # PDF version
-        @version = 1.3
-       
-        # Whether streams should be compressed
-        @compress = no
-        
-        # The PDF object store
-        @store = new PDFObjectStore(@options)
-        
-        # A list of pages in this document
-        @pages = []
-        
-        # The current page
-        @page = null
-         
-        # Outlines
-        @outlines = []  # Generally, a list which nodes can be 
-                        # lists itself - sublevel outline containers
-        @root_outlines = @store.outlines
-        @cur       = @outlines  # link to the current  level list
-        @levelHead = @root_outlines  # the head node of current outlines list
-        @levs  = []  # stack of list heads to go up
-        @prevs = []  # stack of nested levels containers to go up
+class PDFDocument extends stream.Readable
+  constructor: (@options = {}) ->
+    super
+    
+    # PDF version
+    @version = 1.3
+    
+    # Whether streams should be compressed
+    @compress = no  # yes
+    
+    # The PDF object store
+    @_offsets = []
+    @_waiting = 0
+    @_ended = false
+    @_offset = 0
+            
+    @_root = @ref
+      Type: 'Catalog'
+      Pages: @ref
+        Type: 'Pages'
+        Count: 0
+        Kids: []
+
+    if @options.hasOutlines
+        @_root.data['PageMode'] = 'UseOutlines'
+        @_root.data['Outlines'] = @ref
+            Type: 'Outlines'
+            Count: 0
+
+    @root_outlines = @_root.data['Outlines'] 
+    
+    # The current page
+    @page = null
+
+    # Outlines data structures
+    @outlines = []  # a multitier tree, represented by lists ( [] )
+    @cur       = @outlines       # current level list
+    @levelHead = @root_outlines  # head of current level list
+    @levs  = []  # stack of sublevel lists heads
+    @prevs = []  # stack of sublevel lists
+    
+    # Initialize mixins
+    @initColor()
+    @initVector()
+    @initFonts()
+    @initText()
+    @initImages()
+    
+    # Initialize the metadata
+    @info =
+      Producer: 'PDFKit'
+      Creator: 'PDFKit'
+      CreationDate: new Date()
+
+    if @options.info
+      for key, val of @options.info
+        @info[key] = val
       
-        # Initialize mixins
-        @initColor()
-        @initVector()
-        @initFonts()
-        @initText()
-        @initImages()
-        
-        # Create the metadata
-        @_info = @ref
-            Producer: 'PDFKit'
-            Creator: 'PDFKit'
-            CreationDate: new Date()
-                
-        @info = @_info.data
-        if @options.info
-            @info[key] = val for key, val of @options.info
-            delete @options.info
-        
-        # Add the first page
-        @addPage()
+    # Write the header
+    # PDF version
+    @_write "%PDF-#{@version}"
+
+    # 4 binary chars, as recommended by the spec
+    @_write "%\xFF\xFF\xFF\xFF"
     
-    mixin = (name) =>
-        methods = require './mixins/' + name
-        for name, method of methods
-            this::[name] = method
+    # Add the first page
+    @addPage()
+  
+  mixin = (name) =>
+    methods = require './mixins/' + name
+    for name, method of methods
+      this::[name] = method
+  
+  # Load mixins
+  mixin 'color'
+  mixin 'vector'
+  mixin 'fonts'
+  mixin 'text'
+  mixin 'images'
+  mixin 'annotations'
     
-    # Load mixins
-    mixin 'color'
-    mixin 'vector'
-    mixin 'fonts'
-    mixin 'text'
-    mixin 'images'
-    mixin 'annotations'
+  addPage: (options = @options) ->
+    # end the current page if needed
+    @page?.end()
+    
+    # create a page object
+    @page = new PDFPage(this, options)
+    
+    # add the page to the object store
+    pages = @_root.data.Pages.data
+    pages.Kids.push @page.dictionary
+    pages.Count++
+    
+    # reset x and y coordinates
+    @x = @page.margins.left
+    @y = @page.margins.top
+    
+    # flip PDF coordinate system so that the origin is in
+    # the top left rather than the bottom left
+    @_ctm = [1, 0, 0, 1, 0, 0]
+    @transform 1, 0, 0, -1, 0, @page.height
+    
+    return this
 
-    addPage: (options = @options) ->
-        # create a page object
-        @page = new PDFPage(this, options)
-        
-        # add the page to the object store
-        @store.addPage @page
-        @pages.push @page
-        
-        # reset x and y coordinates
-        @x = @page.margins.left
-        @y = @page.margins.top
-        
-        # flip PDF coordinate system so that the origin is in
-        # the top left rather than the bottom left
-        @_ctm = [1, 0, 0, 1, 0, 0]
-        @transform 1, 0, 0, -1, 0, @page.height
-        
+  isRoot: () ->
+    return @prevs.length == 0
+
+  addOutline: (title, dest, options) ->
+
+    if not @options.hasOutlines
         return this
 
-    isRoot: () ->
-        return @prevs.length == 0
+    prevNode = null
+    if @isRoot()
+        parent = @root_outlines
+    else
+        parent = @levelHead.dictionary
 
-    addOutline: (title, dest, options) ->
- 
-        if not @options.hasOutlines
-            return this
+    if @cur.length > 0  # can be on Root level
+        prevNode = @cur[@cur.length-1]
+        if prevNode instanceof Array # prev is a sublevel list
+            prevNode = @cur[@cur.length-2]  # there *must* be an element before
 
-        prevNode = null
-        if @isRoot()
-            parent = @root_outlines
-        else
-            parent = @levelHead.dictionary
+    # create an outline object
+    outline = new PDFOutline(this, parent, title, dest, options)
+    
+    # update list header info
+    if @outlines.length == 0  # init root level list
+        @root_outlines.data['First'] = outline.dictionary
 
-        if @cur.length > 0  # can be on Root level
-            prevNode = @cur[@cur.length-1]
-            if prevNode instanceof Array # prev is a sublevel list
-                prevNode = @cur[@cur.length-2]  # there *must* be an element before
+    parent.data['Last'] = outline.dictionary   # can be root level
+    parent.data['Count']++
 
-        # create an outline object
-        outline = new PDFOutline(this, parent, title, dest, options)
-        
-        # update list header info
-        if @outlines.length == 0  # init root level list
-            @root_outlines.data['First'] = outline.dictionary
+    if prevNode != null   # not first in the list
+        outline.dictionary.data['Prev']  = prevNode.dictionary
+        prevNode.dictionary.data['Next'] = outline.dictionary
 
-        parent.data['Last'] = outline.dictionary   # can be root level
-        parent.data['Count']++
+    # add to the current level list
+    @cur.push outline
 
-        if prevNode != null   # not first in the list
-            outline.dictionary.data['Prev']  = prevNode.dictionary
-            prevNode.dictionary.data['Next'] = outline.dictionary
+    return this
 
-        # add to the current level list
-        @cur.push outline
+  addSublevelOutline: (title, dest, options) ->
 
+    if not @options.hasOutlines
         return this
 
-    addSublevelOutline: (title, dest, options) ->
+    if @cur.length == 0 or ( @cur[@cur.length-1] instanceof Array )
+       throw new Error '
+          Cannot start sublevel with empty current level:
+          add current level outline first.'
+        
+    @levs.push @levelHead
+    @levelHead = @cur[@cur.length-1]  # head of sublevel list
+    @prevs.push @cur  # remember up level container
+    @cur.push []      # add sublevel container
+    @cur = @cur[@cur.length-1]
 
-        if not @options.hasOutlines
-            return this
+    outline = new PDFOutline(this, @levelHead.dictionary, title, dest, options)
+    @cur.push outline
+    @levelHead.dictionary.data['First'] = outline.dictionary
+    @levelHead.dictionary.data['Last']  = outline.dictionary
+    @levelHead.dictionary.data['Count'] = 1  # important: not ++ (field is absent now)
 
-        if @cur.length == 0 or ( @cur[@cur.length-1] instanceof Array )
-            console.log("add current level outline first")
-            return this
+    return this
 
-        @levs.push @levelHead
+  endOutlineSublevel: () ->
 
-        @levelHead = @cur[@cur.length-1]  # head of sublevel list
-        @prevs.push @cur  # remember up level container
-        @cur.push []      # add sublevel container
-        @cur = @cur[@cur.length-1]
-
-        outline = new PDFOutline(this, @levelHead.dictionary, title, dest, options)
-
-        @cur.push outline
-        @levelHead.dictionary.data['First'] = outline.dictionary
-        @levelHead.dictionary.data['Last']  = outline.dictionary
-        @levelHead.dictionary.data['Count'] = 1  # important: not ++ (field is absent now)
-
+    if not @options.hasOutlines
         return this
 
-    endOutlineSublevel: () ->
+    if @isRoot()
+        throw new Error 'cannot end root outlines level'
 
-        if not @options.hasOutlines
-            return this
+    # restore previous list as current
+    @cur  = @prevs.pop()
+    count = @levelHead.dictionary.data['Count']
+    @levelHead = @levs.pop()
 
-        if @isRoot()
-            console.log("cannot end root level")
-            return this
+    # add child sublist counter (will contain all child counters)
+    if @isRoot()
+        @levelHead.data['Count'] += count
+    else
+        @levelHead.dictionary.data['Count'] += count
 
-        # restore previous list as current
-        @cur  = @prevs.pop()
+    return this
 
-        count = @levelHead.dictionary.data['Count']
-        @levelHead = @levs.pop()
+  endOutlines: (outlines) ->
+      for outline in outlines
+         if outline instanceof Array
+           @endOutlines(outline)
+         else
+           outline.dictionary.end()
+    
+  ref: (data) ->
+    ref = new PDFReference(this, @_offsets.length + 1, data)
+    @_offsets.push null # placeholder for this object''s offset once it is finalized
+    @_waiting++
+    return ref
+    
+  _read: ->
+      # do nothing, but this method is required by node
+    
+  _write: (data) ->
+    unless Buffer.isBuffer(data)
+      data = new Buffer(data + '\n', 'binary')
+    
+    @push data
+    @_offset += data.length
+        
+  addContent: (data) ->
+    @page.write data
+    return this
+    
+  _refEnd: (ref) ->
+    @_offsets[ref.id - 1] = ref.offset
+    if --@_waiting is 0 and @_ended
+      @_finalize()
+      @_ended = false
+    
+  write: (filename, fn) ->
+    # print a deprecation warning with a stacktrace
+    err = new Error '
+      PDFDocument#write is deprecated, and will be removed in a future version of PDFKit.
+      Please pipe the document into a Node stream.
+    '
+    
+    console.warn err.stack
+    
+    @pipe fs.createWriteStream(filename)
+    @end()
+    @once 'end', fn
+    
+  output: (fn) ->
+    # more difficult to support this. It would involve concatenating all the buffers together
+    throw new Error '
+      PDFDocument#output is deprecated, and has been removed from PDFKit.
+      Please pipe the document into a Node stream.
+    '
+         
+  end: ->
+    @page.end()
+    
+    @_info = @ref()
+    for key, val of @info
+      if typeof val is 'string'
+        val = PDFObject.s val, true
+              
+      @_info.data[key] = val
+        
+    @_info.end()
+    
+    for name, font of @_fontFamilies
+      font.embed()
+        
+    @_root.end()
+    @_root.data.Pages.end()
+    @_root.data.Outlines.end()
+    @endOutlines(@outlines)
+    
+    if @_waiting is 0
+      @_finalize()
+    else
+      @_ended = true
+    
+  _finalize: (fn) ->    
+    # generate xref
+    xRefOffset = @_offset
+    @_write "xref"
+    @_write "0 #{@_offsets.length + 1}"
+    @_write "0000000000 65535 f "
+    
+    for offset in @_offsets
+      offset = ('0000000000' + offset).slice(-10)
+      @_write offset + ' 00000 n '
+        
+    # trailer
+    @_write 'trailer'
+    @_write PDFObject.convert
+      Size: @_offsets.length
+      Root: @_root
+      Info: @_info
+        
+    @_write 'startxref'
+    @_write "#{xRefOffset}"
+    @_write '%%EOF'
 
-        # add child sublist counter (will contain all child counters)
-        if @isRoot()
-            @levelHead.data['Count'] += count
-        else
-            @levelHead.dictionary.data['Count'] += count
-
-        return this
-        
-    ref: (data) ->
-        @store.ref(data)
-        
-    addContent: (str) ->
-        @page.content.add str
-        return this # make chaining possible
-           
-    write: (filename, fn) ->
-        @output (out) ->
-            fs.writeFile filename, out, 'binary', fn
-        
-    output: (fn) ->
-       @finalize =>
-           out = []
-           @generateHeader out
-           @generateBody out, =>
-               @generateXRef out
-               @generateTrailer out
-               
-               ret = []
-               for k in out
-                   ret.push(k + '\n')
-                   
-               fn new Buffer(ret.join(''),'binary')
-        
-    finalize: (fn) ->
-        # convert strings in the info dictionary to literals
-        for key, val of @info when typeof val is 'string'
-            @info[key] = PDFObject.s val, true
-        
-        # embed the subsetted fonts
-        @embedFonts =>
-            # embed the images
-            @embedImages =>
-                done = 0
-                cb = => fn() if ++done is @pages.length
-            
-                # finalize each page
-                for page in @pages
-                    page.finalize(cb)
-        
-    generateHeader: (out) ->
-        # PDF version
-        out.push "%PDF-#{@version}"
-
-        # 4 binary chars, as recommended by the spec
-        out.push "%\xFF\xFF\xFF\xFF\n"
-        return out
-
-    generateBody: (out, fn) ->
-        offset = out.join('\n').length + 1
-        
-        refs = (ref for id, ref of @store.objects)
-        do proceed = =>
-            if ref = refs.shift()
-                ref.object @compress, (object) ->
-                    ref.offset = offset
-                    out.push object
-                    offset += object.length + 1 # plus one for newline
-                    proceed()
-            else
-                @xref_offset = offset
-                fn()
-        
-    generateXRef: (out) ->
-        len = @store.length + 1
-        out.push "xref"
-        out.push "0 #{len}"
-        out.push "0000000000 65535 f "
-
-        for id, ref of @store.objects
-            offset = ('0000000000' + ref.offset).slice(-10)
-            out.push offset + ' 00000 n '
-            
-    generateTrailer: (out) ->
-        trailer = PDFObject.convert
-            Size: @store.length + 1
-            Root: @store.root
-            Info: @_info
-
-        out.push 'trailer'
-        out.push trailer
-        out.push 'startxref'
-        out.push @xref_offset
-        out.push '%%EOF'
-        
-    toString: ->
-        "[object PDFDocument]"
-        
+    # end the stream
+    @push null
+    
+  toString: ->
+    "[object PDFDocument]"
+    
 module.exports = PDFDocument

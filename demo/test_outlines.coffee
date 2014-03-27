@@ -1,4 +1,5 @@
 PDFDocument = require 'pdfkit'
+fs = require 'fs'
 
 docOptions = {
          hasOutlines: true,   # required for outlines
@@ -7,6 +8,8 @@ docOptions = {
 
 # Create a new PDFDocument
 doc = new PDFDocument(docOptions)
+doc.pipe fs.createWriteStream('out_outlines.pdf')
+
 doc.fontSize(16)
 title = 'Test Document With Outlines'
 
@@ -75,5 +78,5 @@ doc.addOutline('Тестовый заголовок', doc.page, outl_options);
 
 doc.text( loremIpsum_0_2, { paragraphGap : 2, indent : 30, align : 'justify' } );
 
-doc.write 'out_outlines.pdf'
+doc.end()
 console.log "out_outlines.pdf created" 
