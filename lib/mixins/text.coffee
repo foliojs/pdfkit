@@ -171,9 +171,10 @@ module.exports =
 
         when 'justify'
           # calculate the word spacing value
+          words = text.trim().split(/\s+/)
           textWidth = @widthOfString(text.replace(/\s+/g, ''), options)
           spaceWidth = @widthOfString(' ') + characterSpacing
-          wordSpacing = Math.max 0, (options.lineWidth - textWidth) / Math.max(1, options.wordCount - 1) - spaceWidth
+          wordSpacing = Math.max 0, (options.lineWidth - textWidth) / Math.max(1, words.length - 1) - spaceWidth
           
     # calculate the actual rendered width of the string after word and character spacing
     renderedWidth = options.textWidth + (wordSpacing * (options.wordCount - 1)) + (characterSpacing * (text.length - 1))
@@ -231,7 +232,7 @@ module.exports =
     # since the normal Tw operator only works on character code 32, which isn't
     # used for embedded fonts.
     if wordSpacing
-      words = text.split(/\s+/)
+      words = text.trim().split(/\s+/)
       wordSpacing += @widthOfString(' ') + characterSpacing
       wordSpacing *= 1000 / @_fontSize
       
