@@ -57,14 +57,17 @@ module.exports =
   widthOfString: (string, options = {}) ->
     @_font.widthOfString(string, @_fontSize) + (options.characterSpacing or 0) * (string.length - 1)
     
-  heightOfString: (text, options) ->
+  heightOfString: (text, options = {}) ->
     {x,y} = this
-    lineGap = options.lineGap or @_lineGap or 0
     
-    @_text text, 0, 0, options, (line, options) =>
+    options = @_initOptions(options)
+    options.height = Infinity # don't break pages
+    
+    lineGap = options.lineGap or @_lineGap or 0
+    @_text text, @x, @y, options, (line, options) =>
       @y += @currentLineHeight(true) + lineGap
       
-    height = @y # we started at y=0
+    height = @y - y
     @x = x
     @y = y
     
