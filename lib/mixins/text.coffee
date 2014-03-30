@@ -24,7 +24,7 @@ module.exports =
     @y -= @currentLineHeight(true) * lines + @_lineGap
     return this
     
-  text: (text, x, y, options) ->
+  _text: (text, x, y, options, lineCallback) ->
     options = @_initOptions(x, y, options)
     
     # Convert text to a string
@@ -39,7 +39,7 @@ module.exports =
       wrapper = @_wrapper
       unless wrapper
         wrapper = new LineWrapper(this, options)
-        wrapper.on 'line', @_line.bind(this)
+        wrapper.on 'line', lineCallback
         
       @_wrapper = if options.continued then wrapper else null
       @_textOptions = if options.continued then options else null
@@ -47,9 +47,28 @@ module.exports =
       
     # render paragraphs as single lines
     else
-      @_line line, options for line in text.split '\n'
+      lineCallback line, options for line in text.split '\n'
     
     return this
+    
+  text: (text, x, y, options) ->
+    @_text text, x, y, options, @_line.bind(this)
+    
+  widthOfString: (string, options = {}) ->
+    @_font.widthOfString(string, @_fontSize) + (options.characterSpacing or 0) * (string.length - 1)
+    
+  heightOfString: (text, options) ->
+    {x,y} = this
+    lineGap = options.lineGap or @_lineGap or 0
+    
+    @_text text, 0, 0, options, (line, options) =>
+      @y += @currentLineHeight(true) + lineGap
+      
+    height = @y # we started at y=0
+    @x = x
+    @y = y
+    
+    return height      
     
   list: (list, x, y, options, wrapper) ->
     options = @_initOptions(x, y, options)
@@ -135,10 +154,7 @@ module.exports =
     options.columnGap ?= 18 # 1/4 inch
 
     return options
-  
-  widthOfString: (string, options = {}) ->
-    @_font.widthOfString(string, @_fontSize) + (options.characterSpacing or 0) * (string.length - 1)
-    
+      
   _line: (text, options = {}, wrapper) ->
     @_fragment text, @x, @y, options
     lineGap = options.lineGap or @_lineGap or 0
