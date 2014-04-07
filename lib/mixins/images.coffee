@@ -12,12 +12,15 @@ module.exports =
     
     x = x ? options.x ? @x
     y = y ? options.y ? @y
-
-    image = @_imageRegistry[src]
+    
+    unless Buffer.isBuffer(src)
+      image = @_imageRegistry[src]
+      
     if not image
       image = PDFImage.open src, 'I' + (++@_imageCount)
       image.embed this
-      @_imageRegistry[src] = image unless Buffer.isBuffer(src)
+      unless Buffer.isBuffer(src)
+        @_imageRegistry[src] = image
         
     @page.xobjects[image.label] ?= image.obj
 
