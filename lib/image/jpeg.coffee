@@ -42,7 +42,6 @@ class JPEG
       BitsPerComponent: @bits
       Width: @width
       Height: @height
-      Length: @data.length
       ColorSpace: @colorSpace
       Filter: 'DCTDecode'
       
