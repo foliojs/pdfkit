@@ -35,7 +35,7 @@ class PDFReference
       @deflate.write chunk
     else
       @chunks.push chunk
-      @data.Length += chunk.length
+      @data.Length = chunk.length
     
   end: (chunk) ->
     if typeof chunk is 'string' or Buffer.isBuffer(chunk)
