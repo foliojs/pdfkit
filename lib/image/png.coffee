@@ -35,7 +35,7 @@ class PNGImage
     else
       # embed the color palette in the PDF as an object stream
       palette = document.ref()
-      palette.end @image.palette
+      palette.end new Buffer @image.palette
 
       # build the color space array for the image
       @obj.data['ColorSpace'] = ['Indexed', 'DeviceRGB', (@image.palette.length / 3) - 1, palette]
