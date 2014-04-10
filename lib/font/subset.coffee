@@ -29,7 +29,7 @@ class Subset
       
     return string
     
-  cmap: ->
+  generateCmap: ->
     # generate the cmap table for this subset
     unicodeCmap = @font.cmap.tables[0].codeMap
     mapping = {}
@@ -67,7 +67,7 @@ class Subset
     
   encode: ->
     # generate the Cmap for this subset
-    cmap = CmapTable.encode @cmap(), 'unicode'
+    cmap = CmapTable.encode @generateCmap(), 'unicode'
     glyphs = @glyphsFor @glyphIDs()
         
     # compute old2new and new2old mapping tables
