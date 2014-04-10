@@ -34,10 +34,14 @@ class PDFFont
     @subset?.use characters
     
   embed: ->
+    return if @embedded
+    
     if @isAFM
       @embedAFM()
     else
       @embedTTF()
+      
+    @embedded = true
     
   encode: (text) ->
     if @isAFM
