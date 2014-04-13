@@ -10,7 +10,6 @@ fs = require 'fs'
 
 class PDFFont
   constructor: (@document, src, family, @id) ->    
-    @ref = @document.ref()
     if typeof src is 'string'
       if src of STANDARD_FONTS
         @isAFM = true
@@ -56,6 +55,9 @@ class PDFFont
       @font.encodeText text
     else
       @subset?.encodeText(text) or text
+          
+  ref: ->
+    @dictionary ?= @document.ref()
     
   registerTTF: ->
     @scaleFactor = 1000.0 / @font.head.unitsPerEm
@@ -121,7 +123,7 @@ class PDFFont
     cmap = @document.ref()
     cmap.end toUnicodeCmap(@subset.subset)
     
-    @ref.data =
+    @dictionary.data =
       Type: 'Font'
       BaseFont: @subset.postscriptName
       Subtype: 'TrueType'
@@ -132,7 +134,7 @@ class PDFFont
       Encoding: 'MacRomanEncoding'
       ToUnicode: cmap
     
-    @ref.end()
+    @dictionary.end()
       
   toUnicodeCmap = (map) ->
     unicodeMap = '''
@@ -174,13 +176,13 @@ class PDFFont
     {@ascender,@decender,@bbox,@lineGap} = @font
     
   embedAFM: ->
-    @ref.data =
+    @dictionary.data =
       Type: 'Font'
       BaseFont: @filename
       Subtype: 'Type1'
       Encoding: 'WinAnsiEncoding'
       
-    @ref.end()
+    @dictionary.end()
       
   _standardFonts: [
     "Courier"

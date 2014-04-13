@@ -225,7 +225,7 @@ module.exports =
     y = @page.height - y - (@_font.ascender / 1000 * @_fontSize)
 
     # add current font to page if necessary
-    @page.fonts[@_font.id] ?= @_font.ref
+    @page.fonts[@_font.id] ?= @_font.ref()
 
     # tell the font subset to use the characters
     @_font.use(text)
