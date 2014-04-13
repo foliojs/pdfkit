@@ -6,24 +6,32 @@ By Devon Govett
 TTFFont = require './font/ttf'
 AFMFont = require './font/afm'
 Subset = require './font/subset'
-zlib = require 'zlib'
+fs = require 'fs'
 
 class PDFFont
-  constructor: (@document, @filename, @family, @id) ->
+  constructor: (@document, src, family, @id) ->    
     @ref = @document.ref()
-    
-    if @filename in @_standardFonts
-      @isAFM = true
-      @font = AFMFont.open __dirname + "/font/data/#{@filename}.afm"
-      @registerAFM()
+    if typeof src is 'string'
+      if src of STANDARD_FONTS
+        @isAFM = true
+        @font = AFMFont.open __dirname + "/font/data/#{@filename}.afm"
+        @registerAFM()
+
+      else if /\.(ttf|ttc)$/i.test src
+        @font = TTFFont.open src, family
+        @subset = new Subset @font
+        @registerTTF()
       
-    else if /\.(ttf|ttc)$/i.test @filename
-      @font = TTFFont.open @filename, @family
-      @subset = new Subset @font
-      @registerTTF()
-      
-    else if /\.dfont$/i.test @filename
-      @font = TTFFont.fromDFont @filename, @family
+      else if /\.dfont$/i.test src
+        @font = TTFFont.fromDFont src, family
+        @subset = new Subset @font
+        @registerTTF()
+        
+      else
+        throw new Error 'Not a supported font format or standard PDF font.'
+        
+    else if Buffer.isBuffer(src)
+      @font = TTFFont.fromBuffer src, family
       @subset = new Subset @font
       @registerTTF()
       
@@ -84,7 +92,7 @@ class PDFFont
     throw new Error 'No unicode cmap for font' if not @font.cmap.unicode
       
   embedTTF: ->
-    data = @subset.encode()    
+    data = @subset.encode()
     fontfile = @document.ref()
     fontfile.write data
     

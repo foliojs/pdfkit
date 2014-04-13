@@ -22,7 +22,25 @@ class TTFFont
   @fromDFont: (filename, family) ->
     dfont = DFont.open(filename)
     new TTFFont dfont.getNamedFont(family)
-  
+    
+  @fromBuffer: (buffer, family) ->
+    try
+      ttf = new TTFFont buffer, family
+    
+      # check some tables to make sure this is valid
+      unless ttf.head.exists and ttf.name.exists and ttf.cmap.exists
+        # if not, try a DFont
+        dfont = new DFont buffer
+        ttf = new TTFFont dfont.getNamedFont(family)
+        
+        # check again after dfont
+        unless ttf.head.exists and ttf.name.exists and ttf.cmap.exists
+          throw new Error 'Invalid TTF file in DFont'
+      
+      return ttf
+    catch e
+      throw new Error 'Unknown font format in buffer: ' + e.message
+        
   constructor: (@rawData, name) ->
     data = @contents = new Data(rawData)
     
