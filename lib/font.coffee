@@ -60,6 +60,7 @@ class PDFFont
     @dictionary ?= @document.ref()
     
   registerTTF: ->
+    @name = @font.name.postscriptName
     @scaleFactor = 1000.0 / @font.head.unitsPerEm
     @bbox = (Math.round e * @scaleFactor for e in @font.bbox)
     @stemV = 0 # not sure how to compute this for true-type fonts...
@@ -172,13 +173,13 @@ class PDFFont
       end
     '''
           
-  registerAFM: ->
+  registerAFM: (@name) ->
     {@ascender,@decender,@bbox,@lineGap} = @font
     
   embedAFM: ->
     @dictionary.data =
       Type: 'Font'
-      BaseFont: @filename
+      BaseFont: @name
       Subtype: 'Type1'
       Encoding: 'WinAnsiEncoding'
       
