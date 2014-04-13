@@ -13,9 +13,9 @@ class PDFFont
     if typeof src is 'string'
       if src of STANDARD_FONTS
         @isAFM = true
-        @font = AFMFont.open __dirname + "/font/data/#{@filename}.afm"
-        @registerAFM()
-
+        @font = new AFMFont STANDARD_FONTS[src]()
+        @registerAFM src
+      
       else if /\.(ttf|ttc)$/i.test src
         @font = TTFFont.open src, family
         @subset = new Subset @font
@@ -36,6 +36,23 @@ class PDFFont
       
     else
       throw new Error 'Not a supported font format or standard PDF font.'
+      
+  # This insanity is so browserify can inline the font files
+  STANDARD_FONTS =
+    "Courier":               -> fs.readFileSync __dirname + "/font/data/Courier.afm", 'utf8'
+    "Courier-Bold":          -> fs.readFileSync __dirname + "/font/data/Courier-Bold.afm", 'utf8'
+    "Courier-Oblique":       -> fs.readFileSync __dirname + "/font/data/Courier-Oblique.afm", 'utf8'
+    "Courier-BoldOblique":   -> fs.readFileSync __dirname + "/font/data/Courier-BoldOblique.afm", 'utf8'
+    "Helvetica":             -> fs.readFileSync __dirname + "/font/data/Helvetica.afm", 'utf8'
+    "Helvetica-Bold":        -> fs.readFileSync __dirname + "/font/data/Helvetica-Bold.afm", 'utf8'
+    "Helvetica-Oblique":     -> fs.readFileSync __dirname + "/font/data/Helvetica-Oblique.afm", 'utf8'
+    "Helvetica-BoldOblique": -> fs.readFileSync __dirname + "/font/data/Helvetica-BoldOblique.afm", 'utf8'
+    "Times-Roman":           -> fs.readFileSync __dirname + "/font/data/Times-Roman.afm", 'utf8'
+    "Times-Bold":            -> fs.readFileSync __dirname + "/font/data/Times-Bold.afm", 'utf8'
+    "Times-Italic":          -> fs.readFileSync __dirname + "/font/data/Times-Italic.afm", 'utf8'
+    "Times-BoldItalic":      -> fs.readFileSync __dirname + "/font/data/Times-BoldItalic.afm", 'utf8'
+    "Symbol":                -> fs.readFileSync __dirname + "/font/data/Symbol.afm", 'utf8'
+    "ZapfDingbats":          -> fs.readFileSync __dirname + "/font/data/ZapfDingbats.afm", 'utf8'
       
   use: (characters) ->
     @subset?.use characters
@@ -185,23 +202,6 @@ class PDFFont
       
     @dictionary.end()
       
-  _standardFonts: [
-    "Courier"
-    "Courier-Bold"
-    "Courier-Oblique"
-    "Courier-BoldOblique"
-    "Helvetica"
-    "Helvetica-Bold"
-    "Helvetica-Oblique"
-    "Helvetica-BoldOblique"
-    "Times-Roman"
-    "Times-Bold"
-    "Times-Italic"
-    "Times-BoldItalic"
-    "Symbol"
-    "ZapfDingbats"
-  ]
-  
   widthOfString: (string, size) ->
     string = '' + string
     width = 0
