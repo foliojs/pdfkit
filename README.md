@@ -135,10 +135,10 @@ stream = doc.pipe(blobStream())
 # get a blob when you're done
 stream.on 'finish', ->
   # get a blob you can do whatever you like with
-  blob = stream.toBlob()
+  blob = stream.toBlob('application/pdf')
 
   # or get a blob URL for display in the browser
-  url = stream.toBlobURL()
+  url = stream.toBlobURL('application/pdf')
   iframe.src = url
 ```
 
