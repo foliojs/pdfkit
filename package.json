@@ -25,7 +25,11 @@
     "coffee-script": ">=1.0.1",
     "codemirror": "~3.20.0",
     "markdown": "~0.5.0",
-    "jade": "~1.1.5"
+    "jade": "~1.1.5",
+    "coffeeify": "^0.6.0",
+    "browserify": "^3.39.0",
+    "brfs": "^1.0.1",
+    "exorcist": "^0.1.5"
   },
   "dependencies": {
     "png-js": ">=0.1.0",
@@ -34,6 +38,12 @@
   "scripts": {
     "prepublish": "coffee -o js -c lib/ && cp -r lib/font/data js/font/data",
     "postpublish": "rm -rf ./js"
+  "browser": "lib/document",
+  "browserify": {
+    "transform": [
+      "coffeeify",
+      "brfs"
+    ]
   },
   "main": "./js/document",
   "engine": [
