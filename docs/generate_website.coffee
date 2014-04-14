@@ -6,6 +6,8 @@ coffee = require 'coffee-script'
 {exec} = require 'child_process'
 PDFDocument = require '../'
 
+process.chdir(__dirname)
+
 files = [
   '../README.md'
   'getting_started.coffee.md'
