@@ -26,11 +26,51 @@ the `end` method to finalize it. Here is an example showing how to pipe to a fil
     
     # add stuff to PDF here using methods described below...
     
-    doc.end() # finalize the PDF and end the stream
+    # finalize the PDF and end the stream
+    doc.end()
     
 The `write` and `output` methods found in PDFKit before version 0.5 are now deprecated.
 
-### Adding pages
+## Using PDFKit in the browser
+
+As of version 0.6, PDFKit can be used in the browser as well as in Node! 
+There are two ways to use PDFKit in the browser.  The first is to use [Browserify](http://browserify.org/),
+which is a Node module packager for the browser with the familiar `require` syntax.  The second is to use
+a prebuilt version of PDFKit, which you can [download from Github](https://github.com/devongovett/pdfkit/releases).
+
+Using PDFKit in the browser is exactly the same as using it in Node, except you'll want to pipe the 
+output to a destination supported in the browser, such as a 
+[Blob](https://developer.mozilla.org/en-US/docs/Web/API/Blob). Blobs can be used
+to generate a URL to allow display of generated PDFs directly in the browser via an `iframe`, or they can
+be used to upload the PDF to a server, or trigger a download in the user's browser.
+
+To get a Blob from a `PDFDocument`, you should pipe it to a [blob-stream](https://github.com/devongovett/blob-stream),
+which is a module that generates a Blob from any Node-style stream.  The following example uses Browserify to load 
+`PDFKit` and `blob-stream`, but if you're not using Browserify, you can load them in whatever way you'd like (e.g. script tags).
+
+    # require dependencies
+    PDFDocument = require 'pdfkit'
+    blobStream  = require 'blob-stream'
+
+    # create a document the same way as above
+    doc = new PDFDocument
+
+    # pipe the document to a blob
+    stream = doc.pipe(blobStream())
+
+    # add your content to the document here, as usual
+
+    # get a blob when you're done
+    doc.end()
+    stream.on 'finish', ->
+      # get a blob you can do whatever you like with
+      blob = stream.toBlob('application/pdf')
+
+      # or get a blob URL for display in the browser
+      url = stream.toBlobURL('application/pdf')
+      iframe.src = url
+
+## Adding pages
 
 The first page of a PDFKit document is added for you automatically when you
 create the document. Subsequent pages must be added by you. Luckily, it is
@@ -65,9 +105,13 @@ For example:
       
     # Add different margins on each side
     doc.addPage
-      margins: { top: 50, bottom: 50, left: 72, right: 72 }
+      margins:
+        top: 50
+        bottom: 50
+        left: 72
+        right: 72
 
-### Setting document metadata
+## Setting document metadata
 
 PDF documents can have various metadata associated with them, such as the
 title, or author of the document. You can add that information by adding it to
