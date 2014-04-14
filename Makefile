@@ -7,11 +7,13 @@ browser: lib/**/*.coffee
 	./node_modules/.bin/browserify \
 		--standalone PDFDocument \
 		--debug \
-		--extension=.coffee \
-		. | ./node_modules/.bin/exorcist build/pdfkit.js.map > build/pdfkit.js
+		--transform coffeeify \
+		--extension .coffee \
+		lib/document.coffee \
+		| ./node_modules/.bin/exorcist build/pdfkit.js.map > build/pdfkit.js
 		
-browser-demo: demo/browser.js
-	./node_modules/.bin/browserify --extension .coffee demo/browser.js > demo/bundle.js
+browser-demo: js demo/browser.js
+	./node_modules/.bin/browserify demo/browser.js > demo/bundle.js
 	
 docs: pdf-guide website browser-demo
 	
