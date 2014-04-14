@@ -182,7 +182,7 @@ module.exports =
     if options.width
       switch align
         when 'right'
-          textWidth = @widthOfString text.trimRight(), options
+          textWidth = @widthOfString text.replace(/\s+$/, ''), options
           x += options.lineWidth - textWidth
 
         when 'center'

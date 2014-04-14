@@ -141,12 +141,12 @@ class LineWrapper extends EventEmitter
         lh = @document.currentLineHeight(true)
         if @height? and @ellipsis and @document.y + lh * 2 > @maxY and @column >= @columns
           @ellipsis = '…' if @ellipsis is true # map default ellipsis character
-          buffer = buffer.trimRight()
+          buffer = buffer.replace(/\s+$/, '')
           textWidth = @wordWidth buffer + @ellipsis
           
           # remove characters from the buffer until the ellipsis fits
           while textWidth > @lineWidth
-            buffer = buffer.slice(0, -1).trimRight()
+            buffer = buffer.slice(0, -1).replace(/\s+$/, '')
             textWidth = @wordWidth buffer + @ellipsis
         
           buffer = buffer + @ellipsis
