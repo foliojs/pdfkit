@@ -70,6 +70,8 @@ which is a module that generates a Blob from any Node-style stream.  The followi
       url = stream.toBlobURL('application/pdf')
       iframe.src = url
       
+You can see an interactive in-browser demo of PDFKit [here](http://pdfkit.org/demo/browser.html).
+
 Note that in order to Browserify a project using PDFKit, you need to install the `brfs` module with npm, 
 which is used to load built-in font data into the package. It is listed as a `devDependency` in 
 PDFKit's `package.json`, so it isn't installed by default for Node users. 
