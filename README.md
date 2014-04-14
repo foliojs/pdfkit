@@ -1,9 +1,10 @@
 # PDFKit
-### A PDF generation library for Node.js.
+
+A JavaScript PDF generation library for Node and the browser.
 
 ## Description
 
-PDFKit is a PDF document generation library for Node that makes creating complex, multi-page, printable documents easy. 
+PDFKit is a PDF document generation library for Node and the browser that makes creating complex, multi-page, printable documents easy. 
 It's written in CoffeeScript, but you can choose to use the API in plain 'ol JavaScript if you like. The API embraces 
 chainability, and includes both low level functions as well as abstractions for higher level functionality. The PDFKit API 
 is designed to be simple, so generating complex documents is often as simple as a few function calls.
@@ -54,51 +55,92 @@ Installation uses the [npm](http://npmjs.org/) package manager.  Just type the f
     
 ## Example
 
-    PDFDocument = require 'pdfkit'
-    
-    # Create a document
-    doc = new PDFDocument
-    
-    # Pipe it's output somewhere, like to a file or HTTP response
-    doc.pipe fs.createWriteStream('output.pdf')
+```coffeescript
+PDFDocument = require 'pdfkit'
 
-    # Embed a font, set the font size, and render some text
-    doc.font('fonts/PalatinoBold.ttf')
-       .fontSize(25)
-       .text('Some text with an embedded font!', 100, 100)
+# Create a document
+doc = new PDFDocument
 
-    # Add another page
-    doc.addPage()
-       .fontSize(25)
-       .text('Here is some vector graphics...', 100, 100)
+# Pipe it's output somewhere, like to a file or HTTP response
+# See below for browser usage
+doc.pipe fs.createWriteStream('output.pdf')
 
-    # Draw a triangle
-    doc.save()
-       .moveTo(100, 150)
-       .lineTo(100, 250)
-       .lineTo(200, 250)
-       .fill("#FF3300")
+# Embed a font, set the font size, and render some text
+doc.font('fonts/PalatinoBold.ttf')
+   .fontSize(25)
+   .text('Some text with an embedded font!', 100, 100)
 
-    # Apply some transforms and render an SVG path with the 'even-odd' fill rule
-    doc.scale(0.6)
-       .translate(470, -380)
-       .path('M 250,75 L 323,301 131,161 369,161 177,301 z')
-       .fill('red', 'even-odd')
-       .restore()
+# Add another page
+doc.addPage()
+   .fontSize(25)
+   .text('Here is some vector graphics...', 100, 100)
 
-    # Add some text with annotations
-    doc.addPage()
-       .fillColor("blue")
-       .text('Here is a link!', 100, 100)
-       .underline(100, 100, 160, 27, color: "#0000FF")
-       .link(100, 100, 160, 27, 'http://google.com/')
+# Draw a triangle
+doc.save()
+   .moveTo(100, 150)
+   .lineTo(100, 250)
+   .lineTo(200, 250)
+   .fill("#FF3300")
 
-    # Finalize PDF file
-    doc.end()
-     
+# Apply some transforms and render an SVG path with the 'even-odd' fill rule
+doc.scale(0.6)
+   .translate(470, -380)
+   .path('M 250,75 L 323,301 131,161 369,161 177,301 z')
+   .fill('red', 'even-odd')
+   .restore()
+
+# Add some text with annotations
+doc.addPage()
+   .fillColor("blue")
+   .text('Here is a link!', 100, 100)
+   .underline(100, 100, 160, 27, color: "#0000FF")
+   .link(100, 100, 160, 27, 'http://google.com/')
+
+# Finalize PDF file
+doc.end()
+```
+ 
 [The PDF output from this example](http://pdfkit.org/demo/out.pdf) (with a few additions) shows the power of PDFKit — producing 
 complex documents with a very small amount of code.  For more, see the `demo` folder and the 
 [PDFKit programming guide](http://pdfkit.org/docs/getting_started.html).
+
+## Browser Usage
+
+There are two ways to use PDFKit in the browser.  The first is to use [Browserify](http://browserify.org/),
+which is a Node module packager for the browser with the familiar `require` syntax.  The second is to use
+a prebuilt version of PDFKit, which you can [download from Github](https://github.com/devongovett/pdfkit/releases).
+
+In addition to PDFKit, you'll need somewhere to stream the output to.  HTML5 has a 
+[Blob](https://developer.mozilla.org/en-US/docs/Web/API/Blob) object which can be used to store binary data, and
+get URLs to this data in order to display PDF output inside an iframe, or upload to a server, etc.  In order to 
+get a Blob from the output of PDFKit, you can use the [blob-stream](https://github.com/devongovett/blob-stream)
+module.
+
+The following example uses Browserify to load `PDFKit` and `blob-stream`, but if you're not using Browserify, 
+you can load them in whatever way you'd like (e.g. script tags).
+
+```coffeescript
+# require dependencies
+PDFDocument = require 'pdfkit'
+blobStream  = require 'blob-stream'
+
+# create a document the same way as above
+doc = new PDFDocument
+
+# pipe the document to a blob
+stream = doc.pipe(blobStream())
+
+# add your content to the document here, as usual
+
+# get a blob when you're done
+stream.on 'finish', ->
+  # get a blob you can do whatever you like with
+  blob = stream.toBlob()
+
+  # or get a blob URL for display in the browser
+  url = stream.toBlobURL()
+  iframe.src = url
+```
 
 ## Documentation
 
