@@ -1,5 +1,5 @@
 js: lib/**/*.coffee
-	coffee -o js -c lib/
+	./node_modules/.bin/coffee -o js -c lib/
 	cp -r lib/font/data js/font/data
 	
 browser: lib/**/*.coffee
@@ -12,6 +12,14 @@ browser: lib/**/*.coffee
 		
 browser-demo: demo/browser.js
 	./node_modules/.bin/browserify --extension .coffee demo/browser.js > demo/bundle.js
+	
+docs: pdf-guide website
+	
+pdf-guide:
+	./node_modules/.bin/coffee docs/generate.coffee
+	
+website:
+	./node_modules/.bin/coffee docs/generate_website.coffee
 		
 clean:
 	rm -rf js build demo/bundle.js
