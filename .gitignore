@@ -5,4 +5,6 @@ lib/font/tables/.DS_Store
 node-zlib/
 src/
 playground/
+build/
+js/
 *.html
