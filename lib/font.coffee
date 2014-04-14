@@ -58,7 +58,7 @@ class PDFFont
     @subset?.use characters
     
   embed: ->
-    return if @embedded
+    return if @embedded or not @dictionary?
     
     if @isAFM
       @embedAFM()
