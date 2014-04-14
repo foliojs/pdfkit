@@ -13,7 +13,7 @@ browser: lib/**/*.coffee
 browser-demo: demo/browser.js
 	./node_modules/.bin/browserify --extension .coffee demo/browser.js > demo/bundle.js
 	
-docs: pdf-guide website
+docs: pdf-guide website browser-demo
 	
 pdf-guide:
 	./node_modules/.bin/coffee docs/generate.coffee
