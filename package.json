@@ -36,8 +36,9 @@
     "linebreak": "~0.1.0"
   },
   "scripts": {
-    "prepublish": "coffee -o js -c lib/ && cp -r lib/font/data js/font/data",
-    "postpublish": "rm -rf ./js"
+    "prepublish": "make js",
+    "postpublish": "make clean"
+  },
   "main": "js/document",
   "browser": "lib/document",
   "browserify": {
