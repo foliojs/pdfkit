@@ -19,6 +19,7 @@ pdf-guide:
 	./node_modules/.bin/coffee docs/generate.coffee
 	
 website:
+	mkdir -p docs/img
 	./node_modules/.bin/coffee docs/generate_website.coffee
 		
 clean:
