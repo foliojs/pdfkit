@@ -6,46 +6,78 @@ By Devon Govett
 TTFFont = require './font/ttf'
 AFMFont = require './font/afm'
 Subset = require './font/subset'
-zlib = require 'zlib'
+fs = require 'fs'
 
 class PDFFont
-  constructor: (@document, @filename, @family, @id) ->
-    @ref = @document.ref()
-    
-    if @filename in @_standardFonts
-      @isAFM = true
-      @font = AFMFont.open __dirname + "/font/data/#{@filename}.afm"
-      @registerAFM()
+  constructor: (@document, src, family, @id) ->    
+    if typeof src is 'string'
+      if src of STANDARD_FONTS
+        @isAFM = true
+        @font = new AFMFont STANDARD_FONTS[src]()
+        @registerAFM src
       
-    else if /\.(ttf|ttc)$/i.test @filename
-      @font = TTFFont.open @filename, @family
-      @subset = new Subset @font
-      @registerTTF()
+      else if /\.(ttf|ttc)$/i.test src
+        @font = TTFFont.open src, family
+        @subset = new Subset @font
+        @registerTTF()
       
-    else if /\.dfont$/i.test @filename
-      @font = TTFFont.fromDFont @filename, @family
+      else if /\.dfont$/i.test src
+        @font = TTFFont.fromDFont src, family
+        @subset = new Subset @font
+        @registerTTF()
+        
+      else
+        throw new Error 'Not a supported font format or standard PDF font.'
+        
+    else if Buffer.isBuffer(src)
+      @font = TTFFont.fromBuffer src, family
       @subset = new Subset @font
       @registerTTF()
       
     else
       throw new Error 'Not a supported font format or standard PDF font.'
       
+  # This insanity is so browserify can inline the font files
+  STANDARD_FONTS =
+    "Courier":               -> fs.readFileSync __dirname + "/font/data/Courier.afm", 'utf8'
+    "Courier-Bold":          -> fs.readFileSync __dirname + "/font/data/Courier-Bold.afm", 'utf8'
+    "Courier-Oblique":       -> fs.readFileSync __dirname + "/font/data/Courier-Oblique.afm", 'utf8'
+    "Courier-BoldOblique":   -> fs.readFileSync __dirname + "/font/data/Courier-BoldOblique.afm", 'utf8'
+    "Helvetica":             -> fs.readFileSync __dirname + "/font/data/Helvetica.afm", 'utf8'
+    "Helvetica-Bold":        -> fs.readFileSync __dirname + "/font/data/Helvetica-Bold.afm", 'utf8'
+    "Helvetica-Oblique":     -> fs.readFileSync __dirname + "/font/data/Helvetica-Oblique.afm", 'utf8'
+    "Helvetica-BoldOblique": -> fs.readFileSync __dirname + "/font/data/Helvetica-BoldOblique.afm", 'utf8'
+    "Times-Roman":           -> fs.readFileSync __dirname + "/font/data/Times-Roman.afm", 'utf8'
+    "Times-Bold":            -> fs.readFileSync __dirname + "/font/data/Times-Bold.afm", 'utf8'
+    "Times-Italic":          -> fs.readFileSync __dirname + "/font/data/Times-Italic.afm", 'utf8'
+    "Times-BoldItalic":      -> fs.readFileSync __dirname + "/font/data/Times-BoldItalic.afm", 'utf8'
+    "Symbol":                -> fs.readFileSync __dirname + "/font/data/Symbol.afm", 'utf8'
+    "ZapfDingbats":          -> fs.readFileSync __dirname + "/font/data/ZapfDingbats.afm", 'utf8'
+      
   use: (characters) ->
     @subset?.use characters
     
   embed: ->
+    return if @embedded or not @dictionary?
+    
     if @isAFM
       @embedAFM()
     else
       @embedTTF()
+      
+    @embedded = true
     
   encode: (text) ->
     if @isAFM
       @font.encodeText text
     else
       @subset?.encodeText(text) or text
+          
+  ref: ->
+    @dictionary ?= @document.ref()
     
   registerTTF: ->
+    @name = @font.name.postscriptName
     @scaleFactor = 1000.0 / @font.head.unitsPerEm
     @bbox = (Math.round e * @scaleFactor for e in @font.bbox)
     @stemV = 0 # not sure how to compute this for true-type fonts...
@@ -80,7 +112,7 @@ class PDFFont
     throw new Error 'No unicode cmap for font' if not @font.cmap.unicode
       
   embedTTF: ->
-    data = @subset.encode()    
+    data = @subset.encode()
     fontfile = @document.ref()
     fontfile.write data
     
@@ -109,7 +141,7 @@ class PDFFont
     cmap = @document.ref()
     cmap.end toUnicodeCmap(@subset.subset)
     
-    @ref.data =
+    @dictionary.data =
       Type: 'Font'
       BaseFont: @subset.postscriptName
       Subtype: 'TrueType'
@@ -120,7 +152,7 @@ class PDFFont
       Encoding: 'MacRomanEncoding'
       ToUnicode: cmap
     
-    @ref.end()
+    @dictionary.end()
       
   toUnicodeCmap = (map) ->
     unicodeMap = '''
@@ -158,35 +190,18 @@ class PDFFont
       end
     '''
           
-  registerAFM: ->
+  registerAFM: (@name) ->
     {@ascender,@decender,@bbox,@lineGap} = @font
     
   embedAFM: ->
-    @ref.data =
+    @dictionary.data =
       Type: 'Font'
-      BaseFont: @filename
+      BaseFont: @name
       Subtype: 'Type1'
       Encoding: 'WinAnsiEncoding'
       
-    @ref.end()
+    @dictionary.end()
       
-  _standardFonts: [
-    "Courier"
-    "Courier-Bold"
-    "Courier-Oblique"
-    "Courier-BoldOblique"
-    "Helvetica"
-    "Helvetica-Bold"
-    "Helvetica-Oblique"
-    "Helvetica-BoldOblique"
-    "Times-Roman"
-    "Times-Bold"
-    "Times-Italic"
-    "Times-BoldItalic"
-    "Symbol"
-    "ZapfDingbats"
-  ]
-  
   widthOfString: (string, size) ->
     string = '' + string
     width = 0

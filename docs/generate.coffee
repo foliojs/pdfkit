@@ -5,6 +5,8 @@ coffee = require 'coffee-script'
 CodeMirror = require 'codemirror/addon/runmode/runmode.node'
 PDFDocument = require '../'
 
+process.chdir(__dirname)
+
 # setup code mirror coffeescript mode
 filename = require.resolve('codemirror/mode/coffeescript/coffeescript')
 coffeeMode = fs.readFileSync filename, 'utf8'

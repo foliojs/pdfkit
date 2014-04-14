@@ -6,6 +6,8 @@ coffee = require 'coffee-script'
 {exec} = require 'child_process'
 PDFDocument = require '../'
 
+process.chdir(__dirname)
+
 files = [
   '../README.md'
   'getting_started.coffee.md'
@@ -79,6 +81,11 @@ generateImages = (tree) ->
 pages = []
 for file in files
   content = fs.readFileSync file, 'utf8'
+  
+  # turn github highlighted code blocks into normal markdown code blocks
+  content = content.replace /^```coffeescript\n((:?.|\n)*?)\n```/mg, (m, $1) ->
+    '    ' + $1.split('\n').join('\n    ')
+    
   tree = markdown.parse(content)
   headers = extractHeaders(tree)
   generateImages(tree)

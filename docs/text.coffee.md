@@ -144,10 +144,10 @@ and Datafork TrueType (`.dfont`) formats.
 
 To change the font used to render text, just call the `font` method. If you
 are using a standard PDF font, just pass the name to the `font` method.
-Otherwise, pass the path to the font file, and if the font is a collection
-font (`.ttc` and `.dfont` files), meaning that they contain multiple styles in
-the same file, you should pass the name of the style to be extracted from the
-collection.
+Otherwise, pass the path to the font file, or a `Buffer` containing the font data.
+If the font is a collection font (`.ttc` and `.dfont` files), meaning that it 
+contains multiple styles in the same file, you should pass the name of the style 
+to be extracted from the collection.
 
 Here is an example showing how to set the font in each case.
 

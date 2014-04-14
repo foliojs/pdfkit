@@ -2,11 +2,9 @@ fs = require 'fs'
 
 class AFMFont
   @open: (filename) ->
-    new AFMFont(filename)
+    new AFMFont fs.readFileSync filename, 'utf8'
   
-  constructor: (filename) ->
-    @contents = fs.readFileSync filename, 'utf8'
-    
+  constructor: (@contents) ->
     @attributes = {}
     @glyphWidths = {}
     @boundingBoxes = {}

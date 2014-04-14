@@ -62,18 +62,17 @@ class PDFDocument extends stream.Readable
     # Add the first page
     @addPage()
   
-  mixin = (name) =>
-    methods = require './mixins/' + name
+  mixin = (methods) =>
     for name, method of methods
       this::[name] = method
   
   # Load mixins
-  mixin 'color'
-  mixin 'vector'
-  mixin 'fonts'
-  mixin 'text'
-  mixin 'images'
-  mixin 'annotations'
+  mixin require './mixins/color'
+  mixin require './mixins/vector'
+  mixin require './mixins/fonts'
+  mixin require './mixins/text'
+  mixin require './mixins/images'
+  mixin require './mixins/annotations'
     
   addPage: (options = @options) ->
     # end the current page if needed

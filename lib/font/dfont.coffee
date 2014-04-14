@@ -87,7 +87,7 @@ class DFont
     data = @contents
     pos = data.pos
     
-    entry = @map.sfnt.named[name]
+    entry = @map.sfnt?.named[name]
     throw new Error "Font #{name} not found in DFont file." unless entry
     
     data.pos = entry.offset
