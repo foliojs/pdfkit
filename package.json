@@ -38,6 +38,7 @@
   "scripts": {
     "prepublish": "coffee -o js -c lib/ && cp -r lib/font/data js/font/data",
     "postpublish": "rm -rf ./js"
+  "main": "js/document",
   "browser": "lib/document",
   "browserify": {
     "transform": [
@@ -45,8 +46,7 @@
       "brfs"
     ]
   },
-  "main": "./js/document",
   "engine": [
-    "node >= v0.6.0"
+    "node >= v0.10.0"
   ]
 }
