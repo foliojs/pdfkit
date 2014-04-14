@@ -14,6 +14,8 @@ You can also read the guide as a [self-generated PDF](http://pdfkit.org/docs/gui
 If you'd like to see how it was generated, check out the README in the [docs](https://github.com/devongovett/pdfkit/tree/master/docs)
 folder.
 
+You can also try out an interactive in-browser demo of PDFKit [here](http://pdfkit.org/demo/browser.html).
+
 ## Installation
 
 Installation uses the [npm](http://npmjs.org/) package manager.  Just type the following command after installing npm.
