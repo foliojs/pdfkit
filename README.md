@@ -143,6 +143,11 @@ stream.on 'finish', ->
   iframe.src = url
 ```
 
+Note that in order to Browserify a project using PDFKit, you need to install the `brfs` module with npm, 
+which is used to load built-in font data into the package. It is listed as a `devDependency` in 
+PDFKit's `package.json`, so it isn't installed by default for Node users. 
+If you forget to install it, Browserify will print an error message.
+
 ## Documentation
 
 For complete API documentation and more examples, see the [PDFKit website](http://pdfkit.org/).
