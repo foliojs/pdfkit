@@ -133,6 +133,7 @@ stream = doc.pipe(blobStream())
 # add your content to the document here, as usual
 
 # get a blob when you're done
+doc.end()
 stream.on 'finish', ->
   # get a blob you can do whatever you like with
   blob = stream.toBlob('application/pdf')
