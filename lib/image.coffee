@@ -13,8 +13,12 @@ class PDFImage
     if Buffer.isBuffer(src)
       data = src
     else
-      data = fs.readFileSync src
-      return unless data
+      if match = /^data:.+;base64,(.*)$/.exec(src)
+        data = new Buffer(match[1], 'base64')
+
+      else
+        data = fs.readFileSync src
+        return unless data
     
     if data[0] is 0xff and data[1] is 0xd8
       return new JPEG(data, label)
