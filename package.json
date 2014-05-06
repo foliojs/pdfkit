@@ -28,13 +28,14 @@
     "jade": "~1.1.5",
     "coffeeify": "^0.6.0",
     "browserify": "^3.39.0",
-    "brfs": "^1.0.1",
+    "brfs": "~1.0.1",
     "exorcist": "^0.1.5",
     "brace": "^0.2.1"
   },
   "dependencies": {
     "png-js": ">=0.1.0",
-    "linebreak": "~0.1.0"
+    "linebreak": "~0.1.0",
+    "blob-stream": "^0.1.2"
   },
   "scripts": {
     "prepublish": "make js",
