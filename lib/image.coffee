@@ -13,9 +13,8 @@ class PDFImage
     if Buffer.isBuffer(src)
       data = src
     else
-      if src[0..4] is 'data:' and src.indexOf(';base64,') > -1
-        base64String = src.split(';base64,')[1]
-        data = new Buffer(base64String, 'base64')
+      if match = /^data:.+;base64,(.*)$/.exec(src)
+        data = new Buffer(match[1], 'base64')
 
       else
         data = fs.readFileSync src
