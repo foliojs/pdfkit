@@ -207,7 +207,7 @@ module.exports =
       @save()
       @strokeColor @_fillColor... unless options.stroke
       
-      lineWidth = if @_fontSize >= 20 then 2 else 1
+      lineWidth = if @_fontSize < 10 then 0.5 else Math.floor(@_fontSize / 10)
       @lineWidth lineWidth
       
       d = if options.underline then 1 else 2
