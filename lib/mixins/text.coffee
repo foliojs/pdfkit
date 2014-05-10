@@ -7,12 +7,6 @@ module.exports =
     @y = 0
     @_lineGap = 0
     
-    # Keeps track of what has been set in the document
-    @_textState = 
-      mode: 0
-      wordSpacing: 0
-      characterSpacing: 0
-    
   lineGap: (@_lineGap) ->
     return this
     
@@ -171,8 +165,6 @@ module.exports =
     text = '' + text
     return if text.length is 0
 
-    state = @_textState
-
     # handle options
     align = options.align or 'left'
     wordSpacing = options.wordSpacing or 0
@@ -241,10 +233,10 @@ module.exports =
 
     # rendering mode
     mode = if options.fill and options.stroke then 2 else if options.stroke then 1 else 0
-    @addContent "#{mode} Tr" unless mode is state.mode
+    @addContent "#{mode} Tr" if mode
 
     # Character spacing
-    @addContent characterSpacing + ' Tc' unless characterSpacing is state.characterSpacing
+    @addContent "#{characterSpacing} Tc" if characterSpacing
     
     # Add the actual text
     # If we have a word spacing value, we need to encode each word separately
@@ -276,7 +268,3 @@ module.exports =
     
     # restore flipped coordinate system
     @restore()
-
-    # keep track of text states
-    state.mode = mode
-    state.characterSpacing = characterSpacing
