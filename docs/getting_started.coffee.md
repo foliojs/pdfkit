@@ -22,7 +22,7 @@ writable Node stream as it is being written. When you're done with your document
 the `end` method to finalize it. Here is an example showing how to pipe to a file or an HTTP response.
 
     doc.pipe fs.createWriteStream('/path/to/file.pdf') # write to PDF
-    doc.pipe fs.createWriteStream(res)                 # HTTP response
+    doc.pipe res                                       # HTTP response
     
     # add stuff to PDF here using methods described below...
     
