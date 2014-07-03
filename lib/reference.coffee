@@ -4,9 +4,11 @@ By Devon Govett
 ###
 
 zlib = require 'zlib'
+stream = require 'stream'
 
-class PDFReference
+class PDFReference extends stream.Writable
   constructor: (@document, @id, @data = {}) ->
+    super decodeStrings: no
     @gen = 0
     @deflate = null
     @compress = @document.compress and not @data.Filter
@@ -22,8 +24,8 @@ class PDFReference
       @data.Length += chunk.length
       
     @deflate.on 'end', @finalize
-  
-  write: (chunk) ->
+    
+  _write: (chunk, encoding, callback) ->
     unless Buffer.isBuffer(chunk)
       chunk = new Buffer(chunk + '\n', 'binary')
       
@@ -36,10 +38,11 @@ class PDFReference
     else
       @chunks.push chunk
       @data.Length += chunk.length
+      
+    callback()
     
   end: (chunk) ->
-    if typeof chunk is 'string' or Buffer.isBuffer(chunk)
-      @write chunk
+    super
     
     if @deflate
       @deflate.end()
