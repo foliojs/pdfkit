@@ -162,7 +162,7 @@ module.exports =
       @y += @currentLineHeight(true) + lineGap
 
   _fragment: (text, x, y, options) ->
-    text = '' + text
+    text = ('' + text).replace(/\n/g, '')
     return if text.length is 0
 
     # handle options
