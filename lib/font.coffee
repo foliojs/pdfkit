@@ -18,7 +18,7 @@ class PDFFont
         @font = new AFMFont STANDARD_FONTS[src]()
         @registerAFM src
       
-      else if /\.(ttf|ttc)$/i.test src
+      else if /\.(ttf|otf|ttc)$/i.test src
         @font = TTFFont.open src, family
         @subset = @font.createSubset()
         @unicode = [[0]]
@@ -96,7 +96,12 @@ class PDFFont
     @bbox = @font.bbox
       
   embedTTF: ->
+    isCFF = @subset.cff?
     fontFile = @document.ref()
+    
+    if isCFF
+      fontFile.data.Subtype = 'CIDFontType0C'
+      
     @subset.encodeStream(fontFile)
       
     familyClass = (@font['OS/2']?.sFamilyClass or 0) >> 8
@@ -122,13 +127,17 @@ class PDFFont
       CapHeight: @font.capHeight or @font.ascent
       XHeight: @font.xHeight or 0
       StemV: 0 # not sure how to calculate this
-      FontFile2: fontFile
+        
+    if isCFF
+      descriptor.data.FontFile3 = fontFile
+    else
+      descriptor.data.FontFile2 = fontFile
       
     descriptor.end()
     
     descendantFont = @document.ref
       Type: 'Font'
-      Subtype: 'CIDFontType2'
+      Subtype: if isCFF then 'CIDFontType0' else 'CIDFontType2'
       BaseFont: name
       CIDSystemInfo:
         Registry: PDFObject.s 'Adobe'
