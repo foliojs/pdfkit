@@ -220,7 +220,6 @@ module.exports =
     @page.fonts[@_font.id] ?= @_font.ref()
 
     # tell the font subset to use the characters
-    @_font.use(text)
 
     # begin the text object
     @addContent "BT"
@@ -252,7 +251,6 @@ module.exports =
         # encode the text based on the font subset,
         # and then convert it to hex
         encoded = @_font.encode(word)
-        encoded = (encoded.charCodeAt(i).toString(16) for i in [0...encoded.length] by 1).join('')
         commands.push "<#{encoded}> #{-wordSpacing}"
       
       @addContent "[#{commands.join ' '}] TJ"
@@ -260,7 +258,6 @@ module.exports =
       # encode the text based on the font subset,
       # and then convert it to hex
       encoded = @_font.encode(text)
-      encoded = (encoded.charCodeAt(i).toString(16) for i in [0...encoded.length] by 1).join('')
       @addContent "<#{encoded}> Tj"
 
     # end the text object

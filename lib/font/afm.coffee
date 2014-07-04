@@ -81,7 +81,7 @@ class AFMFont
     for i in [0...text.length]
       char = text.charCodeAt(i)
       char = WIN_ANSI_MAP[char] or char
-      string += String.fromCharCode(char)
+      string += char.toString(16)
     
     return string
           

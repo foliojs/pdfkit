@@ -3,9 +3,11 @@ PDFFont - embeds fonts in PDF documents
 By Devon Govett
 ###
 
-TTFFont = require './font/ttf'
+TTF = require './font/ttf'
 AFMFont = require './font/afm'
-Subset = require './font/subset'
+TTFFont = require 'fontkit'
+TTFSubset = require 'fontkit/src/TTFSubset'
+PDFObject = require './object'
 fs = require 'fs'
 
 class PDFFont
@@ -18,20 +20,24 @@ class PDFFont
       
       else if /\.(ttf|ttc)$/i.test src
         @font = TTFFont.open src, family
-        @subset = new Subset @font
+        @subset = @font.createSubset()
+        @unicode = [[0]]
+        @widths = [@font.widthOfGlyph 0]
         @registerTTF()
       
-      else if /\.dfont$/i.test src
-        @font = TTFFont.fromDFont src, family
-        @subset = new Subset @font
-        @registerTTF()
+      # else if /\.dfont$/i.test src
+      #   @font = TTFFont.fromDFont src, family
+      #   @subset = new TTFSubset @font
+      #   @registerTTF()
         
       else
         throw new Error 'Not a supported font format or standard PDF font.'
         
     else if Buffer.isBuffer(src)
       @font = TTFFont.fromBuffer src, family
-      @subset = new Subset @font
+      @subset = @font.createSubset()
+      @unicode = [[0]]
+      @widths = [@font.widthOfGlyph 0]
       @registerTTF()
       
     else
@@ -54,9 +60,6 @@ class PDFFont
     "Symbol":                -> fs.readFileSync __dirname + "/font/data/Symbol.afm", 'utf8'
     "ZapfDingbats":          -> fs.readFileSync __dirname + "/font/data/ZapfDingbats.afm", 'utf8'
       
-  use: (characters) ->
-    @subset?.use characters
-    
   embed: ->
     return if @embedded or not @dictionary?
     
@@ -67,95 +70,113 @@ class PDFFont
       
     @embedded = true
     
-  encode: (text) ->
+  encode: (text) ->    
     if @isAFM
       @font.encodeText text
     else
-      @subset?.encodeText(text) or text
+      glyphs = @font.glyphsForString text
+      buffer = new Buffer(glyphs.length * 2)
+      
+      for glyph, i in glyphs
+        gid = @subset.includeGlyph glyph.id
+        @widths[gid] ?= @font.widthOfGlyph glyph.id
+        @unicode[gid] ?= glyph.codePoints
+        buffer.writeUInt16BE gid, i * 2
+        
+      return buffer.toString('hex')
           
   ref: ->
     @dictionary ?= @document.ref()
     
   registerTTF: ->
-    @name = @font.name.postscriptName
-    @scaleFactor = 1000.0 / @font.head.unitsPerEm
-    @bbox = (Math.round e * @scaleFactor for e in @font.bbox)
-    @stemV = 0 # not sure how to compute this for true-type fonts...
-    
-    if @font.post.exists
-      raw = @font.post.italic_angle
-      hi = raw >> 16
-      low = raw & 0xFF
-      hi = -((hi ^ 0xFFFF) + 1) if hi & 0x8000 isnt 0
-      @italicAngle = +"#{hi}.#{low}"
-    else
-      @italicAngle = 0
-      
-    @ascender = Math.round @font.ascender * @scaleFactor
-    @decender = Math.round @font.decender * @scaleFactor
-    @lineGap = Math.round @font.lineGap * @scaleFactor
-
-    @capHeight = (@font.os2.exists and @font.os2.capHeight) or @ascender
-    @xHeight = (@font.os2.exists and @font.os2.xHeight) or 0
-
-    @familyClass = (@font.os2.exists and @font.os2.familyClass or 0) >> 8
-    @isSerif = @familyClass in [1,2,3,4,5,7]
-    @isScript = @familyClass is 10
-
-    @flags = 0
-    @flags |= 1 << 0 if @font.post.isFixedPitch
-    @flags |= 1 << 1 if @isSerif
-    @flags |= 1 << 3 if @isScript
-    @flags |= 1 << 6 if @italicAngle isnt 0
-    @flags |= 1 << 5 # assume the font is nonsymbolic...
-
-    throw new Error 'No unicode cmap for font' if not @font.cmap.unicode
+    @name = @font.postscriptName
+    @ascender = @font.ascent
+    @decender = @font.descent
+    @lineGap = @font.lineGap
+    @bbox = @font.bbox
       
   embedTTF: ->
-    data = @subset.encode()
-    fontfile = @document.ref()
-    fontfile.write data
-    
-    fontfile.data.Length1 = fontfile.uncompressedLength
-    fontfile.end()
+    fontFile = @document.ref()
+    @subset.encodeStream(fontFile)
       
+    familyClass = (@font['OS/2']?.sFamilyClass or 0) >> 8
+    flags = 0
+    flags |= 1 << 0 if @font.post.isFixedPitch
+    flags |= 1 << 1 if 1 <= familyClass <= 7
+    flags |= 1 << 2 # assume the font uses non-latin characters
+    flags |= 1 << 3 if familyClass is 10
+    flags |= 1 << 6 if @font.head.macStyle.italic
+    
+    # generate a random tag (6 uppercase letters. 65 is the char code for 'A')
+    tag = (String.fromCharCode Math.random() * 26 + 65 for i in [0...6]).join ''
+    name = tag + '+' + @font.postscriptName
+    
     descriptor = @document.ref
       Type: 'FontDescriptor'
-      FontName: @subset.postscriptName
-      FontFile2: fontfile
-      FontBBox: @bbox
-      Flags: @flags
-      StemV: @stemV
-      ItalicAngle: @italicAngle
-      Ascent: @ascender
-      Descent: @decender
-      CapHeight: @capHeight
-      XHeight: @xHeight
+      FontName: name
+      Flags: flags
+      FontBBox: @font.bbox
+      ItalicAngle: @font.italicAngle
+      Ascent: @font.ascent
+      Descent: @font.descent
+      CapHeight: @font.capHeight or @font.ascent
+      XHeight: @font.xHeight or 0
+      StemV: 0 # not sure how to calculate this
+      FontFile2: fontFile
       
     descriptor.end()
-      
-    firstChar = +Object.keys(@subset.cmap)[0]
-    charWidths = for code, glyph of @subset.cmap
-      Math.round @font.widthOfGlyph(glyph)
-  
-    cmap = @document.ref()
-    cmap.end toUnicodeCmap(@subset.subset)
     
+    descendantFont = @document.ref
+      Type: 'Font'
+      Subtype: 'CIDFontType2'
+      BaseFont: name
+      CIDSystemInfo:
+        Registry: PDFObject.s 'Adobe'
+        Ordering: PDFObject.s 'Identity'
+        Supplement: 0
+      FontDescriptor: descriptor
+      W: [0, @widths]
+      
+    descendantFont.end()
+          
     @dictionary.data =
       Type: 'Font'
-      BaseFont: @subset.postscriptName
-      Subtype: 'TrueType'
-      FontDescriptor: descriptor
-      FirstChar: firstChar
-      LastChar: firstChar + charWidths.length - 1
-      Widths: charWidths
-      Encoding: 'MacRomanEncoding'
-      ToUnicode: cmap
-    
-    @dictionary.end()
+      Subtype: 'Type0'
+      BaseFont: name
+      Encoding: 'Identity-H'
+      DescendantFonts: [descendantFont]
+      ToUnicode: @toUnicodeCmap @document
       
-  toUnicodeCmap = (map) ->
-    unicodeMap = '''
+    @dictionary.end()
+        
+  toHex = (codePoints...) ->
+    codes = for code in codePoints
+      ('0000' + code.toString(16)).slice(-4)
+        
+    return codes.join ''
+      
+  # Maps the glyph ids encoded in the PDF back to unicode strings
+  # Because of ligature substitutions and the like, there may be one or more
+  # unicode characters represented by each glyph.
+  toUnicodeCmap: (doc) ->
+    cmap = @document.ref()
+    
+    entries = []    
+    for codePoints in @unicode
+      encoded = []
+      
+      # encode codePoints to utf16
+      for value in codePoints
+        if value > 0xffff
+          value -= 0x10000
+          encoded.push toHex value >>> 10 & 0x3ff | 0xd800
+          value = 0xdc00 | value & 0x3ff
+        
+        encoded.push toHex value
+        
+      entries.push "<#{encoded.join ' '}>"
+    
+    cmap.end """
       /CIDInit /ProcSet findresource begin
       12 dict begin
       begincmap
@@ -167,29 +188,19 @@ class PDFFont
       /CMapName /Adobe-Identity-UCS def
       /CMapType 2 def
       1 begincodespacerange
-      <00><ff>
+      <0000><ffff>
       endcodespacerange
-    '''
-  
-    codes = Object.keys(map).sort (a, b) -> a - b
-    range = []
-    for code in codes
-      if range.length >= 100
-        unicodeMap += "\n#{range.length} beginbfchar\n#{range.join('\n')}\nendbfchar"
-        range = []
-        
-      unicode = ('0000' + map[code].toString(16)).slice(-4)
-      code = (+code).toString(16)
-      range.push "<#{code}><#{unicode}>"
-      
-    unicodeMap += "\n#{range.length} beginbfchar\n#{range.join('\n')}\nendbfchar\n" if range.length
-    unicodeMap += '''
+      1 beginbfrange
+      <0000> <#{toHex entries.length - 1}> [#{entries.join ' '}]
+      endbfrange
       endcmap
       CMapName currentdict /CMap defineresource pop
       end
       end
-    '''
-          
+    """
+    
+    return cmap
+                  
   registerAFM: (@name) ->
     {@ascender,@decender,@bbox,@lineGap} = @font
     
@@ -203,11 +214,22 @@ class PDFFont
     @dictionary.end()
       
   widthOfString: (string, size) ->
-    string = '' + string
+    if @isAFM
+      string = '' + string
+      width = 0
+      for i in [0...string.length]
+        charCode = string.charCodeAt(i)        
+        width += @font.widthOfGlyph(@font.characterToGlyph(charCode)) or 0
+ 
+      scale = size / 1000  
+      return width * scale
+      
+    glyphs = @font.glyphsForString '' + string
+    advances = @font.advancesForGlyphs glyphs
+    
     width = 0
-    for i in [0...string.length]
-      charCode = string.charCodeAt(i)        
-      width += @font.widthOfGlyph(@font.characterToGlyph(charCode)) or 0
+    for advance in advances
+      width += advance
     
     scale = size / 1000  
     return width * scale
