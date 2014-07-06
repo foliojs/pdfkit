@@ -246,19 +246,39 @@ module.exports =
       wordSpacing += @widthOfString(' ') + characterSpacing
       wordSpacing *= 1000 / @_fontSize
       
-      commands = []
+      encoded = []
+      advances = []
       for word in words
-        # encode the text based on the font subset,
-        # and then convert it to hex
-        encoded = @_font.encode(word)
-        commands.push "<#{encoded}> #{-wordSpacing}"
+        [encodedWord, advancesWord] = @_font.encode(word)
+        unless advancesWord
+          advancesWord = (0 for i in [0...encodedWord.length])
+          
+        encoded.push encodedWord...
+        advances.push advancesWord...
+        
+        # add thw word spacing to the end of the word
+        advances[advances.length - 1] += wordSpacing
+    else
+      [encoded, advances] = @_font.encode(text)
+      
+    # if we have an array of advances (e.g kerning data),
+    # use the TJ operator to control spacing
+    if advances
+      commands = []
+      last = 0
+      for a, i in advances
+        # group consecutive letters together whose advance adjustments are 0
+        if a is 0 and i < advances.length - 1
+          continue
+        
+        h = encoded.slice(last, i + 1).join ''
+        commands.push "<#{h}> #{-a}"
+        last = i + 1
       
       @addContent "[#{commands.join ' '}] TJ"
     else
-      # encode the text based on the font subset,
-      # and then convert it to hex
-      encoded = @_font.encode(text)
-      @addContent "<#{encoded}> Tj"
+      # otherwise, just use the normal Tj operator
+      @addContent "<#{encoded.join ''}> Tj"
 
     # end the text object
     @addContent "ET"
