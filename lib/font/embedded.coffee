@@ -20,6 +20,7 @@ class EmbeddedFont extends PDFFont
   encode: (text) ->
     features = ['ccmp', 'liga', 'dlig', 'kern']
     glyphs = @font.glyphsForString text, features
+    advances = @font.advancesForGlyphs glyphs, features
     
     res = []
     for glyph, i in glyphs
@@ -28,8 +29,9 @@ class EmbeddedFont extends PDFFont
         
       @widths[gid] ?= @font.widthOfGlyph glyph.id
       @unicode[gid] ?= glyph.codePoints
+      advances[i] -= @widths[gid]
       
-    return res.join ''
+    return [res, advances]
     
   widthOfString: (string, size) ->
     features = ['ccmp', 'liga', 'dlig', 'kern']
