@@ -18,7 +18,12 @@ class StandardFont extends PDFFont
     
   encode: (text) ->
     encoded = @font.encodeText text
-    return encoded
+    glyphs = @font.glyphsForString '' + text
+    advances = @font.advancesForGlyphs glyphs
+    for glyph, i in glyphs
+      advances[i] -= @font.widthOfGlyph glyph
+      
+    return [encoded, advances]
     
   widthOfString: (string, size) ->
     glyphs = @font.glyphsForString '' + string

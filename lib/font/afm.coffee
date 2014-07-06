@@ -8,6 +8,7 @@ class AFMFont
     @attributes = {}
     @glyphWidths = {}
     @boundingBoxes = {}
+    @kernPairs = {}
     
     @parse()
     @charWidths = (@glyphWidths[characters[i]] for i in [0..255])
@@ -30,7 +31,7 @@ class AFMFont
         
       switch section
         when 'FontMetrics'
-          match = line.match(/(^\w+)\s+(.*)/)
+          match = line.match /(^\w+)\s+(.*)/
           key = match[1]
           value = match[2]
           
@@ -44,6 +45,11 @@ class AFMFont
           continue unless /^CH?\s/.test(line)
           name = line.match(/\bN\s+(\.?\w+)\s*;/)[1]
           @glyphWidths[name] = +line.match(/\bWX\s+(\d+)\s*;/)[1]
+          
+        when 'KernPairs'
+          match = line.match /^KPX\s+(\.?\w+)\s+(\.?\w+)\s+(-?\d+)/
+          if match
+            @kernPairs[match[1] + '\0' + match[2]] = parseInt match[3]
           
     return
     
@@ -77,19 +83,40 @@ class AFMFont
     382:  158
 
   encodeText: (text) ->
-    string = ''
+    res = []
     for i in [0...text.length]
       char = text.charCodeAt(i)
       char = WIN_ANSI_MAP[char] or char
-      string += char.toString(16)
+      res.push char.toString(16)
     
-    return string
+    return res
+    
+  glyphsForString: (string) ->
+    glyphs = []
+    
+    for i in [0...string.length]
+      charCode = string.charCodeAt(i)        
+      glyphs.push @characterToGlyph charCode
+      
+    return glyphs
           
   characterToGlyph: (character) ->
-    return characters[WIN_ANSI_MAP[character] or character]
+    return characters[WIN_ANSI_MAP[character] or character] or '.notdef'
           
   widthOfGlyph: (glyph) ->
     return @glyphWidths[glyph]
+    
+  getKernPair: (left, right) ->
+    return @kernPairs[left + '\0' + right] or 0
+    
+  advancesForGlyphs: (glyphs) ->
+    advances = []
+    
+    for left, index in glyphs
+      right = glyphs[index + 1]
+      advances.push @widthOfGlyph(left) + @getKernPair(left, right)
+      
+    return advances
                     
   characters = '''
       .notdef       .notdef        .notdef        .notdef
