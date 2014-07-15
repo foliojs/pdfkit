@@ -54,10 +54,13 @@ module.exports =
       
       if options.align is 'center'
         x = x + bw / 2 - w / 2
+        
       else if options.align is 'right'
         x = x + bw - w
+        
       if options.valign is 'center'
         y = y + bh / 2 - h / 2
+        
       else if options.valign is 'bottom'
         y = y + bh - h
     
