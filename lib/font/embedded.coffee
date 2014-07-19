@@ -1,5 +1,4 @@
 PDFFont = require '../font'
-TTFSubset = require 'fontkit/src/TTFSubset'
 PDFObject = require '../object'
 
 class EmbeddedFont extends PDFFont
