@@ -33,6 +33,11 @@ class PDFFont
       @font = TTFFont.fromBuffer src, family
       @subset = new Subset @font
       @registerTTF()
+
+    else if src instanceof Uint8Array
+      @font = TTFFont.fromBuffer (new Buffer src), family
+      @subset = new Subset @font
+      @registerTTF()  
       
     else
       throw new Error 'Not a supported font format or standard PDF font.'
