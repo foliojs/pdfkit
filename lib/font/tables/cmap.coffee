@@ -32,6 +32,8 @@ class CmapEntry
     @platformID = data.readUInt16()
     @encodingID = data.readShort()
     @offset = offset + data.readInt()
+
+    saveOffset = data.pos
     
     data.pos = @offset
     @format = data.readUInt16()
@@ -58,7 +60,7 @@ class CmapEntry
         idDelta = (data.readUInt16() for i in [0...segCount])
         idRangeOffset = (data.readUInt16() for i in [0...segCount])
         
-        count = @length - data.pos + @offset
+        count = (@length - data.pos + @offset) / 2
         glyphIds = (data.readUInt16() for i in [0...count])
         
         for tail, i in endCode
@@ -72,6 +74,8 @@ class CmapEntry
               glyphId += idDelta[i] if glyphId isnt 0
               
             @codeMap[code] = glyphId & 0xFFFF
+
+    data.pos = saveOffset
             
   @encode: (charmap, encoding) ->
     subtable = new Data
