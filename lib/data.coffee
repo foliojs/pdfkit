@@ -19,11 +19,11 @@ class Data
     @writeByte if val then 1 else 0
     
   readUInt32: ->
-    b1 = @readByte() << 24
+    b1 = @readByte() * 0x1000000
     b2 = @readByte() << 16
     b3 = @readByte() << 8
     b4 = @readByte()
-    b1 | b2 | b3 | b4
+    b1 + b2 + b3 + b4
   
   writeUInt32: (val) ->
     @writeByte (val >>> 24) & 0xff
