@@ -22,7 +22,7 @@ module.exports =
     
   note: (x, y, w, h, contents, options = {}) ->
     options.Subtype = 'Text'
-    options.Contents = PDFObject.s contents
+    options.Contents = PDFObject.s contents, true
     options.Name = 'Comment'
     options.color ?= [243, 223, 92]
     @annotate x, y, w, h, options
@@ -73,7 +73,7 @@ module.exports =
     
   textAnnotation: (x, y, w, h, text, options = {}) ->
     options.Subtype = 'FreeText'
-    options.Contents = PDFObject.s text
+    options.Contents = PDFObject.s text, true
     options.DA = PDFObject.s ''
     @annotate x, y, w, h, options
     
