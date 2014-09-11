@@ -4,7 +4,7 @@ LineBreaker = require 'linebreak'
 class LineWrapper extends EventEmitter
   constructor: (@document, options) ->
     @indent    = options.indent or 0
-    @charSpacing = options.characterSpacing or 0
+    @characterSpacing = options.characterSpacing or 0
     @wordSpacing = options.wordSpacing is 0
     @columns   = options.columns or 1
     @columnGap   = options.columnGap ? 18 # 1/4 inch
@@ -50,7 +50,7 @@ class LineWrapper extends EventEmitter
         @lastLine = false
         
   wordWidth: (word) ->
-    return @document.widthOfString(word, this) + @charSpacing + @wordSpacing
+    return @document.widthOfString(word, this) + @characterSpacing + @wordSpacing
         
   eachWord: (text, fn) ->
     # setup a unicode line breaker
@@ -97,7 +97,7 @@ class LineWrapper extends EventEmitter
   wrap: (text, options) ->
     # override options from previous continued fragments
     @indent    = options.indent       if options.indent?
-    @charSpacing = options.characterSpacing if options.characterSpacing?
+    @characterSpacing = options.characterSpacing if options.characterSpacing?
     @wordSpacing = options.wordSpacing    if options.wordSpacing?
     @ellipsis  = options.ellipsis     if options.ellipsis?
     
