@@ -13,8 +13,8 @@ class AFMFont
     @charWidths = (@glyphWidths[characters[i]] for i in [0..255])
     
     @bbox = (+e for e in @attributes['FontBBox'].split /\s+/)
-    @ascender = +@attributes['Ascender']
-    @decender = +@attributes['Descender']
+    @ascender = +(@attributes['Ascender'] or 0)
+    @decender = +(@attributes['Descender'] or 0)
     @lineGap = (@bbox[3] - @bbox[1]) - (@ascender - @decender)
   
   parse: ->
