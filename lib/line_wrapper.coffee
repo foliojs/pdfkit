@@ -34,6 +34,8 @@ class LineWrapper extends EventEmitter
       @once 'line', =>
         @document.x -= indent
         @lineWidth += indent
+        if options.continued and not @continuedX
+          @continuedX = @indent
         @continuedX = 0 unless options.continued
     
     # handle left aligning last lines of paragraphs
