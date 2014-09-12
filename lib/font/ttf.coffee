@@ -68,16 +68,16 @@ class TTFFont
     
   parse: ->
     @directory = new Directory(@contents)
-    @head = new HeadTable(this)
-    @name = new NameTable(this)
-    @cmap = new CmapTable(this)
-    @hhea = new HheaTable(this)
-    @maxp = new MaxpTable(this)
-    @hmtx = new HmtxTable(this)
-    @post = new PostTable(this)
-    @os2  = new OS2Table(this)
-    @loca = new LocaTable(this)
-    @glyf = new GlyfTable(this)
+    @head = new HeadTable(this, 'HeadTable')
+    @name = new NameTable(this, 'NameTable')
+    @cmap = new CmapTable(this, 'CmapTable')
+    @hhea = new HheaTable(this, 'HheaTable')
+    @maxp = new MaxpTable(this, 'MaxpTable')
+    @hmtx = new HmtxTable(this, 'HmtxTable')
+    @post = new PostTable(this, 'PostTable')
+    @os2  = new OS2Table(this, 'OS2Table')
+    @loca = new LocaTable(this, 'LocaTable')
+    @glyf = new GlyfTable(this, 'GlyfTable')
     
     @ascender = (@os2.exists and @os2.ascender) or @hhea.ascender
     @decender = (@os2.exists and @os2.decender) or @hhea.decender
