@@ -1,6 +1,5 @@
 class Table
   constructor: (@file, @tag) ->
-    @tag ?= @constructor.name.replace('Table', '').toLowerCase()
     info = @file.directory.tables[@tag]
     @exists = !!info
     
