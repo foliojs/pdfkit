@@ -64,7 +64,7 @@ class LineWrapper extends EventEmitter
       
       # if the word is longer than the whole line, chop it up
       # TODO: break by grapheme clusters, not JS string characters
-      if w > @lineWidth
+      if w > @lineWidth + @continuedX
         # make some fake break objects
         lbk = last
         fbk = {}
