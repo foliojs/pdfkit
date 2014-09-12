@@ -9,6 +9,7 @@ class LineWrapper extends EventEmitter
     @columns   = options.columns or 1
     @columnGap   = options.columnGap ? 18 # 1/4 inch
     @lineWidth   = (options.width - (@columnGap * (@columns - 1))) / @columns
+    @spaceLeft = @lineWidth
     @startX    = @document.x
     @startY    = @document.y
     @column    = 1
