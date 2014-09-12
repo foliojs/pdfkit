@@ -8,6 +8,7 @@ fs = require 'fs'
 PDFObject = require './object'
 PDFReference = require './reference'
 PDFPage = require './page'
+PDFOutline = require './outline'
 
 class PDFDocument extends stream.Readable
   constructor: (@options = {}) ->
@@ -31,9 +32,24 @@ class PDFDocument extends stream.Readable
         Type: 'Pages'
         Count: 0
         Kids: []
+
+    if @options.hasOutlines
+        @_root.data['PageMode'] = 'UseOutlines'
+        @_root.data['Outlines'] = @ref
+            Type: 'Outlines'
+            Count: 0
+
+    @root_outlines = @_root.data['Outlines'] 
     
     # The current page
     @page = null
+
+    # Outlines data structures
+    @outlines = []  # a multitier tree, represented by lists ( [] )
+    @cur       = @outlines       # current level list
+    @levelHead = @root_outlines  # head of current level list
+    @levs  = []  # stack of sublevel lists heads
+    @prevs = []  # stack of sublevel lists
     
     # Initialize mixins
     @initColor()
@@ -96,10 +112,100 @@ class PDFDocument extends stream.Readable
     @transform 1, 0, 0, -1, 0, @page.height
     
     return this
+
+  isRoot: () ->
+    return @prevs.length == 0
+
+  addOutline: (title, dest, options) ->
+
+    if not @options.hasOutlines
+        return this
+
+    prevNode = null
+    if @isRoot()
+        parent = @root_outlines
+    else
+        parent = @levelHead.dictionary
+
+    if @cur.length > 0  # can be on Root level
+        prevNode = @cur[@cur.length-1]
+        if prevNode instanceof Array # prev is a sublevel list
+            prevNode = @cur[@cur.length-2]  # there *must* be an element before
+
+    # create an outline object
+    outline = new PDFOutline(this, parent, title, dest, options)
+    
+    # update list header info
+    if @outlines.length == 0  # init root level list
+        @root_outlines.data['First'] = outline.dictionary
+
+    parent.data['Last'] = outline.dictionary   # can be root level
+    parent.data['Count']++
+
+    if prevNode != null   # not first in the list
+        outline.dictionary.data['Prev']  = prevNode.dictionary
+        prevNode.dictionary.data['Next'] = outline.dictionary
+
+    # add to the current level list
+    @cur.push outline
+
+    return this
+
+  addSublevelOutline: (title, dest, options) ->
+
+    if not @options.hasOutlines
+        return this
+
+    if @cur.length == 0 or ( @cur[@cur.length-1] instanceof Array )
+       throw new Error '
+          Cannot start sublevel with empty current level:
+          add current level outline first.'
+        
+    @levs.push @levelHead
+    @levelHead = @cur[@cur.length-1]  # head of sublevel list
+    @prevs.push @cur  # remember up level container
+    @cur.push []      # add sublevel container
+    @cur = @cur[@cur.length-1]
+
+    outline = new PDFOutline(this, @levelHead.dictionary, title, dest, options)
+    @cur.push outline
+    @levelHead.dictionary.data['First'] = outline.dictionary
+    @levelHead.dictionary.data['Last']  = outline.dictionary
+    @levelHead.dictionary.data['Count'] = 1  # important: not ++ (field is absent now)
+
+    return this
+
+  endOutlineSublevel: () ->
+
+    if not @options.hasOutlines
+        return this
+
+    if @isRoot()
+        throw new Error 'cannot end root outlines level'
+
+    # restore previous list as current
+    @cur  = @prevs.pop()
+    count = @levelHead.dictionary.data['Count']
+    @levelHead = @levs.pop()
+
+    # add child sublist counter (will contain all child counters)
+    if @isRoot()
+        @levelHead.data['Count'] += count
+    else
+        @levelHead.dictionary.data['Count'] += count
+
+    return this
+
+  endOutlines: (outlines) ->
+      for outline in outlines
+         if outline instanceof Array
+           @endOutlines(outline)
+         else
+           outline.dictionary.end()
     
   ref: (data) ->
     ref = new PDFReference(this, @_offsets.length + 1, data)
-    @_offsets.push null # placeholder for this object's offset once it is finalized
+    @_offsets.push null # placeholder for this object''s offset once it is finalized
     @_waiting++
     return ref
     
@@ -160,6 +266,8 @@ class PDFDocument extends stream.Readable
         
     @_root.end()
     @_root.data.Pages.end()
+    @_root.data.Outlines.end()
+    @endOutlines(@outlines)
     
     if @_waiting is 0
       @_finalize()
