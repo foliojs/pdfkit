@@ -101,11 +101,13 @@ class PDFDocument extends stream.Readable
     
     return this
 
-  bufferedPageRange: -> { start: @_pageBufferStart, count: @_pageBuffer.length }
+  bufferedPageRange: -> 
+    return { start: @_pageBufferStart, count: @_pageBuffer.length }
 
   switchToPage: (n) ->
-    unless page = @_pageBuffer[n-@_pageBufferStart]
-      throw new Error("switchToPage(#{n}) out of bounds, current buffer covers pages #{@_pageBufferStart} to #{@_pageBufferStart + @_pageBuffer.length - 1}")
+    unless page = @_pageBuffer[n - @_pageBufferStart]
+      throw new Error "switchToPage(#{n}) out of bounds, current buffer covers pages #{@_pageBufferStart} to #{@_pageBufferStart + @_pageBuffer.length - 1}"
+      
     @page = page
 
   flushPages: ->
@@ -116,7 +118,8 @@ class PDFDocument extends stream.Readable
     @_pageBufferStart += pages.length
     for page in pages
       page.end()
-    null
+      
+    return
 
   ref: (data) ->
     ref = new PDFReference(this, @_offsets.length + 1, data)
