@@ -2,6 +2,10 @@ Table = require '../table'
 Data = require '../../data'
 
 class LocaTable extends Table
+  constructor: ->
+    @tag = 'loca'
+    super
+
   parse: (data) ->
     data.pos = @offset
     format = @file.head.indexToLocFormat

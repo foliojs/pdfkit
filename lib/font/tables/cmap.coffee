@@ -2,6 +2,10 @@ Table = require '../table'
 Data = require '../../data'
 
 class CmapTable extends Table
+  constructor: ->
+    @tag = 'cmap'
+    super
+  
   parse: (data) ->
     data.pos = @offset
     

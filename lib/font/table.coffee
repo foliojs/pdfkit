@@ -1,5 +1,5 @@
 class Table
-  constructor: (@file, @tag) ->
+  constructor: (@file) ->
     info = @file.directory.tables[@tag]
     @exists = !!info
     
