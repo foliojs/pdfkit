@@ -2,10 +2,7 @@ Table = require '../table'
 Data = require '../../data'
 
 class PostTable extends Table
-  constructor: ->
-    @tag = 'post'
-    super
-
+  tag: 'post'
   parse: (data) ->
     data.pos = @offset
     
