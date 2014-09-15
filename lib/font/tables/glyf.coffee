@@ -2,6 +2,10 @@ Table = require '../table'
 Data = require '../../data'
 
 class GlyfTable extends Table
+  constructor: ->
+    @tag = 'glyf'
+    super
+  
   parse: (data) ->
     # We're not going to parse the whole glyf table, just the glyfs we need.  See below.
     @cache = {}
