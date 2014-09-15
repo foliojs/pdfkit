@@ -1,4 +1,4 @@
-<!DOCTYPE html><html><head><meta charset="utf-8"><title>Getting Started with PDFKit</title><link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Source+Code+Pro:400,700|Alegreya:700|Merriweather"><link rel="stylesheet" href="/docs/css/index.css"><link rel="stylesheet" href="/docs/css/github.css"></head><body><nav class="sidebar"><ul><li><a href="/">Home</a></li><li><a href="/docs/../index.html">Documentation</a><ul><li><a href="/docs/getting_started.html" class="selected">Getting Started </a><ul><li><a href="#installation">Installation</a></li><li><a href="#creating_a_document">Creating a document</a></li><li><a href="#using_pdfkit_in_the_browser">Using PDFKit in the browser</a></li><li><a href="#adding_pages">Adding pages</a></li><li><a href="#setting_document_metadata">Setting document metadata</a></li><li><a href="#adding_content">Adding content</a></li></ul></li><li><a href="/docs/vector.html">Vector Graphics </a></li><li><a href="/docs/text.html">Text </a></li><li><a href="/docs/images.html">Images </a></li><li><a href="/docs/annotations.html">Annotations </a></li></ul></li><li><a href="/docs/guide.pdf">PDF Guide</a></li><li><a href="/demo/out.pdf">Example PDF</a></li><li><a href="/demo/browser.html">Interactive Browser Demo</a></li><li><a href="http://github.com/devongovett/pdfkit">Source Code</a></li></ul></nav><div class="main"><h1 id="getting_started_with_pdfkit">Getting Started with PDFKit</h1>
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>Getting Started with PDFKit</title><link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Source+Code+Pro:400,700|Alegreya:700|Merriweather"><link rel="stylesheet" href="/docs/css/index.css"><link rel="stylesheet" href="/docs/css/github.css"></head><body><nav class="sidebar"><ul><li><a href="/">Home</a></li><li><a href="/docs/../index.html">Documentation</a><ul><li><a href="/docs/getting_started.html" class="selected">Getting Started </a><ul><li><a href="#installation">Installation</a></li><li><a href="#creating_a_document">Creating a document</a></li><li><a href="#using_pdfkit_in_the_browser">Using PDFKit in the browser</a></li><li><a href="#adding_pages">Adding pages</a></li><li><a href="#switching_to_previous_pages">Switching to previous pages</a></li><li><a href="#setting_document_metadata">Setting document metadata</a></li><li><a href="#adding_content">Adding content</a></li></ul></li><li><a href="/docs/vector.html">Vector Graphics </a></li><li><a href="/docs/text.html">Text </a></li><li><a href="/docs/images.html">Images </a></li><li><a href="/docs/annotations.html">Annotations </a></li></ul></li><li><a href="/docs/guide.pdf">PDF Guide</a></li><li><a href="/demo/out.pdf">Example PDF</a></li><li><a href="/demo/browser.html">Interactive Browser Demo</a></li><li><a href="http://github.com/devongovett/pdfkit">Source Code</a></li></ul></nav><div class="main"><h1 id="getting_started_with_pdfkit">Getting Started with PDFKit</h1>
 
 <h2 id="installation">Installation</h2>
 
@@ -117,6 +117,48 @@ doc.addPage
     bottom: 50
     left: 72
     right: 72</code></pre>
+
+<h2 id="switching_to_previous_pages">Switching to previous pages</h2>
+
+<p>PDFKit normally flushes pages to the output file immediately when a new page is created, making
+it impossible to jump back and add content to previous pages.  This is normally not an issue, but
+in some circumstances it can be useful to add content to pages after the whole document, or a part
+of the document, has been created already.  Examples include adding page numbers, or filling in other
+parts of information you don&#39;t have until the rest of the document has been created.</p>
+
+<p>PDFKit has a <code>bufferPages</code> option in versions v0.7.0 and later that allows you to control when
+pages are flushed to the output file yourself rather than letting PDFKit handle that for you. To use
+it, just pass <code>bufferPages: true</code> as an option to the <code>PDFDocument</code> constructor.  Then, you can call
+<code>doc.switchToPage(pageNumber)</code> to switch to a previous page (page numbers start at 0).</p>
+
+<p>When you&#39;re ready to flush the buffered pages to the output file, call <code>flushPages</code>.
+This method is automatically called by <code>doc.end()</code>, so if you just want to buffer all pages in the document, you
+never need to call it.  Finally, there is a <code>bufferedPageRange</code> method, which returns the range
+of pages that are currently buffered.  Here is a small example that shows how you might add page 
+numbers to a document.</p>
+
+<pre><code># create a document, and enable bufferPages mode
+doc = new PDFDocument
+  bufferPages: true
+
+# add some content...
+doc.addPage()
+# ...
+doc.addPage()
+
+# see the range of buffered pages
+range = doc.bufferedPageRange() # =&gt; { start: 0, count: 2 }
+
+for i in [range.start...range.start + range.count]
+  doc.switchToPage(i)
+  doc.text &quot;Page #{i + 1} of #{range.count}&quot;
+
+# manually flush pages that have been buffered
+doc.flushPages()
+
+# or, if you are at the end of the document anyway,
+# doc.end() will call it for you automatically.
+doc.end()</code></pre>
 
 <h2 id="setting_document_metadata">Setting document metadata</h2>
 
