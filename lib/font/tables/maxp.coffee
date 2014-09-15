@@ -2,6 +2,7 @@ Table = require '../table'
 Data = require '../../data'
 
 class MaxpTable extends Table
+  tag: 'maxp'
   parse: (data) ->
     data.pos = @offset
     
