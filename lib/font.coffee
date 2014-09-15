@@ -15,27 +15,32 @@ class PDFFont
         @isAFM = true
         @font = new AFMFont STANDARD_FONTS[src]()
         @registerAFM src
+        return
       
       else if /\.(ttf|ttc)$/i.test src
         @font = TTFFont.open src, family
-        @subset = new Subset @font
-        @registerTTF()
       
       else if /\.dfont$/i.test src
         @font = TTFFont.fromDFont src, family
-        @subset = new Subset @font
-        @registerTTF()
         
       else
         throw new Error 'Not a supported font format or standard PDF font.'
         
     else if Buffer.isBuffer(src)
       @font = TTFFont.fromBuffer src, family
-      @subset = new Subset @font
-      @registerTTF()
+
+    else if src instanceof Uint8Array
+      @font = TTFFont.fromBuffer new Buffer(src), family
+      
+    else if src instanceof ArrayBuffer
+      @font = TTFFont.fromBuffer new Buffer(new Uint8Array(src)), family
       
     else
       throw new Error 'Not a supported font format or standard PDF font.'
+      
+    # create a subset for the font and register
+    @subset = new Subset @font
+    @registerTTF()
       
   # This insanity is so browserify can inline the font files
   STANDARD_FONTS =

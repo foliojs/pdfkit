@@ -2,6 +2,7 @@ Table = require '../table'
 Data = require '../../data'
 
 class HmtxTable extends Table
+  tag: 'hmtx'
   parse: (data) ->
     data.pos = @offset
     

@@ -2,6 +2,7 @@ Table = require '../table'
 Data = require '../../data'
 
 class HheaTable extends Table
+  tag: 'hhea'
   parse: (data) ->
     data.pos = @offset
     

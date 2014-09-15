@@ -2,6 +2,7 @@ Table = require '../table'
 Data = require '../../data'
 
 class GlyfTable extends Table
+  tag: 'glyf'
   parse: (data) ->
     # We're not going to parse the whole glyf table, just the glyfs we need.  See below.
     @cache = {}

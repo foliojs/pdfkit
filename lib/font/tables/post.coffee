@@ -2,6 +2,7 @@ Table = require '../table'
 Data = require '../../data'
 
 class PostTable extends Table
+  tag: 'post'
   parse: (data) ->
     data.pos = @offset
     

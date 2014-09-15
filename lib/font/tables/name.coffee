@@ -3,6 +3,7 @@ Data = require '../../data'
 utils = require '../utils'
 
 class NameTable extends Table
+  tag: 'name'
   parse: (data) ->
     data.pos = @offset
     

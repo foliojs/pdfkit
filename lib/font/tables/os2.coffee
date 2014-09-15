@@ -1,10 +1,7 @@
 Table = require '../table'
 
 class OS2Table extends Table
-  constructor: ->
-    @tag = 'OS/2'
-    super
-  
+  tag: 'OS/2'
   parse: (data) ->
      data.pos = @offset
      
