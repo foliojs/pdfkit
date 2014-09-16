@@ -52,6 +52,13 @@ class LineWrapper extends EventEmitter
         
   wordWidth: (word) ->
     return @document.widthOfString(word, this) + @characterSpacing + @wordSpacing
+
+  trailingSpaceWidth: (word) ->
+    match = /(\s+)$/.exec(word)
+    if match
+      @wordWidth(match[1])
+    else
+      0
         
   eachWord: (text, fn) ->
     # setup a unicode line breaker
@@ -62,10 +69,11 @@ class LineWrapper extends EventEmitter
     while bk = breaker.nextBreak()
       word = text.slice(last?.position or 0, bk.position)
       w = wordWidths[word] ?= @wordWidth word
+      trailing = @trailingSpaceWidth word
       
       # if the word is longer than the whole line, chop it up
       # TODO: break by grapheme clusters, not JS string characters
-      if w > @lineWidth + @continuedX
+      if w - trailing > @lineWidth + @continuedX
         # make some fake break objects
         lbk = last
         fbk = {}
@@ -76,19 +84,22 @@ class LineWrapper extends EventEmitter
           while w > @spaceLeft
             w = @wordWidth word.slice(0, --l)
             
+          trailing = @trailingSpaceWidth word.slice(0, l)
+
           # send a required break unless this is the last piece
           fbk.required = l < word.length
-          shouldContinue = fn word.slice(0, l), w, fbk, lbk
+          shouldContinue = fn word.slice(0, l), w, fbk, lbk, trailing
           lbk = required: false
           
           # get the remaining piece of the word
           word = word.slice(l)
           w = @wordWidth word
+          trailing = @trailingSpaceWidth word
           
           break if shouldContinue is no
       else
         # otherwise just emit the break as it was given to us
-        shouldContinue = fn word, w, bk, last
+        shouldContinue = fn word, w, bk, last, trailing
         
       break if shouldContinue is no
       last = bk
@@ -125,17 +136,17 @@ class LineWrapper extends EventEmitter
       
     @emit 'sectionStart', options, this
     
-    @eachWord text, (word, w, bk, last) =>
+    @eachWord text, (word, w, bk, last, trailing) =>
       if not last? or last.required
         @emit 'firstLine', options, this
         @spaceLeft = @lineWidth
       
-      if w <= @spaceLeft
+      if w - trailing <= @spaceLeft
         buffer += word
         textWidth += w
         wc++
               
-      if bk.required or w > @spaceLeft
+      if bk.required or w - trailing > @spaceLeft
         if bk.required
           @emit 'lastLine', options, this
           
