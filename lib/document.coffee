@@ -97,8 +97,11 @@ class PDFDocument extends stream.Readable
     # flip PDF coordinate system so that the origin is in
     # the top left rather than the bottom left
     @_ctm = [1, 0, 0, 1, 0, 0]
-    @transform 1, 0, 0, -1, 0, @page.height
-    
+    @transform 1, 0, 0, -1, 0, @page.height	
+     
+    # add background image to page automatically if option is set
+    @image(@options.bgImgPath, 0, 0) if @options.bigImgPath
+
     return this
 
   bufferedPageRange: -> 
