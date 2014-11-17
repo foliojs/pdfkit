@@ -27,7 +27,7 @@ module.exports =
 
       # CMYK
       else if color.length is 4
-        color = (part / 100 for part in color)    
+        color = (part / 100 for part in color)
     
       return color
       
@@ -67,16 +67,16 @@ module.exports =
     op = if stroke then 'CS' else 'cs'
     @addContent "/#{space} #{op}"
 
-  fillColor: (color, opacity = 1) ->
+  fillColor: (color, opacity) ->
     set = @_setColor color, no
     @fillOpacity opacity if set
     
-    # save this for text wrapper, which needs to reset 
+    # save this for text wrapper, which needs to reset
     # the fill color on new pages
     @_fillColor = [color, opacity]
     return this
 
-  strokeColor: (color, opacity = 1) ->
+  strokeColor: (color, opacity) ->
     set = @_setColor color, yes
     @strokeOpacity opacity if set
     return this
@@ -103,7 +103,7 @@ module.exports =
      if @_opacityRegistry[key]
        [dictionary, name] = @_opacityRegistry[key]
      else
-       dictionary = 
+       dictionary =
          Type: 'ExtGState'
 
        dictionary.ca = fillOpacity if fillOpacity?

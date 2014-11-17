@@ -18,12 +18,13 @@ module.exports =
     @addContent 'Q'
     
   closePath: ->
+    @opacity 1
     @addContent 'h'
   
   lineWidth: (w) ->
     @addContent "#{w} w"
     
-  _CAP_STYLES: 
+  _CAP_STYLES:
     BUTT: 0
     ROUND: 1
     SQUARE: 2
