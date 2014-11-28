@@ -16,8 +16,7 @@ class EmbeddedFont extends PDFFont
   includeGlyph: (gid) ->
     return @subset.includeGlyph gid
   
-  encode: (text) ->
-    features = ['ccmp', 'liga', 'dlig', 'kern']
+  encode: (text, features) ->
     glyphs = @font.glyphsForString text, features
     advances = @font.advancesForGlyphs glyphs, features
     
@@ -32,8 +31,7 @@ class EmbeddedFont extends PDFFont
       
     return [res, advances]
     
-  widthOfString: (string, size) ->
-    features = ['ccmp', 'liga', 'dlig', 'kern']
+  widthOfString: (string, size, features) ->
     glyphs = @font.glyphsForString '' + string, features
     advances = @font.advancesForGlyphs glyphs, features
     
@@ -51,7 +49,7 @@ class EmbeddedFont extends PDFFont
     if isCFF
       fontFile.data.Subtype = 'CIDFontType0C'
       
-    @subset.encodeStream(fontFile)
+    @subset.encodeStream().pipe(fontFile)
       
     familyClass = (@font['OS/2']?.sFamilyClass or 0) >> 8
     flags = 0

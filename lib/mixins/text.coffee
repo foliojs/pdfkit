@@ -49,7 +49,7 @@ module.exports =
     @_text text, x, y, options, @_line.bind(this)
     
   widthOfString: (string, options = {}) ->
-    @_font.widthOfString(string, @_fontSize) + (options.characterSpacing or 0) * (string.length - 1)
+    @_font.widthOfString(string, @_fontSize, options.features) + (options.characterSpacing or 0) * (string.length - 1)
     
   heightOfString: (text, options = {}) ->
     {x,y} = this
@@ -219,8 +219,6 @@ module.exports =
     # add current font to page if necessary
     @page.fonts[@_font.id] ?= @_font.ref()
 
-    # tell the font subset to use the characters
-
     # begin the text object
     @addContent "BT"
 
@@ -249,7 +247,7 @@ module.exports =
       encoded = []
       advances = []
       for word in words
-        [encodedWord, advancesWord] = @_font.encode(word)
+        [encodedWord, advancesWord] = @_font.encode(word, options.features)
         unless advancesWord
           advancesWord = (0 for i in [0...encodedWord.length])
           
@@ -259,7 +257,7 @@ module.exports =
         # add thw word spacing to the end of the word
         advances[advances.length - 1] += wordSpacing
     else
-      [encoded, advances] = @_font.encode(text)
+      [encoded, advances] = @_font.encode(text, options.features)
       
     # if we have an array of advances (e.g kerning data),
     # use the TJ operator to control spacing
