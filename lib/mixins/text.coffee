@@ -117,7 +117,6 @@ module.exports =
           
     wrapper.wrap items.join('\n'), options
     
-    @x -= indent
     return this
     
   _initOptions: (x = {}, y, options = {}) ->

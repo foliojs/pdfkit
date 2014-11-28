@@ -19,6 +19,9 @@ class PDFDocument extends stream.Readable
     # Whether streams should be compressed
     @compress = @options.compress ? yes
     
+    @_pageBuffer = []
+    @_pageBufferStart = 0
+
     # The PDF object store
     @_offsets = []
     @_waiting = 0
@@ -76,11 +79,12 @@ class PDFDocument extends stream.Readable
     
   addPage: (options = @options) ->
     # end the current page if needed
-    @page?.end()
-    
+    @flushPages() unless @options.bufferPages
+
     # create a page object
     @page = new PDFPage(this, options)
-    
+    @_pageBuffer.push(@page)
+
     # add the page to the object store
     pages = @_root.data.Pages.data
     pages.Kids.push @page.dictionary
@@ -96,7 +100,27 @@ class PDFDocument extends stream.Readable
     @transform 1, 0, 0, -1, 0, @page.height
     
     return this
-    
+
+  bufferedPageRange: -> 
+    return { start: @_pageBufferStart, count: @_pageBuffer.length }
+
+  switchToPage: (n) ->
+    unless page = @_pageBuffer[n - @_pageBufferStart]
+      throw new Error "switchToPage(#{n}) out of bounds, current buffer covers pages #{@_pageBufferStart} to #{@_pageBufferStart + @_pageBuffer.length - 1}"
+      
+    @page = page
+
+  flushPages: ->
+    # this local variable exists so we're future-proof against
+    # reentrant calls to flushPages.
+    pages = @_pageBuffer
+    @_pageBuffer = []
+    @_pageBufferStart += pages.length
+    for page in pages
+      page.end()
+      
+    return
+
   ref: (data) ->
     ref = new PDFReference(this, @_offsets.length + 1, data)
     @_offsets.push null # placeholder for this object's offset once it is finalized
@@ -144,8 +168,7 @@ class PDFDocument extends stream.Readable
     '
          
   end: ->
-    @page.end()
-    
+    @flushPages()
     @_info = @ref()
     for key, val of @info
       if typeof val is 'string'

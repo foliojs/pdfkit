@@ -4,16 +4,18 @@ LineBreaker = require 'linebreak'
 class LineWrapper extends EventEmitter
   constructor: (@document, options) ->
     @indent    = options.indent or 0
-    @charSpacing = options.characterSpacing or 0
+    @characterSpacing = options.characterSpacing or 0
     @wordSpacing = options.wordSpacing is 0
     @columns   = options.columns or 1
     @columnGap   = options.columnGap ? 18 # 1/4 inch
     @lineWidth   = (options.width - (@columnGap * (@columns - 1))) / @columns
+    @spaceLeft = @lineWidth
     @startX    = @document.x
     @startY    = @document.y
     @column    = 1
     @ellipsis  = options.ellipsis
     @continuedX  = 0
+    @features = options.features
     
     # calculate the maximum Y position the text can appear at
     if options.height?
@@ -34,6 +36,8 @@ class LineWrapper extends EventEmitter
       @once 'line', =>
         @document.x -= indent
         @lineWidth += indent
+        if options.continued and not @continuedX
+          @continuedX = @indent
         @continuedX = 0 unless options.continued
     
     # handle left aligning last lines of paragraphs
@@ -48,7 +52,7 @@ class LineWrapper extends EventEmitter
         @lastLine = false
         
   wordWidth: (word) ->
-    return @document.widthOfString(word, this) + @charSpacing + @wordSpacing
+    return @document.widthOfString(word, this) + @characterSpacing + @wordSpacing
         
   eachWord: (text, fn) ->
     # setup a unicode line breaker
@@ -62,7 +66,7 @@ class LineWrapper extends EventEmitter
       
       # if the word is longer than the whole line, chop it up
       # TODO: break by grapheme clusters, not JS string characters
-      if w > @lineWidth
+      if w > @lineWidth + @continuedX
         # make some fake break objects
         lbk = last
         fbk = {}
@@ -95,7 +99,7 @@ class LineWrapper extends EventEmitter
   wrap: (text, options) ->
     # override options from previous continued fragments
     @indent    = options.indent       if options.indent?
-    @charSpacing = options.characterSpacing if options.characterSpacing?
+    @characterSpacing = options.characterSpacing if options.characterSpacing?
     @wordSpacing = options.wordSpacing    if options.wordSpacing?
     @ellipsis  = options.ellipsis     if options.ellipsis?
     
