@@ -6,8 +6,7 @@ class PDFFont
       if StandardFont.isStandardFont src
         return new StandardFont document, src, id
         
-      if /\.(ttf|otf|ttc|dfont)$/i.test src
-        font = fontkit.openSync src, family
+      font = fontkit.openSync src, family
                 
     else if Buffer.isBuffer(src)
       font = fontkit.create src, family
