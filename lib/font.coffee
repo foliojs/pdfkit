@@ -1,4 +1,4 @@
-TTFFont = require 'fontkit'
+fontkit = require 'fontkit'
 
 class PDFFont
   @open: (document, src, family, id) ->
@@ -6,17 +6,17 @@ class PDFFont
       if StandardFont.isStandardFont src
         return new StandardFont document, src, id
         
-      if /\.(ttf|otf|ttc)$/i.test src
-        font = TTFFont.open src, family
+      if /\.(ttf|otf|ttc|dfont)$/i.test src
+        font = fontkit.openSync src, family
                 
     else if Buffer.isBuffer(src)
-      font = new TTFFont src, family
+      font = fontkit.create src, family
       
     else if src instanceof Uint8Array
-      font = new TTFFont new Buffer(src), family
+      font = fontkit.create new Buffer(src), family
       
     else if src instanceof ArrayBuffer
-      font = new TTFFont new Buffer(new Uint8Array(src)), family
+      font = fontkit.create new Buffer(new Uint8Array(src)), family
       
     if not font?
       throw new Error 'Not a supported font format or standard PDF font.'
