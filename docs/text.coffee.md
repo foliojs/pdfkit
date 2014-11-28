@@ -91,6 +91,7 @@ below.
 * `underline` - whether to underline the text
 * `strike` - whether to strike out the text
 * `continued` - whether the text segment will be followed immediately by another segment. Useful for changing styling in the middle of a paragraph.
+* `features` - an array of [OpenType feature tags](https://www.microsoft.com/typography/otspec/featuretags.htm) to apply. If not provided, a set of defaults is used.
 
 Additionally, the fill and stroke color and opacity methods described in the
 [vector graphics section](vector.html) are applied to text content as well.
@@ -139,14 +140,14 @@ Here is the output:
 The PDF format defines 14 standard fonts that can be used in PDF documents (4
 styles of Helvetica, Courier, and Times, as well as Symbol and Zapf Dingbats),
 but also allows fonts to be embedded right in the document. PDFKit supports
-embedding font files in the TrueType (`.ttf`), TrueType Collection (`.ttc`),
-and Datafork TrueType (`.dfont`) formats.
+embedding TrueType (`.ttf`), OpenType (`.otf`), WOFF, WOFF2, TrueType Collection (`.ttc`),
+and Datafork TrueType (`.dfont`) fonts.
 
 To change the font used to render text, just call the `font` method. If you
 are using a standard PDF font, just pass the name to the `font` method.
 Otherwise, pass the path to the font file, or a `Buffer` containing the font data.
-If the font is a collection font (`.ttc` and `.dfont` files), meaning that it 
-contains multiple styles in the same file, you should pass the name of the style 
+If the font is a collection font (`.ttc` and `.dfont` files), meaning that it
+contains multiple styles in the same file, you should pass the name of the style
 to be extracted from the collection.
 
 Here is an example showing how to set the font in each case.
