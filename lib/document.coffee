@@ -203,7 +203,7 @@ class PDFDocument extends stream.Readable
     # trailer
     @_write 'trailer'
     @_write PDFObject.convert
-      Size: @_offsets.length
+      Size: @_offsets.length + 1
       Root: @_root
       Info: @_info
         
