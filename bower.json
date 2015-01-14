@@ -1,0 +1,25 @@
+{
+  "name": "pdfkit",
+  "main": "dist/pdfkit.min.js",
+  "version": "0.7.0",
+  "homepage": "https://github.com/devongovett/pdfkit",
+  "authors": [
+    "Devon Govett <devongovett@gmail.com>"
+  ],
+  "description": "A JavaScript PDF generation library for Node and the browser",
+  "moduleType": [
+    "globals"
+  ],
+  "keywords": [
+    "pdf",
+    "svg"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
