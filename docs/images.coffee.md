@@ -21,7 +21,7 @@ Here is an example showing some of these options.
        .text('Proprotional to width', 0, 0)
      
     # Fit the image within the dimensions
-    doc.image('data:image/png;base64,iVBORw0K...', 320, 15, fit: [100, 100])
+    doc.image('images/test.jpeg', 320, 15, fit: [100, 100])
        .rect(320, 15, 100, 100)
        .stroke()
        .text('Fit', 320, 0)
