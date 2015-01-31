@@ -1,6 +1,6 @@
 # Images in PDFKit
 
-Adding images to PDFKit documents is an easy task. Just pass an image path to
+Adding images to PDFKit documents is an easy task. Just pass an image path, buffer, or data uri with base64 encoded data to
 the `image` method along with some optional arguments. PDFKit supports the
 JPEG and PNG formats. If an X and Y position are not provided, the image is
 rendered at the current point in the text flow (below the last line of text).
