@@ -34,8 +34,9 @@
     "blob-stream": "^0.1.2"
   },
   "dependencies": {
+    "linebreak": "~0.1.0",
     "png-js": ">=0.1.0",
-    "linebreak": "~0.1.0"
+    "png-stream": "^1.0.2"
   },
   "scripts": {
     "prepublish": "make js",

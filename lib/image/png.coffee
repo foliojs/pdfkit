@@ -1,134 +1,144 @@
-zlib = require 'zlib'
-PNG = require 'png-js'
-
+PNGDecoder = require 'png-stream/decoder'
+PNGEncoder = require 'png-stream/encoder'
+stream = require 'stream'
+    
 class PNGImage
-  constructor: (data, @label) ->
-    @image = new PNG(data)
-    @width = @image.width
-    @height = @image.height
-    @imgData = @image.imgData
+  constructor: (@source, @label) ->
+    # Read the image dimensions synchronously, and put the chunk back on the stream
+    chunk = @source.read(24)
+    @source.unshift chunk
+    
+    @width = chunk.readUInt32BE(16)
+    @height = chunk.readUInt32BE(20)
+    
     @obj = null
     
-  embed: (@document) ->
-    return if @obj
+  COMPONENTS =
+    rgb: 3
+    rgba: 4
+    gray: 1
+    graya: 2
+    indexed: 1
+    
+  embed: (document) ->
+    decoder = new PNGDecoder
+      indexed: true
     
     @obj = document.ref
       Type: 'XObject'
       Subtype: 'Image'
-      BitsPerComponent: @image.bits
-      Width: @width
-      Height: @height
-      Filter: 'FlateDecode'
-      
-    unless @image.hasAlphaChannel
-      params = document.ref
+
+    decoder.once 'format', (format) =>
+      @obj.data.BitsPerComponent = decoder.bits
+      @width = @obj.data.Width = format.width
+      @height = @obj.data.Height = format.height
+      @obj.data.ColorSpace = switch format.colorSpace
+        when 'rgb', 'rgba' then 'DeviceRGB'
+        when 'gray', 'graya' then 'DeviceGray'
+        when 'indexed'
+          palette = document.ref()
+          palette.end format.palette
+          ['Indexed', 'DeviceRGB', (format.palette.length / 3) - 1, palette]
+
+      colors = COMPONENTS[format.colorSpace]
+      @obj.data.DecodeParms =
         Predictor: 15
-        Colors: @image.colors
-        BitsPerComponent: @image.bits
-        Columns: @width
+        Colors: colors
+        BitsPerComponent: decoder.bits
+        Columns: format.width
+          
+      if format.colorSpace in ['rgba', 'graya'] or format.alphaPalette
+        sMask = document.ref
+          Type: 'XObject'
+          Subtype: 'Image'
+          Height: format.height
+          Width: format.width
+          BitsPerComponent: 8
+          ColorSpace: 'DeviceGray'
+          DecodeParms:
+            Predictor: 15
+            Colors: 1
+            BitsPerComponent: 8
+            Columns: format.width
+
+        @obj.data.SMask = sMask
+      
+      if format.colorSpace in ['rgba', 'graya']
+        @obj.data.DecodeParms.Colors--
+            
+        split = new SplitAlphaStream colors
+        split.alpha
+          .pipe new FilterStream 1, format.width
+          .pipe sMask
+
+        split.image
+          .pipe new FilterStream colors - 1, format.width
+          .pipe @obj
+          
+        decoder.pipe split
+                
+      else
+        if format.alphaPalette
+          decoder
+            .pipe new PaletteStream format.alphaPalette
+            .pipe new FilterStream 1, format.width
+            .pipe sMask
         
-      @obj.data['DecodeParms'] = params
-      params.end()
-        
-    if @image.palette.length is 0
-      @obj.data['ColorSpace'] = @image.colorSpace
-    else
-      # embed the color palette in the PDF as an object stream
-      palette = document.ref()
-      palette.end new Buffer @image.palette
-
-      # build the color space array for the image
-      @obj.data['ColorSpace'] = ['Indexed', 'DeviceRGB', (@image.palette.length / 3) - 1, palette]
-      
-    # For PNG color types 0, 2 and 3, the transparency data is stored in
-    # a dedicated PNG chunk.
-    if @image.transparency.grayscale
-      # Use Color Key Masking (spec section 4.8.5)
-      # An array with N elements, where N is two times the number of color components.
-      val = @image.transparency.greyscale
-      @obj.data['Mask'] = [val, val]
-
-    else if @image.transparency.rgb
-      # Use Color Key Masking (spec section 4.8.5)
-      # An array with N elements, where N is two times the number of color components.
-      rgb = @image.transparency.rgb
-      mask = []
-      for x in rgb
-        mask.push x, x
-
-      @obj.data['Mask'] = mask
-      
-    else if @image.transparency.indexed
-      # Create a transparency SMask for the image based on the data 
-      # in the PLTE and tRNS sections. See below for details on SMasks.
-      @loadIndexedAlphaChannel()
-      
-    else if @image.hasAlphaChannel
-      # For PNG color types 4 and 6, the transparency data is stored as a alpha
-      # channel mixed in with the main image data. Separate this data out into an
-      # SMask object and store it separately in the PDF.
-      @splitAlphaChannel()
-      
-    else
-      @finalize()
-      
-  finalize: ->
-    if @alphaChannel
-      sMask = @document.ref
-        Type: 'XObject'
-        Subtype: 'Image'
-        Height: @height
-        Width: @width
-        BitsPerComponent: 8
-        Filter: 'FlateDecode'
-        ColorSpace: 'DeviceGray'
-        Decode: [0, 1]
-
-      sMask.end @alphaChannel
-      @obj.data['SMask'] = sMask
-
-    # add the actual image data
-    @obj.end @imgData
+        decoder
+          .pipe new FilterStream colors, format.width
+          .pipe @obj
     
-    # free memory
-    @image = null
-    @imgData = null
+    @source.pipe decoder
+
+# This stream filters pixel data using the PNGEncoder
+class FilterStream extends stream.Transform
+  constructor: (colors, width) ->
+    super()
+    @_prevScanline = null
+    @_pixelBytes = (8 * colors) >> 3
+  
+  _transform: (data, encoding, callback) ->
+    callback null, PNGEncoder::_filter.call this, data
     
-  splitAlphaChannel: ->
-    @image.decodePixels (pixels) =>
-      colorByteSize = @image.colors * @image.bits / 8
-      pixelCount = @width * @height
-      imgData = new Buffer(pixelCount * colorByteSize)
-      alphaChannel = new Buffer(pixelCount)
+# This stream separates the alpha channel and other channels into two streams
+class SplitAlphaStream extends stream.Writable
+  constructor: (@components) ->
+    super()
+    @image = new stream.PassThrough
+    @alpha = new stream.PassThrough
+    
+  _write: (data, encoding, callback) ->
+    len = data.length / @components | 0
+    rgb = new Buffer len * (@components - 1)
+    alpha = new Buffer len
+    i = rgbIndex = alphaIndex = 0
+    
+    while i < data.length
+      for j in [0...@components - 1]
+        rgb[rgbIndex++] = data[i++]
 
-      i = p = a = 0
-      len = pixels.length
-      while i < len
-        imgData[p++] = pixels[i++]
-        imgData[p++] = pixels[i++]
-        imgData[p++] = pixels[i++]
-        alphaChannel[a++] = pixels[i++]
-
-      done = 0
-      zlib.deflate imgData, (err, @imgData) =>
-        throw err if err
-        @finalize() if ++done is 2
-
-      zlib.deflate alphaChannel, (err, @alphaChannel) =>
-        throw err if err
-        @finalize() if ++done is 2
-        
-  loadIndexedAlphaChannel: (fn) ->
-    transparency = @image.transparency.indexed
-    @image.decodePixels (pixels) =>
-      alphaChannel = new Buffer(@width * @height)
-
-      i = 0
-      for j in [0...pixels.length] by 1
-        alphaChannel[i++] = transparency[pixels[j]]
-
-      zlib.deflate alphaChannel, (err, @alphaChannel) =>
-        throw err if err
-        @finalize()
+      alpha[alphaIndex++] = data[i++]
+      
+    @image.write rgb
+    @alpha.write alpha
+    
+    callback()
+    
+  end: (chunk) ->
+    super
+    @image.end()
+    @alpha.end()
+    
+# This stream converts indexed transparency data to actual pixels
+class PaletteStream extends stream.Transform
+  constructor: (@palette) ->
+    super()
+    
+  _transform: (data, encoding, callback) ->
+    res = new Buffer data.length
+    for index, i in data
+      res[i] = @palette[index]
+      
+    callback null, res
     
 module.exports = PNGImage
