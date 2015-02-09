@@ -19,11 +19,10 @@ class PDFImage
     else if typeof src is 'string' and (match = /^data:.+;base64,(.*)$/.exec(src))
       src = new Buffer(match[1], 'base64')
             
-    else if typeof src isnt 'string'
+    else if typeof src isnt 'string' and not Buffer.isBuffer(src)
       throw new Error 'Unsupported input passed to doc.image. Must be a path, buffer, arraybuffer, uint8array, or base64 string.'
     
     if Buffer.isBuffer(src)
-      chunk = src.slice(0, BUFFER_SIZE)
       source = new stream.PassThrough
       source.end src
     else
