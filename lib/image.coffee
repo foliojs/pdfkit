@@ -26,6 +26,9 @@ class PDFImage
       source = new stream.PassThrough
       source.end src
     else
+      if process.browser
+        throw new Error 'Using filesystem paths is not supported in the browser. Please pass the image as a buffer.'
+        
       source = new SyncFileStream src
     
     chunk = source.read(4)
@@ -40,35 +43,36 @@ class PDFImage
     else
       throw new Error 'Unknown image format.'
 
-# This subclass of fs.ReadStream starts out reading synchronously,
-# but switches to asynchronous mode when piped somewhere.
-# This allows us to read image dimensions and other metadata that
-# usually occurs at the start of the file synchronously, but do the
-# rest of our reading and decoding asynchronously.
-class SyncFileStream extends fs.ReadStream
-  constructor: (filename) ->
-    super
-    @bufferSize = 1024
-    @sync = true
+unless process.browser
+  # This subclass of fs.ReadStream starts out reading synchronously,
+  # but switches to asynchronous mode when piped somewhere.
+  # This allows us to read image dimensions and other metadata that
+  # usually occurs at the start of the file synchronously, but do the
+  # rest of our reading and decoding asynchronously.
+  class SyncFileStream extends fs.ReadStream
+    constructor: (filename) ->
+      super
+      @bufferSize = 1024
+      @sync = true
     
-  open: ->
-    @fd = fs.openSync @path, @flags, @mode
-    @emit 'open', @fd
+    open: ->
+      @fd = fs.openSync @path, @flags, @mode
+      @emit 'open', @fd
     
-  _read: (size) ->
-    unless @sync
-      return super
+    _read: (size) ->
+      unless @sync
+        return super
 
-    chunk = new Buffer @bufferSize
-    bytesRead = fs.readSync @fd, chunk, 0, chunk.length
+      chunk = new Buffer @bufferSize
+      bytesRead = fs.readSync @fd, chunk, 0, chunk.length
     
-    if bytesRead > 0
-      @push chunk.slice(0, bytesRead)
-    else
-      @push null
+      if bytesRead > 0
+        @push chunk.slice(0, bytesRead)
+      else
+        @push null
       
-  pipe: (dest) ->
-    @sync = false
-    super
+    pipe: (dest) ->
+      @sync = false
+      super
           
 module.exports = PDFImage
