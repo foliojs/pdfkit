@@ -35,7 +35,7 @@
   },
   "dependencies": {
     "linebreak": "~0.1.0",
-    "png-stream": "^1.0.3"
+    "png-stream": "^1.0.4"
   },
   "scripts": {
     "prepublish": "make js",

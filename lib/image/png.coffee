@@ -46,7 +46,8 @@ class PNGImage
         Colors: colors
         BitsPerComponent: decoder.bits
         Columns: format.width
-          
+        
+      # Add an SMask for images with an alpha channel
       if format.colorSpace in ['rgba', 'graya'] or format.alphaPalette
         sMask = document.ref
           Type: 'XObject'
@@ -63,6 +64,7 @@ class PNGImage
 
         @obj.data.SMask = sMask
       
+      # Normal non-indexed images with alpha need to be split
       if format.colorSpace in ['rgba', 'graya']
         @obj.data.DecodeParms.Colors--
             
@@ -76,17 +78,25 @@ class PNGImage
           .pipe @obj
           
         decoder.pipe split
-                
-      else
-        if format.alphaPalette
-          decoder
-            .pipe new PaletteStream format.alphaPalette
-            .pipe new FilterStream 1, format.width
-            .pipe sMask
-        
+      
+      # Indexed images with alpha need to generate an SMask image from the palette
+      else if format.alphaPalette
+        decoder
+          .pipe new PaletteStream format.alphaPalette
+          .pipe new FilterStream 1, format.width
+          .pipe sMask
+          
         decoder
           .pipe new FilterStream colors, format.width
           .pipe @obj
+          
+      # Other images can be embedded directly, without decoding.
+      else
+        decoder._decodeRaw = true
+        @obj.compress = no
+        @obj.data.Filter = 'FlateDecode'
+
+        decoder.pipe @obj
     
     @source.pipe decoder
 
