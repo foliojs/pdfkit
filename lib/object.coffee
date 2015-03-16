@@ -17,6 +17,9 @@ class PDFObject
 
         else if object?.isString
             '(' + object + ')'
+			
+		else if object?.isRaw
+			object.toString()
             
         else if object instanceof PDFReference
             object.toString()
