@@ -15,12 +15,9 @@ class PDFObject
         else if typeof object is 'string'
             '/' + object
 
-        else if object?.isString
-            '(' + object + ')'
-			
-		else if object?.isRaw
-			object.toString()
-            
+        else if Buffer.isBuffer(object)
+            object.toString()
+			            
         else if object instanceof PDFReference
             object.toString()
             
@@ -67,10 +64,7 @@ class PDFObject
         if swap
             string = swapBytes(new Buffer('\ufeff' + string, 'ucs-2')).toString('binary')
         
-        return {
-            isString: yes
-            toString: -> string
-        }
+        return new Buffer("("+string+")")
         
 module.exports = PDFObject
 PDFReference = require './reference'
