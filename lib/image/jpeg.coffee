@@ -3,29 +3,29 @@ fs = require 'fs'
 class JPEG
   MARKERS = [0xFFC0, 0xFFC1, 0xFFC2, 0xFFC3, 0xFFC5, 0xFFC6, 0xFFC7,
              0xFFC8, 0xFFC9, 0xFFCA, 0xFFCB, 0xFFCC, 0xFFCD, 0xFFCE, 0xFFCF]
-  
-  constructor: (@data, @label) ->    
-    if data.readUInt16BE(0) isnt 0xFFD8
+
+  constructor: (@data, @label) ->
+    if @data.readUInt16BE(0) isnt 0xFFD8
       throw "SOI not found in JPEG"
            
     pos = 2
-    while pos < data.length
-      marker = data.readUInt16BE(pos)
+    while pos < @data.length
+      marker = @data.readUInt16BE(pos)
       pos += 2
       break if marker in MARKERS
-      pos += data.readUInt16BE(pos)
-    
+      pos += @data.readUInt16BE(pos)
+
     throw "Invalid JPEG." unless marker in MARKERS
     pos += 2
-     
-    @bits = data[pos++]
-    @height = data.readUInt16BE(pos)
+
+    @bits = @data[pos++]
+    @height = @data.readUInt16BE(pos)
     pos += 2
-    
-    @width = data.readUInt16BE(pos)
+
+    @width = @data.readUInt16BE(pos)
     pos += 2
-    
-    channels = data[pos++]
+
+    channels = @data[pos++]
     @colorSpace = switch channels
       when 1 then 'DeviceGray'
       when 3 then 'DeviceRGB'
