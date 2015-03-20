@@ -15,9 +15,9 @@ class PDFObject
     else if typeof object is 'string'
       '/' + object
 
-    else if object?.isString
-      '(' + object + ')'
-      
+    else if Buffer.isBuffer(object)
+      object.toString()
+	            
     else if object instanceof PDFReference
       object.toString()
       
