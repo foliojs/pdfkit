@@ -1,5 +1,3 @@
-PDFObject = require '../object'
-
 module.exports = 
   annotate: (x, y, w, h, options) ->
     options.Type = 'Annot'
@@ -9,7 +7,7 @@ module.exports =
     delete options.color
     
     if typeof options.Dest is 'string'
-      options.Dest = PDFObject.s options.Dest
+      options.Dest = new String options.Dest
     
     # Capitalize keys  
     for key, val of options
@@ -22,7 +20,7 @@ module.exports =
     
   note: (x, y, w, h, contents, options = {}) ->
     options.Subtype = 'Text'
-    options.Contents = PDFObject.s contents, true
+    options.Contents = new String contents
     options.Name = 'Comment'
     options.color ?= [243, 223, 92]
     @annotate x, y, w, h, options
@@ -31,7 +29,7 @@ module.exports =
     options.Subtype = 'Link'
     options.A = @ref
       S: 'URI'
-      URI: PDFObject.s url
+      URI: new String url
       
     options.A.end()
     @annotate x, y, w, h, options
@@ -39,7 +37,7 @@ module.exports =
   _markup: (x, y, w, h, options = {}) ->
     [x1, y1, x2, y2] = @_convertRect x, y, w, h
     options.QuadPoints = [x1, y2, x2, y2, x1, y1, x2, y1]
-    options.Contents = PDFObject.s ''
+    options.Contents = new String
     @annotate x, y, w, h, options
     
   highlight: (x, y, w, h, options = {}) ->
@@ -57,24 +55,24 @@ module.exports =
     
   lineAnnotation: (x1, y1, x2, y2, options = {}) ->
     options.Subtype = 'Line'
-    options.Contents = PDFObject.s ''
+    options.Contents = new String
     options.L = [x1, @page.height - y1, x2, @page.height - y2]
     @annotate x1, y1, x2, y2, options
     
   rectAnnotation: (x, y, w, h, options = {}) ->
     options.Subtype = 'Square'
-    options.Contents = PDFObject.s ''
+    options.Contents = new String
     @annotate x, y, w, h, options
     
   ellipseAnnotation: (x, y, w, h, options = {}) ->
     options.Subtype = 'Circle'
-    options.Contents = PDFObject.s ''
+    options.Contents = new String
     @annotate x, y, w, h, options
     
   textAnnotation: (x, y, w, h, text, options = {}) ->
     options.Subtype = 'FreeText'
-    options.Contents = PDFObject.s text, true
-    options.DA = PDFObject.s ''
+    options.Contents = new String text
+    options.DA = new String
     @annotate x, y, w, h, options
     
   _convertRect: (x1, y1, w, h) ->

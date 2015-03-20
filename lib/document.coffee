@@ -172,7 +172,7 @@ class PDFDocument extends stream.Readable
     @_info = @ref()
     for key, val of @info
       if typeof val is 'string'
-        val = PDFObject.s val, true
+        val = new String val
               
       @_info.data[key] = val
         
