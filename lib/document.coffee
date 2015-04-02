@@ -63,7 +63,7 @@ class PDFDocument extends stream.Readable
     @_write "%\xFF\xFF\xFF\xFF"
     
     # Add the first page
-    if @options.autoFirstPage != false
+    if @options.autoFirstPage isnt false
       @addPage()
   
   mixin = (methods) =>
