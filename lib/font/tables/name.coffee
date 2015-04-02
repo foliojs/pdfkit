@@ -97,7 +97,7 @@ module.exports = NameTable
         
 class NameEntry
   constructor: (@raw, entry) ->
-    @length = raw.length
+    @length = @raw.length
     @platformID = entry.platformID
     @encodingID = entry.encodingID
     @languageID = entry.languageID
