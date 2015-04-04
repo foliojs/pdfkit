@@ -63,7 +63,8 @@ class PDFDocument extends stream.Readable
     @_write "%\xFF\xFF\xFF\xFF"
     
     # Add the first page
-    @addPage()
+    if @options.autoFirstPage isnt false
+      @addPage()
   
   mixin = (methods) =>
     for name, method of methods
@@ -172,7 +173,7 @@ class PDFDocument extends stream.Readable
     @_info = @ref()
     for key, val of @info
       if typeof val is 'string'
-        val = PDFObject.s val, true
+        val = new String val
               
       @_info.data[key] = val
         
@@ -203,7 +204,7 @@ class PDFDocument extends stream.Readable
     # trailer
     @_write 'trailer'
     @_write PDFObject.convert
-      Size: @_offsets.length
+      Size: @_offsets.length + 1
       Root: @_root
       Info: @_info
         
