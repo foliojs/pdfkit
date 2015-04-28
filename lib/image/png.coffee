@@ -12,7 +12,7 @@ class PNGImage
   embed: (@document) ->
     return if @obj
     
-    @obj = document.ref
+    @obj = @document.ref
       Type: 'XObject'
       Subtype: 'Image'
       BitsPerComponent: @image.bits
@@ -21,7 +21,7 @@ class PNGImage
       Filter: 'FlateDecode'
       
     unless @image.hasAlphaChannel
-      params = document.ref
+      params = @document.ref
         Predictor: 15
         Colors: @image.colors
         BitsPerComponent: @image.bits
@@ -34,7 +34,7 @@ class PNGImage
       @obj.data['ColorSpace'] = @image.colorSpace
     else
       # embed the color palette in the PDF as an object stream
-      palette = document.ref()
+      palette = @document.ref()
       palette.end new Buffer @image.palette
 
       # build the color space array for the image
