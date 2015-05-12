@@ -118,9 +118,10 @@ module.exports =
     for col, colIndex in @tableOptions.columns
       height = 0
       line = () -> height += @currentLineHeight(true)
-      wrapper = new LineWrapper(this)
+      height = height += @currentLineHeight(true)
+      wrapper = new LineWrapper(this, {})
       wrapper.on 'line', line.bind(this)
-      wrapper.wrap([row[col.id]+'' or ''], { width: @getColWidth(colIndex) })
+      wrapper.wrap(row[col.id]+'' or '', { width: @getColWidth(colIndex) })
       if height > maxHeight
         maxHeight = height
 
