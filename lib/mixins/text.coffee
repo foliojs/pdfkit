@@ -140,6 +140,9 @@ module.exports =
       @x = x
     if y?
       @y = y
+      @maxY = @page.height - @page.margins.bottom
+    else
+      @maxY = @page.height - @page.margins.bottom - @page.footerHeight
 
     # wrap to margins if no x or y position passed
     unless options.lineBreak is false
