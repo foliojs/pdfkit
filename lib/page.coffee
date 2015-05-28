@@ -20,6 +20,9 @@ class PDFPage
     else
       @margins = options.margins or DEFAULT_MARGINS
       
+    # prepare for footers
+    @footerHeight = options.footerHeight or 0 
+      
     # calculate page dimensions
     dimensions = if Array.isArray(@size) then @size else SIZES[@size.toUpperCase()]
     @width = dimensions[if @layout is 'portrait' then 0 else 1]

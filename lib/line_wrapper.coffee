@@ -15,13 +15,14 @@ class LineWrapper extends EventEmitter
     @column    = 1
     @ellipsis  = options.ellipsis
     @continuedX  = 0
+    @footerStartY = @document.page.maxY() - @document.page.footerHeight
     
     # calculate the maximum Y position the text can appear at
     if options.height?
       @height = options.height
       @maxY = @startY + options.height
-    else
-      @maxY = @document.page.maxY()
+    else 
+      @maxY = @footerStartY
     
     # handle paragraph indents
     @on 'firstLine', (options) =>
@@ -216,7 +217,7 @@ class LineWrapper extends EventEmitter
       @document.addPage()
       @column = 1
       @startY = @document.page.margins.top
-      @maxY = @document.page.maxY()
+      @maxY = @footerStartY
       @document.x = @startX
       @document.fillColor @document._fillColor... if @document._fillColor
       @emit 'pageBreak', options, this
