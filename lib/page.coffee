@@ -20,6 +20,9 @@ class PDFPage
     else
       @margins = options.margins or DEFAULT_MARGINS
       
+    # process footer
+    @footerHeight = options.footerHeight or 0
+      
     # calculate page dimensions
     dimensions = if Array.isArray(@size) then @size else SIZES[@size.toUpperCase()]
     @width = dimensions[if @layout is 'portrait' then 0 else 1]
@@ -52,8 +55,13 @@ class PDFPage
       Contents: @content
       Resources: @resources
       
-  maxY: ->
-    @height - @margins.bottom
+  maxY: (yIsSpecified) ->
+    # If a y-coordinate is included, text is allowed to be written to "footer"
+    if yIsSpecified
+      @height - @margins.bottom
+    # Else (no y-coordinate is included), the script needs to be avoid writing in "footer"
+    else
+      @height - @margins.bottom - @footerHeight
         
   write: (chunk) ->
     @content.write chunk
