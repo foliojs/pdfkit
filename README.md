@@ -65,7 +65,7 @@ PDFDocument = require 'pdfkit'
 # Create a document
 doc = new PDFDocument
 
-# Pipe it's output somewhere, like to a file or HTTP response
+# Pipe its output somewhere, like to a file or HTTP response
 # See below for browser usage
 doc.pipe fs.createWriteStream('output.pdf')
 
