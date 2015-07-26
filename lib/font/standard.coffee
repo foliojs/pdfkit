@@ -5,7 +5,7 @@ fs = require 'fs'
 class StandardFont extends PDFFont
   constructor: (@document, @name, @id) ->
     @font = new AFMFont STANDARD_FONTS[@name]()
-    {@ascender,@decender,@bbox,@lineGap} = @font
+    {@ascender,@descender,@bbox,@lineGap} = @font
     
   embed: ->
     @dictionary.data =
@@ -20,10 +20,16 @@ class StandardFont extends PDFFont
     encoded = @font.encodeText text
     glyphs = @font.glyphsForString '' + text
     advances = @font.advancesForGlyphs glyphs
+    positions = []
     for glyph, i in glyphs
-      advances[i] -= @font.widthOfGlyph glyph
+      positions.push
+        xAdvance: advances[i]
+        yAdvance: 0
+        xOffset: 0
+        yOffset: 0
+        advanceWidth: @font.widthOfGlyph glyph
       
-    return [encoded, advances]
+    return [encoded, positions]
     
   widthOfString: (string, size) ->
     glyphs = @font.glyphsForString '' + string
