@@ -222,7 +222,7 @@ module.exports =
     @addContent "BT"
 
     # text position
-    @addContent "#{x} #{y} Td"
+    @addContent "1 0 0 1 #{x} #{y} Tm"
 
     # font and font size
     @addContent "/#{@_font.id} #{@_fontSize} Tf"
@@ -244,39 +244,66 @@ module.exports =
       wordSpacing *= 1000 / @_fontSize
       
       encoded = []
-      advances = []
+      positions = []
       for word in words
-        [encodedWord, advancesWord] = @_font.encode(word, options.features)
-        unless advancesWord
-          advancesWord = (0 for i in [0...encodedWord.length])
-          
+        [encodedWord, positionsWord] = @_font.encode(word, options.features)          
         encoded.push encodedWord...
-        advances.push advancesWord...
+        positions.push positionsWord...
         
-        # add thw word spacing to the end of the word
-        advances[advances.length - 1] += wordSpacing
+        # add the word spacing to the end of the word
+        positions[positions.length - 1].xAdvance += wordSpacing
     else
-      [encoded, advances] = @_font.encode(text, options.features)
+      [encoded, positions] = @_font.encode(text, options.features)
       
-    # if we have an array of advances (e.g kerning data),
-    # use the TJ operator to control spacing
-    if advances
-      commands = []
-      last = 0
-      for a, i in advances
-        # group consecutive letters together whose advance adjustments are 0
-        if a is 0 and i < advances.length - 1
-          continue
+    scale = @_fontSize / 1000
+    commands = []
+    last = 0
+    hadOffset = no
+    
+    # Adds a segment of text to the TJ command buffer
+    addSegment = (cur) =>
+      if last < cur
+        hex = encoded.slice(last, cur).join ''
+        advance = positions[cur - 1].xAdvance - positions[cur - 1].advanceWidth
+        commands.push "<#{hex}> #{-advance}"
+      
+      last = cur
+    
+    # Flushes the current TJ commands to the output stream
+    flush = (i) =>
+      addSegment i
+      
+      if commands.length > 0
+        @addContent "[#{commands.join ' '}] TJ"
+        commands.length = 0
+    
+    for pos, i in positions
+      # If we have an x or y offset, we have to break out of the current TJ command
+      # so we can move the text position.
+      if pos.xOffset or pos.yOffset
+        # Flush the current buffer
+        flush i
         
-        h = encoded.slice(last, i + 1).join ''
-        commands.push "<#{h}> #{-a}"
-        last = i + 1
+        # Move the text position and flush just the current character
+        @addContent "1 0 0 1 #{x + pos.xOffset * scale} #{y + pos.yOffset * scale} Tm"
+        flush i + 1
+        
+        hadOffset = yes
+      else
+        # If the last character had an offset, reset the text position
+        if hadOffset
+          @addContent "1 0 0 1 #{x} #{y} Tm"
+          hadOffset = no
+        
+        # Group segments that don't have any advance adjustments
+        unless pos.xAdvance - pos.advanceWidth is 0
+          addSegment i + 1
       
-      @addContent "[#{commands.join ' '}] TJ"
-    else
-      # otherwise, just use the normal Tj operator
-      @addContent "<#{encoded.join ''}> Tj"
-
+      x += pos.xAdvance * scale
+    
+    # Flush any remaining commands
+    flush i
+      
     # end the text object
     @addContent "ET"
     
