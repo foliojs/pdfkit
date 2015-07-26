@@ -5,41 +5,36 @@ class EmbeddedFont extends PDFFont
   constructor: (@document, @font, @id) ->
     @subset = @font.createSubset()
     @unicode = [[0]]
-    @widths = [@font.widthOfGlyph 0]
+    @widths = [@font.getGlyph(0).advanceWidth]
     
     @name = @font.postscriptName
-    @ascender = @font.ascent
-    @decender = @font.descent
-    @lineGap = @font.lineGap
+    @scale = 1000 / @font.unitsPerEm
+    @ascender = @font.ascent * @scale
+    @descender = @font.descent * @scale
+    @lineGap = @font.lineGap * @scale
     @bbox = @font.bbox
-    
-  includeGlyph: (gid) ->
-    return @subset.includeGlyph gid
   
   encode: (text, features) ->
-    glyphs = @font.glyphsForString text, features
-    advances = @font.advancesForGlyphs glyphs, features
+    {glyphs, positions} = @font.layout text, features
     
     res = []
     for glyph, i in glyphs
-      gid = @includeGlyph glyph.id
+      gid = @subset.includeGlyph glyph.id
       res.push ('0000' + gid.toString(16)).slice(-4)
-        
-      @widths[gid] ?= @font.widthOfGlyph glyph.id
+    
+      @widths[gid] ?= glyph.advanceWidth * @scale
       @unicode[gid] ?= glyph.codePoints
-      advances[i] -= @widths[gid]
       
-    return [res, advances]
+      for key of positions[i]
+        positions[i][key] *= @scale
+        
+      positions[i].advanceWidth = glyph.advanceWidth * @scale
+      
+    return [res, positions]
     
   widthOfString: (string, size, features) ->
-    glyphs = @font.glyphsForString '' + string, features
-    advances = @font.advancesForGlyphs glyphs, features
-    
-    width = 0
-    for advance in advances
-      width += advance
-    
-    scale = size / 1000  
+    width = @font.widthOfString string, features
+    scale = size / @font.unitsPerEm
     return width * scale
         
   embed: ->
@@ -63,16 +58,17 @@ class EmbeddedFont extends PDFFont
     tag = (String.fromCharCode Math.random() * 26 + 65 for i in [0...6]).join ''
     name = tag + '+' + @font.postscriptName
     
+    bbox = @font.bbox
     descriptor = @document.ref
       Type: 'FontDescriptor'
       FontName: name
       Flags: flags
-      FontBBox: @font.bbox
+      FontBBox: [bbox.minX * @scale, bbox.minY * @scale, bbox.maxX * @scale, bbox.maxY * @scale]
       ItalicAngle: @font.italicAngle
-      Ascent: @font.ascent
-      Descent: @font.descent
-      CapHeight: @font.capHeight or @font.ascent
-      XHeight: @font.xHeight or 0
+      Ascent: @ascender
+      Descent: @descender
+      CapHeight: (@font.capHeight or @font.ascent) * @scale
+      XHeight: (@font.xHeight or 0) * @scale
       StemV: 0 # not sure how to calculate this
         
     if isCFF
@@ -87,8 +83,8 @@ class EmbeddedFont extends PDFFont
       Subtype: if isCFF then 'CIDFontType0' else 'CIDFontType2'
       BaseFont: name
       CIDSystemInfo:
-        Registry: PDFObject.s 'Adobe'
-        Ordering: PDFObject.s 'Identity'
+        Registry: new String 'Adobe'
+        Ordering: new String 'Identity'
         Supplement: 0
       FontDescriptor: descriptor
       W: [0, @widths]
