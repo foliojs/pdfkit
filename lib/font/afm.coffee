@@ -104,7 +104,7 @@ class AFMFont
     return characters[WIN_ANSI_MAP[character] or character] or '.notdef'
           
   widthOfGlyph: (glyph) ->
-    return @glyphWidths[glyph]
+    return @glyphWidths[glyph] or 0
     
   getKernPair: (left, right) ->
     return @kernPairs[left + '\0' + right] or 0
