@@ -45,7 +45,7 @@ class PDFFont
       
   lineHeight: (size, includeGap = false) ->
     gap = if includeGap then @lineGap else 0
-    (@ascender + gap - @decender) / 1000 * size
+    (@ascender + gap - @descender) / 1000 * size
   
 module.exports = PDFFont
 
