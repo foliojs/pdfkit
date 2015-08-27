@@ -12,7 +12,7 @@ class PNGImage
   embed: (@document) ->
     return if @obj
     
-    @obj = document.ref
+    @obj = @document.ref
       Type: 'XObject'
       Subtype: 'Image'
       BitsPerComponent: @image.bits
