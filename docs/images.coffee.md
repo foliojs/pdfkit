@@ -18,7 +18,7 @@ Here is an example showing some of these options.
 
     # Scale proprotionally to the specified width
     doc.image('images/test.jpeg', 0, 15, width: 300)
-       .text('Proprotional to width', 0, 0)
+       .text('Proportional to width', 0, 0)
      
     # Fit the image within the dimensions
     doc.image('images/test.jpeg', 320, 15, fit: [100, 100])
