@@ -3,12 +3,13 @@ LineBreaker = require 'linebreak'
 
 class LineWrapper extends EventEmitter
   constructor: (@document, options) ->
-    @indent    = options.indent or 0
-    @characterSpacing = options.characterSpacing or 0
-    @wordSpacing = options.wordSpacing is 0
+    @horizontalScaling = options.horizontalScaling or 100
+    @indent    = (options.indent or 0) * @horizontalScaling / 100 
+    @characterSpacing = (options.characterSpacing or 0) * @horizontalScaling / 100
+    @wordSpacing = (options.wordSpacing is 0) * @horizontalScaling / 100
     @columns   = options.columns or 1
-    @columnGap   = options.columnGap ? 18 # 1/4 inch
-    @lineWidth   = (options.width - (@columnGap * (@columns - 1))) / @columns
+    @columnGap   = (options.columnGap ? 18) * @horizontalScaling / 100 # 1/4 inch
+    @lineWidth   = ((options.width  * @horizontalScaling / 100) - (@columnGap * (@columns - 1))) / @columns
     @spaceLeft = @lineWidth
     @startX    = @document.x
     @startY    = @document.y
@@ -22,7 +23,7 @@ class LineWrapper extends EventEmitter
       @maxY = @startY + options.height
     else
       @maxY = @document.page.maxY()
-    
+
     # handle paragraph indents
     @on 'firstLine', (options) =>
       # if this is the first line of the text segment, and
@@ -97,11 +98,12 @@ class LineWrapper extends EventEmitter
     
   wrap: (text, options) ->
     # override options from previous continued fragments
-    @indent    = options.indent       if options.indent?
-    @characterSpacing = options.characterSpacing if options.characterSpacing?
-    @wordSpacing = options.wordSpacing    if options.wordSpacing?
+    @horizontalScaling = options.horizontalScaling or 100
+    @indent    = (options.indent * @horizontalScaling/100)       if options.indent?
+    @characterSpacing = (options.characterSpacing * @horizontalScaling/100) if options.characterSpacing?
+    @wordSpacing = (options.wordSpacing * @horizontalScaling/100)    if options.wordSpacing?
     @ellipsis  = options.ellipsis     if options.ellipsis?
-    
+
     # make sure we're actually on the page 
     # and that the first line of is never by 
     # itself at the bottom of a page (orphans)

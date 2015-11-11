@@ -49,7 +49,9 @@ module.exports =
     @_text text, x, y, options, @_line.bind(this)
     
   widthOfString: (string, options = {}) ->
-    @_font.widthOfString(string, @_fontSize) + (options.characterSpacing or 0) * (string.length - 1)
+    horizontalScaling = options.horizontalScaling or 100
+
+    (@_font.widthOfString(string, @_fontSize) + (options.characterSpacing or 0) * (string.length - 1)) * horizontalScaling/100
     
   heightOfString: (text, options = {}) ->
     {x,y} = this
@@ -70,6 +72,8 @@ module.exports =
   list: (list, x, y, options, wrapper) ->
     options = @_initOptions(x, y, options)
     
+    horizontalScaling = options.horizontalScaling or 100
+
     r = Math.round (@_font.ascender / 1000 * @_fontSize) / 3
     indent = options.textIndent or r * 5
     itemIndent = options.bulletIndent or r * 8
@@ -168,6 +172,7 @@ module.exports =
     align = options.align or 'left'
     wordSpacing = options.wordSpacing or 0
     characterSpacing = options.characterSpacing or 0
+    horizontalScaling = options.horizontalScaling or 100
 
     # text alignments
     if options.width
@@ -237,6 +242,9 @@ module.exports =
     # Character spacing
     @addContent "#{characterSpacing} Tc" if characterSpacing
     
+    # Horizontal scaling
+    @addContent "#{horizontalScaling} Tz" if horizontalScaling != 100
+
     # Add the actual text
     # If we have a word spacing value, we need to encode each word separately
     # since the normal Tw operator only works on character code 32, which isn't
