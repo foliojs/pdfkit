@@ -64,7 +64,7 @@ class PDFObject
         
     else if object instanceof Date
       '(D:' + pad(object.getUTCFullYear(), 4) +
-              pad(object.getUTCMonth(), 2) + 
+              pad(object.getUTCMonth() + 1, 2) + 
               pad(object.getUTCDate(), 2) + 
               pad(object.getUTCHours(), 2) + 
               pad(object.getUTCMinutes(), 2) + 
