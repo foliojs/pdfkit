@@ -1,4 +1,6 @@
-js: lib/**/*.coffee
+.PHONY: js
+
+js:
 	./node_modules/.bin/coffee -o js -c lib/
 	cp -r lib/font/data js/font/data
 	
