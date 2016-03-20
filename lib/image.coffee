@@ -12,6 +12,8 @@ class PDFImage
   @open: (src, label) ->
     if Buffer.isBuffer(src)
       data = src
+    else if src instanceof ArrayBuffer
+      data = new Buffer(new Uint8Array(src))
     else
       if match = /^data:.+;base64,(.*)$/.exec(src)
         data = new Buffer(match[1], 'base64')
