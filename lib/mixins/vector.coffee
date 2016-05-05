@@ -155,6 +155,8 @@ module.exports =
 
       # render segment
       @bezierCurveTo cp1x, cp1y, cp2x, cp2y, ax, ay
+    
+    return @
 
   polygon: (points...) ->
     @moveTo points.shift()...
