@@ -102,6 +102,60 @@ module.exports =
   circle: (x, y, radius) ->
     @ellipse x, y, radius
     
+  arc: (x, y, radius, startAngle, endAngle, anticlockwise = false) ->
+    TWO_PI = 2.0 * Math.PI
+    HALF_PI = 0.5 * Math.PI
+
+    deltaAng = endAngle - startAngle
+
+    if Math.abs(deltaAng) > TWO_PI
+      #draw only full circle if more than that is specified
+      deltaAng = TWO_PI
+   
+    else if (deltaAng != 0 && anticlockwise != (deltaAng < 0))
+      #necessary to flip direction of rendering
+      dir = if anticlockwise then -1 else 1
+      deltaAng = dir * TWO_PI + deltaAng
+
+    numSegs = Math.ceil(Math.abs(deltaAng) / HALF_PI)
+    segAng = deltaAng / numSegs
+    handleLen = (segAng / HALF_PI) * KAPPA * radius
+    curAng = startAngle
+
+    # component distances between anchor point and control point
+    deltaCx = -Math.sin(curAng) * handleLen
+    deltaCy = Math.cos(curAng) * handleLen
+
+    # anchor point
+    ax = x + Math.cos(curAng) * radius
+    ay = y + Math.sin(curAng) * radius
+
+    # calculate and render segments
+    @moveTo ax, ay
+
+    for segIdx in [0...numSegs]
+      # starting control point
+      cp1x = ax + deltaCx
+      cp1y = ay + deltaCy
+
+      # step angle
+      curAng += segAng
+
+      # next anchor point
+      ax = x + Math.cos(curAng) * radius
+      ay = y + Math.sin(curAng) * radius
+
+      # next control point delta
+      deltaCx = -Math.sin(curAng) * handleLen
+      deltaCy = Math.cos(curAng) * handleLen
+
+      # ending control point
+      cp2x = ax - deltaCx
+      cp2y = ay - deltaCy
+
+      # render segment
+      @bezierCurveTo cp1x, cp1y, cp2x, cp2y, ax, ay
+
   polygon: (points...) ->
     @moveTo points.shift()...
     @lineTo point... for point in points
