@@ -1,5 +1,6 @@
 CmapTable = require './tables/cmap'
 utils = require './utils'
+Crypto = require 'crypto'
 
 class Subset
   constructor: (@font) ->
@@ -86,8 +87,14 @@ class Subset
     # encode the font tables
     glyf = @font.glyf.encode(glyphs, oldIDs, old2new)
     loca = @font.loca.encode(glyf.offsets)
-    name = @font.name.encode()
-    
+
+    # build subset tag and name table
+    hash = Crypto.createHash('md5');
+    hash.update JSON.stringify(glyf.offsets)
+    hash.update JSON.stringify(glyf.table)
+    tag = hash.digest('base64').substr(0, 6).toUpperCase()
+    name = @font.name.encode(tag)
+
     # store for use later
     @postscriptName = name.postscriptName
     @cmap = {}
