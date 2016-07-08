@@ -3,6 +3,7 @@ Data = require '../../data'
 utils = require '../utils'
 
 class NameTable extends Table
+  tag: 'name'
   parse: (data) ->
     data.pos = @offset
     
@@ -96,7 +97,7 @@ module.exports = NameTable
         
 class NameEntry
   constructor: (@raw, entry) ->
-    @length = raw.length
+    @length = @raw.length
     @platformID = entry.platformID
     @encodingID = entry.encodingID
     @languageID = entry.languageID
