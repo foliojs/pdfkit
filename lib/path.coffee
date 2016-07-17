@@ -92,17 +92,17 @@ class SVGPath
     # run the commands
     for c, i in commands
       runners[c.cmd]?(doc, c.args)
-      
+
     cx = cy = px = py = 0
 
-  runners = 
+  runners =
     M: (doc, a) ->
       cx = a[0]
       cy = a[1]
       px = py = null
       sx = cx
       sy = cy
-      doc.moveTo cx, cy
+      doc.moveTo(fixRoundingError(cx), fixRoundingError(cy))
 
     m: (doc, a) ->
       cx += a[0]
@@ -110,7 +110,10 @@ class SVGPath
       px = py = null
       sx = cx
       sy = cy
-      doc.moveTo cx, cy
+      doc.moveTo(
+        fixRoundingError(cx),
+        fixRoundingError(cy)
+      )
 
     C: (doc, a) ->
       cx = a[4]
@@ -120,7 +123,14 @@ class SVGPath
       doc.bezierCurveTo a...
 
     c: (doc, a) ->
-      doc.bezierCurveTo a[0] + cx, a[1] + cy, a[2] + cx, a[3] + cy, a[4] + cx, a[5] + cy
+      doc.bezierCurveTo(
+        fixRoundingError(a[0] + cx),
+        fixRoundingError(a[1] + cy),
+        fixRoundingError(a[2] + cx),
+        fixRoundingError(a[3] + cy),
+        fixRoundingError(a[4] + cx),
+        fixRoundingError(a[5] + cy)
+      )
       px = cx + a[2]
       py = cy + a[3]
       cx += a[4]
@@ -131,7 +141,11 @@ class SVGPath
         px = cx
         py = cy
 
-      doc.bezierCurveTo cx-(px-cx), cy-(py-cy), a[0], a[1], a[2], a[3]
+      doc.bezierCurveTo(
+        fixRoundingError(cx-(px-cx)),
+        fixRoundingError(cy-(py-cy)),
+        a[0], a[1], a[2], a[3]
+      )
       px = a[0]
       py = a[1]
       cx = a[2]
@@ -141,22 +155,34 @@ class SVGPath
       if px is null
         px = cx
         py = cy
-        
-      doc.bezierCurveTo cx-(px-cx), cy-(py-cy), cx + a[0], cy + a[1], cx + a[2], cy + a[3]
+
+      doc.bezierCurveTo(
+        fixRoundingError(cx-(px-cx)),
+        fixRoundingError(cy-(py-cy)),
+        fixRoundingError(cx + a[0]),
+        fixRoundingError(cy + a[1]),
+        fixRoundingError(cx + a[2]),
+        fixRoundingError(cy + a[3])
+      )
       px = cx + a[0]
       py = cy + a[1]
       cx += a[2]
       cy += a[3]
-      
+
     Q: (doc, a) ->
       px = a[0]
       py = a[1]
       cx = a[2]
       cy = a[3]
-      doc.quadraticCurveTo(a[0], a[1], cx, cy)
+      doc.quadraticCurveTo(a[0], a[1], fixRoundingError(cx), fixRoundingError(cy))
 
     q: (doc, a) ->
-      doc.quadraticCurveTo(a[0] + cx, a[1] + cy, a[2] + cx, a[3] + cy)
+      doc.quadraticCurveTo(
+        fixRoundingError(a[0] + cx),
+        fixRoundingError(a[1] + cy),
+        fixRoundingError(a[2] + cx),
+        fixRoundingError(a[3] + cy)
+      )
       px = cx + a[0]
       py = cy + a[1]
       cx += a[2]
@@ -166,11 +192,11 @@ class SVGPath
       if px is null
         px = cx
         py = cy
-      else 
+      else
         px = cx-(px-cx)
         py = cy-(py-cy)
 
-      doc.quadraticCurveTo(px, py, a[0], a[1])
+      doc.quadraticCurveTo(fixRoundingError(px), fixRoundingError(py), a[0], a[1])
       px = cx-(px-cx)
       py = cy-(py-cy)
       cx = a[0]
@@ -183,8 +209,12 @@ class SVGPath
       else
         px = cx-(px-cx)
         py = cy-(py-cy)
-
-      doc.quadraticCurveTo(px, py, cx + a[0], cy + a[1])
+      doc.quadraticCurveTo(
+        fixRoundingError(px),
+        fixRoundingError(py),
+        fixRoundingError(cx + a[0]),
+        fixRoundingError(cy + a[1])
+      )
       cx += a[0]
       cy += a[1]
 
@@ -204,33 +234,33 @@ class SVGPath
       cx = a[0]
       cy = a[1]
       px = py = null
-      doc.lineTo(cx, cy)
+      doc.lineTo(fixRoundingError(cx), fixRoundingError(cy))
 
     l: (doc, a) ->
       cx += a[0]
       cy += a[1]
       px = py = null
-      doc.lineTo(cx, cy)
+      doc.lineTo(fixRoundingError(cx), fixRoundingError(cy))
 
     H: (doc, a) ->
       cx = a[0]
       px = py = null
-      doc.lineTo(cx, cy)
+      doc.lineTo(fixRoundingError(cx), fixRoundingError(cy))
 
     h: (doc, a) ->
       cx += a[0]
       px = py = null
-      doc.lineTo(cx, cy)
+      doc.lineTo(fixRoundingError(cx), fixRoundingError(cy))
 
     V: (doc, a) ->
       cy = a[0]
       px = py = null
-      doc.lineTo(cx, cy)
+      doc.lineTo(fixRoundingError(cx), fixRoundingError(cy))
 
     v: (doc, a) ->
       cy += a[0]
       px = py = null
-      doc.lineTo(cx, cy)
+      doc.lineTo(fixRoundingError(cx), fixRoundingError(cy))
 
     Z: (doc) ->
       doc.closePath()
