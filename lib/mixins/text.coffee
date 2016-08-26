@@ -49,7 +49,7 @@ module.exports =
     @_text text, x, y, options, @_line.bind(this)
     
   widthOfString: (string, options = {}) ->
-    @_font.widthOfString(string, @_fontSize) + (options.characterSpacing or 0) * (string.length - 1)
+    @_font.widthOfString(string, @_fontSize, options.features) + (options.characterSpacing or 0) * (string.length - 1)
     
   heightOfString: (text, options = {}) ->
     {x,y} = this
@@ -161,7 +161,7 @@ module.exports =
       @y += @currentLineHeight(true) + lineGap
 
   _fragment: (text, x, y, options) ->
-    text = '' + text
+    text = ('' + text).replace(/\n/g, '')
     return if text.length is 0
 
     # handle options
@@ -218,14 +218,11 @@ module.exports =
     # add current font to page if necessary
     @page.fonts[@_font.id] ?= @_font.ref()
 
-    # tell the font subset to use the characters
-    @_font.use(text)
-
     # begin the text object
     @addContent "BT"
 
     # text position
-    @addContent "#{x} #{y} Td"
+    @addContent "1 0 0 1 #{x} #{y} Tm"
 
     # font and font size
     @addContent "/#{@_font.id} #{@_fontSize} Tf"
@@ -246,22 +243,67 @@ module.exports =
       wordSpacing += @widthOfString(' ') + characterSpacing
       wordSpacing *= 1000 / @_fontSize
       
-      commands = []
+      encoded = []
+      positions = []
       for word in words
-        # encode the text based on the font subset,
-        # and then convert it to hex
-        encoded = @_font.encode(word)
-        encoded = (encoded.charCodeAt(i).toString(16) for i in [0...encoded.length] by 1).join('')
-        commands.push "<#{encoded}> #{-wordSpacing}"
-      
-      @addContent "[#{commands.join ' '}] TJ"
+        [encodedWord, positionsWord] = @_font.encode(word, options.features)          
+        encoded.push encodedWord...
+        positions.push positionsWord...
+        
+        # add the word spacing to the end of the word
+        positions[positions.length - 1].xAdvance += wordSpacing
     else
-      # encode the text based on the font subset,
-      # and then convert it to hex
-      encoded = @_font.encode(text)
-      encoded = (encoded.charCodeAt(i).toString(16) for i in [0...encoded.length] by 1).join('')
-      @addContent "<#{encoded}> Tj"
-
+      [encoded, positions] = @_font.encode(text, options.features)
+      
+    scale = @_fontSize / 1000
+    commands = []
+    last = 0
+    hadOffset = no
+    
+    # Adds a segment of text to the TJ command buffer
+    addSegment = (cur) =>
+      if last < cur
+        hex = encoded.slice(last, cur).join ''
+        advance = positions[cur - 1].xAdvance - positions[cur - 1].advanceWidth
+        commands.push "<#{hex}> #{-advance}"
+      
+      last = cur
+    
+    # Flushes the current TJ commands to the output stream
+    flush = (i) =>
+      addSegment i
+      
+      if commands.length > 0
+        @addContent "[#{commands.join ' '}] TJ"
+        commands.length = 0
+    
+    for pos, i in positions
+      # If we have an x or y offset, we have to break out of the current TJ command
+      # so we can move the text position.
+      if pos.xOffset or pos.yOffset
+        # Flush the current buffer
+        flush i
+        
+        # Move the text position and flush just the current character
+        @addContent "1 0 0 1 #{x + pos.xOffset * scale} #{y + pos.yOffset * scale} Tm"
+        flush i + 1
+        
+        hadOffset = yes
+      else
+        # If the last character had an offset, reset the text position
+        if hadOffset
+          @addContent "1 0 0 1 #{x} #{y} Tm"
+          hadOffset = no
+        
+        # Group segments that don't have any advance adjustments
+        unless pos.xAdvance - pos.advanceWidth is 0
+          addSegment i + 1
+      
+      x += pos.xAdvance * scale
+    
+    # Flush any remaining commands
+    flush i
+      
     # end the text object
     @addContent "ET"
     

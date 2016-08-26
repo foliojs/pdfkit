@@ -182,7 +182,7 @@ class PDFDocument extends stream.Readable
     @_info.end()
     
     for name, font of @_fontFamilies
-      font.embed()
+      font.finalize()
         
     @_root.end()
     @_root.data.Pages.end()
