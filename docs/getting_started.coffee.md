@@ -85,6 +85,11 @@ quite simple!
     
     doc.addPage()
 
+To add some content every time a page is created, either by calling `addPage()` or automatically, you can use the `pageAdded` event.
+    
+    doc.on 'pageAdded', ->
+      doc.text "Page Title"
+
 You can also set some options for the page, such as it's size and orientation.
 
 The `layout` property can be either `portrait` (the default) or `landscape`.
