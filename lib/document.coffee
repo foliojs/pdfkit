@@ -63,7 +63,8 @@ class PDFDocument extends stream.Readable
     @_write "%\xFF\xFF\xFF\xFF"
     
     # Add the first page
-    @addPage()
+    if @options.autoFirstPage isnt false
+      @addPage()
   
   mixin = (methods) =>
     for name, method of methods
@@ -98,6 +99,8 @@ class PDFDocument extends stream.Readable
     # the top left rather than the bottom left
     @_ctm = [1, 0, 0, 1, 0, 0]
     @transform 1, 0, 0, -1, 0, @page.height
+
+    @emit('pageAdded')
     
     return this
 
@@ -172,14 +175,14 @@ class PDFDocument extends stream.Readable
     @_info = @ref()
     for key, val of @info
       if typeof val is 'string'
-        val = PDFObject.s val, true
+        val = new String val
               
       @_info.data[key] = val
         
     @_info.end()
     
     for name, font of @_fontFamilies
-      font.embed()
+      font.finalize()
         
     @_root.end()
     @_root.data.Pages.end()
@@ -203,7 +206,7 @@ class PDFDocument extends stream.Readable
     # trailer
     @_write 'trailer'
     @_write PDFObject.convert
-      Size: @_offsets.length
+      Size: @_offsets.length + 1
       Root: @_root
       Info: @_info
         

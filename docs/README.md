@@ -1,6 +1,6 @@
 # PDFKit Guide
 
-The PDFKit guide can be read a number of ways.  The first is online at [http://pdfkit.org/](pdfkit.org).
+The PDFKit guide can be read a number of ways.  The first is online at [pdfkit.org](http://pdfkit.org/).
 You can also read the guide in PDF form, in this directory or [online](http://pdfkit.org/docs/guide.pdf).
 
 Both the website and the PDF guide are generated from the Literate CoffeeScript (runnable Markdown) files

@@ -310,12 +310,12 @@ class SVGPath
 
     th_half = 0.5 * (th1 - th0)
     t = (8 / 3) * Math.sin(th_half * 0.5) * Math.sin(th_half * 0.5) / Math.sin(th_half)
-    x1 = cx + Math.cos(th0) - t * Math.sin(th0)
-    y1 = cy + Math.sin(th0) + t * Math.cos(th0)
-    x3 = cx + Math.cos(th1)
-    y3 = cy + Math.sin(th1)
-    x2 = x3 + t * Math.sin(th1)
-    y2 = y3 - t * Math.cos(th1)
+    x1 = fixRoundingError(cx + Math.cos(th0) - t * Math.sin(th0))
+    y1 = fixRoundingError(cy + Math.sin(th0) + t * Math.cos(th0))
+    x3 = fixRoundingError(cx + Math.cos(th1))
+    y3 = fixRoundingError(cy + Math.sin(th1))
+    x2 = fixRoundingError(x3 + t * Math.sin(th1))
+    y2 = fixRoundingError(y3 - t * Math.cos(th1))
 
     return [
       a00 * x1 + a01 * y1,   a10 * x1 + a11 * y1,
@@ -323,4 +323,9 @@ class SVGPath
       a00 * x3 + a01 * y3,   a10 * x3 + a11 * y3
     ]
 
+  fixRoundingError = (x) ->
+    if Math.abs(Math.round(x) - x) < 0.0000000000001
+      return Math.round(x);  
+    return x
+        
 module.exports = SVGPath

@@ -15,6 +15,7 @@ class LineWrapper extends EventEmitter
     @column    = 1
     @ellipsis  = options.ellipsis
     @continuedX  = 0
+    @features = options.features
     
     # calculate the maximum Y position the text can appear at
     if options.height?
@@ -57,7 +58,7 @@ class LineWrapper extends EventEmitter
     # setup a unicode line breaker
     breaker = new LineBreaker(text)
     last = null
-    wordWidths = {}
+    wordWidths = Object.create(null)
     
     while bk = breaker.nextBreak()
       word = text.slice(last?.position or 0, bk.position)
