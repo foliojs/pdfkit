@@ -73,7 +73,7 @@ doc.rect(doc.x, 0, 410, doc.y).stroke()</code></pre>
 documents, which can be passed to the <code>text</code> method. They are enumerated
 below.</p>
 
-<ul><li><code>lineBreak</code> - set to <code>false</code> to disable line wrapping all together</li><li><code>width</code> - the width that text should be wrapped to (by default, the page width minus the left and right margin)</li><li><code>height</code> - the maximum height that text should be clipped to</li><li><code>ellipsis</code> - the character to display at the end of the text when it is too long. Set to <code>true</code> to use the default character.</li><li><code>columns</code> - the number of columns to flow the text into</li><li><code>columnGap</code> - the amount of space between each column (1/4 inch by default)</li><li><code>indent</code> - the amount in PDF points (72 per inch) to indent each paragraph of text</li><li><code>paragraphGap</code> - the amount of space between each paragraph of text</li><li><code>lineGap</code> - the amount of space between each line of text</li><li><code>wordSpacing</code> - the amount of space between each word in the text</li><li><code>characterSpacing</code> - the amount of space between each character in the text</li><li><code>fill</code> - whether to fill the text (<code>true</code> by default)</li><li><code>stroke</code> - whether to stroke the text</li><li><code>link</code> - a URL to link this text to (shortcut to create an annotation)</li><li><code>underline</code> - whether to underline the text</li><li><code>strike</code> - whether to strike out the text</li><li><code>continued</code> - whether the text segment will be followed immediately by another segment. Useful for changing styling in the middle of a paragraph.</li></ul>
+<ul><li><code>lineBreak</code> - set to <code>false</code> to disable line wrapping all together</li><li><code>width</code> - the width that text should be wrapped to (by default, the page width minus the left and right margin)</li><li><code>height</code> - the maximum height that text should be clipped to</li><li><code>ellipsis</code> - the character to display at the end of the text when it is too long. Set to <code>true</code> to use the default character.</li><li><code>columns</code> - the number of columns to flow the text into</li><li><code>columnGap</code> - the amount of space between each column (1/4 inch by default)</li><li><code>indent</code> - the amount in PDF points (72 per inch) to indent each paragraph of text</li><li><code>paragraphGap</code> - the amount of space between each paragraph of text</li><li><code>lineGap</code> - the amount of space between each line of text</li><li><code>wordSpacing</code> - the amount of space between each word in the text</li><li><code>characterSpacing</code> - the amount of space between each character in the text</li><li><code>fill</code> - whether to fill the text (<code>true</code> by default)</li><li><code>stroke</code> - whether to stroke the text</li><li><code>link</code> - a URL to link this text to (shortcut to create an annotation)</li><li><code>underline</code> - whether to underline the text</li><li><code>strike</code> - whether to strike out the text</li><li><code>continued</code> - whether the text segment will be followed immediately by another segment. Useful for changing styling in the middle of a paragraph.</li><li><code>features</code> - an array of <a href="https://www.microsoft.com/typography/otspec/featuretags.htm">OpenType feature tags</a> to apply. If not provided, a set of defaults is used.</li></ul>
 
 <p>Additionally, the fill and stroke color and opacity methods described in the
 <a href="vector.html">vector graphics section</a> are applied to text content as well.</p>
@@ -122,14 +122,14 @@ option from the first <code>text</code> call is retained by the second call.</p>
 <p>The PDF format defines 14 standard fonts that can be used in PDF documents (4
 styles of Helvetica, Courier, and Times, as well as Symbol and Zapf Dingbats),
 but also allows fonts to be embedded right in the document. PDFKit supports
-embedding font files in the TrueType (<code>.ttf</code>), TrueType Collection (<code>.ttc</code>),
-and Datafork TrueType (<code>.dfont</code>) formats.</p>
+embedding TrueType (<code>.ttf</code>), OpenType (<code>.otf</code>), WOFF, WOFF2, TrueType Collection (<code>.ttc</code>),
+and Datafork TrueType (<code>.dfont</code>) fonts.</p>
 
 <p>To change the font used to render text, just call the <code>font</code> method. If you
 are using a standard PDF font, just pass the name to the <code>font</code> method.
 Otherwise, pass the path to the font file, or a <code>Buffer</code> containing the font data.
-If the font is a collection font (<code>.ttc</code> and <code>.dfont</code> files), meaning that it 
-contains multiple styles in the same file, you should pass the name of the style 
+If the font is a collection font (<code>.ttc</code> and <code>.dfont</code> files), meaning that it
+contains multiple styles in the same file, you should pass the name of the style
 to be extracted from the collection.</p>
 
 <p>Here is an example showing how to set the font in each case.</p>

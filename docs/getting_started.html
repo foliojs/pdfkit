@@ -80,10 +80,15 @@ If you forget to install it, Browserify will print an error message.</p>
 <h2 id="adding_pages">Adding pages</h2>
 
 <p>The first page of a PDFKit document is added for you automatically when you
-create the document. Subsequent pages must be added by you. Luckily, it is
+create the document unless you provide <code>autoFirstPage: false</code>. Subsequent pages must be added by you. Luckily, it is
 quite simple!</p>
 
 <pre><code>doc.addPage()</code></pre>
+
+<p>To add some content every time a page is created, either by calling <code>addPage()</code> or automatically, you can use the <code>pageAdded</code> event.</p>
+
+<pre><code>doc.on &#39;pageAdded&#39;, -&gt;
+  doc.text &quot;Page Title&quot;</code></pre>
 
 <p>You can also set some options for the page, such as it&#39;s size and orientation.</p>
 
