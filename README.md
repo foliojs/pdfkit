@@ -37,8 +37,9 @@ Installation uses the [npm](http://npmjs.org/) package manager.  Just type the f
   * Text alignments
   * Bulleted lists
 * Font embedding
-  * Supports TrueType (.ttf), TrueType Collections (.ttc), and Datafork TrueType (.dfont) fonts
+  * Supports TrueType (.ttf), OpenType (.otf), WOFF, WOFF2, TrueType Collections (.ttc), and Datafork TrueType (.dfont) fonts
   * Font subsetting
+  * See [fontkit](http://github.com/devongovett/fontkit) for more details on advanced glyph layout support.
 * Image embedding
   * Supports JPEG and PNG files (including indexed PNGs, and PNGs with transparency)
 * Annotations

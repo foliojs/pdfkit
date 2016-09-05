@@ -9,7 +9,7 @@
     "document",
     "vector"
   ],
-  "version": "0.7.2",
+  "version": "0.8.0",
   "homepage": "http://pdfkit.org/",
   "author": {
     "name": "Devon Govett",
@@ -22,20 +22,22 @@
   },
   "bugs": "http://github.com/devongovett/pdfkit/issues",
   "devDependencies": {
-    "coffee-script": ">=1.0.1",
-    "codemirror": "~3.20.0",
-    "markdown": "~0.5.0",
-    "jade": "~1.1.5",
-    "coffeeify": "^0.6.0",
-    "browserify": "^3.39.0",
-    "brfs": "~1.0.1",
-    "exorcist": "^0.1.5",
+    "blob-stream": "^0.1.2",
     "brace": "^0.2.1",
-    "blob-stream": "^0.1.2"
+    "brfs": "~1.0.1",
+    "browserify": "^3.39.0",
+    "codemirror": "~3.20.0",
+    "coffee-script": ">=1.0.1",
+    "coffeeify": "^0.6.0",
+    "exorcist": "^0.1.5",
+    "iconv-lite": "^0.4.13",
+    "jade": "~1.1.5",
+    "markdown": "~0.5.0"
   },
   "dependencies": {
-    "png-js": ">=0.1.0",
-    "linebreak": "~0.1.0"
+    "fontkit": "^1.0.0",
+    "linebreak": "~0.1.0",
+    "png-js": ">=0.1.0"
   },
   "scripts": {
     "prepublish": "make js",

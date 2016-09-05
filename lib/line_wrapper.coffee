@@ -15,6 +15,7 @@ class LineWrapper extends EventEmitter
     @column    = 1
     @ellipsis  = options.ellipsis
     @continuedX  = 0
+    @features = options.features
     
     # calculate the maximum Y position the text can appear at
     if options.height?
