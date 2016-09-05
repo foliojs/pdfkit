@@ -169,6 +169,26 @@ module.exports =
     wordSpacing = options.wordSpacing or 0
     characterSpacing = options.characterSpacing or 0
 
+    # vertical (baseline) alignments based on https://cs.chromium.org/chromium/src/third_party/WebKit/Source/core/layout/svg/SVGTextLayoutEngineBaseline.cpp?l=67
+    switch options.verticalAlign
+      when 'middle'
+        dy = 0.5 * @_font.xHeight
+      when 'central'
+        dy = 0.5 * (@_font.descender + @_font.ascender)
+      when 'bottom', 'after-edge', 'text-after-edge', 'ideographic'
+        dy = @_font.descender
+      when 'baseline', 'alphabetic'
+        dy = 0;
+      when 'mathematical':
+        dy = 0.5 * @_font.ascender
+      when 'hanging':
+        dy = 0.8 * @_font.ascender
+      when 'top', 'before-edge', 'text-before-edge'
+        dy = @_font.ascender
+      else
+        dy = @_font.ascender
+    dy = dy / 1000 * @_fontSize
+
     # text alignments
     if options.width
       switch align
@@ -213,7 +233,7 @@ module.exports =
     # flip coordinate system
     @save()
     @transform 1, 0, 0, -1, 0, @page.height
-    y = @page.height - y - (@_font.ascender / 1000 * @_fontSize)
+    y = @page.height - y - dy
 
     # add current font to page if necessary
     @page.fonts[@_font.id] ?= @_font.ref()
