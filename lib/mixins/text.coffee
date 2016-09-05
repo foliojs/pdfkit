@@ -179,9 +179,9 @@ module.exports =
         dy = @_font.descender
       when 'baseline', 'alphabetic'
         dy = 0;
-      when 'mathematical':
+      when 'mathematical'
         dy = 0.5 * @_font.ascender
-      when 'hanging':
+      when 'hanging'
         dy = 0.8 * @_font.ascender
       when 'top', 'before-edge', 'text-before-edge'
         dy = @_font.ascender
