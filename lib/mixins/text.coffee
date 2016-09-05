@@ -230,8 +230,19 @@ module.exports =
       @stroke()
       @restore()
 
-    # flip coordinate system
     @save()
+
+    # oblique (angle in degrees or boolean)
+    if options.oblique
+      if typeof options.oblique is 'number'
+        skew = -Math.tan(options.oblique * Math.PI / 180)
+      else
+        skew = -0.25
+      @transform 1, 0, 0, 1, x, y
+      @transform 1, 0, skew, 1, skew * @_font.ascender / 1000 * @_fontSize, 0
+      @transform 1, 0, 0, 1, -x, -y
+    
+    # flip coordinate system
     @transform 1, 0, 0, -1, 0, @page.height
     y = @page.height - y - dy
 
