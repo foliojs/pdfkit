@@ -5,7 +5,7 @@ fs = require 'fs'
 class StandardFont extends PDFFont
   constructor: (@document, @name, @id) ->
     @font = new AFMFont STANDARD_FONTS[@name]()
-    {@ascender,@descender,@bbox,@lineGap} = @font
+    {@ascender,@descender,@bbox,@lineGap,@xHeight,@capHeight} = @font
     
   embed: ->
     @dictionary.data =
