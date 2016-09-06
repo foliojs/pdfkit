@@ -71,6 +71,8 @@ module.exports =
     @addContent "#{x} #{y} #{w} #{h} re"
     
   roundedRect: (x, y, w, h, r = 0) ->
+    r = Math.min(r, 0.5 * w, 0.5 * h)
+
     # amount to inset control points from corners (see `ellipse`)
     c = r * (1.0 - KAPPA)
 
@@ -83,6 +85,7 @@ module.exports =
     @bezierCurveTo x + c, y + h, x, y + h - c, x, y + h - r
     @lineTo x, y + r
     @bezierCurveTo x, y + c, x + c, y, x + r, y
+    @closePath()
     
   ellipse: (x, y, r1, r2 = r1) ->
     # based on http://stackoverflow.com/questions/2172798/how-to-draw-an-oval-in-html5-canvas/2173084#2173084
