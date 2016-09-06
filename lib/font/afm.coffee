@@ -16,6 +16,8 @@ class AFMFont
     @bbox = (+e for e in @attributes['FontBBox'].split /\s+/)
     @ascender = +(@attributes['Ascender'] or 0)
     @descender = +(@attributes['Descender'] or 0)
+    @xHeight = +(@attributes['XHeight'] or 0)
+    @capHeight = +(@attributes['CapHeight'] or 0)
     @lineGap = (@bbox[3] - @bbox[1]) - (@ascender - @descender)
   
   parse: ->
