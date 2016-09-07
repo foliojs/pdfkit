@@ -186,7 +186,7 @@ module.exports =
           spaceWidth = @widthOfString(' ') + characterSpacing
           wordSpacing = Math.max 0, (options.lineWidth - textWidth) / Math.max(1, words.length - 1) - spaceWidth
 
-    # text baseline alignments based on https://cs.chromium.org/chromium/src/third_party/WebKit/Source/core/layout/svg/SVGTextLayoutEngineBaseline.cpp?l=67
+    # text baseline alignments based on http://wiki.apache.org/xmlgraphics-fop/LineLayout/AlignmentHandling
     if typeof options.baseline is 'number'
       dy = -options.baseline
     else
