@@ -191,19 +191,19 @@ module.exports =
       dy = -options.baseline
     else
       switch options.baseline
-        when 'middle'
+        when 'svg-middle'
           dy = 0.5 * @_font.xHeight
-        when 'central'
+        when 'middle', 'svg-central'
           dy = 0.5 * (@_font.descender + @_font.ascender)
-        when 'after-edge'
+        when 'bottom', 'ideographic'
           dy = @_font.descender
-        when 'baseline'
+        when 'alphabetic'
           dy = 0;
         when 'mathematical'
           dy = 0.5 * @_font.ascender
         when 'hanging'
           dy = 0.8 * @_font.ascender
-        when 'before-edge'
+        when 'top'
           dy = @_font.ascender
         else
           dy = @_font.ascender
