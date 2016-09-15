@@ -51,16 +51,26 @@ module.exports =
       else
         h = bh
         w = bh * ip
-      
+
+    else if options.cover
+      [bw, bh] = options.cover
+      bp = bw / bh
+      ip = image.width / image.height
+      if ip > bp
+        h = bh
+        w = bh * ip
+      else
+        w = bw
+        h = bw / ip
+
+    if options.fit or options.cover
       if options.align is 'center'
         x = x + bw / 2 - w / 2
-        
       else if options.align is 'right'
         x = x + bw - w
         
       if options.valign is 'center'
         y = y + bh / 2 - h / 2
-        
       else if options.valign is 'bottom'
         y = y + bh - h
     
