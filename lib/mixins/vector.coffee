@@ -107,8 +107,15 @@ module.exports =
     
   circle: (x, y, radius) ->
     @ellipse x, y, radius
-    
-  polygon: (points...) ->
+  
+  #PATCH - Jorge Lopez
+  # Changed argument for polygon method
+  #used to take in a splat
+  # Now accepts an array of points. ie. [[x, y]]
+  polygon : (points) ->
+    if not points or points.length < 1
+      return false
+
     @moveTo points.shift()...
     @lineTo point... for point in points
     @closePath()
