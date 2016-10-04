@@ -2,6 +2,11 @@ zlib = require 'zlib'
 PNG = require 'png-js'
 
 class PNGImage
+
+  # Returns true if the given data buffer has a PNG signature
+  @is: (data) ->
+    data[0] is 0x89 and data.toString('ascii', 1, 4) is 'PNG'
+
   constructor: (data, @label) ->
     @image = new PNG(data)
     @width = @image.width
