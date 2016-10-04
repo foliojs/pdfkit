@@ -20,12 +20,13 @@ class PDFImage
     else
       fs.readFileSync src
 
-  @open: (src, label) ->
+  @open: (src, label, alphaSrc) ->
     data = @toBuffer src
     if data
 
       if JPEG.is(data)
-        return new JPEG(data, label)
+        alphaData = @toBuffer alphaSrc if alphaSrc
+        return new JPEG(data, label, alphaData)
 
       else if PNG.is(data)
         return new PNG(data, label)
