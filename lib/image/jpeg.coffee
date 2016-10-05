@@ -44,12 +44,12 @@ class JPEG
       @alphaMeta = getMetaInfo @alphaData
       if @alphaMeta.colorSpace != 'DeviceGray'
         throw new Error('Alpha mask must be a gray JPEG image')
-
+      
     @obj = null
-
+      
   embed: (document) ->
     return if @obj
-
+    
     @obj = document.ref
       Type: 'XObject'
       Subtype: 'Image'
@@ -58,13 +58,13 @@ class JPEG
       Height: @height
       ColorSpace: @colorSpace
       Filter: 'DCTDecode'
-
+      
     # add extra decode params for CMYK images. By swapping the
     # min and max values from the default, we invert the colors. See
-    # section 4.8.4 of the spec.
+    # section 4.8.4 of the spec.  
     if @colorSpace is 'DeviceCMYK'
       @obj.data['Decode'] = [1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0]
-
+      
     if @alphaData
 
       sMask = document.ref
@@ -85,8 +85,8 @@ class JPEG
       @obj.data['SMask'] = sMask
 
     @obj.end @data
-
+    
     # free memory
     @data = null
-
+    
 module.exports = JPEG

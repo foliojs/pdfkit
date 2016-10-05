@@ -33,5 +33,5 @@ class PDFImage
 
       else
         throw new Error 'Unknown image format.'
-
+          
 module.exports = PDFImage
