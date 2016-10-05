@@ -45,7 +45,6 @@ class JPEG
       if @alphaMeta.colorSpace != 'DeviceGray'
         throw new Error('Alpha mask must be a gray JPEG image')
 
-
     @obj = null
 
   embed: (document) ->
@@ -84,7 +83,6 @@ class JPEG
       @alphaData = null
 
       @obj.data['SMask'] = sMask
-
 
     @obj.end @data
 
