@@ -35,10 +35,10 @@ Here is an example showing some of these options.
        .text('Scale', 320, 265)
 
     # Fit the image in the dimensions, and center it both horizontally and vertically
-    doc.image('images/test.jpeg', 320, 15, fit: [100, 100], align: 'center', valign: 'center')
-       .rect(320, 15, 100, 100)
+    doc.image('images/test.jpeg', 430, 15, fit: [100, 100], align: 'center', valign: 'center')
+       .rect(430, 15, 100, 100)
        .stroke()
-       .text('Fit', 320, 0)
+       .text('Centered', 430, 0)
        
 * * *
 
