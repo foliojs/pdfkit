@@ -13,7 +13,7 @@ module.exports =
     x = x ? options.x ? @x
     y = y ? options.y ? @y
 
-    unless Buffer.isBuffer(src)
+    if typeof src is 'string'
       image = @_imageRegistry[src]
 
     if not image
@@ -88,12 +88,12 @@ module.exports =
     return this
 
   openImage: (src) ->
-    unless Buffer.isBuffer(src)
+    if typeof src is 'string'
       image = @_imageRegistry[src]
 
     if not image
       image = PDFImage.open src, 'I' + (++@_imageCount)
-      unless Buffer.isBuffer(src)
+      if typeof src is 'string'
         @_imageRegistry[src] = image
 
     return image
