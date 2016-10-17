@@ -9,24 +9,27 @@ module.exports =
     if typeof x is 'object'
       options = x
       x = null
-    
+
     x = x ? options.x ? @x
     y = y ? options.y ? @y
-    
-    unless Buffer.isBuffer(src)
+
+    if typeof src is 'string'
       image = @_imageRegistry[src]
-      
+
     if not image
-      image = PDFImage.open src, 'I' + (++@_imageCount)
+      if src.width and src.height
+        image = src
+      else
+        image = @openImage src
+
+    unless image.obj
       image.embed this
-      unless Buffer.isBuffer(src)
-        @_imageRegistry[src] = image
-        
+
     @page.xobjects[image.label] ?= image.obj
 
     w = options.width or image.width
     h = options.height or image.height
-    
+
     if options.width and not options.height
       wp = w / image.width
       w = image.width * wp
@@ -68,12 +71,12 @@ module.exports =
         x = x + bw / 2 - w / 2
       else if options.align is 'right'
         x = x + bw - w
-        
+
       if options.valign is 'center'
         y = y + bh / 2 - h / 2
       else if options.valign is 'bottom'
         y = y + bh - h
-    
+
     # Set the current y position to below the image if it is in the document flow      
     @y += h if @y is y
 
@@ -81,5 +84,16 @@ module.exports =
     @transform w, 0, 0, -h, x, y + h
     @addContent "/#{image.label} Do"
     @restore()
-      
+
     return this
+
+  openImage: (src) ->
+    if typeof src is 'string'
+      image = @_imageRegistry[src]
+
+    if not image
+      image = PDFImage.open src, 'I' + (++@_imageCount)
+      if typeof src is 'string'
+        @_imageRegistry[src] = image
+
+    return image
