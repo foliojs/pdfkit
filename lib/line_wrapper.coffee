@@ -155,6 +155,11 @@ class LineWrapper extends EventEmitter
         
           buffer = buffer + @ellipsis
           
+        if bk.required and w > @spaceLeft
+          buffer = word
+          textWidth = w
+          wc = 1
+
         emitLine()
         
         # if we've reached the edge of the page, 
@@ -170,13 +175,6 @@ class LineWrapper extends EventEmitter
         
         # reset the space left and buffer
         if bk.required
-          # if there's a word but no space left, emit single line
-          if w > @spaceLeft
-            buffer = word
-            textWidth = w
-            wc = 1
-            emitLine()
-            
           @spaceLeft = @lineWidth
           buffer = ''
           textWidth = 0
