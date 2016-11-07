@@ -15,6 +15,10 @@ be scaled according to the following options.
 * `fit` array provided - image is scaled proportionally to fit within the passed width and height
 * `cover` array provided - image is scaled proportionally to completely cover the rectangle defined by the passed width and height
 
+When a `fit` or `cover` array is provided, PDFKit accepts these additional options:
+* `align` - horizontally align the image, the possible values are `'left'`, `'center'` and `'right'` 
+* `valign` - vertically align the image, the possible values are `'top'`, `'center'` and `'bottom'`
+
 Here is an example showing some of these options.
 
     # Scale proprotionally to the specified width
