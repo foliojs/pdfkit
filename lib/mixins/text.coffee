@@ -223,7 +223,7 @@ module.exports =
     @addContent "BT"
 
     # text position
-    @addContent "1 0 0 1 #{x} #{y} Tm"
+    @addContent "1 0 0 1 #{@number(x)} #{@number(y)} Tm"
 
     # font and font size
     @addContent "/#{@_font.id} #{@_fontSize} Tf"
@@ -233,7 +233,7 @@ module.exports =
     @addContent "#{mode} Tr" if mode
 
     # Character spacing
-    @addContent "#{characterSpacing} Tc" if characterSpacing
+    @addContent "#{@number(characterSpacing)} Tc" if characterSpacing
     
     # Add the actual text
     # If we have a word spacing value, we need to encode each word separately
@@ -266,7 +266,7 @@ module.exports =
       if last < cur
         hex = encoded.slice(last, cur).join ''
         advance = positions[cur - 1].xAdvance - positions[cur - 1].advanceWidth
-        commands.push "<#{hex}> #{-advance}"
+        commands.push "<#{hex}> #{@number(-advance)}"
       
       last = cur
     
@@ -286,14 +286,14 @@ module.exports =
         flush i
         
         # Move the text position and flush just the current character
-        @addContent "1 0 0 1 #{x + pos.xOffset * scale} #{y + pos.yOffset * scale} Tm"
+        @addContent "1 0 0 1 #{@number(x + pos.xOffset * scale)} #{@number(y + pos.yOffset * scale)} Tm"
         flush i + 1
         
         hadOffset = yes
       else
         # If the last character had an offset, reset the text position
         if hadOffset
-          @addContent "1 0 0 1 #{x} #{y} Tm"
+          @addContent "1 0 0 1 #{@number(x)} #{@number(y)} Tm"
           hadOffset = no
         
         # Group segments that don't have any advance adjustments
