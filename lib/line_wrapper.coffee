@@ -175,7 +175,12 @@ class LineWrapper extends EventEmitter
             buffer = word
             textWidth = w
             wc = 1
+
+            @document.y -= options.paragraphGap or 0
+
             emitLine()
+
+            @document.y += options.paragraphGap or 0
             
           @spaceLeft = @lineWidth
           buffer = ''
