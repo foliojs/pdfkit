@@ -226,7 +226,7 @@ module.exports =
     @addContent "1 0 0 1 #{@number(x)} #{@number(y)} Tm"
 
     # font and font size
-    @addContent "/#{@_font.id} #{@_fontSize} Tf"
+    @addContent "/#{@_font.id} #{@number(@_fontSize)} Tf"
 
     # rendering mode
     mode = if options.fill and options.stroke then 2 else if options.stroke then 1 else 0
