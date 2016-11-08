@@ -6,7 +6,7 @@ module.exports =
     @_opacityRegistry = {}
     @_opacityCount = 0
     @_gradCount = 0
-    
+
   _normalizeColor: (color) ->
     if color instanceof PDFGradient
       return color
@@ -58,11 +58,11 @@ module.exports =
       space = if color.length is 4 then 'DeviceCMYK' else 'DeviceRGB'
       @_setColorSpace space, stroke
       
-      color = color.join ' '
+      color = (@number(v) for v in color).join(' ')
       @addContent "#{color} #{op}"
     
     return yes
-    
+
   _setColorSpace: (space, stroke) ->
     op = if stroke then 'CS' else 'cs'
     @addContent "/#{space} #{op}"
@@ -80,50 +80,50 @@ module.exports =
     set = @_setColor color, yes
     @strokeOpacity opacity if set
     return this
-     
+
   opacity: (opacity) ->
-     @_doOpacity opacity, opacity
-     return this
-     
+    @_doOpacity opacity, opacity
+    return this
+
   fillOpacity: (opacity) ->
-     @_doOpacity opacity, null
-     return this
+    @_doOpacity opacity, null
+    return this
 
   strokeOpacity: (opacity) ->
-     @_doOpacity null, opacity
-     return this
+    @_doOpacity null, opacity
+    return this
 
   _doOpacity: (fillOpacity, strokeOpacity) ->
-     return unless fillOpacity? or strokeOpacity?
+    return unless fillOpacity? or strokeOpacity?
 
-     fillOpacity = Math.max 0, Math.min 1, fillOpacity    if fillOpacity?
-     strokeOpacity = Math.max 0, Math.min 1, strokeOpacity  if strokeOpacity?
-     key = "#{fillOpacity}_#{strokeOpacity}"
+    fillOpacity = @number(Math.max 0, Math.min 1, fillOpacity)  if fillOpacity?
+    strokeOpacity = @number(Math.max 0, Math.min 1, strokeOpacity)  if strokeOpacity?
+    key = "#{fillOpacity}_#{strokeOpacity}"
 
-     if @_opacityRegistry[key]
-       [dictionary, name] = @_opacityRegistry[key]
-     else
-       dictionary = 
-         Type: 'ExtGState'
+    if @_opacityRegistry[key]
+      [dictionary, name] = @_opacityRegistry[key]
+    else
+      dictionary = 
+        Type: 'ExtGState'
 
-       dictionary.ca = fillOpacity if fillOpacity?
-       dictionary.CA = strokeOpacity if strokeOpacity?
+      dictionary.ca = fillOpacity if fillOpacity?
+      dictionary.CA = strokeOpacity if strokeOpacity?
 
-       dictionary = @ref dictionary
-       dictionary.end()
-       id = ++@_opacityCount
-       name = "Gs#{id}"
-       @_opacityRegistry[key] = [dictionary, name]
+      dictionary = @ref dictionary
+      dictionary.end()
+      id = ++@_opacityCount
+      name = "Gs#{id}"
+      @_opacityRegistry[key] = [dictionary, name]
 
-     @page.ext_gstates[name] = dictionary
-     @addContent "/#{name} gs"
-     
+    @page.ext_gstates[name] = dictionary
+    @addContent "/#{name} gs"
+
   linearGradient: (x1, y1, x2, y2) ->
     return new PDFLinearGradient(this, x1, y1, x2, y2)
-    
+
   radialGradient: (x1, y1, r1, x2, y2, r2) ->
     return new PDFRadialGradient(this, x1, y1, r1, x2, y2, r2)
-     
+
 namedColors =
   aliceblue: [240, 248, 255]
   antiquewhite: [250, 235, 215]
