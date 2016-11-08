@@ -26,7 +26,7 @@ class PDFGradient
     for i in [0...@stops.length - 1]
       encode.push 0, 1
       unless i + 2 is @stops.length
-        bounds.push @stops[i + 1][0]
+        bounds.push @doc.number(@stops[i + 1][0])
       
       fn = @doc.ref
         FunctionType: 2
