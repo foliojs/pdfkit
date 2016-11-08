@@ -31,8 +31,8 @@ class PDFGradient
       fn = @doc.ref
         FunctionType: 2
         Domain: [0, 1]
-        C0: @stops[i + 0][1]
-        C1: @stops[i + 1][1]
+        C0: (@doc.number(v) for v in @stops[i + 0][1])
+        C1: (@doc.number(v) for v in @stops[i + 1][1])
         N: 1
         
       stops.push fn
