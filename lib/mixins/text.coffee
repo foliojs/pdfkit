@@ -70,7 +70,8 @@ module.exports =
   list: (list, x, y, options, wrapper) ->
     options = @_initOptions(x, y, options)
     
-    r = Math.round (@_font.ascender / 1000 * @_fontSize) / 3
+    midLine = Math.round (@_font.ascender / 1000 * @_fontSize) / 2
+    r = options.bulletRadius or Math.round (@_font.ascender / 1000 * @_fontSize) / 3
     indent = options.textIndent or r * 5
     itemIndent = options.bulletIndent or r * 8
     
@@ -102,7 +103,7 @@ module.exports =
         wrapper.lineWidth -= diff
         level = l
         
-      @circle @x - indent + r, @y + r + (r / 2), r
+      @circle @x - indent + r, @y + midLine, r
       @fill()
         
     wrapper.on 'sectionStart', =>
