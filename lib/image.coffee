@@ -22,14 +22,21 @@ class PDFImage
 
   @open: (src, label, alphaSrc) ->
     data = toBuffer src
-    if data
 
+    if alphaSrc
+      alphaData = toBuffer alphaSrc
+      if not JPEG.is alphaData
+        throw Error 'Alpha mask must be a gray JPEG image'
+      alpha = new JPEG alphaData
+      if alpha.colorSpace != 'DeviceGray'
+        throw Error 'Alpha mask must be a gray JPEG image'
+
+    if data
       if JPEG.is(data)
-        alphaData = toBuffer alphaSrc if alphaSrc
-        return new JPEG(data, label, alphaData)
+        return new JPEG(data, label, alpha)
 
       else if PNG.is(data)
-        return new PNG(data, label)
+        return new PNG(data, label, alpha)
 
       else
         throw new Error 'Unknown image format.'
