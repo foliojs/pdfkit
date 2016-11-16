@@ -21,7 +21,7 @@ module.exports =
     @addContent 'h'
   
   lineWidth: (w) ->
-    @addContent "#{w} w"
+    @addContent "#{@number(w)} w"
     
   _CAP_STYLES: 
     BUTT: 0
@@ -42,44 +42,53 @@ module.exports =
     @addContent "#{j} j"
     
   miterLimit: (m) ->
-    @addContent "#{m} M"
+    @addContent "#{@number(m)} M"
     
   dash: (length, options = {}) ->
     return this unless length?
-    
-    space = options.space ? length
-    phase = options.phase or 0
-    
-    @addContent "[#{length} #{space}] #{phase} d"
+    if Array.isArray length
+      length = (@number(v) for v in length).join(' ')
+      phase = options.phase or 0
+      @addContent "[#{length}] #{@number(phase)} d"
+    else
+      space = options.space ? length
+      phase = options.phase or 0
+      @addContent "[#{@number(length)} #{@number(space)}] #{@number(phase)} d"
     
   undash: ->
     @addContent "[] 0 d"
     
   moveTo: (x, y) ->
-    @addContent "#{x} #{y} m"
+    @addContent "#{@number(x)} #{@number(y)} m"
 
   lineTo: (x, y) ->
-    @addContent "#{x} #{y} l"
+    @addContent "#{@number(x)} #{@number(y)} l"
     
   bezierCurveTo: (cp1x, cp1y, cp2x, cp2y, x, y) ->
-    @addContent "#{cp1x} #{cp1y} #{cp2x} #{cp2y} #{x} #{y} c"
+    @addContent "#{@number(cp1x)} #{@number(cp1y)} #{@number(cp2x)} #{@number(cp2y)} #{@number(x)} #{@number(y)} c"
     
   quadraticCurveTo: (cpx, cpy, x, y) ->
-    @addContent "#{cpx} #{cpy} #{x} #{y} v"
+    @addContent "#{@number(cpx)} #{@number(cpy)} #{@number(x)} #{@number(y)} v"
     
   rect: (x, y, w, h) ->
-    @addContent "#{x} #{y} #{w} #{h} re"
+    @addContent "#{@number(x)} #{@number(y)} #{@number(w)} #{@number(h)} re"
     
   roundedRect: (x, y, w, h, r = 0) ->
+    r = Math.min(r, 0.5 * w, 0.5 * h)
+
+    # amount to inset control points from corners (see `ellipse`)
+    c = r * (1.0 - KAPPA)
+
     @moveTo x + r, y
     @lineTo x + w - r, y
-    @quadraticCurveTo x + w, y, x + w, y + r
+    @bezierCurveTo x + w - c, y, x + w, y + c, x + w, y + r
     @lineTo x + w, y + h - r
-    @quadraticCurveTo x + w, y + h, x + w - r, y + h
+    @bezierCurveTo x + w, y + h - c, x + w - c, y + h, x + w - r, y + h
     @lineTo x + r, y + h
-    @quadraticCurveTo x, y + h, x, y + h - r
+    @bezierCurveTo x + c, y + h, x, y + h - c, x, y + h - r
     @lineTo x, y + r
-    @quadraticCurveTo x, y, x + r, y
+    @bezierCurveTo x, y + c, x + c, y, x + r, y
+    @closePath()
     
   ellipse: (x, y, r1, r2 = r1) ->
     # based on http://stackoverflow.com/questions/2172798/how-to-draw-an-oval-in-html5-canvas/2173084#2173084
@@ -159,7 +168,7 @@ module.exports =
     m[4] = m0 * dx + m2 * dy + m4
     m[5] = m1 * dx + m3 * dy + m5
     
-    values = (+v.toFixed(5) for v in [m11, m12, m21, m22, dx, dy]).join(' ')
+    values = (@number(v) for v in [m11, m12, m21, m22, dx, dy]).join(' ')
     @addContent "#{values} cm"
     
   translate: (x, y) ->

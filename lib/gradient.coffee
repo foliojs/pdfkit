@@ -26,13 +26,13 @@ class PDFGradient
     for i in [0...@stops.length - 1]
       encode.push 0, 1
       unless i + 2 is @stops.length
-        bounds.push @stops[i + 1][0]
+        bounds.push @doc.number(@stops[i + 1][0])
       
       fn = @doc.ref
         FunctionType: 2
         Domain: [0, 1]
-        C0: @stops[i + 0][1]
-        C1: @stops[i + 1][1]
+        C0: (@doc.number(v) for v in @stops[i + 0][1])
+        C1: (@doc.number(v) for v in @stops[i + 1][1])
         N: 1
         
       stops.push fn
@@ -71,7 +71,7 @@ class PDFGradient
       Type: 'Pattern'
       PatternType: 2
       Shading: shader
-      Matrix: (+v.toFixed(5) for v in m)
+      Matrix: (@doc.number(v) for v in m)
 
     @doc.page.patterns[@id] = pattern
     pattern.end()
@@ -144,7 +144,7 @@ class PDFLinearGradient extends PDFGradient
     @doc.ref
       ShadingType: 2
       ColorSpace: @_colorSpace
-      Coords: [@x1, @y1, @x2, @y2]
+      Coords: [@doc.number(@x1), @doc.number(@y1), @doc.number(@x2), @doc.number(@y2)]
       Function: fn
       Extend: [true, true]
       
@@ -159,7 +159,7 @@ class PDFRadialGradient extends PDFGradient
     @doc.ref
       ShadingType: 3
       ColorSpace: @_colorSpace
-      Coords: [@x1, @y1, @r1, @x2, @y2, @r2]
+      Coords: [@doc.number(@x1), @doc.number(@y1), @doc.number(@r1), @doc.number(@x2), @doc.number(@y2), @doc.number(@r2)]
       Function: fn
       Extend: [true, true]
       
