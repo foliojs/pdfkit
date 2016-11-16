@@ -129,7 +129,12 @@ class PDFDocument extends stream.Readable
     @_offsets.push null # placeholder for this object's offset once it is finalized
     @_waiting++
     return ref
-    
+
+  number: (n) ->
+    if n > -1e21 and n < 1e21
+      return Math.round(n * 1e6) / 1e6
+    throw new Error "unsupported number: #{n}"
+
   _read: ->
       # do nothing, but this method is required by node
     
