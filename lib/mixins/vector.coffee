@@ -46,11 +46,14 @@ module.exports =
     
   dash: (length, options = {}) ->
     return this unless length?
-    
-    space = options.space ? length
-    phase = options.phase or 0
-    
-    @addContent "[#{length} #{space}] #{phase} d"
+    if Array.isArray length
+      length = length.join ' '
+      phase = options.phase or 0
+      @addContent "[#{length}] #{phase} d"
+    else
+      space = options.space ? length
+      phase = options.phase or 0
+      @addContent "[#{length} #{space}] #{phase} d"
     
   undash: ->
     @addContent "[] 0 d"
