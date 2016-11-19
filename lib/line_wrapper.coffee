@@ -30,6 +30,7 @@ class LineWrapper extends EventEmitter
       # we're continuing where we left off, indent that much
       # otherwise use the user specified indent option
       indent = @continuedX or @indent
+      @document.y += options.marginBefore || 0;
       @document.x += indent
       @lineWidth -= indent
       
@@ -47,7 +48,7 @@ class LineWrapper extends EventEmitter
       @lastLine = true
       
       @once 'line', =>
-        @document.y += options.paragraphGap or 0
+        @document.y += options.paragraphGap or options.marginAfter or 0
         options.align = align
         @lastLine = false
         
