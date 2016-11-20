@@ -70,8 +70,7 @@ module.exports =
   list: (list, x, y, options, wrapper) ->
     options = @_initOptions(x, y, options)
     
-    midLine = Math.round (@_font.ascender / 1000 * @_fontSize) / 2
-    r = options.bulletRadius or Math.round (@_font.ascender / 1000 * @_fontSize) / 3
+    r = Math.round (@_font.ascender / 1000 * @_fontSize) / 3
     indent = options.textIndent or r * 5
     itemIndent = options.bulletIndent or r * 8
     
@@ -103,7 +102,7 @@ module.exports =
         wrapper.lineWidth -= diff
         level = l
         
-      @circle @x - indent + r, @y + midLine, r
+      @circle @x - indent + r, @y + r + (r / 2), r
       @fill()
         
     wrapper.on 'sectionStart', =>
@@ -257,17 +256,17 @@ module.exports =
     @addContent "BT"
 
     # text position
-    @addContent "1 0 0 1 #{@number(x)} #{@number(y)} Tm"
+    @addContent "1 0 0 1 #{x} #{y} Tm"
 
     # font and font size
-    @addContent "/#{@_font.id} #{@number(@_fontSize)} Tf"
+    @addContent "/#{@_font.id} #{@_fontSize} Tf"
 
     # rendering mode
     mode = if options.fill and options.stroke then 2 else if options.stroke then 1 else 0
     @addContent "#{mode} Tr" if mode
 
     # Character spacing
-    @addContent "#{@number(characterSpacing)} Tc" if characterSpacing
+    @addContent "#{characterSpacing} Tc" if characterSpacing
     
     # Add the actual text
     # If we have a word spacing value, we need to encode each word separately
@@ -300,7 +299,7 @@ module.exports =
       if last < cur
         hex = encoded.slice(last, cur).join ''
         advance = positions[cur - 1].xAdvance - positions[cur - 1].advanceWidth
-        commands.push "<#{hex}> #{@number(-advance)}"
+        commands.push "<#{hex}> #{-advance}"
       
       last = cur
     
@@ -320,14 +319,14 @@ module.exports =
         flush i
         
         # Move the text position and flush just the current character
-        @addContent "1 0 0 1 #{@number(x + pos.xOffset * scale)} #{@number(y + pos.yOffset * scale)} Tm"
+        @addContent "1 0 0 1 #{x + pos.xOffset * scale} #{y + pos.yOffset * scale} Tm"
         flush i + 1
         
         hadOffset = yes
       else
         # If the last character had an offset, reset the text position
         if hadOffset
-          @addContent "1 0 0 1 #{@number(x)} #{@number(y)} Tm"
+          @addContent "1 0 0 1 #{x} #{y} Tm"
           hadOffset = no
         
         # Group segments that don't have any advance adjustments
