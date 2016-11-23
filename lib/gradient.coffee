@@ -107,6 +107,7 @@ class PDFGradient
         Group: group
         Resources: resources
       
+      form.write "#{@transform.join(" ")} cm"
       form.end "/Sh1 sh"
       
       sMask = @doc.ref
