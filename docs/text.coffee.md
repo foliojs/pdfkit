@@ -90,6 +90,7 @@ below.
 * `fill` - whether to fill the text (`true` by default)
 * `stroke` - whether to stroke the text
 * `link` - a URL to link this text to (shortcut to create an annotation)
+* `bgColor` - a hex color to set the background of the text  
 * `underline` - whether to underline the text
 * `strike` - whether to strike out the text
 * `continued` - whether the text segment will be followed immediately by another segment. Useful for changing styling in the middle of a paragraph.
