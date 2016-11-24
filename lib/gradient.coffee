@@ -103,10 +103,11 @@ class PDFGradient
         Type: 'XObject'
         Subtype: 'Form'
         FormType: 1
-        BBox: [0, 0, @doc.page.width, @doc.page.height]
+        BBox: [-1000000, -1000000, 1000000, 1000000]
         Group: group
         Resources: resources
       
+      form.write "#{@transform.join(" ")} cm"
       form.end "/Sh1 sh"
       
       sMask = @doc.ref
