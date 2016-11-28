@@ -197,7 +197,7 @@ There are two types of gradients: linear and radial. They are created by the `li
 and `radialGradient` methods.  Their function signatures are listed below:
 
 * `linearGradient(x1, y1, x2, y2)` - `x1,y1` is the start point, `x2,y2` is the end point
-* `radialGradient(x1, y2, r1, x2, y2, r2)` - `r1` is the inner radius, `r2` is the outer radius
+* `radialGradient(x1, y1, r1, x2, y2, r2)` - `r1` is the inner radius, `r2` is the outer radius
 
 Once you have a gradient object, you need to create color stops at points along that gradient.
 Stops are defined at percentage values (0 to 1), and take a color value (any usable by the 
