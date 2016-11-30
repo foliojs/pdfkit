@@ -2,7 +2,7 @@ class PDFGradient
   constructor: (@doc) ->
     @stops = []
     @embedded = no
-    @_transform = [1, 0, 0, 1, 0, 0]
+    @transform = [1, 0, 0, 1, 0, 0]
     @_colorSpace = 'DeviceRGB'
     
   stop: (pos, color, opacity = 1) ->
@@ -10,8 +10,8 @@ class PDFGradient
     @stops.push [pos, @doc._normalizeColor(color), opacity]
     return this
     
-  transform: (m11, m12, m21, m22, dx, dy) ->
-    @_transform = [m11, m12, m21, m22, dx, dy]
+  setTransform: (m11, m12, m21, m22, dx, dy) ->
+    @transform = [m11, m12, m21, m22, dx, dy]
     return this
 
   embed: (m) ->
@@ -117,9 +117,9 @@ class PDFGradient
         Resources:
           ProcSet: ['PDF', 'Text', 'ImageB', 'ImageC', 'ImageI']
           Pattern:
-            Sh1 : pattern
+            Sh1: pattern
           ExtGState:
-            Gs1 : gstate
+            Gs1: gstate
       
       opacityPattern.write "/Gs1 gs /Pattern cs /Sh1 scn"
       opacityPattern.end "#{pageBBox.join(" ")} re f"
@@ -134,8 +134,13 @@ class PDFGradient
   apply: (op) ->
     # apply gradient transform to existing document ctm
     [m0, m1, m2, m3, m4, m5] = @doc._ctm.slice()
-    [m11, m12, m21, m22, dx, dy] = @_transform
-    m = [m0 * m11 + m2 * m12, m1 * m11 + m3 * m12, m0 * m21 + m2 * m22, m1 * m21 + m3 * m22, m0 * dx + m2 * dy + m4, m1 * dx + m3 * dy + m5]
+    [m11, m12, m21, m22, dx, dy] = @transform
+    m = [m0 * m11 + m2 * m12,
+         m1 * m11 + m3 * m12,
+         m0 * m21 + m2 * m22,
+         m1 * m21 + m3 * m22,
+         m0 * dx + m2 * dy + m4,
+         m1 * dx + m3 * dy + m5]
 
     @embed(m) unless @embedded and m.join(" ") is @matrix.join(" ")
     @doc.addContent "/#{@id} #{op}"
