@@ -113,6 +113,22 @@ The output looks like this:
 
 ![3]()
 
+## Text measurements
+
+If you're working with documents that require precise layout, you may need to know the 
+size of a piece of text. PDFKit has two methods to achieve this: `widthOfString(text, options)` 
+and `heightOfString(text, options)`. Both methods use the same options described in the 
+Text styling section, and take into account the eventual line wrapping.
+
+## Lists
+
+The `list` method creates a bulleted list. It accepts as arguments an array of strings, 
+and the optional `x`, `y` position. You can create complex multilevel lists by using nested arrays. 
+Lists use the following additional options: 
+* `bulletRadius`
+* `textIndent`
+* `bulletIndent`
+
 ## Rich Text
 
 As mentioned above, PDFKit supports a simple form of rich text via the `continued` option.
