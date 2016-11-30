@@ -28,9 +28,10 @@ automatically inserts new pages as necessary so you don't have to worry about
 doing that for long pieces of text. PDFKit can also automatically wrap text
 into multiple columns.
 
-If you pass a specific X and Y position for the text, it will not wrap unless
-you also pass the `width` option, setting the width the text should be wrapped
-to. If you set the `height` option, the text will be clipped to the number of
+The text will automatically wrap unless you set the `lineBreak` option to `false`. 
+By default it will wrap to the page margin, but the `width` option allows 
+you to set a different width the text should be wrapped to.
+If you set the `height` option, the text will be clipped to the number of
 lines that can fit in that height.
 
 When line wrapping is enabled, you can choose a text justification. There are
