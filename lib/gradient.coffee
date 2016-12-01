@@ -10,9 +10,14 @@ class PDFGradient
     @stops.push [pos, @doc._normalizeColor(color), opacity]
     return this
     
-  embed: ->
-    return if @embedded or @stops.length is 0
+  setTransform: (m11, m12, m21, m22, dx, dy) ->
+    @transform = [m11, m12, m21, m22, dx, dy]
+    return this
+
+  embed: (m) ->
+    return if @stops.length is 0
     @embedded = yes
+    @matrix = m
     
     # if the last stop comes before 100%, add a copy at 100%
     last = @stops[@stops.length - 1]
@@ -53,17 +58,6 @@ class PDFGradient
         
     @id = 'Sh' + (++@doc._gradCount)
     
-    # apply gradient transform to existing document ctm
-    m = @doc._ctm.slice()
-    [m0, m1, m2, m3, m4, m5] = m
-    [m11, m12, m21, m22, dx, dy] = @transform
-    m[0] = m0 * m11 + m2 * m12
-    m[1] = m1 * m11 + m3 * m12
-    m[2] = m0 * m21 + m2 * m22
-    m[3] = m1 * m21 + m3 * m22
-    m[4] = m0 * dx + m2 * dy + m4
-    m[5] = m1 * dx + m3 * dy + m5
-
     shader = @shader fn
     shader.end()
     
@@ -71,9 +65,8 @@ class PDFGradient
       Type: 'Pattern'
       PatternType: 2
       Shading: shader
-      Matrix: (+v.toFixed(5) for v in m)
+      Matrix: (+v.toFixed(5) for v in @matrix)
 
-    @doc.page.patterns[@id] = pattern
     pattern.end()
     
     if (@stops.some (stop) -> stop[2] < 1)
@@ -83,59 +76,75 @@ class PDFGradient
       for stop in @stops
         grad.stop stop[0], [stop[2]]
         
-      grad = grad.embed()
-              
-      group = @doc.ref
-        Type: 'Group'
-        S: 'Transparency'
-        CS: 'DeviceGray'
-        
-      group.end()
+      grad = grad.embed(@matrix)
       
-      resources = @doc.ref
-        ProcSet: ['PDF', 'Text', 'ImageB', 'ImageC', 'ImageI']
-        Shading:
-          Sh1: grad.data.Shading
-          
-      resources.end()
+      pageBBox = [0, 0, @doc.page.width, @doc.page.height]
       
       form = @doc.ref
         Type: 'XObject'
         Subtype: 'Form'
         FormType: 1
-        BBox: [0, 0, @doc.page.width, @doc.page.height]
-        Group: group
-        Resources: resources
+        BBox: pageBBox
+        Group:
+          Type: 'Group'
+          S: 'Transparency'
+          CS: 'DeviceGray'
+        Resources:
+          ProcSet: ['PDF', 'Text', 'ImageB', 'ImageC', 'ImageI']
+          Pattern:
+            Sh1: grad
       
-      form.end "/Sh1 sh"
+      form.write "/Pattern cs /Sh1 scn"
+      form.end "#{pageBBox.join(" ")} re f"
       
-      sMask = @doc.ref
-        Type: 'Mask'
-        S: 'Luminosity'
-        G: form
-          
-      sMask.end()
-        
       gstate = @doc.ref
         Type: 'ExtGState'
-        SMask: sMask
+        SMask:
+          Type: 'Mask'
+          S: 'Luminosity'
+          G: form
       
-      @opacity_id = ++@doc._opacityCount
-      name = "Gs#{@opacity_id}"
-      
-      @doc.page.ext_gstates[name] = gstate
       gstate.end()
-    
-    return pattern
       
+      opacityPattern = @doc.ref
+        Type: 'Pattern'
+        PatternType: 1
+        PaintType: 1
+        TilingType: 2
+        BBox: pageBBox
+        XStep: pageBBox[2]
+        YStep: pageBBox[3]
+        Resources:
+          ProcSet: ['PDF', 'Text', 'ImageB', 'ImageC', 'ImageI']
+          Pattern:
+            Sh1: pattern
+          ExtGState:
+            Gs1: gstate
+      
+      opacityPattern.write "/Gs1 gs /Pattern cs /Sh1 scn"
+      opacityPattern.end "#{pageBBox.join(" ")} re f"
+      
+      @doc.page.patterns[@id] = opacityPattern
+      
+    else
+      @doc.page.patterns[@id] = pattern
+      
+    return pattern
+
   apply: (op) ->
-    @embed() unless @embedded
+    # apply gradient transform to existing document ctm
+    [m0, m1, m2, m3, m4, m5] = @doc._ctm.slice()
+    [m11, m12, m21, m22, dx, dy] = @transform
+    m = [m0 * m11 + m2 * m12,
+         m1 * m11 + m3 * m12,
+         m0 * m21 + m2 * m22,
+         m1 * m21 + m3 * m22,
+         m0 * dx + m2 * dy + m4,
+         m1 * dx + m3 * dy + m5]
+
+    @embed(m) unless @embedded and m.join(" ") is @matrix.join(" ")
     @doc.addContent "/#{@id} #{op}"
-    
-    if @opacity_id
-      @doc.addContent "/Gs#{@opacity_id} gs"
-      @doc._sMasked = true
-    
+
 class PDFLinearGradient extends PDFGradient
   constructor: (@doc, @x1, @y1, @x2, @y2) ->
     super
