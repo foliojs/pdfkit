@@ -154,9 +154,25 @@ Here is the output:
 
 ## Fonts
 
-The PDF format defines 14 standard fonts that can be used in PDF documents (4
-styles of Helvetica, Courier, and Times, as well as Symbol and Zapf Dingbats),
-but also allows fonts to be embedded right in the document. PDFKit supports
+The PDF format defines 14 standard fonts that can be used in PDF documents. PDFKit supports each of them out of the box. 
+Besides Symbol and Zapf Dingbats this includes 4 styles (regular, bold, italic/oblique, bold+italic) of Helvetica, 
+Courier, and Times. To switch between standard fonts, call the `font` method with the corresponding Label:
+* `'Courier'`
+* `'Courier-Bold'`
+* `'Courier-Oblique'`
+* `'Courier-BoldOblique'`
+* `'Helvetica'`
+* `'Helvetica-Bold'`
+* `'Helvetica-Oblique'`
+* `'Helvetica-BoldOblique'`
+* `'Symbol'`
+* `'Times-Roman'`
+* `'Times-Bold'`
+* `'Times-Italic'`
+* `'Times-BoldItalic'`
+* `'ZapfDingbats'`
+
+The PDF format also allows fonts to be embedded right in the document. PDFKit supports
 embedding TrueType (`.ttf`), OpenType (`.otf`), WOFF, WOFF2, TrueType Collection (`.ttc`),
 and Datafork TrueType (`.dfont`) fonts.
 
