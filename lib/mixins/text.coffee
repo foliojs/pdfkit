@@ -70,8 +70,7 @@ module.exports =
   list: (list, x, y, options, wrapper) ->
     options = @_initOptions(x, y, options)
     
-    midLine = Math.round (@_font.ascender / 1000 * @_fontSize) / 2
-    r = options.bulletRadius or Math.round (@_font.ascender / 1000 * @_fontSize) / 3
+    r = Math.round (@_font.ascender / 1000 * @_fontSize) / 3
     indent = options.textIndent or r * 5
     itemIndent = options.bulletIndent or r * 8
     
@@ -103,7 +102,7 @@ module.exports =
         wrapper.lineWidth -= diff
         level = l
         
-      @circle @x - indent + r, @y + midLine, r
+      @circle @x - indent + r, @y + r + (r / 2), r
       @fill()
         
     wrapper.on 'sectionStart', =>
@@ -186,7 +185,30 @@ module.exports =
           textWidth = @widthOfString(text.replace(/\s+/g, ''), options)
           spaceWidth = @widthOfString(' ') + characterSpacing
           wordSpacing = Math.max 0, (options.lineWidth - textWidth) / Math.max(1, words.length - 1) - spaceWidth
-          
+
+    # text baseline alignments based on http://wiki.apache.org/xmlgraphics-fop/LineLayout/AlignmentHandling
+    if typeof options.baseline is 'number'
+      dy = -options.baseline
+    else
+      switch options.baseline
+        when 'svg-middle'
+          dy = 0.5 * @_font.xHeight
+        when 'middle', 'svg-central'
+          dy = 0.5 * (@_font.descender + @_font.ascender)
+        when 'bottom', 'ideographic'
+          dy = @_font.descender
+        when 'alphabetic'
+          dy = 0;
+        when 'mathematical'
+          dy = 0.5 * @_font.ascender
+        when 'hanging'
+          dy = 0.8 * @_font.ascender
+        when 'top'
+          dy = @_font.ascender
+        else
+          dy = @_font.ascender
+      dy = dy / 1000 * @_fontSize
+
     # calculate the actual rendered width of the string after word and character spacing
     renderedWidth = options.textWidth + (wordSpacing * (options.wordCount - 1)) + (characterSpacing * (text.length - 1))
           
@@ -211,10 +233,21 @@ module.exports =
       @stroke()
       @restore()
 
-    # flip coordinate system
     @save()
+
+    # oblique (angle in degrees or boolean)
+    if options.oblique
+      if typeof options.oblique is 'number'
+        skew = -Math.tan(options.oblique * Math.PI / 180)
+      else
+        skew = -0.25
+      @transform 1, 0, 0, 1, x, y
+      @transform 1, 0, skew, 1, -skew * dy, 0
+      @transform 1, 0, 0, 1, -x, -y
+
+    # flip coordinate system
     @transform 1, 0, 0, -1, 0, @page.height
-    y = @page.height - y - (@_font.ascender / 1000 * @_fontSize)
+    y = @page.height - y - dy
 
     # add current font to page if necessary
     @page.fonts[@_font.id] ?= @_font.ref()

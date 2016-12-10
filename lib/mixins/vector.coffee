@@ -46,14 +46,11 @@ module.exports =
     
   dash: (length, options = {}) ->
     return this unless length?
-    if Array.isArray length
-      length = length.join ' '
-      phase = options.phase or 0
-      @addContent "[#{length}] #{phase} d"
-    else
-      space = options.space ? length
-      phase = options.phase or 0
-      @addContent "[#{length} #{space}] #{phase} d"
+    
+    space = options.space ? length
+    phase = options.phase or 0
+    
+    @addContent "[#{length} #{space}] #{phase} d"
     
   undash: ->
     @addContent "[] 0 d"
@@ -74,21 +71,15 @@ module.exports =
     @addContent "#{x} #{y} #{w} #{h} re"
     
   roundedRect: (x, y, w, h, r = 0) ->
-    r = Math.min(r, 0.5 * w, 0.5 * h)
-
-    # amount to inset control points from corners (see `ellipse`)
-    c = r * (1.0 - KAPPA)
-
     @moveTo x + r, y
     @lineTo x + w - r, y
-    @bezierCurveTo x + w - c, y, x + w, y + c, x + w, y + r
+    @quadraticCurveTo x + w, y, x + w, y + r
     @lineTo x + w, y + h - r
-    @bezierCurveTo x + w, y + h - c, x + w - c, y + h, x + w - r, y + h
+    @quadraticCurveTo x + w, y + h, x + w - r, y + h
     @lineTo x + r, y + h
-    @bezierCurveTo x + c, y + h, x, y + h - c, x, y + h - r
+    @quadraticCurveTo x, y + h, x, y + h - r
     @lineTo x, y + r
-    @bezierCurveTo x, y + c, x + c, y, x + r, y
-    @closePath()
+    @quadraticCurveTo x, y, x + r, y
     
   ellipse: (x, y, r1, r2 = r1) ->
     # based on http://stackoverflow.com/questions/2172798/how-to-draw-an-oval-in-html5-canvas/2173084#2173084

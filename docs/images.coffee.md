@@ -13,11 +13,6 @@ be scaled according to the following options.
 * Both `width` and `height` provided - image is stretched to the dimensions provided
 * `scale` factor provided - image is scaled proportionally by the provided scale factor
 * `fit` array provided - image is scaled proportionally to fit within the passed width and height
-* `cover` array provided - image is scaled proportionally to completely cover the rectangle defined by the passed width and height
-
-When a `fit` or `cover` array is provided, PDFKit accepts these additional options:
-* `align` - horizontally align the image, the possible values are `'left'`, `'center'` and `'right'` 
-* `valign` - vertically align the image, the possible values are `'top'`, `'center'` and `'bottom'`
 
 Here is an example showing some of these options.
 
@@ -38,12 +33,6 @@ Here is an example showing some of these options.
     # Scale the image
     doc.image('images/test.jpeg', 320, 280, scale: 0.25)
        .text('Scale', 320, 265)
-
-    # Fit the image in the dimensions, and center it both horizontally and vertically
-    doc.image('images/test.jpeg', 430, 15, fit: [100, 100], align: 'center', valign: 'center')
-       .rect(430, 15, 100, 100)
-       .stroke()
-       .text('Centered', 430, 0)
        
 * * *
 
