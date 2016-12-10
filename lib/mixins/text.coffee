@@ -144,7 +144,9 @@ module.exports =
       @y = y
 
     # wrap to margins if no x or y position passed
-    unless options.lineBreak is false
+    if options.lineBreak is false
+      options.width = Number.MAX_SAFE_INTEGER
+    else
       margins = @page.margins
       options.width ?= @page.width - @x - margins.right
 
