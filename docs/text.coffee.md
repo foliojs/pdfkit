@@ -28,9 +28,10 @@ automatically inserts new pages as necessary so you don't have to worry about
 doing that for long pieces of text. PDFKit can also automatically wrap text
 into multiple columns.
 
-If you pass a specific X and Y position for the text, it will not wrap unless
-you also pass the `width` option, setting the width the text should be wrapped
-to. If you set the `height` option, the text will be clipped to the number of
+The text will automatically wrap unless you set the `lineBreak` option to `false`. 
+By default it will wrap to the page margin, but the `width` option allows 
+you to set a different width the text should be wrapped to.
+If you set the `height` option, the text will be clipped to the number of
 lines that can fit in that height.
 
 When line wrapping is enabled, you can choose a text justification. There are
@@ -112,6 +113,22 @@ Here is an example combining some of the options above, wrapping a piece of text
 The output looks like this:
 
 ![3]()
+
+## Text measurements
+
+If you're working with documents that require precise layout, you may need to know the 
+size of a piece of text. PDFKit has two methods to achieve this: `widthOfString(text, options)` 
+and `heightOfString(text, options)`. Both methods use the same options described in the 
+Text styling section, and take into account the eventual line wrapping.
+
+## Lists
+
+The `list` method creates a bulleted list. It accepts as arguments an array of strings, 
+and the optional `x`, `y` position. You can create complex multilevel lists by using nested arrays. 
+Lists use the following additional options: 
+* `bulletRadius`
+* `textIndent`
+* `bulletIndent`
 
 ## Rich Text
 
