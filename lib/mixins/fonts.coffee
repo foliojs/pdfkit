@@ -38,10 +38,13 @@ module.exports =
     # load the font
     id = 'F' + (++@_fontCount)
     @_font = PDFFont.open(this, src, family, id)
+
+    # default to id if font.name is undefined
+    name = @_font.name or id
     
     # check for existing font familes with the same name already in the PDF
     # useful if the font was passed as a buffer
-    if font = @_fontFamilies[@_font.name]
+    if font = @_fontFamilies[name]
       @_font = font
       return this
       
@@ -49,7 +52,7 @@ module.exports =
     if cacheKey
       @_fontFamilies[cacheKey] = @_font
       
-    @_fontFamilies[@_font.name] = @_font
+    @_fontFamilies[name] = @_font
     return this
     
   fontSize: (@_fontSize) ->
