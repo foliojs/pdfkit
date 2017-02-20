@@ -36,19 +36,7 @@ module.exports =
   _setColor: (color, stroke) ->
     color = @_normalizeColor color
     return no unless color
-    
-    # clear sMask
-    if @_sMasked
-      gstate = @ref
-        Type: 'ExtGState'
-        SMask: 'None'
-        
-      gstate.end()
-      name = "Gs#{++@_opacityCount}"
-      @page.ext_gstates[name] = gstate
-      @addContent "/#{name} gs"
-      @_sMasked = false
-    
+
     op = if stroke then 'SCN' else 'scn'
 
     if color instanceof PDFGradient
