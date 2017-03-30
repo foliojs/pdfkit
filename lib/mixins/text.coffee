@@ -23,7 +23,7 @@ module.exports =
     options = @_initOptions(x, y, options)
 
     # Convert text to a string
-    text = '' + text
+    text = if text == null or text == undefined then '' else '' + text
 
     # if the wordSpacing option is specified, remove multiple consecutive spaces
     if options.wordSpacing
