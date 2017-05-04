@@ -41,7 +41,7 @@ module.exports =
     
     # check for existing font familes with the same name already in the PDF
     # useful if the font was passed as a buffer
-    if font = @_fontFamilies[@_font.name]
+    if font = @_fontFamilies[@_font.name || cacheKey]
       @_font = font
       return this
       
