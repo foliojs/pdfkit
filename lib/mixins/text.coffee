@@ -145,8 +145,7 @@ module.exports =
 
     # wrap to margins if no x or y position passed
     unless options.lineBreak is false
-      margins = @page.margins
-      options.width ?= @page.width - @x - margins.right
+      options.width ?= @page.width - @x - @page.margins.right
 
     options.columns ||= 0
     options.columnGap ?= 18 # 1/4 inch
