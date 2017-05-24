@@ -36,7 +36,7 @@
   },
   "dependencies": {
     "fontkit": "^1.0.0",
-    "linebreak": "~0.1.0",
+    "linebreak": "^0.3.0",
     "png-js": ">=0.1.0"
   },
   "scripts": {
