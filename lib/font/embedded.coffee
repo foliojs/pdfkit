@@ -14,8 +14,57 @@ class EmbeddedFont extends PDFFont
     @lineGap = @font.lineGap * @scale
     @bbox = @font.bbox
 
+    @layoutCache = Object.create(null)
+
+  layoutRun: (text, features) ->
+    run = @font.layout text, features
+
+    # Normalize position values
+    for position, i in run.positions
+      for key of position
+        position[key] *= @scale
+
+      position.advanceWidth = run.glyphs[i].advanceWidth * @scale
+
+    return run
+
+  layoutCached: (text) ->
+    if cached = @layoutCache[text]
+      return cached
+
+    run = @layoutRun text
+    @layoutCache[text] = run
+    return run
+
+  layout: (text, features, onlyWidth = false) ->
+    # Skip the cache if any user defined features are applied
+    if features
+      return @layoutRun text, features
+
+    glyphs = if onlyWidth then null else []
+    positions = if onlyWidth then null else []
+    advanceWidth = 0
+
+    # Split the string by words to increase cache efficiency.
+    # For this purpose, spaces and tabs are a good enough delimeter.
+    last = 0
+    index = 0
+    while index <= text.length
+      if (index is text.length and last < index) or text.charAt(index) in [' ', '\t']
+        run = @layoutCached text.slice(last, ++index)
+        if not onlyWidth
+          glyphs.push run.glyphs...
+          positions.push run.positions...
+
+        advanceWidth += run.advanceWidth
+        last = index
+      else
+        index++
+
+    return {glyphs, positions, advanceWidth}
+
   encode: (text, features) ->
-    {glyphs, positions} = @font.layout text, features
+    {glyphs, positions} = @layout text, features
 
     res = []
     for glyph, i in glyphs
@@ -25,16 +74,11 @@ class EmbeddedFont extends PDFFont
       @widths[gid] ?= glyph.advanceWidth * @scale
       @unicode[gid] ?= glyph.codePoints
 
-      for key of positions[i]
-        positions[i][key] *= @scale
-
-      positions[i].advanceWidth = glyph.advanceWidth * @scale
-
     return [res, positions]
 
   widthOfString: (string, size, features) ->
-    width = @font.layout(string, features).advanceWidth
-    scale = size / @font.unitsPerEm
+    width = @layout(string, features, true).advanceWidth
+    scale = size / 1000
     return width * scale
 
   embed: ->
