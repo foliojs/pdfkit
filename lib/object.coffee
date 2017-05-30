@@ -38,10 +38,7 @@ class PDFObject
 
     # String objects are converted to PDF strings (UTF-16)
     else if object instanceof String
-      # Escape characters as required by the spec
-      string = object.replace escapableRe, (c) ->
-        return escapable[c]
-
+      string = object
       # Detect if this is a unicode string
       isUnicode = false
       for i in [0...string.length] by 1
@@ -52,6 +49,10 @@ class PDFObject
       # If so, encode it as big endian UTF-16
       if isUnicode
         string = swapBytes(new Buffer('\ufeff' + string, 'utf16le')).toString('binary')
+
+      # Escape characters as required by the spec
+      string = string.replace escapableRe, (c) ->
+        return escapable[c]
 
       '(' + string + ')'
 
