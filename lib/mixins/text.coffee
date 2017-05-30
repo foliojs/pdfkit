@@ -166,11 +166,10 @@ module.exports =
     return if text.length is 0
 
     # handle options
-    dir = if options.dir is 'rtl' then 'rtl' else 'ltr'
-    if dir is 'ltr'
-      align = options.align or 'left'
-    else
+    if options.dir is 'rtl'
       align = options.align or 'right'
+    else
+      align = options.align or 'left'
 
     wordSpacing = options.wordSpacing or 0
     characterSpacing = options.characterSpacing or 0
@@ -179,8 +178,7 @@ module.exports =
     if options.width
       switch align
         when 'right'
-          lineEndingRegx = /\s+$/
-          lineEndingRegx = /^\s+/ if options.dir is 'rtl'
+          lineEndingRe = if options.dir is 'rtl' then /^\s+/ else /\s+$/
           textWidth = @widthOfString text.replace(lineEndingRegx, ''), options
 
           x += options.lineWidth - textWidth
