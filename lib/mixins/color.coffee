@@ -6,20 +6,20 @@ module.exports =
     @_opacityRegistry = {}
     @_opacityCount = 0
     @_gradCount = 0
-    
+
   _normalizeColor: (color) ->
     if color instanceof PDFGradient
       return color
-    
+
     if typeof color is 'string'
       if color.charAt(0) is '#'
         color = color.replace(/#([0-9A-F])([0-9A-F])([0-9A-F])/i, "#$1$1$2$2$3$3") if color.length is 4
         hex = parseInt(color.slice(1), 16)
         color = [hex >> 16, hex >> 8 & 0xff, hex & 0xff]
-         
+
       else if namedColors[color]
         color = namedColors[color]
-        
+
     if Array.isArray color
       # RGB
       if color.length is 3
@@ -27,10 +27,10 @@ module.exports =
 
       # CMYK
       else if color.length is 4
-        color = (part / 100 for part in color)    
-    
+        color = (part / 100 for part in color)
+
       return color
-      
+
     return null
 
   _setColor: (color, stroke) ->
@@ -45,34 +45,34 @@ module.exports =
     else
       space = if color.length is 4 then 'DeviceCMYK' else 'DeviceRGB'
       @_setColorSpace space, stroke
-      
+
       color = color.join ' '
       @addContent "#{color} #{op}"
-    
+
     return yes
-    
+
   _setColorSpace: (space, stroke) ->
     op = if stroke then 'CS' else 'cs'
     @addContent "/#{space} #{op}"
 
-  fillColor: (color, opacity = 1) ->
+  fillColor: (color, opacity) ->
     set = @_setColor color, no
     @fillOpacity opacity if set
-    
-    # save this for text wrapper, which needs to reset 
+
+    # save this for text wrapper, which needs to reset
     # the fill color on new pages
     @_fillColor = [color, opacity]
     return this
 
-  strokeColor: (color, opacity = 1) ->
+  strokeColor: (color, opacity) ->
     set = @_setColor color, yes
     @strokeOpacity opacity if set
     return this
-     
+
   opacity: (opacity) ->
      @_doOpacity opacity, opacity
      return this
-     
+
   fillOpacity: (opacity) ->
      @_doOpacity opacity, null
      return this
@@ -91,7 +91,7 @@ module.exports =
      if @_opacityRegistry[key]
        [dictionary, name] = @_opacityRegistry[key]
      else
-       dictionary = 
+       dictionary =
          Type: 'ExtGState'
 
        dictionary.ca = fillOpacity if fillOpacity?
@@ -105,13 +105,13 @@ module.exports =
 
      @page.ext_gstates[name] = dictionary
      @addContent "/#{name} gs"
-     
+
   linearGradient: (x1, y1, x2, y2) ->
     return new PDFLinearGradient(this, x1, y1, x2, y2)
-    
+
   radialGradient: (x1, y1, r1, x2, y2, r2) ->
     return new PDFRadialGradient(this, x1, y1, r1, x2, y2, r2)
-     
+
 namedColors =
   aliceblue: [240, 248, 255]
   antiquewhite: [250, 235, 215]
