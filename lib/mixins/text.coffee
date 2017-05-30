@@ -179,7 +179,7 @@ module.exports =
       switch align
         when 'right'
           lineEndingRe = if options.dir is 'rtl' then /^\s+/ else /\s+$/
-          textWidth = @widthOfString text.replace(lineEndingRegx, ''), options
+          textWidth = @widthOfString text.replace(lineEndingRe, ''), options
 
           x += options.lineWidth - textWidth
 
