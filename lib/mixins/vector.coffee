@@ -191,9 +191,9 @@ module.exports =
     @transform cos, sin, -sin, cos, x, y
 
   scale: (xFactor, yFactor = xFactor, options = {}) ->
-    if arguments.length is 2
-      yFactor = xFactor
+    if typeof yFactor is "object"
       options = yFactor
+      yFactor = xFactor
 
     x = y = 0
     if options.origin?
