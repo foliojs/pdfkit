@@ -22,7 +22,7 @@ class LineWrapper extends EventEmitter
       @height = options.height
       @maxY = @startY + options.height
     else
-      @maxY = @document.page.maxY()
+      @maxY = @document.page.maxY( options.yIsSpecified )
     
     # handle paragraph indents
     @on 'firstLine', (options) =>
