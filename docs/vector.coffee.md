@@ -270,13 +270,13 @@ the drawing itself. There are three types of transformations available, as
 well as a method for setting the transformation matrix yourself. They are
 `translate`, `rotate` and `scale`.
 
-The `translate` transformation takes two arguments, x and y, and effectively
-moves the origin of the document which is (0, 0) by default, to the left and
-right x and y units.
+The `translate` transformation takes two arguments, `x` and `y`, and effectively
+moves the origin of the page which is (0, 0) by default, to the left and
+right `x` and `y` units.
 
 The `rotate` transformation takes an angle and optionally, an object with an
 `origin` property. It rotates the document `angle` degrees around the passed
-`origin` or by default, the center of the page.
+`origin` or by default, around the origin (top left corner) of the page.
 
 The `scale` transformation takes a scale factor and an optional `origin`
 passed in an options hash as with the `rotate` transformation. It is used to
@@ -321,6 +321,9 @@ example that clips a checkerboard pattern to the shape of a circle.
 The result of this example is the following:
 
 ![9](images/clipping.png "200")
+
+If you want to "unclip", you can use the `save` method before the clipping, 
+and then use `restore` to retrieve access to the whole page.
 
 That's it for vector graphics in PDFKit. Now let's move on to learning about
 PDFKit's text support!
