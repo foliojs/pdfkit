@@ -39,9 +39,12 @@ module.exports =
     id = 'F' + (++@_fontCount)
     @_font = PDFFont.open(this, src, family, id)
 
+    # use font name (or id as fallback) to identify font
+    name = @_font.name || id
+
     # check for existing font familes with the same name already in the PDF
     # useful if the font was passed as a buffer
-    if font = @_fontFamilies[@_font.name]
+    if font = @_fontFamilies[name]
       @_font = font
       return this
 
@@ -49,8 +52,8 @@ module.exports =
     if cacheKey
       @_fontFamilies[cacheKey] = @_font
 
-    if @_font.name
-      @_fontFamilies[@_font.name] = @_font
+    if name
+      @_fontFamilies[name] = @_font
 
     return this
 
