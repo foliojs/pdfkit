@@ -252,7 +252,11 @@ module.exports =
         positions.push positionsWord...
 
         # add the word spacing to the end of the word
-        positions[positions.length - 1].xAdvance += wordSpacing
+        # clone object because of cache
+        space = {}
+        space[key] = val for key, val of positions[positions.length - 1]
+        space.xAdvance += wordSpacing
+        positions[positions.length - 1] = space
     else
       [encoded, positions] = @_font.encode(text, options.features)
 
