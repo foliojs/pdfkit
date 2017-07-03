@@ -35,15 +35,17 @@ module.exports =
         options.A = @ref
           S: 'GoTo'
           D: [pages.Kids[url], 'XYZ', null, null, null]
+        options.A.end()
       else
         throw new Error "The document has no page #{url}"
+
     else
       # Link to an external url
       options.A = @ref
         S: 'URI'
         URI: new String url
+      options.A.end()
 
-    options.A.end()
     @annotate x, y, w, h, options
 
   _markup: (x, y, w, h, options = {}) ->
