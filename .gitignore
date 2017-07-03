@@ -4,9 +4,8 @@ lib/font/tables/.DS_Store
 /tests/
 node-zlib/
 src/
+<<<<<<< HEAD
 playground/
 build/
 js/
-demo/bundle.js
-*.html
-!demo/browser.html
+playground/
