@@ -45,7 +45,7 @@ syntax like this.
 
     doc.path('M 0,20 L 100,160 Q 130,200 150,120 C 190,-40 200,200 300,150 L 400,90')
        .stroke()
-       
+
 ![1](images/path.png "170")
 
 The PDFKit SVG parser supports all of the command types supported by SVG, so
@@ -106,33 +106,33 @@ should do. This is best illustrated by an example.
 
     # these examples are easier to see with a large line width
     doc.lineWidth(25)
-     
+
     # line cap settings
     doc.lineCap('butt')
        .moveTo(50, 20)
        .lineTo(100, 20)
        .stroke()
-       
+
     doc.lineCap('round')
        .moveTo(150, 20)
        .lineTo(200, 20)
        .stroke()
-     
-    # square line cap shown with a circle instead of a line so you can see it   
+
+    # square line cap shown with a circle instead of a line so you can see it
     doc.lineCap('square')
        .moveTo(250, 20)
        .circle(275, 30, 15)
        .stroke()
-       
+
     # line join settings
     doc.lineJoin('miter')
        .rect(50, 100, 50, 50)
        .stroke()
-       
+
     doc.lineJoin('round')
        .rect(150, 100, 50, 50)
        .stroke()
-       
+
     doc.lineJoin('bevel')
        .rect(250, 100, 50, 50)
        .stroke()
@@ -158,7 +158,7 @@ between the dashes is double the length of each dash.
     doc.circle(100, 50, 50)
        .dash(5, space: 10)
        .stroke()
-    
+
 The output of this example looks like this:
 
 ![4](images/dash.png "100")
@@ -200,7 +200,7 @@ and `radialGradient` methods.  Their function signatures are listed below:
 * `radialGradient(x1, y1, r1, x2, y2, r2)` - `r1` is the inner radius, `r2` is the outer radius
 
 Once you have a gradient object, you need to create color stops at points along that gradient.
-Stops are defined at percentage values (0 to 1), and take a color value (any usable by the 
+Stops are defined at percentage values (0 to 1), and take a color value (any usable by the
 fillColor method), and an optional opacity.
 
 You can see both linear and radial gradients in the following example:
@@ -209,20 +209,20 @@ You can see both linear and radial gradients in the following example:
     grad = doc.linearGradient(50, 0, 150, 100)
     grad.stop(0, 'green')
         .stop(1, 'red')
-        
+
     doc.rect 50, 0, 100, 100
     doc.fill grad
-    
+
     # Create a radial gradient
     grad = doc.radialGradient(300, 50, 0, 300, 50, 50)
     grad.stop(0, 'orange', 0)
         .stop(1, 'orange', 1)
-        
-    doc.circle 300, 50, 50    
+
+    doc.circle 300, 50, 50
     doc.fill grad
- 
-Here is the output from the this example: 
-    
+
+Here is the output from the this example:
+
 ![6]()
 
 ## Winding rules
@@ -236,12 +236,12 @@ and `even-odd`.
     doc.fillColor('red')
        .translate(-100, -50)
        .scale(0.8)
-     
+
     # Draw the path with the non-zero winding rule
     doc.path('M 250,75 L 323,301 131,161 369,161 177,301 z')
        .fill('non-zero')
-     
-    # Draw the path with the even-odd winding rule   
+
+    # Draw the path with the even-odd winding rule
     doc.translate(280, 0)
        .path('M 250,75 L 323,301 131,161 369,161 177,301 z')
        .fill('even-odd')
@@ -280,7 +280,7 @@ The `rotate` transformation takes an angle and optionally, an object with an
 
 The `scale` transformation takes a scale factor and an optional `origin`
 passed in an options hash as with the `rotate` transformation. It is used to
-increase or decrease the size of the units in the drawing, or change it's
+increase or decrease the size of the units in the drawing, or change its
 size. For example, applying a scale of `0.5` would make the drawing appear at
 half size, and a scale of `2` would make it appear twice as large.
 
@@ -307,10 +307,10 @@ parts of the drawing. Everything falling inside the clipping path after it is
 created is visible, and everything outside the path is invisible. Here is an
 example that clips a checkerboard pattern to the shape of a circle.
 
-    # Create a clipping path   
+    # Create a clipping path
     doc.circle(100, 100, 100)
        .clip()
-     
+
     # Draw a checkerboard pattern
     for row in [0...10]
       for col in [0...10]
@@ -322,7 +322,7 @@ The result of this example is the following:
 
 ![9](images/clipping.png "200")
 
-If you want to "unclip", you can use the `save` method before the clipping, 
+If you want to "unclip", you can use the `save` method before the clipping,
 and then use `restore` to retrieve access to the whole page.
 
 That's it for vector graphics in PDFKit. Now let's move on to learning about
