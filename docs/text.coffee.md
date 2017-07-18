@@ -83,8 +83,8 @@ below.
 * `columnGap` - the amount of space between each column (1/4 inch by default)
 * `indent` - the amount in PDF points (72 per inch) to indent each paragraph of text
 * `paragraphGap` - the amount of space between each paragraph of text
-* `marginBefore` - the amount of space before the text
-* `marginAfter` - the amount of space after the text
+* `marginTop` - the amount of space before the text
+* `marginBottom` - the amount of space after the text
 * `lineGap` - the amount of space between each line of text
 * `wordSpacing` - the amount of space between each word in the text
 * `characterSpacing` - the amount of space between each character in the text
