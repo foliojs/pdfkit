@@ -27,13 +27,27 @@ module.exports =
     
   link: (x, y, w, h, url, options = {}) ->
     options.Subtype = 'Link'
-    options.A = @ref
-      S: 'URI'
-      URI: new String url
-      
-    options.A.end()
+
+    if typeof url is 'number'
+      # Link to a page in the document (the page must already exist)
+      pages = @_root.data.Pages.data
+      if url >= 0 and url < pages.Kids.length
+        options.A = @ref
+          S: 'GoTo'
+          D: [pages.Kids[url], 'XYZ', null, null, null]
+        options.A.end()
+      else
+        throw new Error "The document has no page #{url}"
+
+    else
+      # Link to an external url
+      options.A = @ref
+        S: 'URI'
+        URI: new String url
+      options.A.end()
+
     @annotate x, y, w, h, options
-    
+
   _markup: (x, y, w, h, options = {}) ->
     [x1, y1, x2, y2] = @_convertRect x, y, w, h
     options.QuadPoints = [x1, y2, x2, y2, x1, y1, x2, y1]
