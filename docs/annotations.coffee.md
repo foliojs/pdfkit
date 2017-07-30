@@ -41,22 +41,22 @@ Here is an example that uses a few of the annotation types.
     doc.fontSize(25)
        .fillColor('blue')
        .text('This is a link!', 20, 0)
-     
+
     # Measure the text
     width = doc.widthOfString('This is a link!')
-    height = doc.currentLineHeight()   
-     
+    height = doc.currentLineHeight()
+
     # Add the underline and link annotations
     doc.underline(20, 0, width, height, color: 'blue')
        .link(20, 0, width, height, 'http://google.com/')
-     
-    # Create the highlighted text   
+
+    # Create the highlighted text
     doc.moveDown()
        .fillColor('black')
        .highlight(20, doc.y, doc.widthOfString('This text is highlighted!'), height)
        .text('This text is highlighted!')
-     
-    # Create the crossed out text   
+
+    # Create the crossed out text
     doc.moveDown()
        .strike(20, doc.y, doc.widthOfString('STRIKE!'), height)
        .text('STRIKE!')
@@ -77,7 +77,7 @@ links, underlines, and strikes.  Here's an example showing two of them:
          underline: true
 
 The output is as you'd expect:
-         
+
 ![1]()
 
 # You made it!
