@@ -53,6 +53,9 @@ class LineWrapper extends EventEmitter
         
   wordWidth: (word) ->
     return @document.widthOfString(word, this) + @characterSpacing + @wordSpacing
+
+  toInt: (n) ->
+    return Math.round(Number(n))
         
   eachWord: (text, fn) ->
     # setup a unicode line breaker
@@ -74,6 +77,19 @@ class LineWrapper extends EventEmitter
         while word.length
           # fit as much of the word as possible into the space we have
           l = word.length
+
+          # if the word is too long, which might happen for long URLs, cause JavaScript heap out of memory
+          # reduce the string size by the rate at which it exceeds the space left and adjust it from there.
+          # This will reduce the number of loops
+
+          if w > @spaceLeft
+            l = @toInt(l*@spaceLeft/w)
+            w = @wordWidth word.slice(0, l)
+            if w < @spaceLeft
+              while w <= @spaceLeft
+                w = @wordWidth word.slice(0, ++l)
+              w = @wordWidth word.slice(0, --l)
+
           while w > @spaceLeft
             w = @wordWidth word.slice(0, --l)
             
