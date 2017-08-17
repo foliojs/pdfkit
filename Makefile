@@ -28,3 +28,6 @@ website:
 
 clean:
 	rm -rf js build demo/bundle.js
+
+test:
+	./node_modules/.bin/coffee demo/test.coffee

@@ -11,7 +11,7 @@ doc.info['Title'] = 'Test Document'
 doc.info['Author'] = 'Devon Govett'
 
 # Register a font name for use later
-doc.registerFont('Palatino', 'fonts/PalatinoBold.ttf')
+doc.registerFont('Palatino', 'demo/fonts/PalatinoBold.ttf')
 
 # Set the font, draw some text, and embed an image
 doc.font('Palatino')
@@ -19,8 +19,8 @@ doc.font('Palatino')
    .text('Some text with an embedded font!', 100, 100)
    .fontSize(18)
    .text('PNG and JPEG images:')
-   .image('images/test.png', 100, 160, width: 412)
-   .image('images/test.jpeg', 190, 400, height: 300)
+   .image('demo/images/test.png', 100, 160, width: 412)
+   .image('demo/images/test.jpeg', 190, 400, height: 300)
 
 # Add another page
 doc.addPage()
@@ -86,7 +86,7 @@ doc.addPage()
    
 # Add a list with a font loaded from a TrueType collection file   
 doc.fillColor('#000')
-   .font('fonts/Chalkboard.ttc', 'Chalkboard', 16)
+   .font('demo/fonts/Chalkboard.ttc', 'Chalkboard', 16)
    .list(['One', 'Two', 'Three'], 100, 150)
         
 doc.end()
