@@ -25,6 +25,14 @@ module.exports =
     options.color ?= [243, 223, 92]
     @annotate x, y, w, h, options
     
+  goTo: (x, y, w, h, name, options = {}) ->
+    options.Subtype = 'Link'
+    options.A = @ref
+        S: 'GoTo'
+        D: new String name
+    options.A.end()
+    @annotate x, y, w, h, options
+
   link: (x, y, w, h, url, options = {}) ->
     options.Subtype = 'Link'
 

@@ -60,7 +60,7 @@ class PDFObject
     else if Buffer.isBuffer(object)
       '<' + object.toString('hex') + '>'
 
-    else if object instanceof PDFReference
+    else if object instanceof PDFReference or object instanceof PDFNameTree
       object.toString()
 
     else if object instanceof Date
@@ -98,3 +98,4 @@ class PDFObject
 
 module.exports = PDFObject
 PDFReference = require './reference'
+PDFNameTree = require './name_tree'

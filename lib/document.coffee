@@ -7,6 +7,7 @@ stream = require 'stream'
 fs = require 'fs'
 PDFObject = require './object'
 PDFReference = require './reference'
+PDFNameTree = require './name_tree'
 PDFPage = require './page'
 
 class PDFDocument extends stream.Readable
@@ -34,6 +35,8 @@ class PDFDocument extends stream.Readable
         Type: 'Pages'
         Count: 0
         Kids: []
+      Names: @ref
+        Dests: new PDFNameTree()
 
     # The current page
     @page = null
@@ -124,6 +127,14 @@ class PDFDocument extends stream.Readable
 
     return
 
+  addNamedDestination: (name, args...) ->
+    if args.length == 0 
+      args = ['XYZ', null, null, null]
+    args.unshift(@page.dictionary)
+    @_root.data.Names.data.Dests.add name, args
+    
+    return
+
   ref: (data) ->
     ref = new PDFReference(this, @_offsets.length + 1, data)
     @_offsets.push null # placeholder for this object's offset once it is finalized
@@ -186,6 +197,7 @@ class PDFDocument extends stream.Readable
 
     @_root.end()
     @_root.data.Pages.end()
+    @_root.data.Names.end()
 
     if @_waiting is 0
       @_finalize()

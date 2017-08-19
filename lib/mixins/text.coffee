@@ -193,6 +193,8 @@ module.exports =
     # create link annotations if the link option is given
     if options.link?
       @link x, y, renderedWidth, @currentLineHeight(), options.link
+    if options.goTo?
+      @goTo x, y, renderedWidth, @currentLineHeight(), options.goTo
 
     # create underline or strikethrough line
     if options.underline or options.strike
