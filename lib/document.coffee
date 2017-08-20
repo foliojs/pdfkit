@@ -130,6 +130,8 @@ class PDFDocument extends stream.Readable
   addNamedDestination: (name, args...) ->
     if args.length == 0 
       args = ['XYZ', null, null, null]
+    if args[0] == 'XYZ' and args[2] != null
+      args[2] = @page.height - args[2]
     args.unshift(@page.dictionary)
     @_root.data.Names.data.Dests.add name, args
     
