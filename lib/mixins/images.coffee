@@ -77,6 +77,14 @@ module.exports =
       else if options.valign is 'bottom'
         y = y + bh - h
 
+    # create link annotations if the link option is given
+    if options.link?
+      @link x, y, renderedWidth, @currentLineHeight(), options.link
+    if options.goTo?
+      @goTo x, y, renderedWidth, @currentLineHeight(), options.goTo
+    if options.destination?
+      @addNamedDestination options.destination, 'XYZ', x, y, null
+
     # Set the current y position to below the image if it is in the document flow      
     @y += h if @y is y
 
