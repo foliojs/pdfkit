@@ -195,6 +195,8 @@ module.exports =
       @link x, y, renderedWidth, @currentLineHeight(), options.link
     if options.goTo?
       @goTo x, y, renderedWidth, @currentLineHeight(), options.goTo
+    if options.destination?
+      @addNamedDestination options.destination, 'XYZ', x, y, null
 
     # create underline or strikethrough line
     if options.underline or options.strike
