@@ -88,8 +88,12 @@ class EmbeddedFont extends PDFFont
     if isCFF
       fontFile.data.Subtype = 'CIDFontType0C'
 
-    @subset.encodeStream().on 'data', (data) ->
-      fontFile.write(data);
+    @subset.encodeStream()
+      .on 'data', (data) ->
+        fontFile.write(data)
+
+      .on 'end', () ->
+        fontFile.end()
 
     familyClass = (@font['OS/2']?.sFamilyClass or 0) >> 8
     flags = 0
