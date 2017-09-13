@@ -4,63 +4,50 @@ By Devon Govett
 ###
 
 zlib = require 'zlib'
-stream = require 'stream'
 
 class PDFReference
   constructor: (@document, @id, @data = {}) ->
     @gen = 0
-    @deflate = null
     @compress = @document.compress and not @data.Filter
     @uncompressedLength = 0
-    @chunks = []
+    @buffer = new Buffer('')
 
-  initDeflate: ->
-    @data.Filter = 'FlateDecode'
-
-    @deflate = zlib.createDeflate()
-    @deflate.on 'data', (chunk) =>
-      @chunks.push chunk
-      @data.Length += chunk.length
-
-    @deflate.on 'end', @finalize
-
-  write: (chunk, encoding, callback) ->
+  write: (chunk) ->
     unless Buffer.isBuffer(chunk)
       chunk = new Buffer(chunk + '\n', 'binary')
 
     @uncompressedLength += chunk.length
     @data.Length ?= 0
-
+    @buffer = Buffer.concat([@buffer, chunk])
+    @data.Length += chunk.length
     if @compress
-      @initDeflate() if not @deflate
-      @deflate.write chunk
-    else
-      @chunks.push chunk
-      @data.Length += chunk.length
+      @data.Filter = 'FlateDecode'
 
   end: (chunk) ->
-    if @deflate
-      @deflate.end()
-    else
-      @finalize()
+    if chunk
+      @write(chunk)
+    @finalize()
 
   finalize: =>
-    @offset = @document._offset
+    setTimeout () =>
+      @offset = @document._offset
 
-    @document._write "#{@id} #{@gen} obj"
-    @document._write PDFObject.convert(@data)
+      @document._write "#{@id} #{@gen} obj"
+      @document._write PDFObject.convert(@data)
 
-    if @chunks.length
-      @document._write 'stream'
-      for chunk in @chunks
-        @document._write chunk
+      if @buffer.length
+        if @compress
+          @buffer = zlib.deflateSync(@buffer)
+          @data.Length = @buffer.length
+        @document._write 'stream'
+        @document._write @buffer
 
-      @chunks.length = 0 # free up memory
-      @document._write '\nendstream'
+        @buffer.length = 0 # free up memory
+        @document._write '\nendstream'
 
-    @document._write 'endobj'
-    @document._refEnd(this)
-
+      @document._write 'endobj'
+      @document._refEnd(this)
+    , 0
   toString: ->
     return "#{@id} #{@gen} R"
 

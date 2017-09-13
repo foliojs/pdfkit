@@ -27,13 +27,25 @@ class PDFDocument extends stream.Readable
     @_waiting = 0
     @_ended = false
     @_offset = 0
+    Pages = @ref
+      Type: 'Pages'
+      Count: 0
+      Kids: new Buffer('')
+
+    Pages.finalize = () ->
+      @offset = @document._offset;
+      @document._write(@id + " " + @gen + " obj");
+      @document._write('<<');
+      @document._write('/Type /Pages');
+      @document._write('/Count ' + @data.Count);
+      @document._write('/Kids [' + @data.Kids.slice(0,-1).toString() + ']');
+      @document._write('>>');
+      @document._write('endobj');
+      return @document._refEnd(@);
 
     @_root = @ref
       Type: 'Catalog'
-      Pages: @ref
-        Type: 'Pages'
-        Count: 0
-        Kids: []
+      Pages: Pages
 
     # The current page
     @page = null
@@ -88,7 +100,7 @@ class PDFDocument extends stream.Readable
 
     # add the page to the object store
     pages = @_root.data.Pages.data
-    pages.Kids.push @page.dictionary
+    pages.Kids = Buffer.concat([pages.Kids, new Buffer(@page.dictionary + ' ')]);
     pages.Count++
 
     # reset x and y coordinates
