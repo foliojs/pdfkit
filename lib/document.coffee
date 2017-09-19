@@ -30,7 +30,7 @@ class PDFDocument extends stream.Readable
     Pages = @ref
       Type: 'Pages'
       Count: 0
-      Kids: new Buffer('')
+      Kids: []
 
     Pages.finalize = () ->
       @offset = @document._offset;
@@ -38,7 +38,7 @@ class PDFDocument extends stream.Readable
       @document._write('<<');
       @document._write('/Type /Pages');
       @document._write('/Count ' + @data.Count);
-      @document._write('/Kids [' + @data.Kids.slice(0,-1).toString() + ']');
+      @document._write('/Kids [' + Buffer.concat(@data.Kids).slice(0,-1).toString() + ']');
       @document._write('>>');
       @document._write('endobj');
       return @document._refEnd(@);
@@ -100,7 +100,7 @@ class PDFDocument extends stream.Readable
 
     # add the page to the object store
     pages = @_root.data.Pages.data
-    pages.Kids = Buffer.concat([pages.Kids, new Buffer(@page.dictionary + ' ')]);
+    pages.Kids.push(new Buffer(@page.dictionary + ' '))
     pages.Count++
 
     # reset x and y coordinates

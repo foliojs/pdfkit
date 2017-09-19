@@ -10,7 +10,7 @@ class PDFReference
     @gen = 0
     @compress = @document.compress and not @data.Filter
     @uncompressedLength = 0
-    @buffer = new Buffer('')
+    @buffer = []
 
   write: (chunk) ->
     unless Buffer.isBuffer(chunk)
@@ -18,7 +18,7 @@ class PDFReference
 
     @uncompressedLength += chunk.length
     @data.Length ?= 0
-    @buffer = Buffer.concat([@buffer, chunk])
+    @buffer.push(chunk)
     @data.Length += chunk.length
     if @compress
       @data.Filter = 'FlateDecode'
@@ -36,6 +36,7 @@ class PDFReference
       @document._write PDFObject.convert(@data)
 
       if @buffer.length
+        @buffer = Buffer.concat(@buffer)
         if @compress
           @buffer = zlib.deflateSync(@buffer)
           @data.Length = @buffer.length
