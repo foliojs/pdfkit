@@ -47,6 +47,11 @@ class LineWrapper extends EventEmitter
       @lastLine = true
       
       @once 'line', =>
+        # when line has an explicit break, don't carry across
+        # the x continuation.
+        if @lineFinal
+          @lineFinal = false
+          @continuedX = @indent
         @document.y += options.paragraphGap or 0
         options.align = align
         @lastLine = false
@@ -138,6 +143,7 @@ class LineWrapper extends EventEmitter
               
       if bk.required or w > @spaceLeft
         if bk.required
+          @lineFinal = true
           @emit 'lastLine', options, this
           
         # if the user specified a max height and an ellipsis, and is about to pass the
