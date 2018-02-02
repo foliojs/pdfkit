@@ -1,15 +1,32 @@
+{number} = require './object'
+
 class PDFGradient
   constructor: (@doc) ->
     @stops = []
     @embedded = no
     @transform = [1, 0, 0, 1, 0, 0]
-    @_colorSpace = 'DeviceRGB'
     
   stop: (pos, color, opacity = 1) ->
+    color = @doc._normalizeColor(color)
+
+    if @stops.length is 0
+      if color.length is 3
+        @_colorSpace = 'DeviceRGB'
+      else if color.length is 4
+        @_colorSpace = 'DeviceCMYK'
+      else if color.length is 1
+        @_colorSpace = 'DeviceGray'
+      else
+        throw new Error('Unknown color space')
+    else if (@_colorSpace is 'DeviceRGB' and color.length isnt 3) or
+            (@_colorSpace is 'DeviceCMYK' and color.length isnt 4) or
+            (@_colorSpace is 'DeviceGray' and color.length isnt 1)
+      throw new Error('All gradient stops must use the same color space')
+
     opacity = Math.max(0, Math.min(1, opacity))
-    @stops.push [pos, @doc._normalizeColor(color), opacity]
+    @stops.push [pos, color, opacity]
     return this
-    
+
   setTransform: (m11, m12, m21, m22, dx, dy) ->
     @transform = [m11, m12, m21, m22, dx, dy]
     return this
@@ -65,7 +82,7 @@ class PDFGradient
       Type: 'Pattern'
       PatternType: 2
       Shading: shader
-      Matrix: (+v.toFixed(5) for v in @matrix)
+      Matrix: number(v) for v in @matrix
 
     pattern.end()
     
