@@ -137,9 +137,6 @@ class LineWrapper extends EventEmitter
         wc++
               
       if bk.required or w > @spaceLeft
-        if bk.required
-          @emit 'lastLine', options, this
-          
         # if the user specified a max height and an ellipsis, and is about to pass the
         # max height and max columns after the next line, append the ellipsis
         lh = @document.currentLineHeight(true)
@@ -155,10 +152,14 @@ class LineWrapper extends EventEmitter
         
           buffer = buffer + @ellipsis
           
-        if bk.required and w > @spaceLeft
-          buffer = word
-          textWidth = w
-          wc = 1
+        if bk.required
+          if w > @spaceLeft
+            emitLine()
+            buffer = word
+            textWidth = w
+            wc = 1
+
+          @emit 'lastLine', options, this
 
         emitLine()
         
