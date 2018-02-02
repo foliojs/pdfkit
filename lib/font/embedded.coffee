@@ -11,6 +11,8 @@ class EmbeddedFont extends PDFFont
     @scale = 1000 / @font.unitsPerEm
     @ascender = @font.ascent * @scale
     @descender = @font.descent * @scale
+    @xHeight = @font.xHeight * @scale
+    @capHeight = @font.capHeight * @scale
     @lineGap = @font.lineGap * @scale
     @bbox = @font.bbox
 
