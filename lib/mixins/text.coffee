@@ -71,16 +71,20 @@ module.exports =
   list: (list, x, y, options, wrapper) ->
     options = @_initOptions(x, y, options)
 
-    midLine = Math.round (@_font.ascender / 1000 * @_fontSize) / 2
-    r = options.bulletRadius or Math.round (@_font.ascender / 1000 * @_fontSize) / 3
-    indent = options.textIndent or r * 5
-    itemIndent = options.bulletIndent or r * 8
+    listType = options.listType or 'bullet'
+    unit = Math.round (@_font.ascender / 1000 * @_fontSize)
+    midLine = unit / 2
+    r = options.bulletRadius or unit / 3
+    indent = options.textIndent or if listType is 'bullet' then r * 5 else unit * 2
+    itemIndent = options.bulletIndent or if listType is 'bullet' then r * 8 else unit * 2
 
     level = 1
     items = []
     levels = []
+    numbers = []
 
     flatten = (list) ->
+      n = 1
       for item, i in list
         if Array.isArray(item)
           level++
@@ -89,8 +93,19 @@ module.exports =
         else
           items.push(item)
           levels.push(level)
+          numbers.push(n++) unless listType is 'bullet'
 
     flatten(list)
+
+    label = (n) ->
+      switch listType
+        when 'numbered'
+          "#{n}."
+        when 'lettered'
+          letter = String.fromCharCode (n - 1) % 26 + 65
+          times = Math.floor (n - 1) / 26 + 1
+          text = Array(times + 1).join(letter)
+          "#{text}."
 
     wrapper = new LineWrapper(this, options)
     wrapper.on 'line', @_line.bind(this)
@@ -104,8 +119,13 @@ module.exports =
         wrapper.lineWidth -= diff
         level = l
 
-      @circle @x - indent + r, @y + midLine, r
-      @fill()
+      switch listType
+        when 'bullet'
+          @circle @x - indent + r, @y + midLine, r
+          @fill()
+        when 'numbered', 'lettered'
+          text = label numbers[i - 1]
+          @_fragment text, @x - indent, @y, options
 
     wrapper.on 'sectionStart', =>
       pos = indent + itemIndent * (level - 1)
