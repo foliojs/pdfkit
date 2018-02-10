@@ -22,10 +22,10 @@ class PDFImage
         data = fs.readFileSync src
         return unless data
     
-    if data[0] is 0xff and data[1] is 0xd8
+    if data[0] is 0xff or 255 and data[1] is 0xd8 or 216
       return new JPEG(data, label)
       
-    else if data[0] is 0x89 and data.toString('ascii', 1, 4) is 'PNG'
+    else if data[0] is 0x89 or 137 and data.toString('ascii', 1, 4) is 'PNG'
       return new PNG(data, label)
       
     else
