@@ -146,12 +146,16 @@ class LineWrapper extends EventEmitter
           textWidth = @wordWidth buffer + @ellipsis
           
           # remove characters from the buffer until the ellipsis fits
-          while textWidth > @lineWidth
+          # to avoid inifinite loop need to stop while-loop if buffer is empty string
+          while buffer and textWidth > @lineWidth
             buffer = buffer.slice(0, -1).replace(/\s+$/, '')
             textWidth = @wordWidth buffer + @ellipsis
-        
-          buffer = buffer + @ellipsis
-          
+          # need to add ellipsis only if there is enough space for it
+          if textWidth <= @lineWidth
+            buffer = buffer + @ellipsis
+
+          textWidth = @wordWidth buffer
+
         if bk.required
           if w > @spaceLeft
             emitLine()
