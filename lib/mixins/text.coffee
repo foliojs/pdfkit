@@ -211,10 +211,11 @@ module.exports =
       @stroke()
       @restore()
 
+  _addGlyphs: (glyphs, positions, x, y, options = {}) ->
     # flip coordinate system
     @save()
     @transform 1, 0, 0, -1, 0, @page.height
-    y = @page.height - y - (@_font.ascender / 1000 * @_fontSize)
+    y = @page.height - y# - (@_font.ascender / 1000 * @_fontSize)
 
     # add current font to page if necessary
     @page.fonts[@_font.id] ?= @_font.ref()
@@ -233,33 +234,10 @@ module.exports =
     @addContent "#{mode} Tr" if mode
 
     # Character spacing
-    @addContent "#{number(characterSpacing)} Tc" if characterSpacing
+    # @addContent "#{number(characterSpacing)} Tc" if characterSpacing
 
     # Add the actual text
-    # If we have a word spacing value, we need to encode each word separately
-    # since the normal Tw operator only works on character code 32, which isn't
-    # used for embedded fonts.
-    if wordSpacing
-      words = text.trim().split(/\s+/)
-      wordSpacing += @widthOfString(' ') + characterSpacing
-      wordSpacing *= 1000 / @_fontSize
-
-      encoded = []
-      positions = []
-      for word in words
-        [encodedWord, positionsWord] = @_font.encode(word, options.features)
-        encoded.push encodedWord...
-        positions.push positionsWord...
-
-        # add the word spacing to the end of the word
-        # clone object because of cache
-        space = {}
-        space[key] = val for key, val of positions[positions.length - 1]
-        space.xAdvance += wordSpacing
-        positions[positions.length - 1] = space
-    else
-      [encoded, positions] = @_font.encode(text, options.features)
-
+    encoded = @_font.encode2(glyphs)
     scale = @_fontSize / 1000
     commands = []
     last = 0
@@ -269,7 +247,7 @@ module.exports =
     addSegment = (cur) =>
       if last < cur
         hex = encoded.slice(last, cur).join ''
-        advance = positions[cur - 1].xAdvance - positions[cur - 1].advanceWidth
+        advance = positions[cur - 1].xAdvance * (1000 / @_fontSize) - glyphs[cur - 1].advanceWidth * (1000 / @_font.font.unitsPerEm)
         commands.push "<#{hex}> #{number(-advance)}"
 
       last = cur
@@ -301,10 +279,10 @@ module.exports =
           hadOffset = no
 
         # Group segments that don't have any advance adjustments
-        unless pos.xAdvance - pos.advanceWidth is 0
+        unless pos.xAdvance - glyphs[i].advanceWidth * (@_fontSize / @_font.font.unitsPerEm) is 0
           addSegment i + 1
 
-      x += pos.xAdvance * scale
+      x += pos.xAdvance
 
     # Flush any remaining commands
     flush i

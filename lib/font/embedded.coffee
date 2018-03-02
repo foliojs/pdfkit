@@ -76,6 +76,17 @@ class EmbeddedFont extends PDFFont
 
     return [res, positions]
 
+  encode2: (glyphs) ->
+    res = []
+    for glyph, i in glyphs
+      gid = @subset.includeGlyph glyph.id
+      res.push ('0000' + gid.toString(16)).slice(-4)
+
+      @widths[gid] ?= glyph.advanceWidth * @scale
+      # @unicode[gid] ?= glyph.codePoints
+
+    return res
+
   widthOfString: (string, size, features) ->
     width = @layout(string, features, true).advanceWidth
     scale = size / 1000
