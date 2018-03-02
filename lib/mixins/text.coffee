@@ -1,4 +1,3 @@
-LineWrapper = require '../line_wrapper'
 {number} = require '../object'
 
 module.exports =
@@ -29,20 +28,8 @@ module.exports =
     if options.wordSpacing
       text = text.replace(/\s{2,}/g, ' ')
 
-    # word wrapping
-    if options.width
-      wrapper = @_wrapper
-      unless wrapper
-        wrapper = new LineWrapper(this, options)
-        wrapper.on 'line', lineCallback
-
-      @_wrapper = if options.continued then wrapper else null
-      @_textOptions = if options.continued then options else null
-      wrapper.wrap text, options
-
     # render paragraphs as single lines
-    else
-      lineCallback line, options for line in text.split '\n'
+    lineCallback line, options for line in text.split '\n'
 
     return this
 
@@ -71,20 +58,16 @@ module.exports =
   list: (list, x, y, options, wrapper) ->
     options = @_initOptions(x, y, options)
 
-    listType = options.listType or 'bullet'
-    unit = Math.round (@_font.ascender / 1000 * @_fontSize)
-    midLine = unit / 2
-    r = options.bulletRadius or unit / 3
-    indent = options.textIndent or if listType is 'bullet' then r * 5 else unit * 2
-    itemIndent = options.bulletIndent or if listType is 'bullet' then r * 8 else unit * 2
+    midLine = Math.round (@_font.ascender / 1000 * @_fontSize) / 2
+    r = options.bulletRadius or Math.round (@_font.ascender / 1000 * @_fontSize) / 3
+    indent = options.textIndent or r * 5
+    itemIndent = options.bulletIndent or r * 8
 
     level = 1
     items = []
     levels = []
-    numbers = []
 
     flatten = (list) ->
-      n = 1
       for item, i in list
         if Array.isArray(item)
           level++
@@ -93,51 +76,11 @@ module.exports =
         else
           items.push(item)
           levels.push(level)
-          numbers.push(n++) unless listType is 'bullet'
 
     flatten(list)
 
-    label = (n) ->
-      switch listType
-        when 'numbered'
-          "#{n}."
-        when 'lettered'
-          letter = String.fromCharCode (n - 1) % 26 + 65
-          times = Math.floor (n - 1) / 26 + 1
-          text = Array(times + 1).join(letter)
-          "#{text}."
-
-    wrapper = new LineWrapper(this, options)
-    wrapper.on 'line', @_line.bind(this)
-
     level = 1
     i = 0
-    wrapper.on 'firstLine', =>
-      if (l = levels[i++]) isnt level
-        diff = itemIndent * (l - level)
-        @x += diff
-        wrapper.lineWidth -= diff
-        level = l
-
-      switch listType
-        when 'bullet'
-          @circle @x - indent + r, @y + midLine, r
-          @fill()
-        when 'numbered', 'lettered'
-          text = label numbers[i - 1]
-          @_fragment text, @x - indent, @y, options
-
-    wrapper.on 'sectionStart', =>
-      pos = indent + itemIndent * (level - 1)
-      @x += pos
-      wrapper.lineWidth -= pos
-
-    wrapper.on 'sectionEnd', =>
-      pos = indent + itemIndent * (level - 1)
-      @x -= pos
-      wrapper.lineWidth += pos
-
-    wrapper.wrap items.join('\n'), options
 
     return this
 
@@ -207,34 +150,11 @@ module.exports =
           spaceWidth = @widthOfString(' ') + characterSpacing
           wordSpacing = Math.max 0, (options.lineWidth - textWidth) / Math.max(1, words.length - 1) - spaceWidth
 
-    # text baseline alignments based on http://wiki.apache.org/xmlgraphics-fop/LineLayout/AlignmentHandling
-    if typeof options.baseline is 'number'
-      dy = -options.baseline
-    else
-      switch options.baseline
-        when 'svg-middle'
-          dy = 0.5 * @_font.xHeight
-        when 'middle', 'svg-central'
-          dy = 0.5 * (@_font.descender + @_font.ascender)
-        when 'bottom', 'ideographic'
-          dy = @_font.descender
-        when 'alphabetic'
-          dy = 0;
-        when 'mathematical'
-          dy = 0.5 * @_font.ascender
-        when 'hanging'
-          dy = 0.8 * @_font.ascender
-        when 'top'
-          dy = @_font.ascender
-        else
-          dy = @_font.ascender
-      dy = dy / 1000 * @_fontSize
-
     # calculate the actual rendered width of the string after word and character spacing
     renderedWidth = options.textWidth + (wordSpacing * (options.wordCount - 1)) + (characterSpacing * (text.length - 1))
 
     # create link annotations if the link option is given
-    if options.link?
+    if options.link
       @link x, y, renderedWidth, @currentLineHeight(), options.link
 
     # create underline or strikethrough line
@@ -254,42 +174,10 @@ module.exports =
       @stroke()
       @restore()
 
-    @save()
-
-    # oblique (angle in degrees or boolean)
-    if options.oblique
-      if typeof options.oblique is 'number'
-        skew = -Math.tan(options.oblique * Math.PI / 180)
-      else
-        skew = -0.25
-      @transform 1, 0, 0, 1, x, y
-      @transform 1, 0, skew, 1, -skew * dy, 0
-      @transform 1, 0, 0, 1, -x, -y
-
-    # flip coordinate system
-    @transform 1, 0, 0, -1, 0, @page.height
-    y = @page.height - y - dy
-
     # add current font to page if necessary
     @page.fonts[@_font.id] ?= @_font.ref()
 
-    # begin the text object
-    @addContent "BT"
-
-    # text position
-    @addContent "1 0 0 1 #{number(x)} #{number(y)} Tm"
-
-    # font and font size
-    @addContent "/#{@_font.id} #{number(@_fontSize)} Tf"
-
-    # rendering mode
-    mode = if options.fill and options.stroke then 2 else if options.stroke then 1 else 0
-    @addContent "#{mode} Tr" if mode
-
-    # Character spacing
-    @addContent "#{number(characterSpacing)} Tc" if characterSpacing
-
-    # Add the actual text
+    # Glyph encoding and positioning
     # If we have a word spacing value, we need to encode each word separately
     # since the normal Tw operator only works on character code 32, which isn't
     # used for embedded fonts.
@@ -313,6 +201,61 @@ module.exports =
         positions[positions.length - 1] = space
     else
       [encoded, positions] = @_font.encode(text, options.features)
+
+    # Pass down spacings to _glyphs method
+    options.wordSpacing = wordSpacing
+    options.characterSpacing = characterSpacing
+
+    # Adjust y to match coordinate flipping
+    y = @page.height - y - (@_font.ascender / 1000 * @_fontSize)
+
+    @_glyphs(encoded, positions, x, y, options)
+
+  _addGlyphs: (glyphs, positions, x, y, options = {}) ->
+    # add current font to page if necessary
+    @page.fonts[@_font.id] ?= @_font.ref()
+
+    # Adjust y to match coordinate flipping
+    y = @page.height - y
+
+    scale = (1000 / @_fontSize)
+    unitsPerEm = @_font.font.unitsPerEm || 1000
+    advanceWidthScale = (1000 / unitsPerEm)
+
+    # Glyph encoding and positioning
+    encodedGlyphs = @_font.encodeGlyphs(glyphs)
+    encodedPositions = positions.map((pos, i) ->
+      {
+        xAdvance: pos.xAdvance * scale,
+        yAdvance: pos.yAdvance * scale,
+        xOffset: pos.xOffset,
+        yOffset: pos.yOffset,
+        advanceWidth: glyphs[i].advanceWidth * advanceWidthScale
+      }
+    )
+
+    @_glyphs(encodedGlyphs, encodedPositions, x, y, options)
+
+  _glyphs: (encoded, positions, x, y, options) ->
+    # flip coordinate system
+    @save()
+    @transform 1, 0, 0, -1, 0, @page.height
+
+    # begin the text object
+    @addContent "BT"
+
+    # text position
+    @addContent "1 0 0 1 #{number(x)} #{number(y)} Tm"
+
+    # font and font size
+    @addContent "/#{@_font.id} #{number(@_fontSize)} Tf"
+
+    # rendering mode
+    mode = if options.fill and options.stroke then 2 else if options.stroke then 1 else 0
+    @addContent "#{mode} Tr" if mode
+
+    # Character spacing
+    @addContent "#{number(options.characterSpacing)} Tc" if options.characterSpacing
 
     scale = @_fontSize / 1000
     commands = []
