@@ -9,6 +9,7 @@
     "document",
     "vector"
   ],
+  "license" : "MIT",
   "version": "0.8.3",
   "homepage": "http://pdfkit.org/",
   "author": {
@@ -27,11 +28,11 @@
     "brfs": "~1.0.1",
     "browserify": "^3.39.0",
     "codemirror": "~3.20.0",
-    "coffee-script": ">=1.0.1",
+    "coffeescript": ">=1.0.1",
     "coffeeify": "^0.6.0",
     "exorcist": "^0.1.5",
     "iconv-lite": "^0.4.13",
-    "jade": "~1.1.5",
+    "pug": "~1.1.5",
     "markdown": "~0.5.0"
   },
   "dependencies": {
