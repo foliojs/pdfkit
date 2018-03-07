@@ -28,7 +28,7 @@
     "brfs": "~1.0.1",
     "browserify": "^3.39.0",
     "codemirror": "~3.20.0",
-    "coffeescript": ">=1.0.1",
+    "coffee-script": ">=1.0.1",
     "coffeeify": "^0.6.0",
     "exorcist": "^0.1.5",
     "iconv-lite": "^0.4.13",
