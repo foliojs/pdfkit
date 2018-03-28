@@ -74,13 +74,15 @@ class LineWrapper extends EventEmitter
         while word.length
           # fit as much of the word as possible into the space we have
           if w > @spaceLeft
-            # start checking our text at the end of our remaining space - this works around long loops when processing massive text
+            # start our check at the end of our available space - this method is faster than a loop of each character and it resolves
+            # an issue with long loops when processing massive words, such as a huge number of spaces
             l = Math.ceil(@spaceLeft / (w / word.length))
             w = @wordWidth word.slice(0, l)
             mightGrow = w <= @spaceLeft and l < word.length
           else
             l = word.length
           mustShrink = w > @spaceLeft and l > 0
+          # shrink or grow word as necessary after our near-guess above
           while mustShrink or mightGrow
             if mustShrink
               w = @wordWidth word.slice(0, --l)
