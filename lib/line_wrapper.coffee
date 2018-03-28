@@ -63,19 +63,32 @@ class LineWrapper extends EventEmitter
     while bk = breaker.nextBreak()
       word = text.slice(last?.position or 0, bk.position)
       w = wordWidths[word] ?= @wordWidth word
-      
+
       # if the word is longer than the whole line, chop it up
       # TODO: break by grapheme clusters, not JS string characters
       if w > @lineWidth + @continuedX
         # make some fake break objects
         lbk = last
         fbk = {}
-        
+
         while word.length
           # fit as much of the word as possible into the space we have
-          l = word.length
-          while w > @spaceLeft and l > 0
-            w = @wordWidth word.slice(0, --l)
+          if w > @spaceLeft
+            # start checking our text at the end of our remaining space - this works around long loops when processing massive text
+            l = Math.ceil(@spaceLeft / (w / word.length))
+            w = @wordWidth word.slice(0, l)
+            mightGrow = w <= @spaceLeft and l < word.length
+          else
+            l = word.length
+          mustShrink = w > @spaceLeft and l > 0
+          while mustShrink or mightGrow
+            if mustShrink
+              w = @wordWidth word.slice(0, --l)
+              mustShrink = w > @spaceLeft and l > 0
+            else
+              w = @wordWidth word.slice(0, ++l)
+              mustShrink = w > @spaceLeft and l > 0
+              mightGrow = w <= @spaceLeft and l < word.length
             
           # send a required break unless this is the last piece
           fbk.required = l < word.length
