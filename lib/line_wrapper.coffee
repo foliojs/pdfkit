@@ -77,8 +77,8 @@ class LineWrapper extends EventEmitter
           while w > @spaceLeft and l > 0
             w = @wordWidth word.slice(0, --l)
             
-          # send a required break unless this is the last piece
-          fbk.required = l < word.length
+          # send a required break unless this is the last piece and a linebreak is not specified
+          fbk.required = bk.required or l < word.length
           shouldContinue = fn word.slice(0, l), w, fbk, lbk
           lbk = required: false
           
