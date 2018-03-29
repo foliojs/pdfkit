@@ -5,17 +5,17 @@ fs = require 'fs'
 class StandardFont extends PDFFont
   constructor: (@document, @name, @id) ->
     @font = new AFMFont STANDARD_FONTS[@name]()
-    {@ascender,@descender,@bbox,@lineGap,@xHeight,@capHeight} = @font
-    
+    {@ascender,@descender,@bbox,@lineGap} = @font
+
   embed: ->
     @dictionary.data =
       Type: 'Font'
       BaseFont: @name
       Subtype: 'Type1'
       Encoding: 'WinAnsiEncoding'
-      
+
     @dictionary.end()
-    
+
   encode: (text) ->
     encoded = @font.encodeText text
     glyphs = @font.glyphsForString '' + text
@@ -28,23 +28,23 @@ class StandardFont extends PDFFont
         xOffset: 0
         yOffset: 0
         advanceWidth: @font.widthOfGlyph glyph
-      
+
     return [encoded, positions]
-    
+
   widthOfString: (string, size) ->
     glyphs = @font.glyphsForString '' + string
     advances = @font.advancesForGlyphs glyphs
-    
+
     width = 0
     for advance in advances
       width += advance
-    
-    scale = size / 1000  
+
+    scale = size / 1000
     return width * scale
-    
+
   @isStandardFont: (name) ->
     return name of STANDARD_FONTS
-    
+
   # This insanity is so browserify can inline the font files
   STANDARD_FONTS =
     "Courier":               -> fs.readFileSync __dirname + "/../font/data/Courier.afm", 'utf8'
@@ -61,5 +61,5 @@ class StandardFont extends PDFFont
     "Times-BoldItalic":      -> fs.readFileSync __dirname + "/../font/data/Times-BoldItalic.afm", 'utf8'
     "Symbol":                -> fs.readFileSync __dirname + "/../font/data/Symbol.afm", 'utf8'
     "ZapfDingbats":          -> fs.readFileSync __dirname + "/../font/data/ZapfDingbats.afm", 'utf8'
-  
+
 module.exports = StandardFont
