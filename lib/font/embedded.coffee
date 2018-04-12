@@ -173,17 +173,16 @@ class EmbeddedFont extends PDFFont
     entries = []
     for codePoints in @unicode
       encoded = []
+      if codePoints
+        for value in codePoints
+          if value > 0xffff
+            value -= 0x10000
+            encoded.push toHex value >>> 10 & 0x3ff | 0xd800
+            value = 0xdc00 | value & 0x3ff
 
-      # encode codePoints to utf16
-      for value in codePoints
-        if value > 0xffff
-          value -= 0x10000
-          encoded.push toHex value >>> 10 & 0x3ff | 0xd800
-          value = 0xdc00 | value & 0x3ff
+          encoded.push toHex value
 
-        encoded.push toHex value
-
-      entries.push "<#{encoded.join ' '}>"
+        entries.push "<#{encoded.join ' '}>"
 
     cmap.end """
       /CIDInit /ProcSet findresource begin
