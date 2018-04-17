@@ -31,6 +31,13 @@ class StandardFont extends PDFFont
 
     return [encoded, positions]
 
+  encodeGlyphs: (glyphs) ->
+    res = []
+    for glyph in glyphs
+      res.push ('00' + glyph.id.toString(16)).slice(-2)
+
+    return res
+
   widthOfString: (string, size) ->
     glyphs = @font.glyphsForString '' + string
     advances = @font.advancesForGlyphs glyphs
