@@ -74,7 +74,7 @@ class EmbeddedFont extends PDFFont
       res.push ('0000' + gid.toString(16)).slice(-4)
 
       @widths[gid] ?= glyph.advanceWidth * @scale
-      @unicode[gid] ?= glyph.codePoints
+      @unicode[gid] ?= @font._cmapProcessor.codePointsForGlyph(glyph.id)
 
     return [res, positions]
 
@@ -85,7 +85,7 @@ class EmbeddedFont extends PDFFont
       res.push ('0000' + gid.toString(16)).slice(-4)
 
       @widths[gid] ?= glyph.advanceWidth * @scale
-      # @unicode[gid] ?= glyph.codePoints
+      @unicode[gid] ?= @font._cmapProcessor.codePointsForGlyph(glyph.id)
 
     return res
 
@@ -173,14 +173,13 @@ class EmbeddedFont extends PDFFont
     entries = []
     for codePoints in @unicode
       encoded = []
-      if codePoints
-        for value in codePoints
-          if value > 0xffff
-            value -= 0x10000
-            encoded.push toHex value >>> 10 & 0x3ff | 0xd800
-            value = 0xdc00 | value & 0x3ff
+      for value in codePoints
+        if value > 0xffff
+          value -= 0x10000
+          encoded.push toHex value >>> 10 & 0x3ff | 0xd800
+          value = 0xdc00 | value & 0x3ff
 
-          encoded.push toHex value
+        encoded.push toHex value
 
         entries.push "<#{encoded.join ' '}>"
 
