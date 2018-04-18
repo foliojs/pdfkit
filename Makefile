@@ -4,6 +4,9 @@ js:
 	./node_modules/.bin/coffee -o js -c lib/
 	cp -r lib/font/data js/font/data
 
+js-demo:
+	./node_modules/.bin/coffee -o demo -c demo/
+
 browser: lib/**/*.coffee
 	mkdir -p build/
 	./node_modules/.bin/browserify \
