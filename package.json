@@ -1,5 +1,5 @@
 {
-  "name": "pdfkit",
+  "name": "@react-pdf/pdfkit",
   "description": "A PDF generation library for Node.js",
   "keywords": [
     "pdf",
