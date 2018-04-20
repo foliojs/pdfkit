@@ -1,4 +1,4 @@
-fontkit = require '@react-pdf/fontkit'
+fontkit = require 'fontkit'
 
 class PDFFont
   @open: (document, src, family, id) ->
