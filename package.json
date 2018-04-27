@@ -40,6 +40,7 @@
     "png-js": ">=0.1.0"
   },
   "scripts": {
+    "coffee": "coffee -o js -c lib/",
     "prepublish": "make js",
     "postpublish": "make clean"
   },

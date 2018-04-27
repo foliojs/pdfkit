@@ -1,7 +1,7 @@
-fontkit = require 'fontkit'
-
 class PDFFont
   @open: (document, src, family, id) ->
+    # Fix 810: Only require fontkit on the fly when we need it.
+    fontkit = require 'fontkit'
     if typeof src is 'string'
       if StandardFont.isStandardFont src
         return new StandardFont document, src, id
