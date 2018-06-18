@@ -47,6 +47,7 @@ class PDFDocument extends stream.Readable
     @initFonts()
     @initText()
     @initImages()
+    @initOutline()
 
     # Initialize the metadata
     @info =
@@ -80,6 +81,7 @@ class PDFDocument extends stream.Readable
   mixin require './mixins/text'
   mixin require './mixins/images'
   mixin require './mixins/annotations'
+  mixin require './mixins/outline'
 
   addPage: (options = @options) ->
     # end the current page if needed
@@ -189,6 +191,7 @@ class PDFDocument extends stream.Readable
 
     @_root.end()
     @_root.data.Pages.end()
+    @endOutline()
 
     if @_waiting is 0
       @_finalize()
