@@ -35,9 +35,6 @@ class PDFDocument extends stream.Readable
         Count: 0
         Kids: []
 
-    if @options.language
-      @_root.data.Lang = new String(@options.language)
-
     # The current page
     @page = null
 
