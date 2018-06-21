@@ -17,7 +17,6 @@ class PDFOutline
 
         @dictionary = @document.ref @outlineData
         @children = []
-        console.info('Created', @dictionary.toString())
 
     addItem: (title, options = { expanded: false }) ->
         result = new PDFOutline(@document, @dictionary, title, @document.page, options)
@@ -29,7 +28,7 @@ class PDFOutline
         if @children.length > 0
             if @options.expanded
                 @outlineData.Count = @children.length
-                
+
             [first, ..., last] = @children
             @outlineData.First = first.dictionary
             @outlineData.Last = last.dictionary
@@ -42,7 +41,6 @@ class PDFOutline
                     child.outlineData.Next = @children[i+1].dictionary
                 child.endOutline()
 
-        console.info('Ending ', @dictionary.toString())
         @dictionary.end()
 
 
