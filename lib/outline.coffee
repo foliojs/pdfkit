@@ -2,13 +2,48 @@ PDFObject = require './object'
 PDFPage = require './page'
 
 class PDFOutline
-    constructor: (@document, parent, @title, @dest) ->
+    constructor: (@document, parent, title, dest, @options = { expanded: false }) ->
 
-        destination = [@dest.dictionary, 'Fit']
+        @outlineData = {}
 
-        @dictionary = @document.ref
-            Title: new String(@title)
-            Parent: parent
-            Dest: destination
+        if dest != null
+            @outlineData['Dest'] = [dest.dictionary, 'Fit']
+
+        if parent != null
+            @outlineData['Parent'] = parent
+
+        if title != null
+            @outlineData['Title'] = new String(title)
+
+        @dictionary = @document.ref @outlineData
+        @children = []
+        console.info('Created', @dictionary.toString())
+
+    addItem: (title, options = { expanded: false }) ->
+        result = new PDFOutline(@document, @dictionary, title, @document.page, options)
+        @children.push(result)
+
+        return result
+
+    endOutline: () ->
+        if @children.length > 0
+            if @options.expanded
+                @outlineData.Count = @children.length
+                
+            [first, ..., last] = @children
+            @outlineData.First = first.dictionary
+            @outlineData.Last = last.dictionary
+
+            for i in [0...@children.length]
+                child = @children[i]
+                if i > 0
+                    child.outlineData.Prev = @children[i-1].dictionary
+                if i < @children.length - 1
+                    child.outlineData.Next = @children[i+1].dictionary
+                child.endOutline()
+
+        console.info('Ending ', @dictionary.toString())
+        @dictionary.end()
+
 
 module.exports = PDFOutline
