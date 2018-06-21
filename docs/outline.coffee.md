@@ -1,21 +1,16 @@
 # Outlines in PDFKit
 
-Outlines are the heirachical bookmarks that display in some PDF readers. Currently only page bookmarks are supported, but more may be added in the future. They are simple to add and only require a few methods:
+Outlines are the heirachical bookmarks that display in some PDF readers. Currently only page bookmarks are supported, but more may be added in the future. They are simple to add and only require a single method:
 
-* `addOutline(title)`
-* `addSublevelOutline(title)`
-* `endOutlineSublevel()`
-* `getOutlineLevel()`
+* `addItem(title)`
 
 Here is an example of adding a bookmark with a single child bookmark.
 
-    # Add some text
-    doc.fontSize(25)
-       .text('Parent', 20, 0)
-       .addOutline('Parent')
-       
-    doc.addPage()
+    # Get a reference to the Outline root
+    outline = doc.outline
 
-    # Add the child bookmark
-    doc.text('Child', 20, 0)
-        .addSublevelOutline('Child')
+    # Add a top-level bookmark
+    top = outline.addItem('Top Level')
+
+    # Add a sub-section
+    top.addItem('Sub-section')
