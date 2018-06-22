@@ -1,11 +1,11 @@
 PDFOutline = require '../outline'
-assert = require('assert').strict
 
 module.exports =
-    initOutline: ->
+    initOutline: () ->
         @outline = new PDFOutline(this, null, null, null)
-        @_root.data.Outlines = @outline.dictionary
 
     endOutline: () ->
-        # @_root.data.Outlines.end()
-        @outline.endOutline()
+        if @outline.children.length > 0
+            @_root.data.Outlines = @outline.dictionary
+            @_root.data.PageMode = 'UseOutlines'
+            @outline.endOutline()

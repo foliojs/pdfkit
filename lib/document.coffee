@@ -186,9 +186,10 @@ class PDFDocument extends stream.Readable
     for name, font of @_fontFamilies
       font.finalize()
 
+    @endOutline()
+    
     @_root.end()
     @_root.data.Pages.end()
-    @endOutline()
 
     if @_waiting is 0
       @_finalize()
