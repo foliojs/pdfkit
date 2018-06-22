@@ -48,11 +48,11 @@ Installation uses the [npm](http://npmjs.org/) package manager.  Just type the f
   * Highlights
   * Underlines
   * etc.
+* Outlines
   
 ## Coming soon!
 
 * Patterns fills
-* Outlines
 * PDF Security
 * Higher level APIs for creating tables and laying out content
 * More performance optimizations
