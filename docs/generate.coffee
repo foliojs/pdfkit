@@ -190,6 +190,11 @@ class Node
             if @type in ['h1', 'h2'] and lastType? and lastType isnt 'h1'
               doc.addPage()
               
+            if @type == 'h1'
+              doc.h1Outline = doc.outline.addItem(fragment.text)
+            else if @type == 'h2' && doc.h1Outline != null
+              doc.h1Outline.addItem(fragment.text)
+
             # set styles and whether this fragment is continued (for rich text wrapping)
             options = @setStyle doc
             options.continued ?= continued or index < @content.length - 1
@@ -227,6 +232,7 @@ renderTitlePage = (doc) ->
   doc.y = doc.page.height / 2 - doc.currentLineHeight()
   doc.text title, align: 'center'
   w = doc.widthOfString(title)
+  doc.h1Outline = doc.outline.addItem(title)
   
   doc.fontSize 20
   doc.y -= 10
@@ -250,5 +256,6 @@ do ->
   render doc, 'vector.coffee.md'
   render doc, 'text.coffee.md'
   render doc, 'images.coffee.md'
+  render doc, 'outline.coffee.md'
   render doc, 'annotations.coffee.md'
   doc.end()
