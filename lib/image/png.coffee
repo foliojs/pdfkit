@@ -2,7 +2,12 @@ zlib = require 'zlib'
 PNG = require 'png-js'
 
 class PNGImage
-  constructor: (data, @label) ->
+
+  # Returns true if the given data buffer has a PNG signature
+  @is: (data) ->
+    data[0] is 0x89 and data.toString('ascii', 1, 4) is 'PNG'
+
+  constructor: (data, @label, @alpha) ->
     @image = new PNG(data)
     @width = @image.width
     @height = @image.height
@@ -73,7 +78,10 @@ class PNGImage
       @finalize()
 
   finalize: ->
-    if @alphaChannel
+    if @alpha
+      @alpha.embed(@document)
+      @obj.data['SMask'] = @alpha.obj
+    else if @alphaChannel
       sMask = @document.ref
         Type: 'XObject'
         Subtype: 'Image'

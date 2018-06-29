@@ -4,7 +4,7 @@ module.exports =
   initImages: ->
     @_imageRegistry = {}
     @_imageCount = 0
-    
+
   image: (src, x, y, options = {}) ->
     if typeof x is 'object'
       options = x
@@ -20,7 +20,7 @@ module.exports =
       if src.width and src.height
         image = src
       else
-        image = @openImage src
+        image = @openImage src, options.alpha
 
     unless image.obj
       image.embed this
@@ -77,7 +77,7 @@ module.exports =
       else if options.valign is 'bottom'
         y = y + bh - h
 
-    # Set the current y position to below the image if it is in the document flow      
+    # Set the current y position to below the image if it is in the document flow
     @y += h if @y is y
 
     @save()
@@ -87,12 +87,12 @@ module.exports =
 
     return this
 
-  openImage: (src) ->
+  openImage: (src, alpha) ->
     if typeof src is 'string'
       image = @_imageRegistry[src]
 
     if not image
-      image = PDFImage.open src, 'I' + (++@_imageCount)
+      image = PDFImage.open src, 'I' + (++@_imageCount), alpha
       if typeof src is 'string'
         @_imageRegistry[src] = image
 

@@ -8,27 +8,37 @@ Data = require './data'
 JPEG = require './image/jpeg'
 PNG = require './image/png'
 
+toBuffer = (src) ->
+  if Buffer.isBuffer(src)
+    src
+  else if src instanceof ArrayBuffer
+    new Buffer(new Uint8Array(src))
+  else if match = /^data:.+;base64,(.*)$/.exec(src)
+    new Buffer(match[1], 'base64')
+  else
+    fs.readFileSync src
+
 class PDFImage
-  @open: (src, label) ->
-    if Buffer.isBuffer(src)
-      data = src
-    else if src instanceof ArrayBuffer
-      data = new Buffer(new Uint8Array(src))
-    else
-      if match = /^data:.+;base64,(.*)$/.exec(src)
-        data = new Buffer(match[1], 'base64')
+
+  @open: (src, label, alphaSrc) ->
+    data = toBuffer src
+
+    if alphaSrc
+      alphaData = toBuffer alphaSrc
+      if not JPEG.is alphaData
+        throw Error 'Alpha mask must be a gray JPEG image'
+      alpha = new JPEG alphaData
+      if alpha.colorSpace != 'DeviceGray'
+        throw Error 'Alpha mask must be a gray JPEG image'
+
+    if data
+      if JPEG.is(data)
+        return new JPEG(data, label, alpha)
+
+      else if PNG.is(data)
+        return new PNG(data, label, alpha)
 
       else
-        data = fs.readFileSync src
-        return unless data
-    
-    if data[0] is 0xff and data[1] is 0xd8
-      return new JPEG(data, label)
-      
-    else if data[0] is 0x89 and data.toString('ascii', 1, 4) is 'PNG'
-      return new PNG(data, label)
-      
-    else
-      throw new Error 'Unknown image format.'
-          
+        throw new Error 'Unknown image format.'
+
 module.exports = PDFImage
