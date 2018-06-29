@@ -219,7 +219,7 @@ class LineWrapper extends EventEmitter
     # the y position
     if options.continued is yes
       @continuedX = 0 if lc > 1
-      @continuedX += options.textWidth
+      @continuedX += options.textWidth or 0
       @document.y = y
     else
       @document.x = @startX
