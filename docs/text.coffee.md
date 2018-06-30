@@ -83,12 +83,15 @@ below.
 * `columnGap` - the amount of space between each column (1/4 inch by default)
 * `indent` - the amount in PDF points (72 per inch) to indent each paragraph of text
 * `paragraphGap` - the amount of space between each paragraph of text
+* `marginTop` - the amount of space before the text
+* `marginBottom` - the amount of space after the text
 * `lineGap` - the amount of space between each line of text
 * `wordSpacing` - the amount of space between each word in the text
 * `characterSpacing` - the amount of space between each character in the text
 * `fill` - whether to fill the text (`true` by default)
 * `stroke` - whether to stroke the text
 * `link` - a URL to link this text to (shortcut to create an annotation)
+* `bgColor` - a hex color to set the background of the text  
 * `underline` - whether to underline the text
 * `strike` - whether to strike out the text
 * `oblique` - whether to slant the text (angle in degrees or `true`)
