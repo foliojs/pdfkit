@@ -1,5 +1,3 @@
-{PDFGradient} = require '../gradient'
-
 module.exports =
   initColor: ->
     # The opacity dictionaries
