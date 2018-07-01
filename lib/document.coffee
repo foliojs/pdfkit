@@ -4,7 +4,6 @@ By Devon Govett
 ###
 
 stream = require 'stream'
-fs = require 'fs'
 PDFObject = require './object'
 PDFReference = require './reference'
 PDFPage = require './page'
@@ -12,7 +11,6 @@ PDFPage = require './page'
 class PDFDocument extends stream.Readable
   constructor: (@options = {}) ->
     super
-
     # PDF version
     @version = 1.3
 
@@ -91,9 +89,10 @@ class PDFDocument extends stream.Readable
     pages.Kids.push @page.dictionary
     pages.Count++
 
+    # TODO: Remove coordinates
     # reset x and y coordinates
-    @x = @page.margins.left
-    @y = @page.margins.top
+    @x = 0
+    @y = 0
 
     # flip PDF coordinate system so that the origin is in
     # the top left rather than the bottom left
@@ -103,15 +102,6 @@ class PDFDocument extends stream.Readable
     @emit('pageAdded')
 
     return this
-
-  bufferedPageRange: ->
-    return { start: @_pageBufferStart, count: @_pageBuffer.length }
-
-  switchToPage: (n) ->
-    unless page = @_pageBuffer[n - @_pageBufferStart]
-      throw new Error "switchToPage(#{n}) out of bounds, current buffer covers pages #{@_pageBufferStart} to #{@_pageBufferStart + @_pageBuffer.length - 1}"
-
-    @page = page
 
   flushPages: ->
     # this local variable exists so we're future-proof against
@@ -149,26 +139,6 @@ class PDFDocument extends stream.Readable
     if --@_waiting is 0 and @_ended
       @_finalize()
       @_ended = false
-
-  write: (filename, fn) ->
-    # print a deprecation warning with a stacktrace
-    err = new Error '
-      PDFDocument#write is deprecated, and will be removed in a future version of PDFKit.
-      Please pipe the document into a Node stream.
-    '
-
-    console.warn err.stack
-
-    @pipe fs.createWriteStream(filename)
-    @end()
-    @once 'end', fn
-
-  output: (fn) ->
-    # more difficult to support this. It would involve concatenating all the buffers together
-    throw new Error '
-      PDFDocument#output is deprecated, and has been removed from PDFKit.
-      Please pipe the document into a Node stream.
-    '
 
   end: ->
     @flushPages()
