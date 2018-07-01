@@ -1,4 +1,4 @@
-{PDFGradient, PDFLinearGradient, PDFRadialGradient} = require '../gradient'
+{PDFGradient} = require '../gradient'
 
 module.exports =
   initColor: ->
@@ -8,9 +8,6 @@ module.exports =
     @_gradCount = 0
 
   _normalizeColor: (color) ->
-    if color instanceof PDFGradient
-      return color
-
     if typeof color is 'string'
       if color.charAt(0) is '#'
         color = color.replace(/#([0-9A-F])([0-9A-F])([0-9A-F])/i, "#$1$1$2$2$3$3") if color.length is 4
@@ -39,15 +36,11 @@ module.exports =
 
     op = if stroke then 'SCN' else 'scn'
 
-    if color instanceof PDFGradient
-      @_setColorSpace 'Pattern', stroke
-      color.apply(op)
-    else
-      space = if color.length is 4 then 'DeviceCMYK' else 'DeviceRGB'
-      @_setColorSpace space, stroke
+    space = if color.length is 4 then 'DeviceCMYK' else 'DeviceRGB'
+    @_setColorSpace space, stroke
 
-      color = color.join ' '
-      @addContent "#{color} #{op}"
+    color = color.join ' '
+    @addContent "#{color} #{op}"
 
     return yes
 
@@ -105,12 +98,6 @@ module.exports =
 
      @page.ext_gstates[name] = dictionary
      @addContent "/#{name} gs"
-
-  linearGradient: (x1, y1, x2, y2) ->
-    return new PDFLinearGradient(this, x1, y1, x2, y2)
-
-  radialGradient: (x1, y1, r1, x2, y2, r2) ->
-    return new PDFRadialGradient(this, x1, y1, r1, x2, y2, r2)
 
 namedColors =
   aliceblue: [240, 248, 255]
