@@ -1,8 +1,3 @@
-###
-PDFPage - represents a single page in the PDF document
-By Devon Govett
-###
-
 class PDFPage
   constructor: (@document, options = {}) ->
     @size = options.size or 'letter'

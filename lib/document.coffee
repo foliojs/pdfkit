@@ -1,8 +1,3 @@
-###
-PDFDocument - represents an entire PDF document
-By Devon Govett
-###
-
 stream = require 'stream'
 PDFObject = require './object'
 PDFReference = require './reference'

@@ -1,8 +1,3 @@
-###
-PDFObject - converts JavaScript types into their corrisponding PDF types.
-By Devon Govett
-###
-
 class PDFObject
   pad = (str, length) ->
     (Array(length + 1).join('0') + str).slice(-length)
