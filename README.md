@@ -2,8 +2,6 @@
 
 A JavaScript PDF generation library for Node and the browser.
 
-[![](https://img.shields.io/gratipay/devongovett.svg)](https://gratipay.com/devongovett)
-
 ## Description
 
 PDFKit is a PDF document generation library for Node and the browser that makes creating complex, multi-page, printable documents easy. 
