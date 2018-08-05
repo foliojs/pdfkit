@@ -189,6 +189,9 @@ module.exports =
     align = options.align or 'left'
     wordSpacing = options.wordSpacing or 0
     characterSpacing = options.characterSpacing or 0
+    characterStrokeWidth = options.characterStrokeWidth or 0
+    mode = options.mode or 0
+    textBuildMode = options.textBuildMode or 0
 
     # text alignments
     if options.width
@@ -254,8 +257,6 @@ module.exports =
       @stroke()
       @restore()
 
-    @save()
-
     # oblique (angle in degrees or boolean)
     if options.oblique
       if typeof options.oblique is 'number'
@@ -266,25 +267,25 @@ module.exports =
       @transform 1, 0, skew, 1, -skew * dy, 0
       @transform 1, 0, 0, 1, -x, -y
 
-    # flip coordinate system
-    @transform 1, 0, 0, -1, 0, @page.height
-    y = @page.height - y - dy
-
     # add current font to page if necessary
     @page.fonts[@_font.id] ?= @_font.ref()
 
     # begin the text object
-    @addContent "BT"
+    @addContent "BT" if not textBuildMode
 
     # text position
-    @addContent "1 0 0 1 #{number(x)} #{number(y)} Tm"
+    @addContent "1 0 0 -1 #{number(x)} #{number(y)} Tm"
 
     # font and font size
     @addContent "/#{@_font.id} #{number(@_fontSize)} Tf"
 
     # rendering mode
-    mode = if options.fill and options.stroke then 2 else if options.stroke then 1 else 0
+    if not mode
+      mode = if options.fill and options.stroke then 2 else if options.stroke then 1 else 0
     @addContent "#{mode} Tr" if mode
+
+    # character stroke width if applicable
+    @addContent "#{number(characterStrokeWidth)} w" if characterStrokeWidth
 
     # Character spacing
     @addContent "#{number(characterSpacing)} Tc" if characterSpacing
@@ -344,14 +345,14 @@ module.exports =
         flush i
 
         # Move the text position and flush just the current character
-        @addContent "1 0 0 1 #{number(x + pos.xOffset * scale)} #{number(y + pos.yOffset * scale)} Tm"
+        @addContent "1 0 0 -1 #{number(x + pos.xOffset * scale)} #{number(y + pos.yOffset * scale)} Tm"
         flush i + 1
 
         hadOffset = yes
       else
         # If the last character had an offset, reset the text position
         if hadOffset
-          @addContent "1 0 0 1 #{number(x)} #{number(y)} Tm"
+          @addContent "1 0 0 -1 #{number(x)} #{number(y)} Tm"
           hadOffset = no
 
         # Group segments that don't have any advance adjustments
@@ -364,7 +365,4 @@ module.exports =
     flush i
 
     # end the text object
-    @addContent "ET"
-
-    # restore flipped coordinate system
-    @restore()
+    @addContent "ET" if not textBuildMode
