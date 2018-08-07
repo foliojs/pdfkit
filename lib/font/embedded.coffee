@@ -100,8 +100,8 @@ class EmbeddedFont extends PDFFont
     flags |= 1 << 3 if familyClass is 10
     flags |= 1 << 6 if @font.head.macStyle.italic
 
-    # generate a random tag (6 uppercase letters. 65 is the char code for 'A')
-    tag = (String.fromCharCode Math.random() * 26 + 65 for i in [0...6]).join ''
+    # generate a tag (6 uppercase letters. 16 is the char code offset from '1' to 'A'. 74 will map to 'Z')
+    tag = (String.fromCharCode (@id.charCodeAt(i) or 74) + 16 for i in [1...7]).join ''
     name = tag + '+' + @font.postscriptName
 
     bbox = @font.bbox
