@@ -32,6 +32,7 @@
     "exorcist": "^0.1.5",
     "iconv-lite": "^0.4.13",
     "jade": "~1.1.5",
+    "jest": "^23.4.2",
     "markdown": "~0.5.0"
   },
   "dependencies": {
@@ -41,7 +42,8 @@
   },
   "scripts": {
     "prepublish": "make js",
-    "postpublish": "make clean"
+    "postpublish": "make clean",
+    "test": "jest -i"
   },
   "main": "js/document",
   "browserify": {
@@ -51,5 +53,12 @@
   },
   "engine": [
     "node >= v0.10.0"
-  ]
+  ],
+  "jest": {
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "<rootDir>/demo/"
+    ],
+    "testURL": "http://localhost/"
+  }
 }
