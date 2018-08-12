@@ -19,7 +19,7 @@ function updatePdf (pdfData, testState, snapshotChanges) {
 
   if (updated) {
     if (fs.existsSync(fileChangesPath)) {
-      fs.unlinkSync();
+      fs.unlinkSync(fileChangesPath);
     }
   }
 
