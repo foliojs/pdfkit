@@ -21912,7 +21912,7 @@ describe('pdfmake', function () {
       doc.text('right',251.998046875,762.5,{lineBreak: false, textWidth: 24.234375, characterSpacing: 0, wordCount: 1, link: null});
       doc.save();
       doc.restore();
-      doc.addPage({size: [595.28,841.89], bufferPages: false, autoFirstPage: false, compress: true});
+      doc.addPage({size: [595.28,841.89], bufferPages: false, autoFirstPage: false, compress: false});
       doc.lineWidth(1);
       doc.undash();
       doc.lineJoin('miter');

@@ -389,7 +389,7 @@ describe('pdfmake', function () {
       doc.image('tests/images/sampleImage.jpg', 40,637.2189748201439,{width: 100, height: 44.60431654676259});
       doc.save();
       doc.restore();
-      doc.addPage({size: [595.28,841.89], bufferPages: false, autoFirstPage: false, compress: true});
+      doc.addPage({size: [595.28,841.89], bufferPages: false, autoFirstPage: false, compress: false});
       doc.fill('black');
       doc.fillColor('black');
       doc.fillOpacity(undefined);

@@ -73,7 +73,7 @@ describe('pdfmake', function () {
       doc.text('position',183.314453125,40,{lineBreak: false, textWidth: 42.97265625, characterSpacing: 0, wordCount: 1, link: null});
       doc.save();
       doc.restore();
-      doc.addPage({size: [595.28,841.89], bufferPages: false, autoFirstPage: false, compress: true});
+      doc.addPage({size: [595.28,841.89], bufferPages: false, autoFirstPage: false, compress: false});
       doc.fill('black');
       doc.fillColor('black');
       doc.fillOpacity(undefined);
@@ -109,7 +109,7 @@ describe('pdfmake', function () {
       doc.text('!!!',300,100,{lineBreak: false, textWidth: 9.263671875, characterSpacing: 0, wordCount: 1, link: null});
       doc.save();
       doc.restore();
-      doc.addPage({size: [595.28,841.89], bufferPages: false, autoFirstPage: false, compress: true});
+      doc.addPage({size: [595.28,841.89], bufferPages: false, autoFirstPage: false, compress: false});
       doc.fill('black');
       doc.fillColor('black');
       doc.fillOpacity(undefined);

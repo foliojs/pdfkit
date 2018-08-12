@@ -2359,7 +2359,7 @@ describe('pdfmake', function () {
       doc.strokeColor('black',1);
       doc.strokeOpacity(1);
       doc.stroke();
-      doc.addPage({size: [595.28,841.89], bufferPages: false, autoFirstPage: false, compress: true});
+      doc.addPage({size: [595.28,841.89], bufferPages: false, autoFirstPage: false, compress: false});
       doc.fill('black');
       doc.fillColor('black');
       doc.fillOpacity(undefined);
@@ -2905,7 +2905,7 @@ describe('pdfmake', function () {
       doc.strokeColor('black',1);
       doc.strokeOpacity(1);
       doc.stroke();
-      doc.addPage({size: [595.28,841.89], bufferPages: false, autoFirstPage: false, compress: true});
+      doc.addPage({size: [595.28,841.89], bufferPages: false, autoFirstPage: false, compress: false});
       doc.fill('black');
       doc.fillColor('black');
       doc.fillOpacity(undefined);
@@ -3843,7 +3843,7 @@ describe('pdfmake', function () {
       doc.strokeColor('black',1);
       doc.strokeOpacity(1);
       doc.stroke();
-      doc.addPage({size: [595.28,841.89], bufferPages: false, autoFirstPage: false, compress: true});
+      doc.addPage({size: [595.28,841.89], bufferPages: false, autoFirstPage: false, compress: false});
       doc.fill('black');
       doc.fillColor('black');
       doc.fillOpacity(undefined);
@@ -8451,7 +8451,7 @@ describe('pdfmake', function () {
       doc.strokeColor('black',1);
       doc.strokeOpacity(1);
       doc.stroke();
-      doc.addPage({size: [595.28,841.89], bufferPages: false, autoFirstPage: false, compress: true});
+      doc.addPage({size: [595.28,841.89], bufferPages: false, autoFirstPage: false, compress: false});
       doc.lineWidth(1);
       doc.undash();
       doc.lineJoin('miter');
@@ -9368,7 +9368,7 @@ describe('pdfmake', function () {
       doc.text('page)',405.73046875,269.671875,{lineBreak: false, textWidth: 30.521484375, characterSpacing: 0, wordCount: 1, link: null});
       doc.save();
       doc.restore();
-      doc.addPage({size: [595.28,841.89], bufferPages: false, autoFirstPage: false, compress: true});
+      doc.addPage({size: [595.28,841.89], bufferPages: false, autoFirstPage: false, compress: false});
       doc.lineWidth(1);
       doc.undash();
       doc.lineJoin('miter');
@@ -11369,7 +11369,7 @@ describe('pdfmake', function () {
       doc.strokeColor('black',1);
       doc.strokeOpacity(1);
       doc.stroke();
-      doc.addPage({size: [595.28,841.89], bufferPages: false, autoFirstPage: false, compress: true});
+      doc.addPage({size: [595.28,841.89], bufferPages: false, autoFirstPage: false, compress: false});
       doc.lineWidth(1);
       doc.undash();
       doc.lineJoin('miter');
@@ -11859,7 +11859,7 @@ describe('pdfmake', function () {
       doc.strokeColor('black',1);
       doc.strokeOpacity(1);
       doc.stroke();
-      doc.addPage({size: [595.28,841.89], bufferPages: false, autoFirstPage: false, compress: true});
+      doc.addPage({size: [595.28,841.89], bufferPages: false, autoFirstPage: false, compress: false});
       doc.lineWidth(1);
       doc.undash();
       doc.lineJoin('miter');

@@ -3608,7 +3608,7 @@ describe('pdfmake', function () {
       doc.text('star-',523.486328125,785.3125,{lineBreak: false, textWidth: 24.005859375, characterSpacing: 0, wordCount: 1, link: null});
       doc.save();
       doc.restore();
-      doc.addPage({size: [595.28,841.89], bufferPages: false, autoFirstPage: false, compress: true});
+      doc.addPage({size: [595.28,841.89], bufferPages: false, autoFirstPage: false, compress: false});
       doc.fill('black');
       doc.fillColor('black');
       doc.fillOpacity(undefined);
@@ -5847,7 +5847,7 @@ describe('pdfmake', function () {
       doc.text('Diu ',465.28,785.3125,{lineBreak: false, textWidth: 20.3671875, characterSpacing: 0, wordCount: 1, link: null});
       doc.save();
       doc.restore();
-      doc.addPage({size: [595.28,841.89], bufferPages: false, autoFirstPage: false, compress: true});
+      doc.addPage({size: [595.28,841.89], bufferPages: false, autoFirstPage: false, compress: false});
       doc.fill('black');
       doc.fillColor('black');
       doc.fillOpacity(undefined);
@@ -9131,7 +9131,7 @@ describe('pdfmake', function () {
       doc.text('ambigua ',492.55255208333335,785.3125,{lineBreak: false, textWidth: 49.53515625, characterSpacing: 0, wordCount: 1, link: null});
       doc.save();
       doc.restore();
-      doc.addPage({size: [595.28,841.89], bufferPages: false, autoFirstPage: false, compress: true});
+      doc.addPage({size: [595.28,841.89], bufferPages: false, autoFirstPage: false, compress: false});
       doc.fill('black');
       doc.fillColor('black');
       doc.fillOpacity(undefined);
@@ -10636,7 +10636,7 @@ describe('pdfmake', function () {
       doc.text('from ',496.2224739583333,778.28125,{lineBreak: false, textWidth: 41.9326171875, characterSpacing: 0, wordCount: 1, link: null});
       doc.save();
       doc.restore();
-      doc.addPage({size: [595.28,841.89], bufferPages: false, autoFirstPage: false, compress: true});
+      doc.addPage({size: [595.28,841.89], bufferPages: false, autoFirstPage: false, compress: false});
       doc.fill('black');
       doc.fillColor('black');
       doc.fillOpacity(undefined);

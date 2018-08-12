@@ -616,7 +616,7 @@ describe('pdfmake', function () {
       doc.fillOpacity(undefined);
       doc.fontSize(12);
       doc.text('',40,785.3125,{lineBreak: false, textWidth: 0, characterSpacing: 0, wordCount: 1, link: null});
-      doc.addPage({size: [595.28,841.89], bufferPages: false, autoFirstPage: false, compress: true});
+      doc.addPage({size: [595.28,841.89], bufferPages: false, autoFirstPage: false, compress: false});
       doc.fill('black');
       doc.fillColor('black');
       doc.fillOpacity(undefined);
@@ -896,7 +896,7 @@ describe('pdfmake', function () {
       doc.fillOpacity(undefined);
       doc.fontSize(12);
       doc.text('',40,785.3125,{lineBreak: false, textWidth: 0, characterSpacing: 0, wordCount: 1, link: null});
-      doc.addPage({size: [595.28,841.89], bufferPages: false, autoFirstPage: false, compress: true});
+      doc.addPage({size: [595.28,841.89], bufferPages: false, autoFirstPage: false, compress: false});
       doc.fill('black');
       doc.fillColor('black');
       doc.fillOpacity(undefined);
