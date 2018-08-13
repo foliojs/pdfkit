@@ -1,5 +1,4 @@
 PDFFont = require '../font'
-PDFObject = require '../object'
 
 class EmbeddedFont extends PDFFont
   constructor: (@document, @font, @id) ->

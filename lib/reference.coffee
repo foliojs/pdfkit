@@ -4,9 +4,10 @@ By Devon Govett
 ###
 
 zlib = require 'zlib'
-stream = require 'stream'
+PDFAbstractReference = require './abstract_reference'
+PDFObject = require './object'
 
-class PDFReference extends stream.Writable
+class PDFReference extends PDFAbstractReference
   constructor: (@document, @id, @data = {}) ->
     super decodeStrings: no
     @gen = 0
@@ -70,4 +71,3 @@ class PDFReference extends stream.Writable
     return "#{@id} #{@gen} R"
       
 module.exports = PDFReference
-PDFObject = require './object'

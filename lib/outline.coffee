@@ -1,4 +1,3 @@
-PDFObject = require './object'
 PDFPage = require './page'
 
 class PDFOutline
