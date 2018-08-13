@@ -1,4 +1,4 @@
-PDFFont = require '../font'
+PDFFontFactory = require '../font_factory'
 
 module.exports =
   initFonts: ->
@@ -37,7 +37,7 @@ module.exports =
 
     # load the font
     id = 'F' + (++@_fontCount)
-    @_font = PDFFont.open(this, src, family, id)
+    @_font = PDFFontFactory.open(this, src, family, id)
 
     # check for existing font familes with the same name already in the PDF
     # useful if the font was passed as a buffer
