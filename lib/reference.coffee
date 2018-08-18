@@ -9,65 +9,49 @@ PDFObject = require './object'
 
 class PDFReference extends PDFAbstractReference
   constructor: (@document, @id, @data = {}) ->
-    super decodeStrings: no
     @gen = 0
-    @deflate = null
     @compress = @document.compress and not @data.Filter
     @uncompressedLength = 0
-    @chunks = []
-    
-  initDeflate: ->
-    @data.Filter = 'FlateDecode'
-    
-    @deflate = zlib.createDeflate()
-    @deflate.on 'data', (chunk) =>
-      @chunks.push chunk
-      @data.Length += chunk.length
-      
-    @deflate.on 'end', @finalize
-    
-  _write: (chunk, encoding, callback) ->
+    @buffer = []
+
+  write: (chunk) ->
     unless Buffer.isBuffer(chunk)
       chunk = new Buffer(chunk + '\n', 'binary')
-      
+
     @uncompressedLength += chunk.length
     @data.Length ?= 0
-    
+    @buffer.push(chunk)
+    @data.Length += chunk.length
     if @compress
-      @initDeflate() if not @deflate
-      @deflate.write chunk
-    else
-      @chunks.push chunk
-      @data.Length += chunk.length
-      
-    callback()
-    
+      @data.Filter = 'FlateDecode'
+
   end: (chunk) ->
-    super
-    
-    if @deflate
-      @deflate.end()
-    else
-      @finalize()
-    
+    if chunk
+      @write(chunk)
+    @finalize()
+
   finalize: =>
-    @offset = @document._offset
-    
-    @document._write "#{@id} #{@gen} obj"
-    @document._write PDFObject.convert(@data)
-    
-    if @chunks.length
-      @document._write 'stream'
-      for chunk in @chunks
-        @document._write chunk
-        
-      @chunks.length = 0 # free up memory
-      @document._write '\nendstream'
-      
-    @document._write 'endobj'
-    @document._refEnd(this)
-    
+    setTimeout () =>
+      @offset = @document._offset
+
+      @document._write "#{@id} #{@gen} obj"
+      @document._write PDFObject.convert(@data)
+
+      if @buffer.length
+        @buffer = Buffer.concat(@buffer)
+        if @compress
+          @buffer = zlib.deflateSync(@buffer)
+          @data.Length = @buffer.length
+        @document._write 'stream'
+        @document._write @buffer
+
+        @buffer.length = 0 # free up memory
+        @document._write '\nendstream'
+
+      @document._write 'endobj'
+      @document._refEnd(this)
+    , 0
   toString: ->
     return "#{@id} #{@gen} R"
-      
+
 module.exports = PDFReference
