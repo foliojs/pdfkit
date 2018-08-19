@@ -24,7 +24,7 @@ describe('text', function () {
 
   test('complex svg', function () {
     return runDocTest(function(doc) {
-      var i, len
+      var i, len, part
       doc.translate(220, 300);
       for (i = 0, len = tiger.length; i < len; i++) {
         part = tiger[i];
