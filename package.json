@@ -22,6 +22,9 @@
   },
   "bugs": "http://github.com/devongovett/pdfkit/issues",
   "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-plugin-add-module-exports": "^0.2.1",
+    "babel-preset-env": "^1.7.0",
     "blob-stream": "^0.1.2",
     "brace": "^0.2.1",
     "brfs": "~1.0.1",
@@ -44,6 +47,7 @@
   "scripts": {
     "prepublish": "make js",
     "postpublish": "make clean",
+    "build": "babel lib --out-dir js",
     "test": "jest -i"
   },
   "main": "js/document",
