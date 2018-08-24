@@ -23,25 +23,25 @@ Here is an example showing some of these options.
 
     # Scale proprotionally to the specified width
     doc.image('images/test.jpeg', 0, 15, width: 300)
-       .text('Proportional to width', 0, 0)
+    doc.text('Proportional to width', 0, 0)
      
     # Fit the image within the dimensions
     doc.image('images/test.jpeg', 320, 15, fit: [100, 100])
-       .rect(320, 15, 100, 100)
+    doc.rect(320, 15, 100, 100)
        .stroke()
        .text('Fit', 320, 0)
       
     # Stretch the image
     doc.image('images/test.jpeg', 320, 145, width: 200, height: 100)
-       .text('Stretch', 320, 130)
+    doc.text('Stretch', 320, 130)
        
     # Scale the image
     doc.image('images/test.jpeg', 320, 280, scale: 0.25)
-       .text('Scale', 320, 265)
+    doc.text('Scale', 320, 265)
 
     # Fit the image in the dimensions, and center it both horizontally and vertically
     doc.image('images/test.jpeg', 430, 15, fit: [100, 100], align: 'center', valign: 'center')
-       .rect(430, 15, 100, 100)
+    doc.rect(430, 15, 100, 100)
        .stroke()
        .text('Centered', 430, 0)
        
@@ -51,5 +51,7 @@ This example produces the following output:
 
 ![0](images/images.png "150")
 
-That is all there is to adding images to your PDF documents with PDFKit. Now
-let's look at adding annotations.
+**NOTE:** As of version 0.9.0, doc.image() returns a promise, since pngs need to decompressed.  While this takes a small amount of resources for a single image, in large numbers the decompression can use a large amount of both CPU and memory and it makes sense to wait for a batch to complete before adding another image.
+
+That is all there is to adding images to your PDF documents with PDFKit. Next let's look at adding annotations.
+
