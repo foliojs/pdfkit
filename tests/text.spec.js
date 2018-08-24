@@ -21,6 +21,9 @@ describe('text', function () {
         link: 'http://google.com/',
         underline: true
       });
+      doc.text('Strike', 100, 130, {
+        strike: true
+      });
     });
   });  
 
