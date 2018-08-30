@@ -27,7 +27,7 @@
     "babel-preset-env": "^1.7.0",
     "blob-stream": "^0.1.2",
     "brace": "^0.2.1",
-    "brfs": "~1.0.1",
+    "brfs": "~2.0.1",
     "browserify": "^3.39.0",
     "codemirror": "~3.20.0",
     "coffee-script": ">=1.0.1",
@@ -51,6 +51,7 @@
     "prepublish": "make js",
     "postpublish": "make clean",
     "build": "rollup -c",
+    "browser-demo": "browserify demo/browser.js > demo/bundle.js",
     "test": "jest -i"
   },
   "main": "js/pdfkit.js",

@@ -4,6 +4,19 @@ import copy from 'rollup-plugin-cpy';
 
 const external = ['stream', 'fs', 'zlib', 'fontkit', 'events', 'linebreak', 'png-js'];
 
+// supports using brfs transform
+const stripFSInterop = function () {
+  return {
+    renderChunk (code) {
+      code = code.replace('var fs = _interopDefault(require(\'fs\'));', 'var fs = require(\'fs\');');
+      return {
+        code,
+        map: null
+      }
+    }
+  }
+}
+
 export default [
 	// CommonJS build for Node
 	{
@@ -29,7 +42,8 @@ export default [
       copy({
         files: ['lib/font/data/*.afm'],
         dest: 'js/font/data'
-      })
+      }),
+      stripFSInterop()
 		]
 	},
 	// ES for legacy (IE11) browsers
