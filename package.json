@@ -22,8 +22,8 @@
   },
   "bugs": "http://github.com/devongovett/pdfkit/issues",
   "devDependencies": {
-    "babel-cli": "^6.26.0",
-    "babel-plugin-add-module-exports": "^0.2.1",
+    "babel-core": "^6.26.3",
+    "babel-plugin-external-helpers": "^6.22.0",
     "babel-preset-env": "^1.7.0",
     "blob-stream": "^0.1.2",
     "brace": "^0.2.1",
@@ -37,7 +37,10 @@
     "iconv-lite": "^0.4.13",
     "jade": "~1.1.5",
     "jest": "^23.4.2",
-    "markdown": "~0.5.0"
+    "markdown": "~0.5.0",
+    "rollup": "^0.65.0",
+    "rollup-plugin-babel": "3",
+    "rollup-plugin-cpy": "^1.0.0"
   },
   "dependencies": {
     "fontkit": "^1.0.0",
@@ -47,17 +50,19 @@
   "scripts": {
     "prepublish": "make js",
     "postpublish": "make clean",
-    "build": "babel lib --out-dir js",
+    "build": "rollup -c",
     "test": "jest -i"
   },
-  "main": "js/document",
+  "main": "js/pdfkit.js",
+  "module": "js/pdfkit.es5.js",
+  "esnext": "js/pdfkit.esnext.js",
   "browserify": {
     "transform": [
       "brfs"
     ]
   },
   "engine": [
-    "node >= v0.10.0"
+    "node >= v6.0.0"
   ],
   "jest": {
     "testPathIgnorePatterns": [
