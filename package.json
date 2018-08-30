@@ -48,10 +48,12 @@
     "png-js": ">=0.1.0"
   },
   "scripts": {
-    "prepublish": "make js",
-    "postpublish": "make clean",
+    "prepublishOnly": "npm run build",
     "build": "rollup -c",
     "browser-demo": "browserify demo/browser.js > demo/bundle.js",
+    "pdf-guide": "node docs/generate.js",
+    "website": "node docs/generate_website.js",
+    "docs": "npm run pdf-guide && npm run website && npm run browser-demo",
     "test": "jest -i"
   },
   "main": "js/pdfkit.js",
