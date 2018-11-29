@@ -22,17 +22,23 @@
   },
   "bugs": "http://github.com/devongovett/pdfkit/issues",
   "devDependencies": {
+    "babel-core": "^6.26.3",
+    "babel-plugin-external-helpers": "^6.22.0",
+    "babel-preset-env": "^1.7.0",
     "blob-stream": "^0.1.2",
     "brace": "^0.2.1",
-    "brfs": "~1.0.1",
+    "brfs": "~2.0.1",
     "browserify": "^3.39.0",
     "codemirror": "~3.20.0",
     "coffee-script": ">=1.0.1",
-    "coffeeify": "^0.6.0",
-    "exorcist": "^0.1.5",
+    "eslint": "^5.3.0",
     "iconv-lite": "^0.4.13",
     "jade": "~1.1.5",
-    "markdown": "~0.5.0"
+    "jest": "^23.4.2",
+    "markdown": "~0.5.0",
+    "rollup": "^0.65.0",
+    "rollup-plugin-babel": "^3.0.7",
+    "rollup-plugin-cpy": "^1.0.0"
   },
   "dependencies": {
     "fontkit": "^1.0.0",
@@ -40,16 +46,30 @@
     "png-js": ">=0.1.0"
   },
   "scripts": {
-    "prepublish": "make js",
-    "postpublish": "make clean"
+    "prepublishOnly": "npm run build",
+    "build": "rollup -c",
+    "browser-demo": "browserify demo/browser.js > demo/bundle.js",
+    "pdf-guide": "node docs/generate.js",
+    "website": "node docs/generate_website.js",
+    "docs": "npm run pdf-guide && npm run website && npm run browser-demo",
+    "test": "jest -i"
   },
-  "main": "js/document",
+  "main": "js/pdfkit.js",
+  "module": "js/pdfkit.es5.js",
+  "esnext": "js/pdfkit.esnext.js",
   "browserify": {
     "transform": [
       "brfs"
     ]
   },
   "engine": [
-    "node >= v0.10.0"
-  ]
+    "node >= v6.0.0"
+  ],
+  "jest": {
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "<rootDir>/demo/"
+    ],
+    "testURL": "http://localhost/"
+  }
 }
