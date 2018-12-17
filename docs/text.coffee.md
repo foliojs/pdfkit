@@ -6,7 +6,7 @@ PDFKit makes adding text to documents quite simple, and includes many options
 to customize the display of the output. Adding text to a document is as simple
 as calling the `text` method.
 
-    doc.text 'Hello world!'
+    doc.text('Hello world!')
 
 Internally, PDFKit keeps track of the current X and Y position of text as it
 is added to the document. This way, subsequent calls to the `text` method will
@@ -14,7 +14,7 @@ automatically appear as new lines below the previous line. However, you can
 modify the position of text by passing X and Y coordinates to the `text`
 method after the text itself.
 
-    doc.text 'Hello world!', 100, 100
+    doc.text('Hello world!', 100, 100)
 
 If you want to move down or up by lines, just call the `moveDown` or `moveUp`
 method with the number of lines you'd like to move (1 by default).
@@ -39,30 +39,38 @@ four options: `left` (the default), `center`, `right`, and `justify`. They
 work just as they do in your favorite word processor, but here is an example
 showing their use in a text box.
     
-    lorem = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam in suscipit purus.  Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Vivamus nec hendrerit felis. Morbi aliquam facilisis risus eu lacinia. Sed eu leo in turpis fringilla hendrerit. Ut nec accumsan nisl.'
+    const lorem = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam in suscipit purus.  Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Vivamus nec hendrerit felis. Morbi aliquam facilisis risus eu lacinia. Sed eu leo in turpis fringilla hendrerit. Ut nec accumsan nisl.';
     
-    doc.fontSize 8
-    doc.text 'This text is left aligned. ' + lorem,
-      width: 410
+    doc.fontSize(8);
+    doc.text(`This text is left aligned. ${lorem}`, {
+      width: 410,
       align: 'left'
+    }
+    );
     
-    doc.moveDown()
-    doc.text 'This text is centered. ' + lorem,
-      width: 410
+    doc.moveDown();
+    doc.text(`This text is centered. ${lorem}`, {
+      width: 410,
       align: 'center'
+    }
+    );
     
-    doc.moveDown()
-    doc.text 'This text is right aligned. ' + lorem, 
-      width: 410
+    doc.moveDown();
+    doc.text(`This text is right aligned. ${lorem}`, { 
+      width: 410,
       align: 'right'
+    }
+    );
     
-    doc.moveDown()
-    doc.text 'This text is justified. ' + lorem, 
-      width: 410
+    doc.moveDown();
+    doc.text(`This text is justified. ${lorem}`, { 
+      width: 410,
       align: 'justify'
+    }
+    );
       
-    # draw bounding rectangle
-    doc.rect(doc.x, 0, 410, doc.y).stroke()
+    // draw bounding rectangle
+    doc.rect(doc.x, 0, 410, doc.y).stroke();
 
 
 The output of this example, looks like this:
@@ -103,14 +111,15 @@ Additionally, the fill and stroke color and opacity methods described in the
 
 Here is an example combining some of the options above, wrapping a piece of text into three columns, in a specified width and height.
    
-    lorem = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam in suscipit purus. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Vivamus nec hendrerit felis. Morbi aliquam facilisis risus eu lacinia. Sed eu leo in turpis fringilla hendrerit. Ut nec accumsan nisl. Suspendisse rhoncus nisl posuere tortor tempus et dapibus elit porta. Cras leo neque, elementum a rhoncus ut, vestibulum non nibh. Phasellus pretium justo turpis. Etiam vulputate, odio vitae tincidunt ultricies, eros odio dapibus nisi, ut tincidunt lacus arcu eu elit. Aenean velit erat, vehicula eget lacinia ut, dignissim non tellus. Aliquam nec lacus mi, sed vestibulum nunc. Suspendisse potenti. Curabitur vitae sem turpis. Vestibulum sed neque eget dolor dapibus porttitor at sit amet sem. Fusce a turpis lorem. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae;'   
+    const lorem = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam in suscipit purus. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Vivamus nec hendrerit felis. Morbi aliquam facilisis risus eu lacinia. Sed eu leo in turpis fringilla hendrerit. Ut nec accumsan nisl. Suspendisse rhoncus nisl posuere tortor tempus et dapibus elit porta. Cras leo neque, elementum a rhoncus ut, vestibulum non nibh. Phasellus pretium justo turpis. Etiam vulputate, odio vitae tincidunt ultricies, eros odio dapibus nisi, ut tincidunt lacus arcu eu elit. Aenean velit erat, vehicula eget lacinia ut, dignissim non tellus. Aliquam nec lacus mi, sed vestibulum nunc. Suspendisse potenti. Curabitur vitae sem turpis. Vestibulum sed neque eget dolor dapibus porttitor at sit amet sem. Fusce a turpis lorem. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae;';   
     
-    doc.text lorem,
-      columns: 3
-      columnGap: 15
-      height: 100
-      width: 465
+    doc.text(lorem, {
+      columns: 3,
+      columnGap: 15,
+      height: 100,
+      width: 465,
       align: 'justify'
+    });
 
 The output looks like this:
 
@@ -143,12 +152,12 @@ The options given to the first `text` call are also retained for subsequent call
 `continued` one, but of course you can override them.  In the following example, the `width`
 option from the first `text` call is retained by the second call.
 
-    doc.fillColor 'green'
-       .text lorem.slice(0, 500),
-         width: 465
-         continued: yes
-       .fillColor 'red'
-       .text lorem.slice(500)
+    doc.fillColor('green')
+       .text(lorem.slice(0, 500), {
+         width: 465,
+         continued: true
+       }).fillColor('red')
+       .text(lorem.slice(500));
        
 Here is the output:
        
@@ -187,22 +196,22 @@ to be extracted from the collection.
 
 Here is an example showing how to set the font in each case.
 
-    # Set the font size
-    doc.fontSize(18)
+    // Set the font size
+    doc.fontSize(18);
      
-    # Using a standard PDF font
+    // Using a standard PDF font
     doc.font('Times-Roman')
        .text('Hello from Times Roman!')
-       .moveDown(0.5)
+       .moveDown(0.5);
      
-    # Using a TrueType font (.ttf)   
+    // Using a TrueType font (.ttf)   
     doc.font('fonts/GoodDog.ttf')
        .text('This is Good Dog!')
-       .moveDown(0.5)
+       .moveDown(0.5);
      
-    # Using a collection font (.ttc or .dfont)   
+    // Using a collection font (.ttc or .dfont)   
     doc.font('fonts/Chalkboard.ttc', 'Chalkboard-Bold')
-       .text('This is Chalkboard, not Comic Sans.')
+       .text('This is Chalkboard, not Comic Sans.');
 
 The output of this example looks like this:
 
@@ -212,12 +221,12 @@ Another nice feature of the PDFKit font support, is the ability to register a
 font file under a name for use later rather than entering the path to the font
 every time you want to use it.
 
-    # Register a font
-    doc.registerFont('Heading Font', 'fonts/Chalkboard.ttc', 'Chalkboard-Bold')
+    // Register a font
+    doc.registerFont('Heading Font', 'fonts/Chalkboard.ttc', 'Chalkboard-Bold');
      
-    # Use the font later
+    // Use the font later
     doc.font('Heading Font')
-       .text('This is a heading.')
+       .text('This is a heading.');
 
 That's about all there is too it for text in PDFKit. Let's move on now to
 images.

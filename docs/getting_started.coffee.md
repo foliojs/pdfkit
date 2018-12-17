@@ -13,21 +13,21 @@ Creating a PDFKit document is quite simple. Just require the `pdfkit` module
 in your CoffeeScript or JavaScript source file and create an instance of the
 `PDFDocument` class.
 
-    PDFDocument = require 'pdfkit'
-    doc = new PDFDocument
+    const PDFDocument = require('pdfkit');
+    const doc = new PDFDocument;
 
 `PDFDocument` instances are readable Node streams. They don't get saved anywhere automatically,
 but you can call the `pipe` method to send the output of the PDF document to another
 writable Node stream as it is being written. When you're done with your document, call
 the `end` method to finalize it. Here is an example showing how to pipe to a file or an HTTP response.
 
-    doc.pipe fs.createWriteStream('/path/to/file.pdf') # write to PDF
-    doc.pipe res                                       # HTTP response
+    doc.pipe(fs.createWriteStream('/path/to/file.pdf')); // write to PDF
+    doc.pipe(res);                                       // HTTP response
 
-    # add stuff to PDF here using methods described below...
+    // add stuff to PDF here using methods described below...
 
-    # finalize the PDF and end the stream
-    doc.end()
+    // finalize the PDF and end the stream
+    doc.end();
 
 The `write` and `output` methods found in PDFKit before version 0.5 are now deprecated.
 
@@ -48,27 +48,28 @@ To get a Blob from a `PDFDocument`, you should pipe it to a [blob-stream](https:
 which is a module that generates a Blob from any Node-style stream.  The following example uses Browserify to load
 `PDFKit` and `blob-stream`, but if you're not using Browserify, you can load them in whatever way you'd like (e.g. script tags).
 
-    # require dependencies
-    PDFDocument = require 'pdfkit'
-    blobStream  = require 'blob-stream'
+    // require dependencies
+    const PDFDocument = require('pdfkit');
+    const blobStream  = require('blob-stream');
 
-    # create a document the same way as above
-    doc = new PDFDocument
+    // create a document the same way as above
+    const doc = new PDFDocument;
 
-    # pipe the document to a blob
-    stream = doc.pipe(blobStream())
+    // pipe the document to a blob
+    const stream = doc.pipe(blobStream());
 
-    # add your content to the document here, as usual
+    // add your content to the document here, as usual
 
-    # get a blob when you're done
-    doc.end()
-    stream.on 'finish', ->
-      # get a blob you can do whatever you like with
-      blob = stream.toBlob('application/pdf')
+    // get a blob when you're done
+    doc.end();
+    stream.on('finish', function() {
+      // get a blob you can do whatever you like with
+      const blob = stream.toBlob('application/pdf');
 
-      # or get a blob URL for display in the browser
-      url = stream.toBlobURL('application/pdf')
-      iframe.src = url
+      // or get a blob URL for display in the browser
+      const url = stream.toBlobURL('application/pdf');
+      iframe.src = url;
+    });
 
 You can see an interactive in-browser demo of PDFKit [here](http://pdfkit.org/demo/browser.html).
 
@@ -87,8 +88,7 @@ quite simple!
 
 To add some content every time a page is created, either by calling `addPage()` or automatically, you can use the `pageAdded` event.
 
-    doc.on 'pageAdded', ->
-      doc.text "Page Title"
+    doc.on('pageAdded', () => doc.text("Page Title"));
 
 You can also set some options for the page, such as its size and orientation.
 
@@ -110,18 +110,20 @@ on all sides.
 
 For example:
 
-    # Add a 50 point margin on all sides
-    doc.addPage
-      margin: 50
+    // Add a 50 point margin on all sides
+    doc.addPage({
+      margin: 50});
 
 
-    # Add different margins on each side
-    doc.addPage
-      margins:
-        top: 50
-        bottom: 50
-        left: 72
+    // Add different margins on each side
+    doc.addPage({
+      margins: {
+        top: 50,
+        bottom: 50,
+        left: 72,
         right: 72
+      }
+    });
 
 ## Switching to previous pages
 
@@ -142,28 +144,31 @@ never need to call it.  Finally, there is a `bufferedPageRange` method, which re
 of pages that are currently buffered.  Here is a small example that shows how you might add page
 numbers to a document.
 
-    # create a document, and enable bufferPages mode
-    doc = new PDFDocument
-      bufferPages: true
+    // create a document, and enable bufferPages mode
+    let i;
+    let end;
+    const doc = new PDFDocument({
+      bufferPages: true});
 
-    # add some content...
-    doc.addPage()
-    # ...
-    doc.addPage()
+    // add some content...
+    doc.addPage();
+    // ...
+    doc.addPage();
 
-    # see the range of buffered pages
-    range = doc.bufferedPageRange() # => { start: 0, count: 2 }
+    // see the range of buffered pages
+    const range = doc.bufferedPageRange(); // => { start: 0, count: 2 }
 
-    for i in [range.start...range.start + range.count]
-      doc.switchToPage(i)
-      doc.text "Page #{i + 1} of #{range.count}"
+    for (i = range.start, end = range.start + range.count, range.start <= end; i < end; i++;) {
+      doc.switchToPage(i);
+      doc.text(`Page ${i + 1} of ${range.count}`);
+    }
 
-    # manually flush pages that have been buffered
-    doc.flushPages()
+    // manually flush pages that have been buffered
+    doc.flushPages();
 
-    # or, if you are at the end of the document anyway,
-    # doc.end() will call it for you automatically.
-    doc.end()
+    // or, if you are at the end of the document anyway,
+    // doc.end() will call it for you automatically.
+    doc.end();
 
 ## Setting document metadata
 

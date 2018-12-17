@@ -81,10 +81,8 @@ PDFKit supports also the following paper sizes. The dimensions in brackets are i
 
 In order to use the predefined sizes, the name of the size (as named in the lists above) should be passed to either the `PDFDocument` constructor or the `addPage()` function in the `size` property of the `options` object, as shown in the example below, using `A7` as the preferred size. 
 
-    # Passing size to the constructor
-    doc = new PDFDocument
-        size: 'A7'
+    // Passing size to the constructor
+    const doc = new PDFDocument({size: 'A7'});
         
-    # Passing size to the addPage function
-    doc.addPage
-        size: 'A7'
+    // Passing size to the addPage function
+    doc.addPage({size: 'A7'});

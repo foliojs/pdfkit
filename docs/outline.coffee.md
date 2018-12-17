@@ -6,14 +6,14 @@ Outlines are the heirachical bookmarks that display in some PDF readers. Current
 
 Here is an example of adding a bookmark with a single child bookmark.
 
-    # Get a reference to the Outline root
-    outline = doc.outline
+    // Get a reference to the Outline root
+    const { outline } = doc;
 
-    # Add a top-level bookmark
-    top = outline.addItem('Top Level')
+    // Add a top-level bookmark
+    const top = outline.addItem('Top Level');
 
-    # Add a sub-section
-    top.addItem('Sub-section')
+    // Add a sub-section
+    top.addItem('Sub-section');
 
 ## Options
 
@@ -21,8 +21,8 @@ The `options` parameter currently only has one property: `expanded`. If this val
 
 In this example the 'Top Level' section will be expanded to show 'Sub-section'.
 
-    # Add a top-level bookmark
-    top = outline.addItem('Top Level', { expanded: true })
+    // Add a top-level bookmark
+    const top = outline.addItem('Top Level', { expanded: true });
 
-    # Add a sub-section
-    top.addItem('Sub-section')
+    // Add a sub-section
+    top.addItem('Sub-section');
