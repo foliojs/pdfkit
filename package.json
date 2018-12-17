@@ -52,7 +52,8 @@
     "pdf-guide": "node docs/generate.js",
     "website": "node docs/generate_website.js",
     "docs": "npm run pdf-guide && npm run website && npm run browser-demo",
-    "test": "jest -i"
+    "test": "jest -i",
+    "test:unit": "jest unit/ -i"
   },
   "main": "js/pdfkit.js",
   "module": "js/pdfkit.es5.js",
