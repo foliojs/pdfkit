@@ -201,13 +201,17 @@ settings in the `option` object when creating `PDFDocument`. By default, all ope
 You need to explicitly allow certain operations.
 
  * `ownerPassword` - the owner password (string value)
- * `allowPrinting` - whether printing is allowed. Specify `"lowResolution"` to allow degraded printing, or `"highResolution"` to allow printing with high resolution
- * `allowModifying` - whether modifying the file is allowed. Specify `true` to allow modifying document content
- * `allowCopying` - whether copying text or graphics is allowed. Specify `true` to allow copying
- * `allowAnnotating` - whether annotating, form filling is allowed. Specify `true` to allow annotating and form filling
- * `allowFillingForms` - whether form filling and signing is allowed. Specify `true` to allow filling in form fields and signing
- * `allowContentAccessibility` - whether copying text for accessibility is allowed. Specify `true` to allow copying for accessibility
- * `allowDocumentAssembly` - whether assembling document is allowed. Specify `true` to allow document assembly
+ * `permissions` - the object specifying PDF file permissions
+
+Following settings are allowed in `permissions` object:
+
+ * `printing` - whether printing is allowed. Specify `"lowResolution"` to allow degraded printing, or `"highResolution"` to allow printing with high resolution
+ * `modifying` - whether modifying the file is allowed. Specify `true` to allow modifying document content
+ * `copying` - whether copying text or graphics is allowed. Specify `true` to allow copying
+ * `annotating` - whether annotating, form filling is allowed. Specify `true` to allow annotating and form filling
+ * `fillingForms` - whether form filling and signing is allowed. Specify `true` to allow filling in form fields and signing
+ * `contentAccessibility` - whether copying text for accessibility is allowed. Specify `true` to allow copying for accessibility
+ * `documentAssembly` - whether assembling document is allowed. Specify `true` to allow document assembly
 
 You can specify either user password, owner password or both passwords.
 Behavior differs according to passwords you provides:
@@ -225,7 +229,7 @@ Behavior differs according to passwords you provides:
 
 Note that PDF file itself cannot enforce access privileges.
 When file is decrypted, PDF viewer applications have full access to the file content,
-and it is up to them to respect permission settings.
+and it is up to viewer applications to respect permission settings.
 
 To choose encryption method, you need to specify PDF version.
 PDFKit will choose best encryption method available in the PDF version you specified.
