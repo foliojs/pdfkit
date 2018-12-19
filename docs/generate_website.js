@@ -13,11 +13,11 @@ if (!fs.existsSync('img')) {
 
 const files = [
   '../README.md',
-  'getting_started.coffee.md',
-  'vector.coffee.md',
-  'text.coffee.md',
-  'images.coffee.md',
-  'annotations.coffee.md'
+  'getting_started.md',
+  'vector.md',
+  'text.md',
+  'images.md',
+  'annotations.md'
 ];
 
 // shared lorem ipsum text so we don't need to copy it into every example
@@ -103,8 +103,8 @@ for (let file of Array.from(files)) {
   generateImages(tree);
   
   file = file
-    .replace(/\.coffee\.md$/, '')
-    .replace(/README\.md/, 'index');
+    .replace(/README\.md/, 'index')
+    .replace(/\.md$/, '');
     
   pages.push({
     file,

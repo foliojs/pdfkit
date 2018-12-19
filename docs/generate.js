@@ -316,12 +316,12 @@ const renderTitlePage = function(doc) {
   const doc = new PDFDocument;
   doc.pipe(fs.createWriteStream('guide.pdf'));
   renderTitlePage(doc);
-  render(doc, 'getting_started.coffee.md');
-  render(doc, 'vector.coffee.md');
-  render(doc, 'text.coffee.md');
-  render(doc, 'images.coffee.md');
-  render(doc, 'outline.coffee.md');
-  render(doc, 'annotations.coffee.md');
+  render(doc, 'getting_started.md');
+  render(doc, 'vector.md');
+  render(doc, 'text.md');
+  render(doc, 'images.md');
+  render(doc, 'outline.md');
+  render(doc, 'annotations.md');
   return doc.end();
 })();
 
