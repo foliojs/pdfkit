@@ -9,7 +9,7 @@ function updatePdf (pdfData, testState, snapshotChanges) {
   }
 
   const fileRefPath = path.join(pdfDir, testState.currentTestName + '.pdf');
-  const fileChangesPath = fileRefPath.replace('.pdf', '[changed].pdf'); 
+  const fileChangesPath = fileRefPath.replace('.pdf', '[changed].pdf');
 
   const {matched, added, unmatched, updated} = snapshotChanges;
 
@@ -41,12 +41,19 @@ function compareSnapshotChanges(changes, previousChanges) {
   }, {})
 }
 
-function runDocTest(fn) {
-  return new Promise(function(resolve) {
-    var doc = new PDFDocument;
-    var buffers = [];
+function runDocTest(options, fn) {
+  if (typeof options === 'function') {
+    fn = options;
+    options = {};
+  }
+  if (!options.info) {
+    options.info = {};
+  }
+  options.info.CreationDate = new Date(Date.UTC(2018,1,1));
 
-    doc.info.CreationDate = new Date(Date.UTC(2018,1,1));
+  return new Promise(function(resolve) {
+    var doc = new PDFDocument(options);
+    var buffers = [];
 
     fn(doc);
 

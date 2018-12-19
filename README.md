@@ -6,9 +6,9 @@ A JavaScript PDF generation library for Node and the browser.
 
 ## Description
 
-PDFKit is a PDF document generation library for Node and the browser that makes creating complex, multi-page, printable documents easy. 
-It's written in CoffeeScript, but you can choose to use the API in plain 'ol JavaScript if you like. The API embraces 
-chainability, and includes both low level functions as well as abstractions for higher level functionality. The PDFKit API 
+PDFKit is a PDF document generation library for Node and the browser that makes creating complex, multi-page, printable documents easy.
+It's written in CoffeeScript, but you can choose to use the API in plain 'ol JavaScript if you like. The API embraces
+chainability, and includes both low level functions as well as abstractions for higher level functionality. The PDFKit API
 is designed to be simple, so generating complex documents is often as simple as a few function calls.
 
 Check out some of the [documentation and examples](http://pdfkit.org/docs/getting_started.html) to see for yourself!
@@ -49,15 +49,17 @@ Installation uses the [npm](http://npmjs.org/) package manager.  Just type the f
   * Underlines
   * etc.
 * Outlines
-  
+* PDF security
+  * Encryption
+  * Access privileges (printing, copying, modifying, annotating, form filling, content accessibility, document assembly)
+
 ## Coming soon!
 
 * Patterns fills
-* PDF Security
 * Higher level APIs for creating tables and laying out content
 * More performance optimizations
 * Even more awesomeness, perhaps written by you! Please fork this repository and send me pull requests.
-    
+
 ## Example
 
 ```coffeescript
@@ -111,9 +113,9 @@ doc.addPage()
 # Finalize PDF file
 doc.end()
 ```
- 
-[The PDF output from this example](http://pdfkit.org/demo/out.pdf) (with a few additions) shows the power of PDFKit — producing 
-complex documents with a very small amount of code.  For more, see the `demo` folder and the 
+
+[The PDF output from this example](http://pdfkit.org/demo/out.pdf) (with a few additions) shows the power of PDFKit — producing
+complex documents with a very small amount of code.  For more, see the `demo` folder and the
 [PDFKit programming guide](http://pdfkit.org/docs/getting_started.html).
 
 ## Browser Usage
@@ -122,13 +124,13 @@ There are two ways to use PDFKit in the browser.  The first is to use [Browserif
 which is a Node module packager for the browser with the familiar `require` syntax.  The second is to use
 a prebuilt version of PDFKit, which you can [download from Github](https://github.com/devongovett/pdfkit/releases).
 
-In addition to PDFKit, you'll need somewhere to stream the output to.  HTML5 has a 
+In addition to PDFKit, you'll need somewhere to stream the output to.  HTML5 has a
 [Blob](https://developer.mozilla.org/en-US/docs/Web/API/Blob) object which can be used to store binary data, and
-get URLs to this data in order to display PDF output inside an iframe, or upload to a server, etc.  In order to 
+get URLs to this data in order to display PDF output inside an iframe, or upload to a server, etc.  In order to
 get a Blob from the output of PDFKit, you can use the [blob-stream](https://github.com/devongovett/blob-stream)
 module.
 
-The following example uses Browserify to load `PDFKit` and `blob-stream`, but if you're not using Browserify, 
+The following example uses Browserify to load `PDFKit` and `blob-stream`, but if you're not using Browserify,
 you can load them in whatever way you'd like (e.g. script tags).
 
 ```coffeescript
@@ -157,9 +159,9 @@ stream.on 'finish', ->
 
 You can see an interactive in-browser demo of PDFKit [here](http://pdfkit.org/demo/browser.html).
 
-Note that in order to Browserify a project using PDFKit, you need to install the `brfs` module with npm, 
-which is used to load built-in font data into the package. It is listed as a `devDependency` in 
-PDFKit's `package.json`, so it isn't installed by default for Node users. 
+Note that in order to Browserify a project using PDFKit, you need to install the `brfs` module with npm,
+which is used to load built-in font data into the package. It is listed as a `devDependency` in
+PDFKit's `package.json`, so it isn't installed by default for Node users.
 If you forget to install it, Browserify will print an error message.
 
 ## Documentation
