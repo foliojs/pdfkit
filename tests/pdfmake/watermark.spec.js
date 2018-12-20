@@ -1,3 +1,4 @@
+jest.mock('../../lib/security');
 var {runDocTest} = require('../helpers');
 
 describe('pdfmake', function () {
