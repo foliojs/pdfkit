@@ -1,5 +1,5 @@
-var PDFDocument = require('../lib/document').default;
-var PDFSecurity = require('../lib/security').default;
+var PDFDocument = require('../../lib/document').default;
+var PDFSecurity = require('../../lib/security').default;
 var CryptoJS = require('crypto-js');
 var path = require('path');
 var fs = require('fs');
