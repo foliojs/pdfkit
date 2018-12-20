@@ -18,12 +18,12 @@ and `quadraticCurveTo` all draw from the current point (which you can set with
 curves use two control points and quadratic curves use just one. Here is an
 example that illustrates defining a path.
 
-    doc.moveTo(0, 20)                               # set the current point
-       .lineTo(100, 160)                            # draw a line
-       .quadraticCurveTo(130, 200, 150, 120)        # draw a quadratic curve
-       .bezierCurveTo(190, -40, 200, 200, 300, 150) # draw a bezier curve
-       .lineTo(400, 90)                             # draw another line
-       .stroke()                                    # stroke the path
+    doc.moveTo(0, 20)                               // set the current point
+       .lineTo(100, 160)                            // draw a line
+       .quadraticCurveTo(130, 200, 150, 120)        // draw a quadratic curve
+       .bezierCurveTo(190, -40, 200, 200, 300, 150) // draw a bezier curve
+       .lineTo(400, 90)                             // draw another line
+       .stroke();                                   // stroke the path
 
 The output of this example looks like this:
 
@@ -67,8 +67,8 @@ pairs), and it will create the shape by moving to the first point, and then
 drawing lines to each consecutive point. Here is how you'd draw a triangle
 with the polygon helper.
 
-    doc.polygon [100, 0], [50, 100], [150, 100]
-    doc.stroke()
+    doc.polygon([100, 0], [50, 100], [150, 100]);
+    doc.stroke();
 
 The output of this example looks like this:
 
@@ -104,38 +104,38 @@ Some of these are pretty self explanatory, but let's go through a few of them.
 The `lineCap` and `lineJoin` properties accept constants describing what they
 should do. This is best illustrated by an example.
 
-    # these examples are easier to see with a large line width
-    doc.lineWidth(25)
+    // these examples are easier to see with a large line width
+    doc.lineWidth(25);
 
-    # line cap settings
+    // line cap settings
     doc.lineCap('butt')
        .moveTo(50, 20)
        .lineTo(100, 20)
-       .stroke()
+       .stroke();
 
     doc.lineCap('round')
        .moveTo(150, 20)
        .lineTo(200, 20)
-       .stroke()
+       .stroke();
 
-    # square line cap shown with a circle instead of a line so you can see it
+    // square line cap shown with a circle instead of a line so you can see it
     doc.lineCap('square')
        .moveTo(250, 20)
        .circle(275, 30, 15)
-       .stroke()
+       .stroke();
 
-    # line join settings
+    // line join settings
     doc.lineJoin('miter')
        .rect(50, 100, 50, 50)
-       .stroke()
+       .stroke();
 
     doc.lineJoin('round')
        .rect(150, 100, 50, 50)
-       .stroke()
+       .stroke();
 
     doc.lineJoin('bevel')
        .rect(250, 100, 50, 50)
-       .stroke()
+       .stroke();
 
 The output of this example looks like this.
 
@@ -156,8 +156,8 @@ The following example draws a circle with a dashed line where the space
 between the dashes is double the length of each dash.
 
     doc.circle(100, 50, 50)
-       .dash(5, space: 10)
-       .stroke()
+       .dash(5, {space: 10})
+       .stroke();
 
 The output of this example looks like this:
 
@@ -205,21 +205,21 @@ fillColor method), and an optional opacity.
 
 You can see both linear and radial gradients in the following example:
 
-    # Create a linear gradient
-    grad = doc.linearGradient(50, 0, 150, 100)
+    // Create a linear gradient
+    let grad = doc.linearGradient(50, 0, 150, 100);
     grad.stop(0, 'green')
-        .stop(1, 'red')
+        .stop(1, 'red');
 
-    doc.rect 50, 0, 100, 100
-    doc.fill grad
+    doc.rect(50, 0, 100, 100);
+    doc.fill(grad);
 
-    # Create a radial gradient
-    grad = doc.radialGradient(300, 50, 0, 300, 50, 50)
+    // Create a radial gradient
+    grad = doc.radialGradient(300, 50, 0, 300, 50, 50);
     grad.stop(0, 'orange', 0)
-        .stop(1, 'orange', 1)
+        .stop(1, 'orange', 1);
 
-    doc.circle 300, 50, 50
-    doc.fill grad
+    doc.circle(300, 50, 50);
+    doc.fill(grad);
 
 Here is the output from the this example:
 
@@ -232,19 +232,19 @@ example. The winding rule is an optional attribute to the `fill` and
 `fillAndStroke` methods, and there are two values to choose from: `non-zero`
 and `even-odd`.
 
-    # Initial setup
+    // Initial setup
     doc.fillColor('red')
        .translate(-100, -50)
-       .scale(0.8)
+       .scale(0.8);
 
-    # Draw the path with the non-zero winding rule
+    // Draw the path with the non-zero winding rule
     doc.path('M 250,75 L 323,301 131,161 369,161 177,301 z')
-       .fill('non-zero')
+       .fill('non-zero');
 
-    # Draw the path with the even-odd winding rule
+    // Draw the path with the even-odd winding rule
     doc.translate(280, 0)
        .path('M 250,75 L 323,301 131,161 369,161 177,301 z')
-       .fill('even-odd')
+       .fill('even-odd');
 
 You'll notice that I used the `scale` and `translate` transformations in this
 example. We'll cover those in a minute. The output of this example, with some
@@ -291,9 +291,9 @@ We used the `scale` and `translate` transformations above, so here is an
 example of using the `rotate` transformation. We'll set the origin of the
 rotation to the center of the rectangle.
 
-    doc.rotate(20, origin: [150, 70])
+    doc.rotate(20, {origin: [150, 70]})
        .rect(100, 20, 100, 100)
-       .fill('gray')
+       .fill('gray');
 
 This example produces the following effect.
 
@@ -307,16 +307,18 @@ parts of the drawing. Everything falling inside the clipping path after it is
 created is visible, and everything outside the path is invisible. Here is an
 example that clips a checkerboard pattern to the shape of a circle.
 
-    # Create a clipping path
+    // Create a clipping path
     doc.circle(100, 100, 100)
-       .clip()
+       .clip();
 
-    # Draw a checkerboard pattern
-    for row in [0...10]
-      for col in [0...10]
-        color = if (col % 2) - (row % 2) then '#eee' else '#4183C4'
+    // Draw a checkerboard pattern
+    for (let row = 0; row < 10; row++) {
+      for (let col = 0; col < 10; col++) {
+        const color = (col % 2) - (row % 2) ? '#eee' : '#4183C4';
         doc.rect(row * 20, col * 20, 20, 20)
-           .fill(color)
+           .fill(color);
+      }
+    }
 
 The result of this example is the following:
 

@@ -1,15 +1,7 @@
-/*
- * decaffeinate suggestions:
- * DS101: Remove unnecessary use of Array.from
- * DS102: Remove unnecessary code created because of implicit returns
- * DS205: Consider reworking code to avoid use of IIFEs
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
 const jade = require('jade');
 const { markdown } = require('markdown');
 const fs = require('fs');
 const vm = require('vm');
-const coffee = require('coffee-script');
 const {exec} = require('child_process');
 const PDFDocument = require('../');
 
@@ -21,11 +13,11 @@ if (!fs.existsSync('img')) {
 
 const files = [
   '../README.md',
-  'getting_started.coffee.md',
-  'vector.coffee.md',
-  'text.coffee.md',
-  'images.coffee.md',
-  'annotations.coffee.md'
+  'getting_started.md',
+  'vector.md',
+  'text.md',
+  'images.md',
+  'annotations.md'
 ];
 
 // shared lorem ipsum text so we don't need to copy it into every example
@@ -53,60 +45,50 @@ let imageIndex = 0;
 const generateImages = function(tree) {
   // find code blocks
   const codeBlocks = [];
-  for (var node of Array.from(tree)) {
+  for (var node of tree) {
     if (node[0] === 'code_block') {
       codeBlocks.push(node[1]);
     }
   }
   
-  return (() => {
-    const result = [];
-    for (node of Array.from(tree)) {
-      if ((node[0] === 'para') && Array.isArray(node[1]) && (node[1][0] === 'img')) {
-        // compile the code
-        const attrs = node[1][1];
-        let code = codeBlocks[attrs.alt];
-        if (code) { code = coffee.compile(code); }
-        delete attrs.height; // used for pdf generation
+  for (node of tree) {
+    if ((node[0] === 'para') && Array.isArray(node[1]) && (node[1][0] === 'img')) {
+      // compile the code
+      const attrs = node[1][1];
+      let code = codeBlocks[attrs.alt];        
+      delete attrs.height; // used for pdf generation
+    
+      // create a PDF and run the example
+      const doc = new PDFDocument;
+      const f = `img/${imageIndex++}`;
+      var file = fs.createWriteStream(`${f}.pdf`);
+      doc.pipe(file);
+    
+      doc.translate(doc.x, doc.y);
+      doc.scale(0.8);
+      doc.x = (doc.y = 0);
       
-        // create a PDF and run the example
-        const doc = new PDFDocument;
-        const f = `img/${imageIndex++}`;
-        var file = fs.createWriteStream(`${f}.pdf`);
-        doc.pipe(file);
-      
-        doc.translate(doc.x, doc.y);
-        doc.scale(0.8);
-        doc.x = (doc.y = 0);
-        
-        vm.runInNewContext(code, {
-          doc,
-          lorem
-        }
-        );
-      
-        delete attrs.title;
-        delete attrs.alt;
-        attrs.href = `${f}.png`;
-      
-        // write the PDF, convert to PNG using the mac `sips`
-        // command line tool, and trim with graphicsmagick
-        (f =>
-          file.on('finish', () =>
-            exec(`sips -s format png ${f}.pdf --out ${f}.png`, function() {
-              fs.unlink(`${f}.pdf`);
-              return exec(`gm convert ${f}.png -trim ${f}.png`);
-            })
-          )
-        )(f);
-            
-        result.push(doc.end());
-      } else {
-        result.push(undefined);
+      vm.runInNewContext(code, {
+        doc,
+        lorem
       }
+      );
+    
+      delete attrs.title;
+      delete attrs.alt;
+      attrs.href = `${f}.png`;
+    
+      // write the PDF, convert to PNG using the mac `sips`
+      // command line tool, and trim with graphicsmagick
+      
+      file.on('finish', () =>
+        exec(`sips -s format png ${f}.pdf --out ${f}.png`, function() {
+          fs.unlink(`${f}.pdf`);
+          exec(`gm convert ${f}.png -trim ${f}.png`);
+        })
+      )      
     }
-    return result;
-  })();
+  }
 };
 
 const pages = [];
@@ -114,15 +96,15 @@ for (let file of Array.from(files)) {
   let content = fs.readFileSync(file, 'utf8');
   
   // turn github highlighted code blocks into normal markdown code blocks
-  content = content.replace(/^```coffeescript\n((:?.|\n)*?)\n```/mg, (m, $1) => `    ${$1.split('\n').join('\n    ')}`);
+  content = content.replace(/^```javascript\n((:?.|\n)*?)\n```/mg, (m, $1) => `    ${$1.split('\n').join('\n    ')}`);
     
   const tree = markdown.parse(content);
   const headers = extractHeaders(tree);
   generateImages(tree);
   
   file = file
-    .replace(/\.coffee\.md$/, '')
-    .replace(/README\.md/, 'index');
+    .replace(/README\.md/, 'index')
+    .replace(/\.md$/, '');
     
   pages.push({
     file,

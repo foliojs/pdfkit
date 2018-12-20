@@ -9,16 +9,15 @@
 const fs = require('fs');
 const vm = require('vm');
 const md = require('markdown').markdown;
-const coffee = require('coffee-script');
 const CodeMirror = require('codemirror/addon/runmode/runmode.node');
 const PDFDocument = require('../');
 
 process.chdir(__dirname);
 
-// setup code mirror coffeescript mode
-const filename = require.resolve('codemirror/mode/coffeescript/coffeescript');
-const coffeeMode = fs.readFileSync(filename, 'utf8');
-vm.runInNewContext(coffeeMode, {CodeMirror});
+// setup code mirror javascript mode
+const filename = require.resolve('codemirror/mode/javascript/javascript');
+const jsMode = fs.readFileSync(filename, 'utf8');
+vm.runInNewContext(jsMode, {CodeMirror});
 
 // style definitions for markdown
 const styles = {
@@ -142,7 +141,7 @@ class Node {
         // use code mirror to syntax highlight the code block
         var code = this.content[0].text;
         this.content = [];
-        CodeMirror.runMode(code, 'coffeescript', (text, style) => {
+        CodeMirror.runMode(code, 'javascript', (text, style) => {
           const color = colors[style] || colors.default;
           const opts = {
             color,
@@ -158,11 +157,11 @@ class Node {
       
       case 'img':
         // images are used to generate inline example output
-        // compiles the coffeescript to JS so it can be run 
+        // stores the JS so it can be run 
         // in the render method
         this.type = 'example';
         code = codeBlocks[this.attrs.alt];
-        if (code) { this.code = coffee.compile(code); }
+        if (code) { this.code = code; }
         this.height = +this.attrs.title || 0;
         break;
     }
@@ -266,7 +265,7 @@ class Node {
   }
 }
 
-// reads and renders a markdown/literate coffeescript file to the document
+// reads and renders a markdown/literate javascript file to the document
 const render = function(doc, filename) {
   codeBlocks = [];
   const tree = md.parse(fs.readFileSync(filename, 'utf8'));
@@ -317,12 +316,12 @@ const renderTitlePage = function(doc) {
   const doc = new PDFDocument;
   doc.pipe(fs.createWriteStream('guide.pdf'));
   renderTitlePage(doc);
-  render(doc, 'getting_started.coffee.md');
-  render(doc, 'vector.coffee.md');
-  render(doc, 'text.coffee.md');
-  render(doc, 'images.coffee.md');
-  render(doc, 'outline.coffee.md');
-  render(doc, 'annotations.coffee.md');
+  render(doc, 'getting_started.md');
+  render(doc, 'vector.md');
+  render(doc, 'text.md');
+  render(doc, 'images.md');
+  render(doc, 'outline.md');
+  render(doc, 'annotations.md');
   return doc.end();
 })();
 

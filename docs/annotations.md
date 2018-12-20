@@ -37,29 +37,29 @@ covered by another annotation and the user won't be able to click it.
 
 Here is an example that uses a few of the annotation types.
 
-    # Add the link text
+    // Add the link text
     doc.fontSize(25)
        .fillColor('blue')
-       .text('This is a link!', 20, 0)
+       .text('This is a link!', 20, 0);
 
-    # Measure the text
-    width = doc.widthOfString('This is a link!')
-    height = doc.currentLineHeight()
+    // Measure the text
+    const width = doc.widthOfString('This is a link!');
+    const height = doc.currentLineHeight();
 
-    # Add the underline and link annotations
-    doc.underline(20, 0, width, height, color: 'blue')
-       .link(20, 0, width, height, 'http://google.com/')
+    // Add the underline and link annotations
+    doc.underline(20, 0, width, height, {color: 'blue'})
+       .link(20, 0, width, height, 'http://google.com/');
 
-    # Create the highlighted text
+    // Create the highlighted text
     doc.moveDown()
        .fillColor('black')
        .highlight(20, doc.y, doc.widthOfString('This text is highlighted!'), height)
-       .text('This text is highlighted!')
+       .text('This text is highlighted!');
 
-    # Create the crossed out text
+    // Create the crossed out text
     doc.moveDown()
        .strike(20, doc.y, doc.widthOfString('STRIKE!'), height)
-       .text('STRIKE!')
+       .text('STRIKE!');
 
 The output of this example looks like this.
 
@@ -70,11 +70,13 @@ that is the fault of the PDF spec itself. Calculating a rectangle manually isn't
 fun, but PDFKit makes it easier for a few common annotations applied to text, including
 links, underlines, and strikes.  Here's an example showing two of them:
 
-    doc.fontSize 20
-       .fillColor 'red'
-       .text 'Another link!', 20, 0,
+    doc.fontSize(20)
+       .fillColor('red')
+       .text('Another link!', 20, 0, {
          link: 'http://apple.com/',
          underline: true
+       }
+    );
 
 The output is as you'd expect:
 
