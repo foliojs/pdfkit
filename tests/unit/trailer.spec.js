@@ -1,4 +1,10 @@
 const PDFDocument = require('../../lib/document').default;
+const PDFSecurity = require('../../lib/security').default;
+
+// manual mock for PDFSecurity to ensure stored id will be the same accross different systems
+PDFSecurity.generateFileID = () => {
+  return new Buffer('mocked-pdf-id');
+}
 
 describe('Document trailer', () => {
   let document;
@@ -28,7 +34,7 @@ describe('Document trailer', () => {
       ],
       [
         'trailer',
-        `<<\n/Size 11\n/Root 2 0 R\n/Info 7 0 R\n/ID [<8c72cf48ff87daac57e26bf1550e6979> <8c72cf48ff87daac57e26bf1550e6979>]\n>>`
+        `<<\n/Size 11\n/Root 2 0 R\n/Info 7 0 R\n/ID [<6d6f636b65642d7064662d6964> <6d6f636b65642d7064662d6964>]\n>>`
       ]
     ];
     document._write = function(data) {

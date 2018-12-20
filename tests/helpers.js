@@ -1,6 +1,21 @@
 var PDFDocument = require('../lib/document').default;
+var PDFSecurity = require('../lib/security').default;
+var CryptoJS = require('crypto-js');
 var path = require('path');
 var fs = require('fs');
+
+// manual mock for PDFSecurity to ensure stored id will be the same accross different systems
+PDFSecurity.generateFileID = () => {
+  return new Buffer('mocked-pdf-id');
+}
+
+PDFSecurity.generateRandomWordArray = (bytes) => {
+  const words = [];
+  for (let i = 0; i < bytes; i++) {
+    words.push(0x00010203);
+  }
+  return new CryptoJS.lib.WordArray.init(words, bytes);
+}
 
 function updatePdf (pdfData, testState, snapshotChanges) {
   const pdfDir = path.join(path.dirname(testState.testPath), '__pdfs__');
