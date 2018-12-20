@@ -1,4 +1,4 @@
-var PDFDocument = require('../');
+var PDFDocument = require('../lib/document').default;
 var path = require('path');
 var fs = require('fs');
 

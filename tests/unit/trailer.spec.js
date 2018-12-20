@@ -1,4 +1,4 @@
-const PDFDocument = require('../../');
+const PDFDocument = require('../../lib/document').default;
 
 describe('Document trailer', () => {
   let document;

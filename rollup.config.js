@@ -41,7 +41,7 @@ export default [
       }),
       copy({
         files: ['lib/font/data/*.afm'],
-        dest: 'js/font/data'
+        dest: 'js/data'
       }),
       stripFSInterop()
 		]

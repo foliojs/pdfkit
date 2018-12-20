@@ -1,8 +1,8 @@
-var PDFDocument = require("../../");
+const PDFDocument = require("../../lib/document").default;
 
 describe("color", function() {
   test("normalize", function() {
-    var doc = new PDFDocument();
+    const doc = new PDFDocument();
 
     expect(doc._normalizeColor("#FFF")).toEqual([1, 1, 1]);
     expect(doc._normalizeColor("#FFFFFF")).toEqual([1, 1, 1]);

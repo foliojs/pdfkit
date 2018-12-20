@@ -23,6 +23,7 @@
   "bugs": "http://github.com/devongovett/pdfkit/issues",
   "devDependencies": {
     "babel-core": "^6.26.3",
+    "babel-jest": "^23.6.0",
     "babel-plugin-external-helpers": "^6.22.0",
     "babel-preset-env": "^1.7.0",
     "blob-stream": "^0.1.2",
