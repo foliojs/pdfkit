@@ -23,6 +23,7 @@
   "bugs": "http://github.com/devongovett/pdfkit/issues",
   "devDependencies": {
     "babel-core": "^6.26.3",
+    "babel-jest": "^23.6.0",
     "babel-plugin-external-helpers": "^6.22.0",
     "babel-preset-env": "^1.7.0",
     "blob-stream": "^0.1.2",
@@ -54,6 +55,7 @@
     "website": "node docs/generate_website.js",
     "docs": "npm run pdf-guide && npm run website && npm run browser-demo",
     "test": "jest -i",
+    "test:integration": "jest integration/ -i",
     "test:unit": "jest unit/ -i"
   },
   "main": "js/pdfkit.js",

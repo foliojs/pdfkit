@@ -1,5 +1,5 @@
 var {runDocTest} = require('../helpers');
-var {jpeg: bee} = require('../images/bee');
+var {jpeg: bee} = require('../../images/bee');
 
 describe('pdfmake', function () {
   test('images', function () {

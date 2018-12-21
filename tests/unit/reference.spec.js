@@ -1,4 +1,5 @@
-const PDFDocument = require('../../')
+const PDFReference = require("../../lib/reference").default;
+const PDFDocument = require("../../lib/document").default;
 const zlib = require('zlib')
 
 describe('PDFReference', () => {
@@ -8,7 +9,7 @@ describe('PDFReference', () => {
   })
   
   test('instantiated without data', () => {
-    const ref = document.ref()    
+    const ref = new PDFReference(document, 1);
     
     expect(ref.id).toBeDefined()          
     expect(ref.data).toBeDefined()
@@ -17,20 +18,20 @@ describe('PDFReference', () => {
 
   test('instantiated with data', () => {
     const refData = {Pages: 0}
-    const ref = document.ref(refData)            
+    const ref = new PDFReference(document, 1, refData);    
 
-    expect(ref.id).toBeDefined()      
+    expect(ref.id).toBe(1)
     expect(ref.data).toBe(refData)        
   })
 
   test('written data of empty reference', (done) => {
     const dataLog = []
     const expected = [
-      '7 0 obj', 
+      '1 0 obj', 
       '<<\n>>', 
       'endobj'
     ]
-    const ref = document.ref()
+    const ref = new PDFReference(document, 1);
     document._write = function(data) {
       dataLog.push(data)
     }
@@ -45,7 +46,7 @@ describe('PDFReference', () => {
     const dataLog = []
     const chunk = new Buffer('test')
     const expected = [
-      '7 0 obj', 
+      '1 0 obj', 
       `<<
 /Length ${chunk.length}
 >>`,
@@ -54,7 +55,7 @@ describe('PDFReference', () => {
       '\nendstream',
       'endobj'
     ]
-    const ref = document.ref()
+    const ref = new PDFReference(document, 1);
     ref.compress = false
     ref.write(chunk)
     document._write = function(data) {
@@ -72,7 +73,7 @@ describe('PDFReference', () => {
     const chunk = new Buffer('test')
     const compressed = zlib.deflateSync(chunk);
     const expected = [
-      '7 0 obj', 
+      '1 0 obj', 
       `<<
 /Length ${compressed.length}
 /Filter /FlateDecode
@@ -82,7 +83,7 @@ describe('PDFReference', () => {
       '\nendstream',
       'endobj'
     ]
-    const ref = document.ref()    
+    const ref = new PDFReference(document, 1);  
     ref.write(chunk)
     document._write = function(data) {
       dataLog.push(data)

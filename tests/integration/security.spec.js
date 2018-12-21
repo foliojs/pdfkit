@@ -1,5 +1,5 @@
-var {runDocTest} = require('../helpers');
-var PDFDocument = require('../..');
+var {runDocTest} = require('./helpers');
+var PDFDocument = require('../../lib/document').default;
 var CryptoJS = require('crypto-js');
 
 describe('pdfmake', function () {
