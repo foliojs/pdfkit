@@ -91,7 +91,7 @@ describe("PNGImage", () => {
     });
   });  
 
-  test("RGB with Alpha", () => {
+  test("RGB (8bit) with Alpha", () => {
     // ImageWidth = 409
     // ImageHeight = 400
     // BitDepth = 8
@@ -129,6 +129,45 @@ describe("PNGImage", () => {
       Width: 409,
     });
   });
+
+  test("RGB (16bit) with Alpha", () => {
+    // ImageWidth = 175
+    // ImageHeight = 65
+    // BitDepth = 16
+    // ColorType = 6
+    // Compression = 0
+    // Filter = 0
+    // Interlace = 0
+
+    const img = createImage("./tests/images/straight.png");
+
+    expect(img.obj.data).toMatchObject({
+      BitsPerComponent: 8,
+      ColorSpace: "DeviceRGB",
+      Filter: "FlateDecode",
+      Height: 65,
+      Length: 28537,
+      Subtype: "Image",
+      Type: "XObject",
+      Width: 175,
+      SMask: expect.any(PDFReference)
+    });
+
+    expect(img.obj.data.SMask.data).toMatchObject({
+      BitsPerComponent: 8,
+      ColorSpace: "DeviceGray",
+      Decode: [
+        0,
+        1
+      ],
+      Filter: "FlateDecode",
+      Height: 65,
+      Length: 16,
+      Subtype: "Image",
+      Type: "XObject",
+      Width: 175,
+    });
+  });  
 
   test("Pallete", () => {
     // ImageWidth = 980
