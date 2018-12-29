@@ -12,15 +12,18 @@ describe("PNGImage", () => {
     img.loadIndexedAlphaChannel = () => {
       if (img.image.transparency.indexed) {
         img.alphaChannel = {};
+        img.finalize()
       }
     };
     img.splitAlphaChannel = () => {
       if (img.image.hasAlphaChannel) {
         img.alphaChannel = {};
+        img.finalize()
       }
     };
-    img.embed(document);
-    img.finalize();
+    const finalizeFn = img.finalize;
+    jest.spyOn(img, 'finalize').mockImplementation(() => finalizeFn.call(img));
+    img.embed(document);    
     return img;
   };
 
@@ -38,6 +41,8 @@ describe("PNGImage", () => {
     // Interlace = 0
 
     const img = createImage("./demo/images/test2.png");
+    
+    expect(img.finalize).toBeCalledTimes(1);
 
     expect(img.obj.data).toMatchObject({
       BitsPerComponent: 8,
@@ -69,6 +74,8 @@ describe("PNGImage", () => {
     // Interlace = 0
 
     const img = createImage("./tests/images/pngsuite-rgb-transparent-white.png");
+    
+    expect(img.finalize).toBeCalledTimes(1);
 
     expect(img.obj.data).toMatchObject({
       BitsPerComponent: 16,
@@ -101,6 +108,8 @@ describe("PNGImage", () => {
     // Interlace = 0
 
     const img = createImage("./tests/images/bee.png");
+    
+    expect(img.finalize).toBeCalledTimes(1);
 
     expect(img.obj.data).toMatchObject({
       BitsPerComponent: 8,
@@ -141,6 +150,8 @@ describe("PNGImage", () => {
 
     const img = createImage("./tests/images/straight.png");
 
+    expect(img.finalize).toBeCalledTimes(1);
+
     expect(img.obj.data).toMatchObject({
       BitsPerComponent: 8,
       ColorSpace: "DeviceRGB",
@@ -180,6 +191,8 @@ describe("PNGImage", () => {
 
     const img = createImage("./demo/images/test3.png");
 
+    expect(img.finalize).toBeCalledTimes(1);
+
     expect(img.obj.data).toMatchObject({
       BitsPerComponent: 8,
       ColorSpace: ["Indexed", "DeviceRGB", 255, expect.any(PDFReference)],
@@ -210,6 +223,8 @@ describe("PNGImage", () => {
     // Interlace = 0
 
     const img = createImage("./tests/images/pngsuite-palette-transparent-white.png");
+
+    expect(img.finalize).toBeCalledTimes(1);
 
     expect(img.obj.data).toMatchObject({
       BitsPerComponent: 8,
@@ -258,6 +273,8 @@ describe("PNGImage", () => {
 
     const img = createImage("./tests/images/glassware-noisy.png");
 
+    expect(img.finalize).toBeCalledTimes(1);
+
     expect(img.obj.data).toMatchObject({
       BitsPerComponent: 8,
       ColorSpace: "DeviceGray",
@@ -281,6 +298,8 @@ describe("PNGImage", () => {
     // Interlace = 0
 
     const img = createImage("./tests/images/pngsuite-gray-transparent-black.png");
+
+    expect(img.finalize).toBeCalledTimes(1);
 
     expect(img.obj.data).toMatchObject({
       BitsPerComponent: 4,
@@ -314,6 +333,8 @@ describe("PNGImage", () => {
 
     const img = createImage("./tests/images/pngsuite-gray-transparent-white.png");
 
+    expect(img.finalize).toBeCalledTimes(1);
+
     expect(img.obj.data).toMatchObject({
       BitsPerComponent: 16,
       ColorSpace: "DeviceGray",
@@ -345,6 +366,8 @@ describe("PNGImage", () => {
     // Interlace = 0
 
     const img = createImage("./tests/images/fish.png");
+
+    expect(img.finalize).toBeCalledTimes(1);
 
     expect(img.obj.data).toMatchObject({
       BitsPerComponent: 8,
