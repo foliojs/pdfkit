@@ -1,4 +1,4 @@
-var {runDocTest} = require('./helpers');
+var { runDocTest } = require('./helpers');
 
 const characters = `Latin
 ABCDEFGHIJKLMNOPQRSTUVWXYZ
@@ -22,33 +22,33 @@ Cyrillic 1 (Russian)
 
 Cyrillic 2 (Extended)
 ЀЁЂЃЄЅІЇЈЉЊЋЌЍЎЏҐӁƏҒҖҚҢҮҰҲҶҺӘӢӨӮ
-ѐёђѓєѕіїјљњћќѝўџґӂǝғҗқңүұҳҷһәӣөӯ`
+ѐёђѓєѕіїјљњћќѝўџґӂǝғҗқңүұҳҷһәӣөӯ`;
 
-describe('fonts', function () {
-  test('default (Helvetica)', function () {
+describe('fonts', function() {
+  test('default (Helvetica)', function() {
     return runDocTest(function(doc) {
       doc.text(characters, 10, 10);
     });
   });
 
-  test('Helvetica Bold', function () {
+  test('Helvetica Bold', function() {
     return runDocTest(function(doc) {
       doc.font('Helvetica-Bold');
-      doc.text(characters, 10, 10);   
+      doc.text(characters, 10, 10);
     });
   });
 
-  test('Roboto', function () {
+  test('Roboto', function() {
     return runDocTest(function(doc) {
       doc.font('tests/fonts/Roboto-Regular.ttf');
-      doc.text(characters, 10, 10);   
+      doc.text(characters, 10, 10);
     });
   });
 
-  test('Roboto Bold', function () {
+  test('Roboto Bold', function() {
     return runDocTest(function(doc) {
-      doc.font('tests/fonts/Roboto-Medium.ttf'); 
-      doc.text(characters, 10, 10);   
+      doc.font('tests/fonts/Roboto-Medium.ttf');
+      doc.text(characters, 10, 10);
     });
-  });  
+  });
 });
