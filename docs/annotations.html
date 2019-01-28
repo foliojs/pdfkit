@@ -29,29 +29,29 @@ covered by another annotation and the user won&#39;t be able to click it.</p>
 
 <p>Here is an example that uses a few of the annotation types.</p>
 
-<pre><code># Add the link text
+<pre><code>// Add the link text
 doc.fontSize(25)
    .fillColor(&#39;blue&#39;)
-   .text(&#39;This is a link!&#39;, 20, 0)
+   .text(&#39;This is a link!&#39;, 20, 0);
 
-# Measure the text
-width = doc.widthOfString(&#39;This is a link!&#39;)
-height = doc.currentLineHeight()   
+// Measure the text
+const width = doc.widthOfString(&#39;This is a link!&#39;);
+const height = doc.currentLineHeight();
 
-# Add the underline and link annotations
-doc.underline(20, 0, width, height, color: &#39;blue&#39;)
-   .link(20, 0, width, height, &#39;http://google.com/&#39;)
+// Add the underline and link annotations
+doc.underline(20, 0, width, height, {color: &#39;blue&#39;})
+   .link(20, 0, width, height, &#39;http://google.com/&#39;);
 
-# Create the highlighted text   
+// Create the highlighted text
 doc.moveDown()
    .fillColor(&#39;black&#39;)
    .highlight(20, doc.y, doc.widthOfString(&#39;This text is highlighted!&#39;), height)
-   .text(&#39;This text is highlighted!&#39;)
+   .text(&#39;This text is highlighted!&#39;);
 
-# Create the crossed out text   
+// Create the crossed out text
 doc.moveDown()
    .strike(20, doc.y, doc.widthOfString(&#39;STRIKE!&#39;), height)
-   .text(&#39;STRIKE!&#39;)</code></pre>
+   .text(&#39;STRIKE!&#39;);</code></pre>
 
 <p>The output of this example looks like this.</p>
 
@@ -62,11 +62,13 @@ that is the fault of the PDF spec itself. Calculating a rectangle manually isn&#
 fun, but PDFKit makes it easier for a few common annotations applied to text, including
 links, underlines, and strikes.  Here&#39;s an example showing two of them:</p>
 
-<pre><code>doc.fontSize 20
-   .fillColor &#39;red&#39;
-   .text &#39;Another link!&#39;, 20, 0,
+<pre><code>doc.fontSize(20)
+   .fillColor(&#39;red&#39;)
+   .text(&#39;Another link!&#39;, 20, 0, {
      link: &#39;http://apple.com/&#39;,
-     underline: true</code></pre>
+     underline: true
+   }
+);</code></pre>
 
 <p>The output is as you&#39;d expect:</p>
 
@@ -77,7 +79,7 @@ links, underlines, and strikes.  Here&#39;s an example showing two of them:</p>
 <p>That&#39;s all there is to creating PDF documents in PDFKit. It&#39;s really quite
 simple to create beautiful multi-page printable documents using Node.js!</p>
 
-<p>This guide was generated from Markdown/Literate CoffeeScript files using a
+<p>This guide was generated from Markdown files using a
 PDFKit generation script. The examples are actually run to generate the output shown
 inline. The script generates both the website and the PDF guide, and
 can be found <a href="http://github.com/devongovett/pdfkit/tree/master/docs/generate.coffee">on Github</a>.

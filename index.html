@@ -2,14 +2,12 @@
 
 <p>A JavaScript PDF generation library for Node and the browser.</p>
 
-<p><a href="https://gratipay.com/devongovett"><img alt="" src="https://img.shields.io/gratipay/devongovett.svg"/></a></p>
-
 <h2 id="description">Description</h2>
 
-<p>PDFKit is a PDF document generation library for Node and the browser that makes creating complex, multi-page, printable documents easy. 
-It&#39;s written in CoffeeScript, but you can choose to use the API in plain &#39;ol JavaScript if you like. The API embraces 
-chainability, and includes both low level functions as well as abstractions for higher level functionality. The PDFKit API 
-is designed to be simple, so generating complex documents is often as simple as a few function calls.</p>
+<p>PDFKit is a PDF document generation library for Node and the browser that makes creating complex, multi-page, printable 
+documents easy. The API embraces chainability, and includes both low level functions as well as abstractions for higher 
+level functionality. The PDFKit API is designed to be simple, so generating complex documents is often as simple as 
+a few function calls.</p>
 
 <p>Check out some of the <a href="http://pdfkit.org/docs/getting_started.html">documentation and examples</a> to see for yourself!
 You can also read the guide as a <a href="http://pdfkit.org/docs/guide.pdf">self-generated PDF</a> with example output displayed inline.
@@ -26,59 +24,66 @@ folder.</p>
 
 <h2 id="features">Features</h2>
 
-<ul><li>Vector graphics<ul><li>HTML5 canvas-like API</li><li>Path operations</li><li>SVG path parser for easy path creation</li><li>Transformations</li><li>Linear and radial gradients</li></ul></li><li>Text<ul><li>Line wrapping</li><li>Text alignments</li><li>Bulleted lists</li></ul></li><li>Font embedding<ul><li>Supports TrueType (.ttf), TrueType Collections (.ttc), and Datafork TrueType (.dfont) fonts</li><li>Font subsetting</li></ul></li><li>Image embedding<ul><li>Supports JPEG and PNG files (including indexed PNGs, and PNGs with transparency)</li></ul></li><li>Annotations<ul><li>Links</li><li>Notes</li><li>Highlights</li><li>Underlines</li><li>etc.</li></ul></li></ul>
+<ul><li>Vector graphics<ul><li>HTML5 canvas-like API</li><li>Path operations</li><li>SVG path parser for easy path creation</li><li>Transformations</li><li>Linear and radial gradients</li></ul></li><li>Text<ul><li>Line wrapping</li><li>Text alignments</li><li>Bulleted lists</li></ul></li><li>Font embedding<ul><li>Supports TrueType (.ttf), OpenType (.otf), WOFF, WOFF2, TrueType Collections (.ttc), and Datafork TrueType (.dfont) fonts</li><li>Font subsetting</li><li>See <a href="http://github.com/devongovett/fontkit">fontkit</a> for more details on advanced glyph layout support.</li></ul></li><li>Image embedding<ul><li>Supports JPEG and PNG files (including indexed PNGs, and PNGs with transparency)</li></ul></li><li>Annotations<ul><li>Links</li><li>Notes</li><li>Highlights</li><li>Underlines</li><li>etc.</li></ul></li><li>Outlines</li><li>PDF security<ul><li>Encryption</li><li>Access privileges (printing, copying, modifying, annotating, form filling, content accessibility, document assembly)</li></ul></li></ul>
 
 <h2 id="coming_soon!">Coming soon!</h2>
 
-<ul><li>Patterns fills</li><li>Outlines</li><li>PDF Security</li><li>Higher level APIs for creating tables and laying out content</li><li>More performance optimizations</li><li>Even more awesomeness, perhaps written by you! Please fork this repository and send me pull requests.</li></ul>
+<ul><li>Patterns fills</li><li>Higher level APIs for creating tables and laying out content</li><li>More performance optimizations</li><li>Even more awesomeness, perhaps written by you! Please fork this repository and send me pull requests.</li></ul>
 
 <h2 id="example">Example</h2>
 
-<pre><code>PDFDocument = require &#39;pdfkit&#39;
+<pre><code>const PDFDocument = require(&#39;pdfkit&#39;);
 
-# Create a document
-doc = new PDFDocument
+// Create a document
+const doc = new PDFDocument;
 
-# Pipe its output somewhere, like to a file or HTTP response
-# See below for browser usage
-doc.pipe fs.createWriteStream(&#39;output.pdf&#39;)
+// Pipe its output somewhere, like to a file or HTTP response
+// See below for browser usage
+doc.pipe(fs.createWriteStream(&#39;output.pdf&#39;));
 
-# Embed a font, set the font size, and render some text
+// Embed a font, set the font size, and render some text
 doc.font(&#39;fonts/PalatinoBold.ttf&#39;)
    .fontSize(25)
-   .text(&#39;Some text with an embedded font!&#39;, 100, 100)
+   .text(&#39;Some text with an embedded font!&#39;, 100, 100);
 
-# Add another page
+// Add an image, constrain it to a given size, and center it vertically and horizontally
+doc.image(&#39;path/to/image.png&#39;, {
+   fit: [250, 300],
+   align: &#39;center&#39;,
+   valign: &#39;center&#39;
+});
+
+// Add another page
 doc.addPage()
    .fontSize(25)
-   .text(&#39;Here is some vector graphics...&#39;, 100, 100)
+   .text(&#39;Here is some vector graphics...&#39;, 100, 100);
 
-# Draw a triangle
+// Draw a triangle
 doc.save()
    .moveTo(100, 150)
    .lineTo(100, 250)
    .lineTo(200, 250)
-   .fill(&quot;#FF3300&quot;)
+   .fill(&quot;#FF3300&quot;);
 
-# Apply some transforms and render an SVG path with the &#39;even-odd&#39; fill rule
+// Apply some transforms and render an SVG path with the &#39;even-odd&#39; fill rule
 doc.scale(0.6)
    .translate(470, -380)
    .path(&#39;M 250,75 L 323,301 131,161 369,161 177,301 z&#39;)
    .fill(&#39;red&#39;, &#39;even-odd&#39;)
-   .restore()
+   .restore();
 
-# Add some text with annotations
+// Add some text with annotations
 doc.addPage()
    .fillColor(&quot;blue&quot;)
    .text(&#39;Here is a link!&#39;, 100, 100)
-   .underline(100, 100, 160, 27, color: &quot;#0000FF&quot;)
-   .link(100, 100, 160, 27, &#39;http://google.com/&#39;)
+   .underline(100, 100, 160, 27, {color: &quot;#0000FF&quot;})
+   .link(100, 100, 160, 27, &#39;http://google.com/&#39;);
 
-# Finalize PDF file
-doc.end()</code></pre>
+// Finalize PDF file
+doc.end();</code></pre>
 
-<p><a href="http://pdfkit.org/demo/out.pdf">The PDF output from this example</a> (with a few additions) shows the power of PDFKit — producing 
-complex documents with a very small amount of code.  For more, see the <code>demo</code> folder and the 
+<p><a href="http://pdfkit.org/demo/out.pdf">The PDF output from this example</a> (with a few additions) shows the power of PDFKit — producing
+complex documents with a very small amount of code.  For more, see the <code>demo</code> folder and the
 <a href="http://pdfkit.org/docs/getting_started.html">PDFKit programming guide</a>.</p>
 
 <h2 id="browser_usage">Browser Usage</h2>
@@ -87,42 +92,43 @@ complex documents with a very small amount of code.  For more, see the <code>dem
 which is a Node module packager for the browser with the familiar <code>require</code> syntax.  The second is to use
 a prebuilt version of PDFKit, which you can <a href="https://github.com/devongovett/pdfkit/releases">download from Github</a>.</p>
 
-<p>In addition to PDFKit, you&#39;ll need somewhere to stream the output to.  HTML5 has a 
+<p>In addition to PDFKit, you&#39;ll need somewhere to stream the output to.  HTML5 has a
 <a href="https://developer.mozilla.org/en-US/docs/Web/API/Blob">Blob</a> object which can be used to store binary data, and
-get URLs to this data in order to display PDF output inside an iframe, or upload to a server, etc.  In order to 
+get URLs to this data in order to display PDF output inside an iframe, or upload to a server, etc.  In order to
 get a Blob from the output of PDFKit, you can use the <a href="https://github.com/devongovett/blob-stream">blob-stream</a>
 module.</p>
 
-<p>The following example uses Browserify to load <code>PDFKit</code> and <code>blob-stream</code>, but if you&#39;re not using Browserify, 
+<p>The following example uses Browserify to load <code>PDFKit</code> and <code>blob-stream</code>, but if you&#39;re not using Browserify,
 you can load them in whatever way you&#39;d like (e.g. script tags).</p>
 
-<pre><code># require dependencies
-PDFDocument = require &#39;pdfkit&#39;
-blobStream  = require &#39;blob-stream&#39;
+<pre><code>// require dependencies
+const PDFDocument = require(&#39;pdfkit&#39;);
+const blobStream  = require(&#39;blob-stream&#39;);
 
-# create a document the same way as above
-doc = new PDFDocument
+// create a document the same way as above
+const doc = new PDFDocument;
 
-# pipe the document to a blob
-stream = doc.pipe(blobStream())
+// pipe the document to a blob
+const stream = doc.pipe(blobStream());
 
-# add your content to the document here, as usual
+// add your content to the document here, as usual
 
-# get a blob when you&#39;re done
-doc.end()
-stream.on &#39;finish&#39;, -&gt;
-  # get a blob you can do whatever you like with
-  blob = stream.toBlob(&#39;application/pdf&#39;)
+// get a blob when you&#39;re done
+doc.end();
+stream.on(&#39;finish&#39;, function() {
+  // get a blob you can do whatever you like with
+  const blob = stream.toBlob(&#39;application/pdf&#39;);
 
-  # or get a blob URL for display in the browser
-  url = stream.toBlobURL(&#39;application/pdf&#39;)
-  iframe.src = url</code></pre>
+  // or get a blob URL for display in the browser
+  const url = stream.toBlobURL(&#39;application/pdf&#39;);
+  iframe.src = url;
+});</code></pre>
 
 <p>You can see an interactive in-browser demo of PDFKit <a href="http://pdfkit.org/demo/browser.html">here</a>.</p>
 
-<p>Note that in order to Browserify a project using PDFKit, you need to install the <code>brfs</code> module with npm, 
-which is used to load built-in font data into the package. It is listed as a <code>devDependency</code> in 
-PDFKit&#39;s <code>package.json</code>, so it isn&#39;t installed by default for Node users. 
+<p>Note that in order to Browserify a project using PDFKit, you need to install the <code>brfs</code> module with npm,
+which is used to load built-in font data into the package. It is listed as a <code>devDependency</code> in
+PDFKit&#39;s <code>package.json</code>, so it isn&#39;t installed by default for Node users.
 If you forget to install it, Browserify will print an error message.</p>
 
 <h2 id="documentation">Documentation</h2>
