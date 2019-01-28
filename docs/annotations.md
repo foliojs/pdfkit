@@ -87,7 +87,7 @@ The output is as you'd expect:
 That's all there is to creating PDF documents in PDFKit. It's really quite
 simple to create beautiful multi-page printable documents using Node.js!
 
-This guide was generated from Markdown/Literate CoffeeScript files using a
+This guide was generated from Markdown files using a
 PDFKit generation script. The examples are actually run to generate the output shown
 inline. The script generates both the website and the PDF guide, and
 can be found [on Github](http://github.com/devongovett/pdfkit/tree/master/docs/generate.coffee).

@@ -16,6 +16,7 @@ be scaled according to the following options.
 * `cover` array provided - image is scaled proportionally to completely cover the rectangle defined by the passed width and height
 
 When a `fit` or `cover` array is provided, PDFKit accepts these additional options:
+
 * `align` - horizontally align the image, the possible values are `'left'`, `'center'` and `'right'` 
 * `valign` - vertically align the image, the possible values are `'top'`, `'center'` and `'bottom'`
 
@@ -41,15 +42,14 @@ Here is an example showing some of these options.
 
     // Fit the image in the dimensions, and center it both horizontally and vertically
     doc.image('images/test.jpeg', 430, 15, {fit: [100, 100], align: 'center', valign: 'center'})
-       .rect(430, 15, 100, 100)
-       .stroke()
+       .rect(430, 15, 100, 100).stroke()
        .text('Centered', 430, 0);
        
 * * *
 
 This example produces the following output:
 
-![0](images/images.png "150")
+![0](images/images.png "400")
 
 That is all there is to adding images to your PDF documents with PDFKit. Now
-let's look at adding annotations.
+let's look at adding outlines.

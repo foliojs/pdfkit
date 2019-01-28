@@ -10,7 +10,7 @@ following command after installing npm.
 ### Creating a document
 
 Creating a PDFKit document is quite simple. Just require the `pdfkit` module
-in your CoffeeScript or JavaScript source file and create an instance of the
+in your JavaScript source file and create an instance of the
 `PDFDocument` class.
 
     const PDFDocument = require('pdfkit');

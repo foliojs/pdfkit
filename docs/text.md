@@ -137,6 +137,7 @@ Text styling section, and take into account the eventual line wrapping.
 The `list` method creates a bulleted list. It accepts as arguments an array of strings, 
 and the optional `x`, `y` position. You can create complex multilevel lists by using nested arrays. 
 Lists use the following additional options: 
+
 * `bulletRadius`
 * `textIndent`
 * `bulletIndent`
@@ -168,6 +169,7 @@ Here is the output:
 The PDF format defines 14 standard fonts that can be used in PDF documents. PDFKit supports each of them out of the box. 
 Besides Symbol and Zapf Dingbats this includes 4 styles (regular, bold, italic/oblique, bold+italic) of Helvetica, 
 Courier, and Times. To switch between standard fonts, call the `font` method with the corresponding Label:
+
 * `'Courier'`
 * `'Courier-Bold'`
 * `'Courier-Oblique'`

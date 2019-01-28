@@ -4,10 +4,10 @@ A JavaScript PDF generation library for Node and the browser.
 
 ## Description
 
-PDFKit is a PDF document generation library for Node and the browser that makes creating complex, multi-page, printable documents easy.
-It's written in CoffeeScript, but you can choose to use the API in plain 'ol JavaScript if you like. The API embraces
-chainability, and includes both low level functions as well as abstractions for higher level functionality. The PDFKit API
-is designed to be simple, so generating complex documents is often as simple as a few function calls.
+PDFKit is a PDF document generation library for Node and the browser that makes creating complex, multi-page, printable 
+documents easy. The API embraces chainability, and includes both low level functions as well as abstractions for higher 
+level functionality. The PDFKit API is designed to be simple, so generating complex documents is often as simple as 
+a few function calls.
 
 Check out some of the [documentation and examples](http://pdfkit.org/docs/getting_started.html) to see for yourself!
 You can also read the guide as a [self-generated PDF](http://pdfkit.org/docs/guide.pdf) with example output displayed inline.

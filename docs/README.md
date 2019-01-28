@@ -3,7 +3,7 @@
 The PDFKit guide can be read a number of ways.  The first is online at [pdfkit.org](http://pdfkit.org/).
 You can also read the guide in PDF form, in this directory or [online](http://pdfkit.org/docs/guide.pdf).
 
-Both the website and the PDF guide are generated from the Literate CoffeeScript (runnable Markdown) files
+Both the website and the PDF guide are generated from the Markdown files
 in this directory. The examples are actually run when generating the PDF in order to show the results inline.
 The `generate.js` file in this directory is actually quite short.  It parses the markdown files into a 
 tree structure using [markdown-js](https://github.com/evilstreak/markdown-js), syntax highlights the code
