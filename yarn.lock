@@ -118,9 +118,9 @@ amdefine@>=0.0.4:
   integrity sha1-SlKCrBZHKek2Gbz9OtFR+BfOkfU=
 
 ansi-escapes@^3.0.0:
-  version "3.1.0"
-  resolved "https://registry.yarnpkg.com/ansi-escapes/-/ansi-escapes-3.1.0.tgz#f73207bb81207d75fd6c83f125af26eea378ca30"
-  integrity sha512-UgAb8H9D41AQnu/PbWlCofQVcnV4Gs2bBJi9eZPxfU/hgglFh3SMDMENRIqdr7H6XFnXdoknctFByVsCOotTVw==
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/ansi-escapes/-/ansi-escapes-3.2.0.tgz#8780b98ff9dbf5638152d1f1fe5c1d7b4442976b"
+  integrity sha512-cBhpre4ma+U0T1oM5fXg7Dy1Jw7zzwv7lt/GoCpr+hDQJoYnKVPLL4dCvSEFMmQurOQvSrwT7SL/DAlhBI97RQ==
 
 ansi-regex@^2.0.0:
   version "2.1.1"
@@ -2395,9 +2395,9 @@ flat-cache@^1.2.1:
     write "^0.2.1"
 
 fontkit@^1.0.0:
-  version "1.7.7"
-  resolved "https://registry.yarnpkg.com/fontkit/-/fontkit-1.7.7.tgz#ebaf2d8f3fedf302ae3c64b4beeaddc247fcdbb1"
-  integrity sha1-668tjz/t8wKuPGS0vurdwkf827E=
+  version "1.7.8"
+  resolved "https://registry.yarnpkg.com/fontkit/-/fontkit-1.7.8.tgz#235ba495e70cd5cab9a3462ee5d32d9fa5f08b69"
+  integrity sha512-4bo/Sp+Ob/cE5f2aCre/N42mHe6hcIWUYmTRgEqLmJyPRX0m0KBl1jflMM70Vh7qZRoh97BcS3JQGrRvK1Ga7Q==
   dependencies:
     babel-runtime "^6.11.6"
     brfs "^1.4.0"
