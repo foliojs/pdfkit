@@ -170,6 +170,13 @@ numbers to a document.
     // doc.end() will call it for you automatically.
     doc.end();
 
+## Setting default font
+
+The default font is 'Helvetica'. It can be configured by passing `font` option
+
+    // use Courier font by default
+    const doc = new PDFDocument({font: 'Courier'});
+
 ## Setting document metadata
 
 PDF documents can have various metadata associated with them, such as the
