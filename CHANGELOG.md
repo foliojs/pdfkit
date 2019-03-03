@@ -6,6 +6,7 @@
 - Fix corruption of string objects in browser
 - Add option to set default font
 - Remove call to fontkit.openSync
+- Add standalone virtual file system implementation
 
 ### [v0.9.0] - 2019-1-28
 
