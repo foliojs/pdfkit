@@ -2,41 +2,59 @@ import pkg from './package.json';
 import babel from 'rollup-plugin-babel';
 import copy from 'rollup-plugin-cpy';
 
-const external = ['stream', 'fs', 'zlib', 'fontkit', 'events', 'linebreak', 'png-js'];
+const external = [
+  'stream',
+  'fs',
+  'zlib',
+  'fontkit',
+  'events',
+  'linebreak',
+  'png-js',
+  'crypto-js',
+  'saslprep'
+];
 
 // supports using brfs transform
-const stripFSInterop = function () {
+const stripFSInterop = function() {
   return {
-    renderChunk (code) {
-      code = code.replace('var fs = _interopDefault(require(\'fs\'));', 'var fs = require(\'fs\');');
+    renderChunk(code) {
+      code = code.replace(
+        "var fs = _interopDefault(require('fs'));",
+        "var fs = require('fs');"
+      );
       return {
         code,
         map: null
-      }
+      };
     }
-  }
-}
+  };
+};
 
 export default [
-	// CommonJS build for Node
-	{
+  // CommonJS build for Node
+  {
     input: 'lib/document.js',
     external,
-		output: {
-			name: 'pdfkit',
-			file: pkg.main,
+    output: {
+      name: 'pdfkit',
+      file: pkg.main,
       format: 'cjs',
       sourcemap: true
-		},
-		plugins: [
-			babel({
+    },
+    plugins: [
+      babel({
         babelrc: false,
-        presets: [['env', { 
-          modules: false,
-          targets: {
-            node: '6.10'
-          }
-        }]],
+        presets: [
+          [
+            'env',
+            {
+              modules: false,
+              targets: {
+                node: '6.10'
+              }
+            }
+          ]
+        ],
         plugins: ['external-helpers']
       }),
       copy({
@@ -44,61 +62,97 @@ export default [
         dest: 'js/data'
       }),
       stripFSInterop()
-		]
-	},
-	// ES for legacy (IE11) browsers
-	{
+    ]
+  },
+  // ES for legacy (IE11) browsers
+  {
     input: 'lib/document.js',
     external,
-		output: {
-			name: 'pdfkit.es5',
-			file: pkg.module,
+    output: {
+      name: 'pdfkit.es5',
+      file: pkg.module,
       format: 'es',
       sourcemap: true
-		},
-		plugins: [
-			babel({
+    },
+    plugins: [
+      babel({
         babelrc: false,
-        presets: [['env', { 
-          modules: false,
-          targets: {
-            browsers: [
-              'ie 11'
-            ]
-          }
-        }]],
+        presets: [
+          [
+            'env',
+            {
+              modules: false,
+              targets: {
+                browsers: ['ie 11']
+              }
+            }
+          ]
+        ],
         plugins: ['external-helpers'],
         exclude: ['babel-plugin-transform-es2015-typeof-symbol']
       })
-		]
-	},
-	// ES for green browsers
-	{
+    ]
+  },
+  // ES for green browsers
+  {
     input: 'lib/document.js',
     external,
-		output: {
-			name: 'pdfkit.esnext',
-			file: pkg.esnext,
+    output: {
+      name: 'pdfkit.esnext',
+      file: pkg.esnext,
       format: 'es',
       sourcemap: true
-		},
-		plugins: [
-			babel({
+    },
+    plugins: [
+      babel({
         babelrc: false,
-        presets: [['env', { 
-          modules: false,
-          targets: {
-            browsers: [
-              'Firefox 57',
-              'Edge 15',
-              'Chrome 60',
-              'iOS 10',
-              'Safari 10'
-            ]
-          }
-        }]],
+        presets: [
+          [
+            'env',
+            {
+              modules: false,
+              targets: {
+                browsers: [
+                  'Firefox 57',
+                  'Edge 15',
+                  'Chrome 60',
+                  'iOS 10',
+                  'Safari 10'
+                ]
+              }
+            }
+          ]
+        ],
         plugins: ['external-helpers']
       })
-		]
-	}
+    ]
+  },
+  {
+    input: 'lib/virtual-fs.js',
+    external,
+    output: {
+      name: 'virtual-fs',
+      file: 'js/virtual-fs.js',
+      format: 'cjs',
+      sourcemap: false
+    },
+    plugins: [
+      babel({
+        babelrc: false,
+        presets: [
+          [
+            'env',
+            {
+              loose: true,
+              modules: false,
+              targets: {
+                browsers: ['ie 11']
+              }
+            }
+          ]
+        ],
+        plugins: ['external-helpers']
+      })
+    ]
+  }
 ];
