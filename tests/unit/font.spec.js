@@ -2,7 +2,7 @@ const PDFFontFactory = require('../../lib/font_factory').default;
 const PDFDocument = require('../../lib/document').default;
 
 describe('EmbeddedFont', () => {
-  test('no fontCache option', () => {
+  test('no fontLayoutCache option', () => {
     const document = new PDFDocument();
     const font = PDFFontFactory.open(
       document,
@@ -18,8 +18,8 @@ describe('EmbeddedFont', () => {
     expect(runSpy).toBeCalledTimes(1);
   });
 
-  test('fontCache = false', () => {
-    const document = new PDFDocument({ fontCache: false });
+  test('fontLayoutCache = false', () => {
+    const document = new PDFDocument({ fontLayoutCache: false });
     const font = PDFFontFactory.open(
       document,
       'tests/fonts/Roboto-Regular.ttf'
