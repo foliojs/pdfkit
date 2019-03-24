@@ -55,7 +55,6 @@ describe('Document trailer', () => {
     };
     document.end();
     setTimeout(() => {
-      console.log(dataLog);
       for (let i = 0; i < expected.length; ++i) {
         let idx = dataLog.indexOf(expected[i][0]);
         for (let j = 1; j < expected[i].length; ++j) {
@@ -67,18 +66,31 @@ describe('Document trailer', () => {
   });
 
   test('written data of destinations', done => {
-    document.addNamedDestination('LINK');
+    document.addNamedDestination('LINK1');
+    document.addNamedDestination('LINK2', 'FitH', 100);
+    document.addNamedDestination('LINK3', 'XYZ', 36, 36, 50);
 
     const dataLog = [];
     const expected = [
-      ['2 0 obj', '<<\n/Dests <<\n  /Names [\n    (LINK) [7 0 R /XYZ null null null]\n]\n>>\n>>'],
+      [
+        '2 0 obj',
+        `<<
+/Dests <<
+  /Limits [(LINK1) (LINK3)]
+  /Names [
+    (LINK1) [7 0 R /XYZ null null null]
+    (LINK2) [7 0 R /FitH 100]
+    (LINK3) [7 0 R /XYZ 36 756 50]
+]
+>>
+>>`
+      ]
     ];
     document._write = function(data) {
       dataLog.push(data);
     };
     document.end();
     setTimeout(() => {
-      console.log(dataLog);
       for (let i = 0; i < expected.length; ++i) {
         let idx = dataLog.indexOf(expected[i][0]);
         for (let j = 1; j < expected[i].length; ++j) {
