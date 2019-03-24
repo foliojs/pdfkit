@@ -14,6 +14,9 @@ be scaled according to the following options.
 * `scale` factor provided - image is scaled proportionally by the provided scale factor
 * `fit` array provided - image is scaled proportionally to fit within the passed width and height
 * `cover` array provided - image is scaled proportionally to completely cover the rectangle defined by the passed width and height
+* `link` - a URL to link this image to (shortcut to create an annotation)
+* `goTo` - go to anchor (shortcut to create an annotation)
+* `destination` - create anchor to this image
 
 When a `fit` or `cover` array is provided, PDFKit accepts these additional options:
 

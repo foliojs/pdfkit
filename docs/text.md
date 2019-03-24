@@ -97,6 +97,8 @@ below.
 * `fill` - whether to fill the text (`true` by default)
 * `stroke` - whether to stroke the text
 * `link` - a URL to link this text to (shortcut to create an annotation)
+* `goTo` - go to anchor (shortcut to create an annotation)
+* `destination` - create anchor to this text
 * `underline` - whether to underline the text
 * `strike` - whether to strike out the text
 * `oblique` - whether to slant the text (angle in degrees or `true`)
