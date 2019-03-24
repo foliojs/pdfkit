@@ -44,4 +44,48 @@ describe('Document trailer', () => {
       done();
     }, 1);
   });
+
+  test('written empty data of destinations', done => {
+    const dataLog = [];
+    const expected = [
+      ['2 0 obj', '<<\n/Dests <<\n  /Names [\n]\n>>\n>>'],
+    ];
+    document._write = function(data) {
+      dataLog.push(data);
+    };
+    document.end();
+    setTimeout(() => {
+      console.log(dataLog);
+      for (let i = 0; i < expected.length; ++i) {
+        let idx = dataLog.indexOf(expected[i][0]);
+        for (let j = 1; j < expected[i].length; ++j) {
+          expect(dataLog[idx + j]).toEqual(expected[i][j]);
+        }
+      }
+      done();
+    }, 1);
+  });
+
+  test('written data of destinations', done => {
+    document.addNamedDestination('LINK');
+
+    const dataLog = [];
+    const expected = [
+      ['2 0 obj', '<<\n/Dests <<\n  /Names [\n    (LINK) [7 0 R /XYZ null null null]\n]\n>>\n>>'],
+    ];
+    document._write = function(data) {
+      dataLog.push(data);
+    };
+    document.end();
+    setTimeout(() => {
+      console.log(dataLog);
+      for (let i = 0; i < expected.length; ++i) {
+        let idx = dataLog.indexOf(expected[i][0]);
+        for (let j = 1; j < expected[i].length; ++j) {
+          expect(dataLog[idx + j]).toEqual(expected[i][j]);
+        }
+      }
+      done();
+    }, 1);
+  });
 });
