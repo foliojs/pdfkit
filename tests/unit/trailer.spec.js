@@ -19,15 +19,15 @@ describe('Document trailer', () => {
     const dataLog = [];
     const expected = [
       [
-        '7 0 obj',
-        '<<\n/Producer 8 0 R\n/Creator 9 0 R\n/CreationDate 10 0 R\n>>'
+        '8 0 obj',
+        '<<\n/Producer 9 0 R\n/Creator 10 0 R\n/CreationDate 11 0 R\n>>'
       ],
-      ['8 0 obj', '(PDFKit)'],
       ['9 0 obj', '(PDFKit)'],
-      ['10 0 obj', '(D:20180201000000Z)'],
+      ['10 0 obj', '(PDFKit)'],
+      ['11 0 obj', '(D:20180201000000Z)'],
       [
         'trailer',
-        `<<\n/Size 11\n/Root 2 0 R\n/Info 7 0 R\n/ID [<6d6f636b65642d7064662d6964> <6d6f636b65642d7064662d6964>]\n>>`
+        `<<\n/Size 12\n/Root 3 0 R\n/Info 8 0 R\n/ID [<6d6f636b65642d7064662d6964> <6d6f636b65642d7064662d6964>]\n>>`
       ]
     ];
     document._write = function(data) {
