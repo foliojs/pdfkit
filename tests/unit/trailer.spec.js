@@ -69,6 +69,7 @@ describe('Document trailer', () => {
     document.addNamedDestination('LINK1');
     document.addNamedDestination('LINK2', 'FitH', 100);
     document.addNamedDestination('LINK3', 'XYZ', 36, 36, 50);
+    document.goTo(10, 10, 100, 20, 'LINK1');
 
     const dataLog = [];
     const expected = [
@@ -83,6 +84,17 @@ describe('Document trailer', () => {
     (LINK3) [7 0 R /XYZ 36 756 50]
 ]
 >>
+>>`
+      ],
+      [
+        '7 0 obj',
+        `<<
+/Type /Page
+/Parent 1 0 R
+/MediaBox [0 0 612 792]
+/Contents 5 0 R
+/Resources 6 0 R
+/Annots [9 0 R]
 >>`
       ]
     ];
