@@ -28,8 +28,8 @@ automatically inserts new pages as necessary so you don't have to worry about
 doing that for long pieces of text. PDFKit can also automatically wrap text
 into multiple columns.
 
-The text will automatically wrap unless you set the `lineBreak` option to `false`. 
-By default it will wrap to the page margin, but the `width` option allows 
+The text will automatically wrap unless you set the `lineBreak` option to `false`.
+By default it will wrap to the page margin, but the `width` option allows
 you to set a different width the text should be wrapped to.
 If you set the `height` option, the text will be clipped to the number of
 lines that can fit in that height.
@@ -38,37 +38,37 @@ When line wrapping is enabled, you can choose a text justification. There are
 four options: `left` (the default), `center`, `right`, and `justify`. They
 work just as they do in your favorite word processor, but here is an example
 showing their use in a text box.
-    
+
     const lorem = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam in suscipit purus.  Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Vivamus nec hendrerit felis. Morbi aliquam facilisis risus eu lacinia. Sed eu leo in turpis fringilla hendrerit. Ut nec accumsan nisl.';
-    
+
     doc.fontSize(8);
     doc.text(`This text is left aligned. ${lorem}`, {
       width: 410,
       align: 'left'
     }
     );
-    
+
     doc.moveDown();
     doc.text(`This text is centered. ${lorem}`, {
       width: 410,
       align: 'center'
     }
     );
-    
+
     doc.moveDown();
-    doc.text(`This text is right aligned. ${lorem}`, { 
+    doc.text(`This text is right aligned. ${lorem}`, {
       width: 410,
       align: 'right'
     }
     );
-    
+
     doc.moveDown();
-    doc.text(`This text is justified. ${lorem}`, { 
+    doc.text(`This text is justified. ${lorem}`, {
       width: 410,
       align: 'justify'
     }
     );
-      
+
     // draw bounding rectangle
     doc.rect(doc.x, 0, 410, doc.y).stroke();
 
@@ -97,6 +97,8 @@ below.
 * `fill` - whether to fill the text (`true` by default)
 * `stroke` - whether to stroke the text
 * `link` - a URL to link this text to (shortcut to create an annotation)
+* `goTo` - go to anchor (shortcut to create an annotation)
+* `destination` - create anchor to this text
 * `underline` - whether to underline the text
 * `strike` - whether to strike out the text
 * `oblique` - whether to slant the text (angle in degrees or `true`)
@@ -110,9 +112,9 @@ Additionally, the fill and stroke color and opacity methods described in the
 * * *
 
 Here is an example combining some of the options above, wrapping a piece of text into three columns, in a specified width and height.
-   
-    const lorem = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam in suscipit purus. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Vivamus nec hendrerit felis. Morbi aliquam facilisis risus eu lacinia. Sed eu leo in turpis fringilla hendrerit. Ut nec accumsan nisl. Suspendisse rhoncus nisl posuere tortor tempus et dapibus elit porta. Cras leo neque, elementum a rhoncus ut, vestibulum non nibh. Phasellus pretium justo turpis. Etiam vulputate, odio vitae tincidunt ultricies, eros odio dapibus nisi, ut tincidunt lacus arcu eu elit. Aenean velit erat, vehicula eget lacinia ut, dignissim non tellus. Aliquam nec lacus mi, sed vestibulum nunc. Suspendisse potenti. Curabitur vitae sem turpis. Vestibulum sed neque eget dolor dapibus porttitor at sit amet sem. Fusce a turpis lorem. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae;';   
-    
+
+    const lorem = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam in suscipit purus. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Vivamus nec hendrerit felis. Morbi aliquam facilisis risus eu lacinia. Sed eu leo in turpis fringilla hendrerit. Ut nec accumsan nisl. Suspendisse rhoncus nisl posuere tortor tempus et dapibus elit porta. Cras leo neque, elementum a rhoncus ut, vestibulum non nibh. Phasellus pretium justo turpis. Etiam vulputate, odio vitae tincidunt ultricies, eros odio dapibus nisi, ut tincidunt lacus arcu eu elit. Aenean velit erat, vehicula eget lacinia ut, dignissim non tellus. Aliquam nec lacus mi, sed vestibulum nunc. Suspendisse potenti. Curabitur vitae sem turpis. Vestibulum sed neque eget dolor dapibus porttitor at sit amet sem. Fusce a turpis lorem. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae;';
+
     doc.text(lorem, {
       columns: 3,
       columnGap: 15,
@@ -127,16 +129,16 @@ The output looks like this:
 
 ## Text measurements
 
-If you're working with documents that require precise layout, you may need to know the 
-size of a piece of text. PDFKit has two methods to achieve this: `widthOfString(text, options)` 
-and `heightOfString(text, options)`. Both methods use the same options described in the 
+If you're working with documents that require precise layout, you may need to know the
+size of a piece of text. PDFKit has two methods to achieve this: `widthOfString(text, options)`
+and `heightOfString(text, options)`. Both methods use the same options described in the
 Text styling section, and take into account the eventual line wrapping.
 
 ## Lists
 
-The `list` method creates a bulleted list. It accepts as arguments an array of strings, 
-and the optional `x`, `y` position. You can create complex multilevel lists by using nested arrays. 
-Lists use the following additional options: 
+The `list` method creates a bulleted list. It accepts as arguments an array of strings,
+and the optional `x`, `y` position. You can create complex multilevel lists by using nested arrays.
+Lists use the following additional options:
 
 * `bulletRadius`
 * `textIndent`
@@ -149,7 +151,7 @@ When set to true, PDFKit will retain the text wrapping state between `text` call
 when you call text again after changing the text styles, the wrapping will continue right
 where it left off.
 
-The options given to the first `text` call are also retained for subsequent calls after a 
+The options given to the first `text` call are also retained for subsequent calls after a
 `continued` one, but of course you can override them.  In the following example, the `width`
 option from the first `text` call is retained by the second call.
 
@@ -159,15 +161,15 @@ option from the first `text` call is retained by the second call.
          continued: true
        }).fillColor('red')
        .text(lorem.slice(500));
-       
+
 Here is the output:
-       
+
 ![4]()
 
 ## Fonts
 
-The PDF format defines 14 standard fonts that can be used in PDF documents. PDFKit supports each of them out of the box. 
-Besides Symbol and Zapf Dingbats this includes 4 styles (regular, bold, italic/oblique, bold+italic) of Helvetica, 
+The PDF format defines 14 standard fonts that can be used in PDF documents. PDFKit supports each of them out of the box.
+Besides Symbol and Zapf Dingbats this includes 4 styles (regular, bold, italic/oblique, bold+italic) of Helvetica,
 Courier, and Times. To switch between standard fonts, call the `font` method with the corresponding Label:
 
 * `'Courier'`
@@ -200,18 +202,18 @@ Here is an example showing how to set the font in each case.
 
     // Set the font size
     doc.fontSize(18);
-     
+
     // Using a standard PDF font
     doc.font('Times-Roman')
        .text('Hello from Times Roman!')
        .moveDown(0.5);
-     
-    // Using a TrueType font (.ttf)   
+
+    // Using a TrueType font (.ttf)
     doc.font('fonts/GoodDog.ttf')
        .text('This is Good Dog!')
        .moveDown(0.5);
-     
-    // Using a collection font (.ttc or .dfont)   
+
+    // Using a collection font (.ttc or .dfont)
     doc.font('fonts/Chalkboard.ttc', 'Chalkboard-Bold')
        .text('This is Chalkboard, not Comic Sans.');
 
@@ -225,7 +227,7 @@ every time you want to use it.
 
     // Register a font
     doc.registerFont('Heading Font', 'fonts/Chalkboard.ttc', 'Chalkboard-Bold');
-     
+
     // Use the font later
     doc.font('Heading Font')
        .text('This is a heading.');
