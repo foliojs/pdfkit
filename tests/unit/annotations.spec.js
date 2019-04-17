@@ -28,10 +28,10 @@ describe('Annotations', () => {
 
       const expected = [
         [
-          `10 0 obj`,
+          `11 0 obj`,
           `<<
 /S /GoTo
-/D [6 0 R /XYZ null null null]
+/D [7 0 R /XYZ null null null]
 >>`
         ]
       ];
