@@ -64,7 +64,7 @@ Installation uses the [npm](http://npmjs.org/) package manager.  Just type the f
 const PDFDocument = require('pdfkit');
 
 // Create a document
-const doc = new PDFDocument;
+const doc = new PDFDocument();
 
 // Pipe its output somewhere, like to a file or HTTP response
 // See below for browser usage
@@ -137,7 +137,7 @@ const PDFDocument = require('pdfkit');
 const blobStream  = require('blob-stream');
 
 // create a document the same way as above
-const doc = new PDFDocument;
+const doc = new PDFDocument();
 
 // pipe the document to a blob
 const stream = doc.pipe(blobStream());
