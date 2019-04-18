@@ -8,6 +8,7 @@ and some other properties. Here is a list of the available annotation methods:
 
 * `note(x, y, width, height, contents, options)`
 * `link(x, y, width, height, url, options)`
+* `goTo(x, y, w, h, name, options)`
 * `highlight(x, y, width, height, options)`
 * `underline(x, y, width, height, options)`
 * `strike(x, y, width, height, options)`
@@ -60,6 +61,9 @@ Here is an example that uses a few of the annotation types.
     doc.moveDown()
        .strike(20, doc.y, doc.widthOfString('STRIKE!'), height)
        .text('STRIKE!');
+
+    // Adding go to as annotation
+    doc.goTo(x, y, w, h, 'LINK', options);
 
 The output of this example looks like this.
 
