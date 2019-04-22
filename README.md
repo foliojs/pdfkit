@@ -62,6 +62,7 @@ Installation uses the [npm](http://npmjs.org/) package manager.  Just type the f
 
 ```javascript
 const PDFDocument = require('pdfkit');
+const fs = require('fs');
 
 // Create a document
 const doc = new PDFDocument();
