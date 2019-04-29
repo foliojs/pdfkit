@@ -11,6 +11,7 @@
 - Remove call to fontkit.openSync
 - Add standalone virtual file system implementation
 - Add option (fontLayoutCache) to disable font layout cache
+- Add support for named destinations
 
 ### [v0.9.0] - 2019-1-28
 
