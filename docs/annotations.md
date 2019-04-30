@@ -63,7 +63,7 @@ Here is an example that uses a few of the annotation types.
        .text('STRIKE!');
 
     // Adding go to as annotation
-    doc.goTo(x, y, w, h, 'LINK', options);
+    doc.goTo(20, doc.y, 10, 20, 'LINK', {});
 
 The output of this example looks like this.
 
