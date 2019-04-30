@@ -14,12 +14,14 @@ if (!fs.existsSync('img')) {
 const files = [
   '../README.md',
   'getting_started.md',
+  'paper_sizes.md',
   'vector.md',
   'text.md',
   'images.md',
   'outline.md',
   'annotations.md',
-  'destinations.md'
+  'destinations.md',
+  'you_made_it.md'
 ];
 
 // shared lorem ipsum text so we don't need to copy it into every example

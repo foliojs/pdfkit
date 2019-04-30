@@ -333,11 +333,14 @@ const renderTitlePage = function(doc) {
   doc.pipe(fs.createWriteStream('guide.pdf'));
   renderTitlePage(doc);
   render(doc, 'getting_started.md');
+  render(doc, 'paper_sizes.md');
   render(doc, 'vector.md');
   render(doc, 'text.md');
   render(doc, 'images.md');
   render(doc, 'outline.md');
   render(doc, 'annotations.md');
+  render(doc, 'destinations.md');
+  render(doc, 'you_made_it.md');
   return doc.end();
 })();
 
