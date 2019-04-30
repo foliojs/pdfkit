@@ -17,7 +17,9 @@ const files = [
   'vector.md',
   'text.md',
   'images.md',
-  'annotations.md'
+  'outline.md',
+  'annotations.md',
+  'destinations.md'
 ];
 
 // shared lorem ipsum text so we don't need to copy it into every example

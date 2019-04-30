@@ -94,7 +94,7 @@ You can also set some options for the page, such as its size and orientation.
 The `layout` property can be either `portrait` (the default) or `landscape`.
 The `size` property can be either an array specifying `[width, height]` in PDF
 points (72 per inch), or a string specifying a predefined size. A
-list of the predefined paper sizes can be seen [here](https://github.com/devongovett/pdfkit/blob/b13423bf0a391ed1c33a2e277bc06c00cabd6bf9/lib/page.coffee#L72-L122). The
+list of the predefined paper sizes can be seen [here](http://pdfkit.org/docs/paper_sizes.html). The
 default is `letter`.
 
 Passing a page options object to the `PDFDocument` constructor will
