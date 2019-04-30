@@ -5,7 +5,7 @@
 - Fix links to pages within the document
 - Add support for named destinations
 
-### [v0.9.1] - 2019-3-04
+### [v0.9.1] - 2019-04-30
 
 - Fix setting printing permission
 - Fix corruption of string objects in browser
