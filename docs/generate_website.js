@@ -85,15 +85,18 @@ const generateImages = function(tree) {
       delete attrs.alt;
       attrs.href = `${f}.png`;
 
-      // write the PDF, convert to PNG using the mac `sips`
-      // command line tool, and trim with graphicsmagick
-
-      file.on('finish', () =>
-        exec(`sips -s format png ${f}.pdf --out ${f}.png`, function() {
-          fs.unlink(`${f}.pdf`);
-          exec(`gm convert ${f}.png -trim ${f}.png`);
-        })
-      );
+      // write the PDF, convert to PNG and trim with ImageMagick (https://imagemagick.org)
+      file.on('finish', () => {
+        exec(`magick convert -density 150x150 -trim ${f}.pdf ${f}.png`, (err, stdout, stderr) => {
+          if (stderr) {
+            console.error(stderr);
+          }
+          if (err) {
+            console.error(err);
+          }
+          fs.unlinkSync(`${f}.pdf`);
+        });
+      });
 
       doc.end();
     }
