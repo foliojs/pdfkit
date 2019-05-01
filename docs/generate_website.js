@@ -94,6 +94,8 @@ const generateImages = function(tree) {
           exec(`gm convert ${f}.png -trim ${f}.png`);
         })
       );
+
+      doc.end();
     }
   }
 };
