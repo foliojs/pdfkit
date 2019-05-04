@@ -1,27 +1,54 @@
-const passMessage = (utils, chunk) => () =>
-  utils.matcherHint('.not.toContainChunk', 'data', 'chunk') +
-  '\n\n' +
-  'Expected data to contain chunk:\n' +
-  `  ${utils.printExpected(chunk)}\n`;
+import diff from 'jest-diff';
 
-const failMessage = (utils, chunk) => () =>
-  utils.matcherHint('.toContainChunk', 'data', 'chunk') +
-  '\n\n' +
-  'Expected data to contain chunk:\n' +
-  `  ${utils.printExpected(chunk)}\n`;
+const buildMessage = (utils, data, chunk, headIndex) => {
+  let message;
+  if (headIndex !== -1) {
+    const received = data.slice(headIndex, headIndex + chunk.length);
+    const difference = diff(chunk, received);
+    message = `Difference:\n\n${difference}`;
+  } else {
+    message =
+      'Expected data to contain chunk:\n' + `  ${utils.printExpected(chunk)}\n`;
+  }
+  return message;
+};
+
+const passMessage = (utils, data, chunk, headIndex) => () => {
+  return (
+    utils.matcherHint('.not.toContainChunk', 'data', 'chunk') +
+    '\n\n' +
+    buildMessage(utils, data, chunk, headIndex)
+  );
+};
+
+const failMessage = (utils, data, chunk, headIndex) => () => {
+  return (
+    utils.matcherHint('.toContainChunk', 'data', 'chunk') +
+    '\n\n' +
+    buildMessage(utils, data, chunk, headIndex)
+  );
+};
 
 export default {
   toContainChunk(data, chunk) {
     let pass = false;
-    let startIndex = data.indexOf(chunk[0]);
-    for (let i = 1; i < chunk.length; ++i) {
-      pass = this.equals(data[startIndex + i], chunk[i]);
+    const headIndex = data.indexOf(chunk[0]);
+    if (headIndex !== -1) {
+      for (let i = 1; i < chunk.length; ++i) {
+        pass = this.equals(data[headIndex + i], chunk[i]);
+      }
     }
 
     if (pass) {
-      return { pass: true, message: passMessage(this.utils, chunk) };
+      return {
+        pass: true,
+        message: passMessage(this.utils, data, chunk, headIndex)
+      };
     }
 
-    return { pass: false, message: failMessage(this.utils, chunk) };
+    return {
+      pass: false,
+      message: failMessage(this.utils, data, chunk, headIndex)
+    };
   }
 };
