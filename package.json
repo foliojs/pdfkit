@@ -16,6 +16,7 @@
     "email": "devongovett@gmail.com",
     "url": "http://badassjs.com/"
   },
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/foliojs/pdfkit.git"
