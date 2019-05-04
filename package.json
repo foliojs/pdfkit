@@ -23,6 +23,7 @@
   "bugs": "https://github.com/foliojs/pdfkit/issues",
   "devDependencies": {
     "@babel/core": "^7.0.0",
+    "@babel/plugin-external-helpers": "^7.0.0",
     "@babel/preset-env": "^7.0.0",
     "babel-jest": "^24.7.1",
     "blob-stream": "^0.1.2",
@@ -76,6 +77,9 @@
       "/node_modules/",
       "<rootDir>/demo/"
     ],
-    "testURL": "http://localhost/"
+    "testURL": "http://localhost/",
+    "setupFilesAfterEnv": [
+      "<rootDir>/tests/unit/setupTests.js"
+    ]
   }
 }

@@ -1,5 +1,6 @@
 const PDFDocument = require('../../lib/document').default;
 const PDFSecurity = require('../../lib/security').default;
+import { logData } from './helpers';
 
 // manual mock for PDFSecurity to ensure stored id will be the same accross different systems
 PDFSecurity.generateFileID = () => {
@@ -15,67 +16,42 @@ describe('Document trailer', () => {
     });
   });
 
-  test('', done => {
-    const dataLog = [];
-    const expected = [
-      [
-        '8 0 obj',
-        '<<\n/Producer 9 0 R\n/Creator 10 0 R\n/CreationDate 11 0 R\n>>'
-      ],
-      ['9 0 obj', '(PDFKit)'],
-      ['10 0 obj', '(PDFKit)'],
-      ['11 0 obj', '(D:20180201000000Z)'],
-      [
-        'trailer',
-        `<<\n/Size 12\n/Root 3 0 R\n/Info 8 0 R\n/ID [<6d6f636b65642d7064662d6964> <6d6f636b65642d7064662d6964>]\n>>`
-      ]
-    ];
-    document._write = function(data) {
-      dataLog.push(data);
-    };
+  test('', () => {
+    const docData = logData(document);
     document.end();
-    setTimeout(() => {
-      for (let i = 0; i < expected.length; ++i) {
-        let idx = dataLog.indexOf(expected[i][0]);
-        for (let j = 1; j < expected[i].length; ++j) {
-          expect(dataLog[idx + j]).toEqual(expected[i][j]);
-        }
-      }
-      done();
-    }, 1);
+    expect(docData).toContainChunk([
+      '8 0 obj',
+      '<<\n/Producer 9 0 R\n/Creator 10 0 R\n/CreationDate 11 0 R\n>>'
+    ]);
+    expect(docData).toContainChunk(['9 0 obj', '(PDFKit)']);
+    expect(docData).toContainChunk(['10 0 obj', '(PDFKit)']);
+    expect(docData).toContainChunk(['11 0 obj', '(D:20180201000000Z)']);
+    expect(docData).toContainChunk([
+      'trailer',
+      `<<\n/Size 12\n/Root 3 0 R\n/Info 8 0 R\n/ID [<6d6f636b65642d7064662d6964> <6d6f636b65642d7064662d6964>]\n>>`
+    ]);
   });
 
-  test('written empty data of destinations', done => {
-    const dataLog = [];
-    const expected = [
-      ['2 0 obj', '<<\n/Dests <<\n  /Names [\n]\n>>\n>>'],
-    ];
-    document._write = function(data) {
-      dataLog.push(data);
-    };
+  test('written empty data of destinations', () => {
+    const docData = logData(document);
     document.end();
-    setTimeout(() => {
-      for (let i = 0; i < expected.length; ++i) {
-        let idx = dataLog.indexOf(expected[i][0]);
-        for (let j = 1; j < expected[i].length; ++j) {
-          expect(dataLog[idx + j]).toEqual(expected[i][j]);
-        }
-      }
-      done();
-    }, 1);
+    expect(docData).toContainChunk([
+      '2 0 obj',
+      '<<\n/Dests <<\n  /Names [\n]\n>>\n>>'
+    ]);
   });
 
-  test('written data of destinations', done => {
+  test('written data of destinations', () => {
+    const docData = logData(document);
     document.addNamedDestination('LINK1');
     document.addNamedDestination('LINK2', 'FitH', 100);
     document.addNamedDestination('LINK3', 'XYZ', 36, 36, 50);
     document.goTo(10, 10, 100, 20, 'LINK1');
+    document.end();
 
-    const dataLog = [];
-    const expected = [
-      [
-        '2 0 obj',
-        `<<
+    expect(docData).toContainChunk([
+      '2 0 obj',
+      `<<
 /Dests <<
   /Limits [(LINK1) (LINK3)]
   /Names [
@@ -85,10 +61,10 @@ describe('Document trailer', () => {
 ]
 >>
 >>`
-      ],
-      [
-        '7 0 obj',
-        `<<
+    ]);
+    expect(docData).toContainChunk([
+      '7 0 obj',
+      `<<
 /Type /Page
 /Parent 1 0 R
 /MediaBox [0 0 612 792]
@@ -96,20 +72,6 @@ describe('Document trailer', () => {
 /Resources 6 0 R
 /Annots [9 0 R]
 >>`
-      ]
-    ];
-    document._write = function(data) {
-      dataLog.push(data);
-    };
-    document.end();
-    setTimeout(() => {
-      for (let i = 0; i < expected.length; ++i) {
-        let idx = dataLog.indexOf(expected[i][0]);
-        for (let j = 1; j < expected[i].length; ++j) {
-          expect(dataLog[idx + j]).toEqual(expected[i][j]);
-        }
-      }
-      done();
-    }, 1);
+    ]);
   });
 });
