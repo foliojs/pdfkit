@@ -1,14 +1,6 @@
-/*
- * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
- * DS103: Rewrite code to no longer use __guard__
- * DS205: Consider reworking code to avoid use of IIFEs
- * DS207: Consider shorter variations of null checks
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
 const fs = require('fs');
 const vm = require('vm');
-const md = require('markdown').markdown;
+const { markdown } = require('markdown');
 const CodeMirror = require('codemirror/addon/runmode/runmode.node');
 const PDFDocument = require('../');
 
@@ -125,13 +117,10 @@ class Node {
     }
 
     // parse sub nodes
-    this.content = (() => {
-      const result = [];
-      while (tree.length) {
-        result.push(new Node(tree.shift()));
-      }
-      return result;
-    })();
+    this.content = [];
+    while (tree.length) {
+      this.content.push(new Node(tree.shift()));
+    }
 
     switch (this.type) {
       case 'header':
@@ -152,10 +141,9 @@ class Node {
           return this.content.push(new Node(['code', opts, text]));
         });
 
-        __guard__(
-          this.content[this.content.length - 1],
-          x => (x.attrs.continued = false)
-        );
+        if (this.content.length) {
+          this.content[this.content.length - 1].attrs.continued = false;
+        }
         codeBlocks.push(code);
         break;
 
@@ -284,23 +272,21 @@ class Node {
 }
 
 // reads and renders a markdown/literate javascript file to the document
-const render = function(doc, filename) {
+const render = (doc, filename) => {
   codeBlocks = [];
-  const tree = md.parse(fs.readFileSync(filename, 'utf8'));
+  const tree = markdown.parse(fs.readFileSync(filename, 'utf8'));
   tree.shift();
 
-  return (() => {
-    const result = [];
-    while (tree.length) {
-      const node = new Node(tree.shift());
-      result.push(node.render(doc));
-    }
-    return result;
-  })();
+  const result = [];
+  while (tree.length) {
+    const node = new Node(tree.shift());
+    result.push(node.render(doc));
+  }
+  return result;
 };
 
 // renders the title page of the guide
-const renderTitlePage = function(doc) {
+const renderTitlePage = (doc) => {
   const title = 'PDFKit Guide';
   const author = 'By Devon Govett';
   const version = `Version ${require('../package.json').version}`;
@@ -324,28 +310,20 @@ const renderTitlePage = function(doc) {
     indent: w - doc.widthOfString(version)
   });
 
-  return doc.addPage();
+  doc.addPage();
 };
 
 // render all sections of the guide and write the pdf file
-(function() {
-  const doc = new PDFDocument();
-  doc.pipe(fs.createWriteStream('guide.pdf'));
-  renderTitlePage(doc);
-  render(doc, 'getting_started.md');
-  render(doc, 'paper_sizes.md');
-  render(doc, 'vector.md');
-  render(doc, 'text.md');
-  render(doc, 'images.md');
-  render(doc, 'outline.md');
-  render(doc, 'annotations.md');
-  render(doc, 'destinations.md');
-  render(doc, 'you_made_it.md');
-  return doc.end();
-})();
-
-function __guard__(value, transform) {
-  return typeof value !== 'undefined' && value !== null
-    ? transform(value)
-    : undefined;
-}
+const doc = new PDFDocument();
+doc.pipe(fs.createWriteStream('guide.pdf'));
+renderTitlePage(doc);
+render(doc, 'getting_started.md');
+render(doc, 'paper_sizes.md');
+render(doc, 'vector.md');
+render(doc, 'text.md');
+render(doc, 'images.md');
+render(doc, 'outline.md');
+render(doc, 'annotations.md');
+render(doc, 'destinations.md');
+render(doc, 'you_made_it.md');
+doc.end();
