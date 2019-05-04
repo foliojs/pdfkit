@@ -1,4 +1,4 @@
-const jade = require('jade');
+const pug = require('pug');
 const { markdown } = require('markdown');
 const fs = require('fs');
 const vm = require('vm');
@@ -132,6 +132,6 @@ for (let index = 0; index < pages.length; index++) {
   const page = pages[index];
   page.pages = pages;
   page.index = index;
-  const html = jade.renderFile('template.jade', page);
+  const html = pug.renderFile('template.pug', page);
   fs.writeFileSync(page.file + '.html', html, 'utf8');
 }
