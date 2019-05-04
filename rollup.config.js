@@ -46,7 +46,7 @@ export default [
         babelrc: false,
         presets: [
           [
-            'env',
+            '@babel/preset-env',
             {
               modules: false,
               targets: {
@@ -54,8 +54,7 @@ export default [
               }
             }
           ]
-        ],
-        plugins: ['external-helpers']
+        ]
       }),
       copy({
         files: ['lib/font/data/*.afm'],
@@ -79,17 +78,16 @@ export default [
         babelrc: false,
         presets: [
           [
-            'env',
+            '@babel/preset-env',
             {
               modules: false,
               targets: {
                 browsers: ['ie 11']
-              }
+              },
+              exclude: ['@babel/plugin-transform-typeof-symbol']
             }
           ]
-        ],
-        plugins: ['external-helpers'],
-        exclude: ['babel-plugin-transform-es2015-typeof-symbol']
+        ]
       })
     ]
   },
@@ -108,7 +106,7 @@ export default [
         babelrc: false,
         presets: [
           [
-            'env',
+            '@babel/preset-env',
             {
               modules: false,
               targets: {
@@ -122,8 +120,7 @@ export default [
               }
             }
           ]
-        ],
-        plugins: ['external-helpers']
+        ]
       })
     ]
   },
@@ -141,7 +138,7 @@ export default [
         babelrc: false,
         presets: [
           [
-            'env',
+            '@babel/preset-env',
             {
               loose: true,
               modules: false,
@@ -150,8 +147,7 @@ export default [
               }
             }
           ]
-        ],
-        plugins: ['external-helpers']
+        ]
       })
     ]
   }
