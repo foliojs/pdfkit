@@ -1,5 +1,9 @@
+.github/
+.prettierrc
+.babelrc
 node-zlib/
 node-modules/
+CONTRIBUTING.md
 demo/
 src/
 lib/
