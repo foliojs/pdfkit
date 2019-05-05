@@ -1,7 +1,7 @@
-const PDFDocument = require('../../lib/document').default;
-const PDFReference = require('../../lib/reference').default;
-const PNGImage = require('../../lib/image/png').default;
-const fs = require('fs');
+import PDFDocument from '../../lib/document';
+import PDFReference from '../../lib/reference';
+import PNGImage from '../../lib/image/png';
+import fs from 'fs';
 
 describe('PNGImage', () => {
   let document;

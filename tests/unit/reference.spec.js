@@ -1,6 +1,7 @@
-const PDFReference = require('../../lib/reference').default;
-const PDFDocument = require('../../lib/document').default;
-const zlib = require('zlib');
+import PDFReference from '../../lib/reference';
+import PDFDocument from '../../lib/document';
+import zlib from 'zlib';
+import { logData } from './helpers';
 
 describe('PDFReference', () => {
   let document;
@@ -24,24 +25,23 @@ describe('PDFReference', () => {
     expect(ref.data).toBe(refData);
   });
 
-  test('written data of empty reference', done => {
-    const dataLog = [];
-    const expected = ['1 0 obj', '<<\n>>', 'endobj'];
+  test('written data of empty reference', () => {
     const ref = new PDFReference(document, 1);
-    document._write = function(data) {
-      dataLog.push(data);
-    };
+
+    const docData = logData(document);
     ref.finalize();
-    setTimeout(() => {
-      expect(dataLog).toEqual(expected);
-      done();
-    }, 1);
+
+    expect(docData).toContainChunk(['1 0 obj', '<<\n>>', 'endobj']);
   });
 
-  test('written data of reference with uncompressed data', done => {
-    const dataLog = [];
+  test('written data of reference with uncompressed data', () => {
+    const docData = logData(document);
     const chunk = new Buffer('test');
-    const expected = [
+    const ref = new PDFReference(document, 1);
+    ref.compress = false;
+    ref.write(chunk);
+    ref.finalize();
+    expect(docData).toContainChunk([
       '1 0 obj',
       `<<
 /Length ${chunk.length}
@@ -50,25 +50,18 @@ describe('PDFReference', () => {
       chunk,
       '\nendstream',
       'endobj'
-    ];
-    const ref = new PDFReference(document, 1);
-    ref.compress = false;
-    ref.write(chunk);
-    document._write = function(data) {
-      dataLog.push(data);
-    };
-    ref.finalize();
-    setTimeout(() => {
-      expect(dataLog).toEqual(expected);
-      done();
-    }, 1);
+    ]);
   });
 
-  test('written data of reference with compressed data', done => {
-    const dataLog = [];
+  test('written data of reference with compressed data', () => {
+    const docData = logData(document);
     const chunk = new Buffer('test');
     const compressed = zlib.deflateSync(chunk);
-    const expected = [
+    const ref = new PDFReference(document, 1);
+    ref.write(chunk);
+
+    ref.finalize();
+    expect(docData).toContainChunk([
       '1 0 obj',
       `<<
 /Length ${compressed.length}
@@ -78,16 +71,6 @@ describe('PDFReference', () => {
       compressed,
       '\nendstream',
       'endobj'
-    ];
-    const ref = new PDFReference(document, 1);
-    ref.write(chunk);
-    document._write = function(data) {
-      dataLog.push(data);
-    };
-    ref.finalize();
-    setTimeout(() => {
-      expect(dataLog).toEqual(expected);
-      done();
-    }, 1);
+    ]);
   });
 });

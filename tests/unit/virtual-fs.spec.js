@@ -1,4 +1,4 @@
-const fs = require('../../lib/virtual-fs').default;
+import fs from '../../lib/virtual-fs';
 
 function checkMissingFiles(files) {
   for (let file of files) {

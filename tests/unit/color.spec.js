@@ -1,4 +1,4 @@
-const PDFDocument = require('../../lib/document').default;
+import PDFDocument from '../../lib/document';
 
 describe('color', function() {
   test('normalize', function() {

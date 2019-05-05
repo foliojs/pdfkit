@@ -1,4 +1,4 @@
-const PDFDocument = require('../../lib/document').default;
+import PDFDocument from '../../lib/document';
 
 describe('PDFDocument', () => {
   describe('font option', () => {

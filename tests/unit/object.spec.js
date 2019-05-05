@@ -1,4 +1,4 @@
-const PDFObject = require('../../lib/object').default;
+import PDFObject from '../../lib/object';
 
 describe('PDFObject', () => {
   describe('convert', () => {

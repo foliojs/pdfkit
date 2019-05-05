@@ -1,5 +1,5 @@
-const PDFFontFactory = require('../../lib/font_factory').default;
-const PDFDocument = require('../../lib/document').default;
+import PDFFontFactory from '../../lib/font_factory';
+import PDFDocument from '../../lib/document';
 
 describe('EmbeddedFont', () => {
   test('no fontLayoutCache option', () => {

@@ -1,5 +1,5 @@
-const PDFDocument = require('../../lib/document').default;
-const PDFSecurity = require('../../lib/security').default;
+import PDFDocument from '../../lib/document';
+import PDFSecurity from '../../lib/security';
 import { logData } from './helpers';
 
 // manual mock for PDFSecurity to ensure stored id will be the same accross different systems
