@@ -31,11 +31,11 @@ const failMessage = (utils, data, chunk, headIndex) => () => {
 
 export default {
   toContainChunk(data, chunk) {
-    let pass = false;
     const headIndex = data.indexOf(chunk[0]);
-    if (headIndex !== -1) {
+    let pass = headIndex !== -1;
+    if (pass) {
       for (let i = 1; i < chunk.length; ++i) {
-        pass = this.equals(data[headIndex + i], chunk[i]);
+        pass = pass && this.equals(data[headIndex + i], chunk[i]);
       }
     }
 
