@@ -32,4 +32,5 @@ describe('PDFDocument', () => {
       expect(fontSpy).not.toBeCalled();
     });
   });
+
 });
