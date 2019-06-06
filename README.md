@@ -11,7 +11,7 @@ a few function calls.
 
 Check out some of the [documentation and examples](http://pdfkit.org/docs/getting_started.html) to see for yourself!
 You can also read the guide as a [self-generated PDF](http://pdfkit.org/docs/guide.pdf) with example output displayed inline.
-If you'd like to see how it was generated, check out the README in the [docs](https://github.com/devongovett/pdfkit/tree/master/docs)
+If you'd like to see how it was generated, check out the README in the [docs](https://github.com/foliojs/pdfkit/tree/master/docs)
 folder.
 
 You can also try out an interactive in-browser demo of PDFKit [here](http://pdfkit.org/demo/browser.html).
@@ -37,7 +37,7 @@ Installation uses the [npm](http://npmjs.org/) package manager.  Just type the f
 * Font embedding
   * Supports TrueType (.ttf), OpenType (.otf), WOFF, WOFF2, TrueType Collections (.ttc), and Datafork TrueType (.dfont) fonts
   * Font subsetting
-  * See [fontkit](http://github.com/devongovett/fontkit) for more details on advanced glyph layout support.
+  * See [fontkit](http://github.com/foliojs/fontkit) for more details on advanced glyph layout support.
 * Image embedding
   * Supports JPEG and PNG files (including indexed PNGs, and PNGs with transparency)
 * Annotations
@@ -119,9 +119,11 @@ complex documents with a very small amount of code.  For more, see the `demo` fo
 
 ## Browser Usage
 
-There are two ways to use PDFKit in the browser.  The first is to use [Browserify](http://browserify.org/),
-which is a Node module packager for the browser with the familiar `require` syntax.  The second is to use
-a prebuilt version of PDFKit, which you can [download from Github](https://github.com/devongovett/pdfkit/releases).
+There are three ways to use PDFKit in the browser:
+ - Use [Browserify](http://browserify.org/). See demo [source code](demo/browser.js) and [build script](https://github.com/foliojs/pdfkit/blob/master/package.json#L56)
+ - Use [webpack](https://webpack.js.org/). See [complete example](https://github.com/blikblum/pdfkit-webpack-example).
+ - Use prebuilt version. Distributed as `js/pdfkit.standalone.js` file in package. 
+
 
 In addition to PDFKit, you'll need somewhere to stream the output to.  HTML5 has a
 [Blob](https://developer.mozilla.org/en-US/docs/Web/API/Blob) object which can be used to store binary data, and
@@ -129,7 +131,7 @@ get URLs to this data in order to display PDF output inside an iframe, or upload
 get a Blob from the output of PDFKit, you can use the [blob-stream](https://github.com/devongovett/blob-stream)
 module.
 
-The following example uses Browserify to load `PDFKit` and `blob-stream`, but if you're not using Browserify,
+The following example uses Browserify or webpack to load `PDFKit` and `blob-stream`, but if you're not using Browserify,
 you can load them in whatever way you'd like (e.g. script tags).
 
 ```javascript
