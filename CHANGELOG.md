@@ -6,6 +6,7 @@
 - Add support for named destinations
 - Throw errors when `dash(...)` is passed invalid lengths
 - Remove PDFDocument#output method
+- Add standalone build (js/pdfkit.standalone.js)
 
 ### [v0.9.1] - 2019-04-30
 
