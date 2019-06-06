@@ -5,6 +5,7 @@
 - Fix links to pages within the document
 - Add support for named destinations
 - Throw errors when `dash(...)` is passed invalid lengths
+- Remove PDFDocument#output method
 
 ### [v0.9.1] - 2019-04-30
 
