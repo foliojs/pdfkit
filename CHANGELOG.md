@@ -2,6 +2,8 @@
 
 ### Unreleased
 
+### [v0.10.0] - 2019-06-06
+
 - Fix links to pages within the document
 - Add support for named destinations
 - Throw errors when `dash(...)` is passed invalid lengths
