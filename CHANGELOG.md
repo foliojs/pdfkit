@@ -1,6 +1,7 @@
 ## pdfkit changelog
 
 ### Unreleased
+ - Fix infinite loop when text is positioned after page right margin
 
 ### [v0.10.0] - 2019-06-06
 
