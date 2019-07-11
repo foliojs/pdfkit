@@ -32,4 +32,19 @@ describe('PDFDocument', () => {
       expect(fontSpy).not.toBeCalled();
     });
   });
+
+  describe('document info', () => {
+    
+    test('accepts properties with value undefined', () => {
+      expect(() => new PDFDocument({ info: { Title: undefined }}))
+        .not.toThrow(new TypeError("Cannot read property 'toString' of undefined"));
+    });
+    
+    test('accepts properties with value null', () => {
+      expect(() => new PDFDocument({ info: { Title: null }}))
+        .not.toThrow(new TypeError("Cannot read property 'toString' of null"));
+    });
+    
+  });
+
 });
