@@ -57,7 +57,7 @@
     "website": "node docs/generate_website.js",
     "docs": "npm run pdf-guide && npm run website && npm run browser-demo",
     "prettier": "prettier {lib,tests,demo,docs}/**/*.js",
-    "test": "jest -i",
+    "test": "jest",
     "test:integration": "jest integration/ -i",
     "test:unit": "jest unit/ -i"
   },
@@ -71,15 +71,5 @@
   },
   "engine": [
     "node >= v6.0.0"
-  ],
-  "jest": {
-    "testPathIgnorePatterns": [
-      "/node_modules/",
-      "<rootDir>/demo/"
-    ],
-    "testURL": "http://localhost/",
-    "setupFilesAfterEnv": [
-      "<rootDir>/tests/unit/setupTests.js"
-    ]
-  }
+  ]
 }
