@@ -12,17 +12,18 @@ doc.info['Title'] = 'Test AcroForm Document';
 doc.info['Author'] = 'Jim Pravetz';
 
 // Register a font name for use later
-doc.registerFont('Palatino', 'fonts/PalatinoBold.ttf');
 
-// Set the font, draw some text, and embed an image
-doc
-  .font('Palatino')
+doc.registerFont('myfont1', 'fonts/PalatinoBold.ttf')
+
+doc.font('Courier-Bold')    // establishes the default font
+doc.initAcroForm()
+
+doc.font('myfont1')
   .fontSize(25)
-  .text('Some text with an embedded font!', 100, 100)
-
+  .text('Test Doc', 0, 20, { width: 612, align: 'center' });
 doc.font('Courier')
-  .initAcroForm();
+  .fontSize(16)
+  .text('Courier subheading', 0, 50, { width: 612, align: 'center' });
 
-doc.font('Palatino').formText('field.0', 10, 10, 200, 200, { multiline: true });
-
+doc.font('myfont1').formText('file0', 10, 100, 592, 400, { multiline: true });
 doc.end();

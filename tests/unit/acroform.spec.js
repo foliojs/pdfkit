@@ -2,6 +2,7 @@ import PDFDocument from '../../lib/document';
 import PDFSecurity from '../../lib/security';
 import { logData } from './helpers';
 import PDFFontFactory from '../../lib/font_factory';
+import fs from 'fs'
 
 // manual mock for PDFSecurity to ensure stored id will be the same accross different systems
 PDFSecurity.generateFileID = () => {
@@ -34,7 +35,6 @@ describe('AcroForm', () => {
     // });
 
     test('standard fonts', () => {
-      doc.addPage();
 
       // const docData = logData(doc);
 
@@ -48,9 +48,9 @@ describe('AcroForm', () => {
         .text('Test Doc', 0, 20, { width: 612, align: 'center' });
       doc.font('Courier')
         .fontSize(16)
-        .text('Courier subheading', 0, 40, { width: 612, align: 'center' });
+        .text('Courier subheading', 0, 50, { width: 612, align: 'center' });
 
-      doc.font('myfont1').formText('file0', 10, 10, 200, 200, { multiline: true });
+      doc.font('myfont1').formText('file0', 10, 100, 592, 400, { multiline: true });
       doc.end();
 
       //expect(docData.length).toBe(2);
