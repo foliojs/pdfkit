@@ -36,7 +36,7 @@ describe('AcroForm', () => {
 
     test('standard fonts', () => {
 
-      // const docData = logData(doc);
+      const docData = logData(doc);
 
       doc.registerFont('myfont1', 'tests/fonts/Roboto-Regular.ttf')
 
