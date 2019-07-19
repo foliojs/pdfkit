@@ -17,10 +17,10 @@ doc.font('Helvetica')    // establishes the default font
 doc.initAcroForm();
 
 let rootField = doc.field('rootField');
-let child1Field = doc.field('child1Field', { parent: rootField });
-let child2Field = doc.field('child2Field', { parent: rootField });
-doc.formText('leaf1', 10, 10, 200, 40, { parent: child1Field })
-doc.formText('leaf2', 10, 60, 200, 40, { parent: child1Field })
-doc.formText('leaf3', 10, 110, 200, 40, { parent: child2Field })
+let child1Field = doc.field('child1Field', { Parent: rootField });
+let child2Field = doc.field('child2Field', { Parent: rootField });
+doc.formText('leaf1', 10, 10, 200, 40, { Parent: child1Field })
+doc.formText('leaf2', 10, 60, 200, 40, { Parent: child1Field })
+doc.formText('leaf3', 10, 110, 200, 40, { Parent: child2Field })
 
 doc.end();
