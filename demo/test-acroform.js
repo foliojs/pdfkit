@@ -23,4 +23,10 @@ doc.formText('leaf1', 10, 10, 200, 40, { Parent: child1Field })
 doc.formText('leaf2', 10, 60, 200, 40, { Parent: child1Field })
 doc.formText('leaf3', 10, 110, 200, 40, { Parent: child2Field })
 
+var opts = {
+  backgroundColor: 'yellow',
+  label: 'Test Button',
+};
+doc.formPushButton('btn1', 10, 160, 100, 30, opts);
+
 doc.end();

@@ -34,6 +34,16 @@ describe('AcroForm', () => {
     //   expect(docData.length).toBe(0);
     // });
 
+    test('push button', () => {
+
+      let opts = {
+        backgroundColor: 'yellow',
+        label: 'Test Button',
+      };
+      doc.formPushButton('btn1', 20, 20, 100, 30, opts);
+
+    });
+
     test('standard fonts', () => {
 
       const docData = logData(doc);
