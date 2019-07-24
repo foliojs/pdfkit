@@ -70,6 +70,7 @@ Plugin](https://help.adobe.com/en_US/acrobat/acrobat_dc_sdk/2015/HTMLHelp/#t=Acr
 ## Other Methods
 
 The font used for a Widget Annotation is set using the `document.font` method.
+Yes that's the same method as is used when setting the text font.
 
 Widget Annotations are, by default, added to the Catalog's `AcroForm` dictionary
 as an array of `Fields`. Fields are organized in a name heirarchy, for example
@@ -115,34 +116,26 @@ that are initially blank. This is not true for push button widget annotations.
 
 * * *
 
-Here is an example that uses a few of the AcroForm field types.
+Here is an example that uses field hierarchy, adds three text fields and a push
+button.
 
-    // Add the link text
-    doc.fontSize(25)
-       .fillColor('blue')
-       .text('This is a link!', 20, 0);
+```javascript
+doc.font('Helvetica')    // establishes the default font
+doc.initAcroForm();
 
-    // Measure the text
-    const width = doc.widthOfString('This is a link!');
-    const height = doc.currentLineHeight();
+let rootField = doc.field('rootField');
+let child1Field = doc.field('child1Field', { Parent: rootField });
+let child2Field = doc.field('child2Field', { Parent: rootField });
+doc.formText('leaf1', 10, 10, 200, 40, { Parent: child1Field, multiline: true })
+doc.formText('leaf2', 10, 60, 200, 40, { Parent: child1Field, multiline: true })
+doc.formText('leaf3', 10, 110, 200, 80, { Parent: child2Field, multiline: true })
 
-    // Add the underline and link annotations
-    doc.underline(20, 0, width, height, {color: 'blue'})
-       .link(20, 0, width, height, 'http://google.com/');
-
-    // Create the highlighted text
-    doc.moveDown()
-       .fillColor('black')
-       .highlight(20, doc.y, doc.widthOfString('This text is highlighted!'), height)
-       .text('This text is highlighted!');
-
-    // Create the crossed out text
-    doc.moveDown()
-       .strike(20, doc.y, doc.widthOfString('STRIKE!'), height)
-       .text('STRIKE!');
-
-    // Adding go to as annotation
-    doc.goTo(20, doc.y, 10, 20, 'LINK', {});
+var opts = {
+  backgroundColor: 'yellow',
+  label: 'Test Button',
+};
+doc.formPushButton('btn1', 10, 200, 100, 30, opts);
+```
 
 The output of this example looks like this.
 

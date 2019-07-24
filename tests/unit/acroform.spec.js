@@ -101,7 +101,6 @@ describe('AcroForm', () => {
   });
 
   test('field heirarchy', () => {
-
     const expected = [
       "13 0 obj",
       '<<\n/Parent 11 0 R\n/FT /Tx\n/DR <<\n/Font <<\n/F1 8 0 R\n>>\n>>\n/T (leaf1)\n/Subtype /Widget\n/F 4\n/Type /Annot\n/Rect [10 742 210 782]\n>>',
