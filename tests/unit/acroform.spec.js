@@ -2,21 +2,19 @@ import PDFDocument from '../../lib/document';
 import PDFSecurity from '../../lib/security';
 import { logData } from './helpers';
 import PDFFontFactory from '../../lib/font_factory';
-import fs from 'fs'
 
 // manual mock for PDFSecurity to ensure stored id will be the same accross different systems
 PDFSecurity.generateFileID = () => {
   return new Buffer('mocked-pdf-id');
 };
 
-function escapeRegExp (string) {
+function escapeRegExp(string) {
   return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
 }
 
-function joinTokens (...args) {
+function joinTokens(...args) {
   let a = args.map(i => escapeRegExp(i));
   let r = new RegExp('^' + a.join('\\s*') + '$');
-  console.log(r)
   return r;
 }
 
@@ -33,7 +31,29 @@ describe('AcroForm', () => {
     const expected = [
       '2 0 obj',
       // '<<\n/Dests <<\n/Names []\n>>\n/JavaScript <<\n/Names [\n(name1) <<\n/JS (my javascript goes here)\n/S /JavaScript\n>>\n]\n>>\n>>',
-      joinTokens('<<', '/Dests', '<<', '/Names', '[', ']', '>>', '/JavaScript', '<<', '/Names', '[', '(name1)', '<<', '/JS', '(my javascript goes here)', '/S', '/JavaScript', '>>', ']', '>>', '>>'),
+      joinTokens(
+        '<<',
+        '/Dests',
+        '<<',
+        '/Names',
+        '[',
+        ']',
+        '>>',
+        '/JavaScript',
+        '<<',
+        '/Names',
+        '[',
+        '(name1)',
+        '<<',
+        '/JS',
+        '(my javascript goes here)',
+        '/S',
+        '/JavaScript',
+        '>>',
+        ']',
+        '>>',
+        '>>'
+      ),
       'endobj'
     ];
     const docData = logData(doc);
@@ -41,44 +61,69 @@ describe('AcroForm', () => {
     expect(docData.length).toBe(0);
     doc.end();
     expect(docData).toContainChunk(expected);
-  })
+  });
 
   test('init no fonts', () => {
     doc.addPage();
     const docData = logData(doc);
-    const font = PDFFontFactory.open(
-      doc,
-      'tests/fonts/Roboto-Regular.ttf'
-    );
-    doc.initAcroForm();
+    const font = PDFFontFactory.open(doc, 'tests/fonts/Roboto-Regular.ttf');
+    doc.initForms();
     expect(docData.length).toBe(0);
   });
-
 
   test('init standard fonts', () => {
     const expected = [
       '12 0 obj',
-      joinTokens('<<', '/FT', '/Tx', '/Ff', '4096', '/DR', '<<', '/Font', '<<', '/F3', '10 0 R', '>>', '>>', '/T', '(file0)', '/Subtype', '/Widget', '/F', '4', '/Type', '/Annot', '/Rect', '[10 292 602 692]', '>>'),
+      joinTokens(
+        '<<',
+        '/FT',
+        '/Tx',
+        '/Ff',
+        '4096',
+        '/DR',
+        '<<',
+        '/Font',
+        '<<',
+        '/F3',
+        '10 0 R',
+        '>>',
+        '>>',
+        '/T',
+        '(file0)',
+        '/Subtype',
+        '/Widget',
+        '/F',
+        '4',
+        '/Type',
+        '/Annot',
+        '/Rect',
+        '[10 292 602 692]',
+        '>>'
+      ),
       'endobj'
     ];
 
     const docData = logData(doc);
-    doc.registerFont('myfont1', 'tests/fonts/Roboto-Regular.ttf')
+    doc.registerFont('myfont1', 'tests/fonts/Roboto-Regular.ttf');
 
-    doc.font('Courier-Bold')    // establishes the default font
-    doc.initAcroForm()
+    doc.font('Courier-Bold'); // establishes the default font
+    doc.initForms();
 
-    doc.font('myfont1')
+    doc
+      .font('myfont1')
       .fontSize(25)
       .text('Test Doc', 0, 20, { width: 612, align: 'center' });
-    doc.font('Courier')
+    doc
+      .font('Courier')
       .fontSize(16)
       .text('Courier subheading', 0, 50, { width: 612, align: 'center' });
 
-    doc.font('myfont1').formText('file0', 10, 100, 592, 400, { multiline: true });
+    doc
+      .font('myfont1')
+      .formText('file0', 10, 100, 592, 400, { multiline: true });
 
     expect(docData.length).toBe(3);
-    expect(docData).toContainChunk(expected)
+    expect(docData).toContainChunk(expected);
   });
 
   test('push button', () => {
@@ -87,11 +132,11 @@ describe('AcroForm', () => {
       '<<\n/FT /Btn\n/Ff 65536\n/DR <<\n/Font <<\n/F1 8 0 R\n>>\n>>\n/MK <<\n/CA (Test Button)\n/BG [1 1 0]\n>>\n/T (btn1)\n/Subtype /Widget\n/F 4\n/Type /Annot\n/Rect [20 742 120 772]\n>>',
       'endobj'
     ];
-    doc.initAcroForm();
+    doc.initForms();
     const docData = logData(doc);
     let opts = {
       backgroundColor: 'yellow',
-      label: 'Test Button',
+      label: 'Test Button'
     };
     doc.formPushButton('btn1', 20, 20, 100, 30, opts);
     expect(docData.length).toBe(3);
@@ -102,9 +147,9 @@ describe('AcroForm', () => {
 
   test('field heirarchy', () => {
     const expected = [
-      "13 0 obj",
+      '13 0 obj',
       '<<\n/Parent 11 0 R\n/FT /Tx\n/DR <<\n/Font <<\n/F1 8 0 R\n>>\n>>\n/T (leaf1)\n/Subtype /Widget\n/F 4\n/Type /Annot\n/Rect [10 742 210 782]\n>>',
-      "endobj",
+      'endobj',
       '14 0 obj',
       '<<\n/Parent 11 0 R\n/FT /Tx\n/DR <<\n/Font <<\n/F1 8 0 R\n>>\n>>\n/T (leaf2)\n/Subtype /Widget\n/F 4\n/Type /Annot\n/Rect [10 692 210 732]\n>>',
       'endobj',
@@ -124,24 +169,24 @@ describe('AcroForm', () => {
       'endobj',
       '9 0 obj',
       '<<\n/Fields [10 0 R]\n/NeedAppearances true\n/DA (/F1 0 Tf 0 g)\n/DR <<\n/Font <<\n/F1 8 0 R\n>>\n>>\n>>',
-      'endobj',
+      'endobj'
     ];
 
     const docData = logData(doc);
 
-    doc.font('Helvetica')    // establishes the default font
-    doc.initAcroForm()
+    doc.font('Helvetica'); // establishes the default font
+    doc.initForms();
 
     let rootField = doc.field('rootField');
     let child1Field = doc.field('child1Field', { Parent: rootField });
     let child2Field = doc.field('child2Field', { Parent: rootField });
-    doc.formText('leaf1', 10, 10, 200, 40, { Parent: child1Field })
-    doc.formText('leaf2', 10, 60, 200, 40, { Parent: child1Field })
-    doc.formText('leaf3', 10, 110, 200, 40, { Parent: child2Field })
+    doc.formText('leaf1', 10, 10, 200, 40, { Parent: child1Field });
+    doc.formText('leaf2', 10, 60, 200, 40, { Parent: child1Field });
+    doc.formText('leaf3', 10, 110, 200, 40, { Parent: child2Field });
 
     expect(docData.length).toBe(expected.length);
     for (let idx = 0; idx < expected.length; ++idx) {
-      expect(docData[idx]).toBe(expected[idx])
+      expect(docData[idx]).toBe(expected[idx]);
     }
 
     doc.end();
@@ -149,7 +194,7 @@ describe('AcroForm', () => {
     for (let idx = 0; idx < docData.length; ++idx) {
       if (docData[idx] === expected2[0]) {
         for (let jdx = 0; jdx < expected2.length; ++jdx) {
-          expect(docData[idx + jdx]).toBe(expected2[jdx])
+          expect(docData[idx + jdx]).toBe(expected2[jdx]);
         }
       }
     }
