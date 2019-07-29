@@ -1,42 +1,43 @@
 # Forms in PDFKit
 
-Forms are interactive features of the PDF format. They make it possible to
-add annotations such as text fields, combo boxes, buttons and actions. To
-include Forms in the PDF that you are generating you must call the document
-`initForms()` method.
+Forms are an interactive feature of the PDF format. Forms make it possible to
+add form annotations such as text fields, combo boxes, buttons and actions.
+Before addings forms to a PDF you must call the document `initForm()` method.
 
-- `initForms()` - Must be called before adding any forms or fields to the
-  document.
+- `initForm()` - Must be called before adding a form annotation to the document.
 
 ```javascript
 doc.font('Helvetica'); // establishes the default form field font
-doc.initForms();
+doc.initForm();
 ```
 
-## Forms Methods
+## Form Annotation Methods
 
-Form elements are _Widget Annotations_ and are added using the document
-`widgetAnnotation` method. Additional methods listed below are shortcut methods
-that call the `widgetAnnotation` method. The list of the available _Widget
-Annotation_ document methods is:
+Form annotations are added using the following document methods.
 
-- `widgetAnnotation( name, x, y, width, height, options)`
 - `formText( name, x, y, width, height, options)`
 - `formPushButton( name, x, y, width, height, name, options)`
-- `formRadioButton( name, x, y, width, height, options)`
-- `formChoice( name, x, y, width, height, options)`
+- `formCombo( name, x, y, width, height, options)`
+- `formList( name, x, y, width, height, options)`
 
-Each field is given a `name` that is used to identify the form field. Field
+The above methods call the `formAnnotation` method with
+type set to one of `text`, `pushButton`, `radioButton`, `combo` or `list`.
+
+- `formAnnotation( name, type, x, y, width, height, options)`
+
+### `name` Parameter
+
+Form annotations are each given a `name` that is used for identification. Field
 names are hierarchical using a period ('.') as a separaror (_e.g._
 _shipping.address.street_). More than one form field can have the same name.
 When this happens, the fields will have the same value. There is more
 information on `name` in the **Field Names** section below.
 
-### Options Parameter
+### `options` Parameter
 
 #### Common Options
 
-Widget Annotation `options` that are common across all field types are:
+Form Annotation `options` that are common across all form annotation types are:
 
 - `required` [_boolean_] - The field must have a value by the time the form is submitted.
 - `noExport` [_boolean_] - The field will not be exported if a form is submitted.
@@ -47,8 +48,8 @@ Widget Annotation `options` that are common across all field types are:
 - `defaultValue` [_number|string_] - The default value to which the field
   reverts if a reset-form action is executed.
 
-Some Widget Annotations have a `color` option that can be specified. You can use
-an array of RGB values, a hex color, or a named CSS color value for that option.
+Some form annotations have `color` options. You can use an array of RGB values,
+a hex color, or a named CSS color value for that option.
 
 - `backgroundColor` - field background color
 - `borderColor` - field border color
@@ -73,35 +74,28 @@ doc.formText('leaf2', 10, 60, 200, 40, {
 });
 ```
 
-#### Choice Field Options
+#### Combo and List Field Options
 
-- `combo` [_boolean_] - If set, the field is a combo box, otherwise it is a list box.
-- `edit` [_boolean_] - For combo boxes, allows for the user to enter a value in the field.
 - `sort` [_boolean_] - The field options will be sorted alphabetically.
-- `noSpell` [_boolean_] - If set, text entered in the field is not spell-checked.
-- `choices` [_array_] - Array of choices to display in the combo box.
+- `edit` [_boolean_] - (combo only) Allow the user to enter a value in the field.
+- `multiSelect` [_boolean_] - Allow more than one choice to be selected.
+- `noSpell` [_boolean_] - (combo only) If set and `edit` is true, text entered in the field is not spell-checked.
+- `select` [_array_] - Array of choices to display in the combo or list form field.
 
 ```js
 opts = {
-  choices: ['', 'github', 'bitbucket', 'gitlab'],
+  select: ['', 'github', 'bitbucket', 'gitlab'],
   value: '',
   defaultValue: '',
-  align: 'left',
-  combo: true
+  align: 'left'
 };
-doc.formChoice('ch1', 10, y, 100, 20, opts);
+doc.formCombo('ch1', 10, y, 100, 20, opts);
 ```
 
 #### Button Field Options
 
-- `label` [_string_] - For buttons, sets the label text.
-- `pushButton` [_boolean_] - If set, the field is a pushbutton that does not
-  retain a permanent value.
-- `radioButton` [_boolean_] - If set, the field is a set of radio buttons; if
-  clear, the field is a checkbox. This flag is meaningful only if the `pushbutton`
-  flag is not true.
-- `toggleToOffButton` [_boolean_] - For Radio Buttons, if set, then exactly one radio
-  button will be selected at one time.
+- `label` [_string_] - Sets the label text. You can also set an icon, but for
+  this you will need to 'expert-up' and dig deeper into the PDF Reference manual.
 
 ```js
 var opts = {
@@ -113,19 +107,20 @@ doc.formPushButton('btn1', 10, 200, 100, 30, opts);
 
 ### Text Field Formatting
 
-When needing to format the text value of a Widget Annotation, the following
+When needing to format the text value of a Form Annotation, the following
 `options` are available. This will cause predefined document JavaScript actions
-to automatically format the text. Refer to the section on **Formatting scripts**
-in the Acrobat SDK documentation for the [Acrobat Forms
+to automatically format the text. Refer to the section _Formatting scripts_ in
+[Acrobat Forms
 Plugin](https://help.adobe.com/en_US/acrobat/acrobat_dc_sdk/2015/HTMLHelp/#t=Acro12_MasterBook%2FIAC_API_FormsIntro%2FMethods1.htm)
-for more information.
+of the Acrobat SDK documentation for more information.
 
-Add a format dictionary to `options`. The dictionary will contain a type and optional additional formatting.
+Add a format dictionary to `options`. The dictionary must contain a `type` attribute.
 
 - `format` - generic object
 - `format.type` - value must be one of `date`, `time`, `percent`, `number`, `zip`, `zipPlus4`, `phone` or `ssn`.
 
-The types `date`, `time`, `percent` and `number` have additional formatting.
+When `type` is `date`, `time`, `percent` or `number` the format dictionary must
+contain additional parameters as described below.
 
 #### Date format
 
@@ -164,10 +159,10 @@ doc.formText('field.time', 10, 60, 200, 40, {
 #### Number and percent format
 
 - `format.nDec` [_number_] - the number of places after the decimal point
-- `format.sepComma` [_boolean_] - display a comma separator
-- `format.negStyle` [_string_] (`number` only) - the value must be one of `MinusBlack` , `Red`, `ParensBlack`, `ParensRed`
-- `format.currency` [_string_] (`number` only) - the currency symbol
-- `format.currencyPrepend` [_boolean_] (`number` only) - set to true to prepend the currency symbol
+- `format.sepComma` [_boolean_] - display a comma separator, otherwise do not display a separator.
+- `format.negStyle` [_string_] (number only) - the value must be one of `MinusBlack` , `Red`, `ParensBlack`, `ParensRed`
+- `format.currency` [_string_] (number only) - a currency symbol to display
+- `format.currencyPrepend` [_boolean_] (number only) - set to true to prepend the currency symbol
 
 ```js
 // Currency text field formatting
@@ -185,63 +180,57 @@ doc.formText('leaf2', 10, 60, 200, 40, {
 });
 ```
 
-### Advanced Form Field Use
-
-Forms can be quite complicated and your needs will likely grow to sometimes need
-to directly specify the attributes that will go into the Widget Annotation or
-Field dictionaries. Consult the **PDF Reference** and set these attributes in
-the `options` object. Any options that are not listed above will be added
-directly to the corresponding PDF Object.
-
-## Other Methods
-
-The font used for a Widget Annotation is set using the `document.font` method.
-Yes that's the same method as is used when setting the text font.
-
-In support of Widget Annotations that execute JavaScript in PDF, you can use the
-following document method:
-
-- `addNamedJavaScript( name, string )`
-
 ## Field Names
 
-Widget Annotations are, by default, added to the Catalog's `Form` dictionary
-as an array of `Fields`. Fields are organized in a name heirarchy, for example
-_shipping.address.street_. You can either set the `name` of each Widget
-Annotation with the full name (e.g. _shipping.address.street_) or you can create
-parent Fields. In this example you might have a _shipping_ field that is added
-to the Form Fields array, an _address_ field that refers to the _shipping_
-Field as it's parent, and a _street_ Widget Annotation that would refer to the
-_address_ field as it's parent. To create a field use the document method:
+Form Annotations are, by default, added to the root of the PDF document. A PDF
+form is organized in a name heirarchy, for example _shipping.address.street_.
+Capture this heirarchy either by setting the `name` of each _form annotation_ with
+the full hierarchical name (e.g. _shipping.address.street_) or by creating a
+hierarchy of _form fields_ and _form annotations_ and refering to a form field or form
+annotations parent using `options.parent`.
 
-- `field( name, options )` - returns a reference to the field
+A _form field_ is an invisible node in the PDF form and is created using the
+document `formField` method. A form field must include the node's `name` (e.g.
+_shipping_) and may include other information such as the default font that is
+to be used by all child form annotations.
 
-To specify the parent of a _Field_ or _Widget Annotation_, set the `parent`
-options to the field reference.
+Using the `formField` method you might create a _shipping_ field that is added
+to the root of the document, an _address_ field that refers to the _shipping_
+field as it's parent, and a _street_ Form Annotation that would refer to the
+_address_ field as it's parent.
 
-Example PDF using field hierarchy, three text fields and a push
-button.
+Create form fields using the document method:
+
+- `formField( name, options )` - returns a reference to the field
+
+-- _Example PDF using field hierarchy, three text fields and a push
+button_ --
 
 ```javascript
 doc.font('Helvetica'); // establishes the default font
-doc.initForms();
+doc.initForm();
 
-let rootField = doc.field('rootField');
-let child1Field = doc.field('child1Field', { Parent: rootField });
-let child2Field = doc.field('child2Field', { Parent: rootField });
+let rootField = doc.formField('rootField');
+let child1Field = doc.formField('child1Field', { parent: rootField });
+let child2Field = doc.formField('child2Field', { parent: rootField });
+
+// Add text form annotation 'rootField.child1Field.leaf1'
 doc.formText('leaf1', 10, 10, 200, 40, {
-  Parent: child1Field,
+  parent: child1Field,
   multiline: true
 });
+// Add text form annotation 'rootField.child1Field.leaf2'
 doc.formText('leaf2', 10, 60, 200, 40, {
-  Parent: child1Field,
+  parent: child1Field,
   multiline: true
 });
-doc.formText('leaf3', 10, 110, 200, 80, {
-  Parent: child2Field,
+// Add text form annotation 'rootField.child2Field.leaf1'
+doc.formText('leaf1', 10, 110, 200, 80, {
+  parent: child2Field,
   multiline: true
 });
 
+// Add push button form annotation 'btn1'
 var opts = {
   backgroundColor: 'yellow',
   label: 'Test Button'
@@ -253,6 +242,33 @@ The output of this example looks like this.
 
 ![0](images/Forms.png)
 
+### Advanced Form Field Use
+
+Forms can be quite complicated and your needs will likely grow to sometimes need
+to directly specify the attributes that will go into the Form Annotation or
+Field dictionaries. Consult the **PDF Reference** and set these attributes in
+the `options` object. Any options that are not listed above will be added
+directly to the corresponding PDF Object.
+
+## Font
+
+The font used for a Form Annotation is set using the `document.font` method.
+Yes that's the same method as is used when setting the text font.
+
+The `font` method must be called before `initForm` and may be called before `formField` or any of the form annotation methods.
+
+```js
+doc.setFont('Courier');
+doc.formText('myfield', 10, 10, 200, 20);
+```
+
+## Named JavaScript
+
+In support of Form Annotations that execute JavaScript in PDF, you may use the
+following document method:
+
+- `addNamedJavaScript( name, string )`
+
 ## Limitations
 
 It is recommended that you test your PDF form documents across all platforms and
@@ -263,7 +279,7 @@ viewers that you wish to support.
 Form elements must each have an _appearance_ set using the `AP` attribute of the
 annotation. If this attribute is not set, the form element's value _may_ not be
 visible. Because appearances can be complex to generate, Adobe Acrobat has an
-option to build these apperances from form values and Widget Annotation
+option to build these apperances from form values and Form Annotation
 attributes when a PDF is first opened. To do this PDFKit always sets the Form dictionary's
 `NeedAppearances` attribute to true. This could mean that the PDF will be
 _dirty_ upon open, meaning it will need to be saved.
@@ -271,7 +287,7 @@ _dirty_ upon open, meaning it will need to be saved.
 The `NeedAppearances` flag may not be honored by all PDF viewers.
 
 Some form documents may not need to generate appearances. This may be the case
-for text Widget Annotations that initially have no value. This is not true for
+for text Form Annotations that initially have no value. This is not true for
 push button widget annotations. Please test
 
 ### Document JavaScript
@@ -279,5 +295,10 @@ push button widget annotations. Please test
 Many PDF Viewers, aside from Adobe Acrobat Reader, do not implement document
 JavaScript. Even Adobe Readers may not implement document JavaScript where it is
 not permitted by a device's app store terms of service (e.g. iOS devices).
+
+### Radio and Checkboxes
+
+Support for radio and checkboxes requires a more advanced attention to their
+rendered appearances and are not supported in this initial forms release.
 
 ---
