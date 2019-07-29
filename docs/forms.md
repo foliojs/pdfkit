@@ -26,7 +26,11 @@ Annotation_ document methods is:
 - `formRadioButton( name, x, y, width, height, options)`
 - `formChoice( name, x, y, width, height, options)`
 
-There is more information on `name` in the **Field Names** section below.
+Each field is given a `name` that is used to identify the form field. Field
+names are hierarchical using a period ('.') as a separaror (_e.g._
+_shipping.address.street_). More than one form field can have the same name.
+When this happens, the fields will have the same value. There is more
+information on `name` in the **Field Names** section below.
 
 ### Options Parameter
 
@@ -37,9 +41,9 @@ Widget Annotation `options` that are common across all field types are:
 - `required` [_boolean_] - The field must have a value by the time the form is submitted.
 - `noExport` [_boolean_] - The field will not be exported if a form is submitted.
 - `readyOnly` [_boolean_] - The user may not change the value of the field, and
-  the field will not respond to mouse clicks. This is useful for fields that are
-  computed.
-- `value` [_number|string_] - The field's value
+  the field will not respond to mouse clicks. This is useful for fields that have
+  computed values.
+- `value` [_number|string_] - The field's value.
 - `defaultValue` [_number|string_] - The default value to which the field
   reverts if a reset-form action is executed.
 
@@ -51,10 +55,10 @@ an array of RGB values, a hex color, or a named CSS color value for that option.
 
 #### Text Field Options
 
-- `align` [_string_] - For text form fields, sets the alignment to `left`,
+- `align` [_string_] - Sets the alignment to `left`,
   `center` or `right`.
-- `multiline` [_boolean_] - For text fields, allows the field to have multiple lines of text.
-- `password` [_boolean_] - For text fields, the text will be masked (_e.g._ with asterisks)
+- `multiline` [_boolean_] - Allows the field to have multiple lines of text.
+- `password` [_boolean_] - The text will be masked (_e.g._ with asterisks).
 - `noSpell` [_boolean_] - If set, text entered in the field is not spell-checked
 - `format` [_object_] - See the section on **Text Field Formatting** below.
 
@@ -74,8 +78,8 @@ doc.formText('leaf2', 10, 60, 200, 40, {
 - `combo` [_boolean_] - If set, the field is a combo box, otherwise it is a list box.
 - `edit` [_boolean_] - For combo boxes, allows for the user to enter a value in the field.
 - `sort` [_boolean_] - The field options will be sorted alphabetically.
-- `noSpell` [_boolean_] - If set, text entered in the field is not spell-checked
-- `choices` [_array_] - Array of choices
+- `noSpell` [_boolean_] - If set, text entered in the field is not spell-checked.
+- `choices` [_array_] - Array of choices to display in the combo box.
 
 ```js
 opts = {
@@ -94,8 +98,8 @@ doc.formChoice('ch1', 10, y, 100, 20, opts);
 - `pushButton` [_boolean_] - If set, the field is a pushbutton that does not
   retain a permanent value.
 - `radioButton` [_boolean_] - If set, the field is a set of radio buttons; if
-  clear, the field is a checkbox. This flag is meaningful only if the Pushbutton
-  flag is clear.
+  clear, the field is a checkbox. This flag is meaningful only if the `pushbutton`
+  flag is not true.
 - `toggleToOffButton` [_boolean_] - For Radio Buttons, if set, then exactly one radio
   button will be selected at one time.
 
@@ -110,9 +114,9 @@ doc.formPushButton('btn1', 10, 200, 100, 30, opts);
 ### Text Field Formatting
 
 When needing to format the text value of a Widget Annotation, the following
-`options` are available to implement predefined document JavaScript actions that
-will automatically format the text. Refer to the section on **Formatting
-scripts** in the Acrobat SDK documentation for the [Acrobat Forms
+`options` are available. This will cause predefined document JavaScript actions
+to automatically format the text. Refer to the section on **Formatting scripts**
+in the Acrobat SDK documentation for the [Acrobat Forms
 Plugin](https://help.adobe.com/en_US/acrobat/acrobat_dc_sdk/2015/HTMLHelp/#t=Acro12_MasterBook%2FIAC_API_FormsIntro%2FMethods1.htm)
 for more information.
 
@@ -197,7 +201,7 @@ Yes that's the same method as is used when setting the text font.
 In support of Widget Annotations that execute JavaScript in PDF, you can use the
 following document method:
 
-- `addNamedJavaScript( name, buffer )`
+- `addNamedJavaScript( name, string )`
 
 ## Field Names
 
@@ -251,6 +255,9 @@ The output of this example looks like this.
 
 ## Limitations
 
+It is recommended that you test your PDF form documents across all platforms and
+viewers that you wish to support.
+
 ### Form Field Appearances
 
 Form elements must each have an _appearance_ set using the `AP` attribute of the
@@ -261,19 +268,16 @@ attributes when a PDF is first opened. To do this PDFKit always sets the Form di
 `NeedAppearances` attribute to true. This could mean that the PDF will be
 _dirty_ upon open, meaning it will need to be saved.
 
-It is important to note that the `NeedAppearances` flag may not be honored by
-PDF viewers that do not implement this aspect of the PDF Reference.
+The `NeedAppearances` flag may not be honored by all PDF viewers.
 
 Some form documents may not need to generate appearances. This may be the case
 for text Widget Annotations that initially have no value. This is not true for
-push button widget annotations.
+push button widget annotations. Please test
 
 ### Document JavaScript
 
 Many PDF Viewers, aside from Adobe Acrobat Reader, do not implement document
 JavaScript. Even Adobe Readers may not implement document JavaScript where it is
-not permitted by a device's app store terms of service (e.g. iOS devices). It is
-recommended that you test your PDF form documents across all platforms and
-viewers that you wish to support.
+not permitted by a device's app store terms of service (e.g. iOS devices).
 
 ---
