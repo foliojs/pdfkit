@@ -18,7 +18,7 @@ function joinTokens(...args) {
   return r;
 }
 
-describe('AcroForm', () => {
+describe('acroform', () => {
   let doc;
 
   beforeEach(() => {
@@ -67,7 +67,7 @@ describe('AcroForm', () => {
     doc.addPage();
     const docData = logData(doc);
     const font = PDFFontFactory.open(doc, 'tests/fonts/Roboto-Regular.ttf');
-    doc.initForms();
+    doc.initForm();
     expect(docData.length).toBe(0);
   });
 
@@ -88,6 +88,8 @@ describe('AcroForm', () => {
         '10 0 R',
         '>>',
         '>>',
+        '/DA',
+        '(/F3 0 Tf 0 g)',
         '/T',
         '(file0)',
         '/Subtype',
@@ -107,7 +109,7 @@ describe('AcroForm', () => {
     doc.registerFont('myfont1', 'tests/fonts/Roboto-Regular.ttf');
 
     doc.font('Courier-Bold'); // establishes the default font
-    doc.initForms();
+    doc.initForm();
 
     doc
       .font('myfont1')
@@ -129,10 +131,10 @@ describe('AcroForm', () => {
   test('push button', () => {
     const expected = [
       '10 0 obj',
-      '<<\n/FT /Btn\n/Ff 65536\n/DR <<\n/Font <<\n/F1 8 0 R\n>>\n>>\n/MK <<\n/CA (Test Button)\n/BG [1 1 0]\n>>\n/T (btn1)\n/Subtype /Widget\n/F 4\n/Type /Annot\n/Rect [20 742 120 772]\n>>',
+      '<<\n/FT /Btn\n/Ff 65536\n/MK <<\n/CA (Test Button)\n/BG [1 1 0]\n>>\n/T (btn1)\n/Subtype /Widget\n/F 4\n/Type /Annot\n/Rect [20 742 120 772]\n>>',
       'endobj'
     ];
-    doc.initForms();
+    doc.initForm();
     const docData = logData(doc);
     let opts = {
       backgroundColor: 'yellow',
@@ -145,27 +147,100 @@ describe('AcroForm', () => {
     expect(docData[2]).toBe(expected[2]);
   });
 
+  describe('text format', () => {
+    test('number', () => {
+      const expected = [
+        '10 0 obj',
+        '<<\n/FT /Tx\n/V 32.98\n/AA <<\n/K <<\n/S /JavaScript\n' +
+          '/JS (AFNumber_Keystroke\\(2,1,"MinusBlack",null,"$",true\\);)\n>>\n' +
+          '/F <<\n/S /JavaScript\n/JS (AFNumber_Format\\(2,1,"MinusBlack",null,"$",true\\);)\n>>\n>>\n' +
+          '/T (dollars)\n/Subtype /Widget\n/F 4\n/Type /Annot\n/Rect [20 752 70 772]\n>>',
+        'endobj'
+      ];
+      doc.initForm();
+      const docData = logData(doc);
+      let opts = {
+        value: 32.98,
+        format: {
+          type: 'number',
+          nDec: 2,
+          currency: '$',
+          currencyPrepend: true
+        }
+      };
+      doc.formText('dollars', 20, 20, 50, 20, opts);
+      expect(docData.length).toBe(3);
+      expect(docData).toContainChunk(expected);
+    });
+    test('date', () => {
+      const expected = [
+        '10 0 obj',
+        '<<\n/FT /Tx\n/V (1999-12-31)\n/AA <<\n/K <<\n/S /JavaScript\n' +
+          '/JS (AFDate_KeystrokeEx\\(yyyy-mm-dd\\);)\n>>\n' +
+          '/F <<\n/S /JavaScript\n/JS (AFDate_Format\\(yyyy-mm-dd\\);)\n>>\n>>\n' +
+          '/T (date)\n/Subtype /Widget\n/F 4\n/Type /Annot\n/Rect [20 752 70 772]\n>>',
+        'endobj'
+      ];
+      doc.initForm();
+      const docData = logData(doc);
+      let opts = {
+        value: '1999-12-31',
+        format: {
+          type: 'date',
+          param: 'yyyy-mm-dd'
+        }
+      };
+      doc.formText('date', 20, 20, 50, 20, opts);
+      expect(docData.length).toBe(3);
+      expect(docData).toContainChunk(expected);
+    });
+  });
+
+  test('flags', () => {
+    const expected = [
+      '10 0 obj',
+      '<<\n/FT /Tx\n' +
+        '/Ff 4206599\n/Q 1\n' +
+        '/T (flags)\n/Subtype /Widget\n/F 4\n/Type /Annot\n/Rect [20 752 70 772]\n>>',
+      'endobj'
+    ];
+    doc.initForm();
+    const docData = logData(doc);
+    let opts = {
+      required: true,
+      noExport: true,
+      readOnly: true,
+      align: 'center',
+      multiline: true,
+      password: true,
+      noSpell: true
+    };
+    doc.formText('flags', 20, 20, 50, 20, opts);
+    expect(docData.length).toBe(3);
+    expect(docData).toContainChunk(expected);
+  });
+
   test('field heirarchy', () => {
     const expected = [
       '13 0 obj',
-      '<<\n/Parent 11 0 R\n/FT /Tx\n/DR <<\n/Font <<\n/F1 8 0 R\n>>\n>>\n/T (leaf1)\n/Subtype /Widget\n/F 4\n/Type /Annot\n/Rect [10 742 210 782]\n>>',
+      '<<\n/Parent 11 0 R\n/FT /Tx\n/T (leaf1)\n/Subtype /Widget\n/F 4\n/Type /Annot\n/Rect [10 742 210 782]\n>>',
       'endobj',
       '14 0 obj',
-      '<<\n/Parent 11 0 R\n/FT /Tx\n/DR <<\n/Font <<\n/F1 8 0 R\n>>\n>>\n/T (leaf2)\n/Subtype /Widget\n/F 4\n/Type /Annot\n/Rect [10 692 210 732]\n>>',
+      '<<\n/Parent 11 0 R\n/FT /Tx\n/T (leaf2)\n/Subtype /Widget\n/F 4\n/Type /Annot\n/Rect [10 692 210 732]\n>>',
       'endobj',
       '15 0 obj',
-      '<<\n/Parent 12 0 R\n/FT /Tx\n/DR <<\n/Font <<\n/F1 8 0 R\n>>\n>>\n/T (leaf3)\n/Subtype /Widget\n/F 4\n/Type /Annot\n/Rect [10 642 210 682]\n>>',
+      '<<\n/Parent 12 0 R\n/FT /Tx\n/T (leaf3)\n/Subtype /Widget\n/F 4\n/Type /Annot\n/Rect [10 642 210 682]\n>>',
       'endobj'
     ];
     const expected2 = [
       '11 0 obj',
-      '<<\n/Parent 10 0 R\n/DR <<\n/Font <<\n/F1 8 0 R\n>>\n>>\n/T (child1Field)\n/Kids [13 0 R 14 0 R]\n>>',
+      '<<\n/Parent 10 0 R\n/T (child1Field)\n/Kids [13 0 R 14 0 R]\n>>',
       'endobj',
       '12 0 obj',
-      '<<\n/Parent 10 0 R\n/DR <<\n/Font <<\n/F1 8 0 R\n>>\n>>\n/T (child2Field)\n/Kids [15 0 R]\n>>',
+      '<<\n/Parent 10 0 R\n/T (child2Field)\n/Kids [15 0 R]\n>>',
       'endobj',
       '10 0 obj',
-      '<<\n/DR <<\n/Font <<\n/F1 8 0 R\n>>\n>>\n/T (rootField)\n/Kids [11 0 R 12 0 R]\n>>',
+      '<<\n/T (rootField)\n/Kids [11 0 R 12 0 R]\n>>',
       'endobj',
       '9 0 obj',
       '<<\n/Fields [10 0 R]\n/NeedAppearances true\n/DA (/F1 0 Tf 0 g)\n/DR <<\n/Font <<\n/F1 8 0 R\n>>\n>>\n>>',
@@ -175,11 +250,11 @@ describe('AcroForm', () => {
     const docData = logData(doc);
 
     doc.font('Helvetica'); // establishes the default font
-    doc.initForms();
+    doc.initForm();
 
-    let rootField = doc.field('rootField');
-    let child1Field = doc.field('child1Field', { Parent: rootField });
-    let child2Field = doc.field('child2Field', { Parent: rootField });
+    let rootField = doc.formField('rootField');
+    let child1Field = doc.formField('child1Field', { Parent: rootField });
+    let child2Field = doc.formField('child2Field', { Parent: rootField });
     doc.formText('leaf1', 10, 10, 200, 40, { Parent: child1Field });
     doc.formText('leaf2', 10, 60, 200, 40, { Parent: child1Field });
     doc.formText('leaf3', 10, 110, 200, 40, { Parent: child2Field });

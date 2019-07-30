@@ -20,11 +20,31 @@ doc.font('Helvetica');
 let child2Field = doc.formField('child2Field', { parent: rootField });
 
 let y = 10;
-doc.formText('leaf1', 10, y, 200, 40, {
+doc.formText('leaf1', 10, y, 200, 20, {
   parent: child1Field,
-  multiline: true
+  value: '1999-12-31',
+  format: {
+    type: 'date',
+    param: 'yyyy-mm-dd'
+  },
+  align: 'center'
 });
-y += 50;
+
+y += 30;
+opts = {
+  parent: child1Field,
+  value: 32.98,
+  format: {
+    type: 'number',
+    nDec: 2,
+    currency: '$',
+    currencyPrepend: true
+  },
+  align: 'right'
+};
+doc.formText('dollar', 10, y, 200, 20, opts);
+
+y += 30;
 doc.formText('leaf2', 10, y, 200, 40, {
   parent: child1Field,
   multiline: true,

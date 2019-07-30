@@ -124,10 +124,19 @@ contain additional parameters as described below.
 
 #### Date format
 
-- `format.param` - value must be one of the strings `m/d`, `m/d/yy`,
-  `mm/dd/yy`, `mm/yy`, `d-mmm`, `d-mmm-yy`, `dd-mmm-yy`, `yy-mm-dd`,
-  `mmm-yy`, `mmmm-yy`, `mmm d, yyyy`, `mmmm d, yyyy`, `m/d/yy h:MM tt`, or
-  `m/d/yy HH:MM`.
+- `format.param` (_string_) - specifies the value and display format and can include:
+  - `d` - single digit day of month
+  - `dd` - double digit day of month
+  - `m` - month digit
+  - `mm` - month double digit
+  - `mmm` - abbreviated month name
+  - `mmmm` - full month name
+  - `yy` - two digit year
+  - `yyyy` - four digit year
+  - `hh` - hour for 12 hour clock
+  - `HH` - hour for 24 hour clock
+  - `MM` - two digit minute
+  - `tt` - am or pm
 
 ```js
 // Date text field formatting
@@ -175,7 +184,7 @@ doc.formText('leaf2', 10, 60, 200, 40, {
     sepComma: true,
     negStyle: 'ParensRed',
     currency: '$',
-    currencPrepend: true
+    currencyPrepend: true
   }
 });
 ```
