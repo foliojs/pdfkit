@@ -13,7 +13,3 @@ demo/bundle.js
 coverage
 tests/integration/__pdfs__
 tests/integration/pdfmake/__pdfs__
-tests/integration/**/__snapshots__/*
-tests/integration/__snapshots__/*
-*.snap
-/*.pdf
