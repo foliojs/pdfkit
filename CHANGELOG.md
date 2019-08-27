@@ -2,6 +2,7 @@
 
 ### Unreleased
  - Fix infinite loop when text is positioned after page right margin
+ - Allow links in continued text to be stopped by setting link to null
 
 ### [v0.10.0] - 2019-06-06
 

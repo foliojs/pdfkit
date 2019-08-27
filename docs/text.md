@@ -166,6 +166,27 @@ Here is the output:
 
 ![4]()
 
+To cancel a link in rich text set the `link` option to `null`.
+
+    doc.fillColor('red')
+       .text(lorem.slice(0, 199), {
+         width: 465,
+         continued: true
+       })
+       .fillColor('blue')
+       .text(lorem.slice(199, 282), {
+         link: 'http://www.example.com',
+         continued: true
+       })
+       .fillColor('green')
+       .text(lorem.slice(182, 400), {
+         link: null
+       });
+
+Here is the output:
+
+![5]()
+
 ## Fonts
 
 The PDF format defines 14 standard fonts that can be used in PDF documents. PDFKit supports each of them out of the box.
@@ -219,7 +240,7 @@ Here is an example showing how to set the font in each case.
 
 The output of this example looks like this:
 
-![5](images/fonts.png)
+![6](images/fonts.png)
 
 Another nice feature of the PDFKit font support, is the ability to register a
 font file under a name for use later rather than entering the path to the font
