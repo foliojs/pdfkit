@@ -32,5 +32,69 @@ describe('Annotations', () => {
 >>`
       ]);
     });
+
+    test('using url', () => {
+      document.addPage();
+
+      const docData = logData(document);
+
+      document.text('Go to url', { link: 'http://www.example.com' });
+
+      expect(docData).toContainChunk([
+        `11 0 obj`,
+        `<<
+/S /URI
+/URI (http://www.example.com)
+>>`
+      ]);
+    });
+
+    test('using url on continue', () => {
+      document.addPage();
+
+      const docData = logData(document);
+
+      document.text('Go to url', { link: 'http://www.example.com', continued: true });
+      document.text('continued link');
+
+      expect(docData).toContainChunk([
+        `11 0 obj`,
+        `<<
+/S /URI
+/URI (http://www.example.com)
+>>`
+      ]);
+
+      expect(docData).toContainChunk([
+        `14 0 obj`,
+        `<<
+/S /URI
+/URI (http://www.example.com)
+>>`
+      ]);
+    });
+
+    test('using url on continue', () => {
+      document.addPage();
+
+      const docData = logData(document);
+
+      document.text('Go to url', { link: 'http://www.example.com', continued: true });
+      document.text('no continued link', { link: null });
+      
+      // console.log(docData);
+      expect(docData).toContainChunk([
+        `11 0 obj`,
+        `<<
+/S /URI
+/URI (http://www.example.com)
+>>`
+      ]);
+
+      expect(docData).not.toContainChunk([
+        `14 0 obj`
+      ]);
+    });
+
   });
 });
