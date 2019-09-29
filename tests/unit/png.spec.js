@@ -21,6 +21,9 @@ describe('PNGImage', () => {
         img.finalize();
       }
     };
+    img.decodeData = () => {
+      img.finalize();
+    };
     const finalizeFn = img.finalize;
     jest.spyOn(img, 'finalize').mockImplementation(() => finalizeFn.call(img));
     img.embed(document);
@@ -390,6 +393,164 @@ describe('PNGImage', () => {
       Subtype: 'Image',
       Type: 'XObject',
       Width: 112
+    });
+  });
+
+  test('Interlaced grayscale', () => {
+    // ImageWidth = 32
+    // ImageHeight = 32
+    // BitDepth = 8
+    // ColorType = 0
+    // Compression = 0
+    // Filter = 0
+    // Interlace = 1
+
+    const img = createImage('./tests/images/interlaced-grayscale-8bit.png');
+
+    expect(img.finalize).toBeCalledTimes(1);
+
+    expect(img.obj.data).toMatchObject({
+      BitsPerComponent: 8,
+      ColorSpace: 'DeviceGray',
+      Filter: 'FlateDecode',
+      Height: 32,
+      Length: 181,
+      Subtype: 'Image',
+      Type: 'XObject',
+      Width: 32,
+      DecodeParms: expect.any(PDFReference)
+    });
+
+    expect(img.obj.data.DecodeParms.data).toMatchObject({
+      BitsPerComponent: 8,
+      Colors: 1,
+      Columns: 32,
+      Predictor: 1
+    });
+  });
+
+  test('Interlaced pallete', () => {
+    // ImageWidth = 32
+    // ImageHeight = 32
+    // BitDepth = 8
+    // ColorType = 3
+    // Compression = 0
+    // Filter = 0
+    // Interlace = 1
+
+    const img = createImage('./tests/images/interlaced-pallete-8bit.png');
+
+    expect(img.finalize).toBeCalledTimes(1);
+
+    expect(img.obj.data).toMatchObject({
+      BitsPerComponent: 8,
+      ColorSpace: ['Indexed', 'DeviceRGB', 255, expect.any(PDFReference)],
+      Filter: 'FlateDecode',
+      Height: 32,
+      Length: 674,
+      Subtype: 'Image',
+      Type: 'XObject',
+      Width: 32,
+      DecodeParms: expect.any(PDFReference)
+    });
+
+    expect(img.obj.data.DecodeParms.data).toMatchObject({
+      BitsPerComponent: 8,
+      Colors: 1,
+      Columns: 32,
+      Predictor: 1
+    });
+  });
+
+  test('Interlaced RGB (8bit)', () => {
+    // ImageWidth = 32
+    // ImageHeight = 32
+    // BitDepth = 8
+    // ColorType = 2
+    // Compression = 0
+    // Filter = 0
+    // Interlace = 1
+
+    const img = createImage('./tests/images/interlaced-rgb-8bit.png');
+
+    expect(img.finalize).toBeCalledTimes(1);
+
+    expect(img.obj.data).toMatchObject({
+      BitsPerComponent: 8,
+      ColorSpace: 'DeviceRGB',
+      Filter: 'FlateDecode',
+      Height: 32,
+      Length: 242,
+      Subtype: 'Image',
+      Type: 'XObject',
+      Width: 32,
+      DecodeParms: expect.any(PDFReference)
+    });
+
+    expect(img.obj.data.DecodeParms.data).toMatchObject({
+      BitsPerComponent: 8,
+      Colors: 3,
+      Columns: 32,
+      Predictor: 1
+    });
+  });
+
+  test('Interlaced RGB (16bit)', () => {
+    // ImageWidth = 32
+    // ImageHeight = 32
+    // BitDepth = 16
+    // ColorType = 2
+    // Compression = 0
+    // Filter = 0
+    // Interlace = 1
+
+    const img = createImage('./tests/images/interlaced-rgb-16bit.png');
+
+    expect(img.finalize).toBeCalledTimes(1);
+
+    expect(img.obj.data).toMatchObject({
+      BitsPerComponent: 16,
+      ColorSpace: 'DeviceRGB',
+      Filter: 'FlateDecode',
+      Height: 32,
+      Length: 522,
+      Subtype: 'Image',
+      Type: 'XObject',
+      Width: 32,
+      DecodeParms: expect.any(PDFReference)
+    });
+
+    expect(img.obj.data.DecodeParms.data).toMatchObject({
+      BitsPerComponent: 16,
+      Colors: 3,
+      Columns: 32,
+      Predictor: 1
+    });
+  });
+
+  test('Interlaced RGB with alpha', () => {
+    // ImageWidth = 32
+    // ImageHeight = 32
+    // BitDepth = 8
+    // ColorType = 6
+    // Compression = 0
+    // Filter = 0
+    // Interlace = 1
+
+    const img = createImage('./tests/images/interlaced-rgb-alpha-8bit.png');
+
+    expect(img.finalize).toBeCalledTimes(1);
+
+    expect(img.obj.data).toMatchObject({
+      BitsPerComponent: 8,
+      ColorSpace: 'DeviceRGB',
+      Filter: 'FlateDecode',
+      Height: 32,
+      Length: 288,
+      Subtype: 'Image',
+      Type: 'XObject',
+      Width: 32,
+      SMask: expect.any(PDFReference)
     });
   });
 });
