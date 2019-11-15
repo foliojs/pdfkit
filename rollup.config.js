@@ -14,22 +14,6 @@ const external = [
   'saslprep'
 ];
 
-// supports using brfs transform
-const stripFSInterop = function() {
-  return {
-    renderChunk(code) {
-      code = code.replace(
-        "var fs = _interopDefault(require('fs'));",
-        "var fs = require('fs');"
-      );
-      return {
-        code,
-        map: null
-      };
-    }
-  };
-};
-
 export default [
   // CommonJS build for Node
   {
@@ -39,7 +23,8 @@ export default [
       name: 'pdfkit',
       file: pkg.main,
       format: 'cjs',
-      sourcemap: true
+      sourcemap: true,
+      interop: false
     },
     plugins: [
       babel({
@@ -59,8 +44,7 @@ export default [
       copy({
         files: ['lib/font/data/*.afm'],
         dest: 'js/data'
-      }),
-      stripFSInterop()
+      })
     ]
   },
   // ES for legacy (IE11) browsers
