@@ -4,6 +4,7 @@
  - Fix infinite loop when an individual character is bigger than the width of the text.
  - Fix infinite loop when text is positioned after page right margin
  - Allow links in continued text to be stopped by setting link to null
+ - Do not emit _interopDefault helper in commonjs build
 
 ### [v0.10.0] - 2019-06-06
 
