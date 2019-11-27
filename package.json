@@ -51,7 +51,7 @@
   "scripts": {
     "prepublishOnly": "npm run build",
     "build": "rollup -c && browserify --standalone PDFDocument js/pdfkit.js > js/pdfkit.standalone.js",
-    "demo": "cd demo && node test.js",
+    "demo": "cd demo && node testSpotColor.js",
     "browser-demo": "browserify demo/browser.js > demo/bundle.js",
     "pdf-guide": "node docs/generate.js",
     "website": "node docs/generate_website.js",
