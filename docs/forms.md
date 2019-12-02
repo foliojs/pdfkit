@@ -41,7 +41,7 @@ Form Annotation `options` that are common across all form annotation types are:
 
 - `required` [_boolean_] - The field must have a value by the time the form is submitted.
 - `noExport` [_boolean_] - The field will not be exported if a form is submitted.
-- `readyOnly` [_boolean_] - The user may not change the value of the field, and
+- `readOnly` [_boolean_] - The user may not change the value of the field, and
   the field will not respond to mouse clicks. This is useful for fields that have
   computed values.
 - `value` [_number|string_] - The field's value.
