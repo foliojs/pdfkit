@@ -1,7 +1,13 @@
 ## pdfkit changelog
 
 ### Unreleased
+ - Fix infinite loop when an individual character is bigger than the width of the text.
  - Fix infinite loop when text is positioned after page right margin
+ - Allow links in continued text to be stopped by setting link to null
+ - Add support to interlaced PNG files
+ - Do not emit _interopDefault helper in commonjs build
+ - Fix gradient with multiple stops (#1045)
+ - Set link annotation flag to print by default
 
 ### [v0.10.0] - 2019-06-06
 
