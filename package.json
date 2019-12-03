@@ -50,7 +50,7 @@
   },
   "scripts": {
     "prepublishOnly": "npm run build",
-    "build": "rollup -c && browserify --standalone PDFDocument js/pdfkit.js > js/pdfkit.standalone.js",
+    "build": "rollup -c && browserify --standalone PDFDocument --ignore iconv-lite js/pdfkit.js > js/pdfkit.standalone.js",
     "demo": "cd demo && node test.js",
     "browser-demo": "browserify demo/browser.js > demo/bundle.js",
     "pdf-guide": "node docs/generate.js",
