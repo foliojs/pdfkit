@@ -100,6 +100,8 @@ describe('acroform', () => {
         '/Annot',
         '/Rect',
         '[10 292 602 692]',
+        '/Border [0 0 0]',
+        '/C [0 0 0]',
         '>>'
       ),
       'endobj'
@@ -131,7 +133,7 @@ describe('acroform', () => {
   test('push button', () => {
     const expected = [
       '10 0 obj',
-      '<<\n/FT /Btn\n/Ff 65536\n/MK <<\n/CA (Test Button)\n/BG [1 1 0]\n>>\n/T (btn1)\n/Subtype /Widget\n/F 4\n/Type /Annot\n/Rect [20 742 120 772]\n>>',
+      '<<\n/FT /Btn\n/Ff 65536\n/MK <<\n/CA (Test Button)\n/BG [1 1 0]\n>>\n/T (btn1)\n/Subtype /Widget\n/F 4\n/Type /Annot\n/Rect [20 742 120 772]\n/Border [0 0 0]\n/C [0 0 0]\n>>',
       'endobj'
     ];
     doc.initForm();
@@ -154,7 +156,7 @@ describe('acroform', () => {
         '<<\n/FT /Tx\n/V 32.98\n/AA <<\n/K <<\n/S /JavaScript\n' +
           '/JS (AFNumber_Keystroke\\(2,1,"MinusBlack",null,"$",true\\);)\n>>\n' +
           '/F <<\n/S /JavaScript\n/JS (AFNumber_Format\\(2,1,"MinusBlack",null,"$",true\\);)\n>>\n>>\n' +
-          '/T (dollars)\n/Subtype /Widget\n/F 4\n/Type /Annot\n/Rect [20 752 70 772]\n>>',
+          '/T (dollars)\n/Subtype /Widget\n/F 4\n/Type /Annot\n/Rect [20 752 70 772]\n/Border [0 0 0]\n/C [0 0 0]\n>>',
         'endobj'
       ];
       doc.initForm();
@@ -178,7 +180,7 @@ describe('acroform', () => {
         '<<\n/FT /Tx\n/V (1999-12-31)\n/AA <<\n/K <<\n/S /JavaScript\n' +
           '/JS (AFDate_KeystrokeEx\\(yyyy-mm-dd\\);)\n>>\n' +
           '/F <<\n/S /JavaScript\n/JS (AFDate_Format\\(yyyy-mm-dd\\);)\n>>\n>>\n' +
-          '/T (date)\n/Subtype /Widget\n/F 4\n/Type /Annot\n/Rect [20 752 70 772]\n>>',
+          '/T (date)\n/Subtype /Widget\n/F 4\n/Type /Annot\n/Rect [20 752 70 772]\n/Border [0 0 0]\n/C [0 0 0]\n>>',
         'endobj'
       ];
       doc.initForm();
@@ -201,7 +203,7 @@ describe('acroform', () => {
       '10 0 obj',
       '<<\n/FT /Tx\n' +
         '/Ff 4206599\n/Q 1\n' +
-        '/T (flags)\n/Subtype /Widget\n/F 4\n/Type /Annot\n/Rect [20 752 70 772]\n>>',
+        '/T (flags)\n/Subtype /Widget\n/F 4\n/Type /Annot\n/Rect [20 752 70 772]\n/Border [0 0 0]\n/C [0 0 0]\n>>',
       'endobj'
     ];
     doc.initForm();
@@ -223,13 +225,13 @@ describe('acroform', () => {
   test('field heirarchy', () => {
     const expected = [
       '13 0 obj',
-      '<<\n/Parent 11 0 R\n/FT /Tx\n/T (leaf1)\n/Subtype /Widget\n/F 4\n/Type /Annot\n/Rect [10 742 210 782]\n>>',
+      '<<\n/Parent 11 0 R\n/FT /Tx\n/T (leaf1)\n/Subtype /Widget\n/F 4\n/Type /Annot\n/Rect [10 742 210 782]\n/Border [0 0 0]\n/C [0 0 0]\n>>',
       'endobj',
       '14 0 obj',
-      '<<\n/Parent 11 0 R\n/FT /Tx\n/T (leaf2)\n/Subtype /Widget\n/F 4\n/Type /Annot\n/Rect [10 692 210 732]\n>>',
+      '<<\n/Parent 11 0 R\n/FT /Tx\n/T (leaf2)\n/Subtype /Widget\n/F 4\n/Type /Annot\n/Rect [10 692 210 732]\n/Border [0 0 0]\n/C [0 0 0]\n>>',
       'endobj',
       '15 0 obj',
-      '<<\n/Parent 12 0 R\n/FT /Tx\n/T (leaf3)\n/Subtype /Widget\n/F 4\n/Type /Annot\n/Rect [10 642 210 682]\n>>',
+      '<<\n/Parent 12 0 R\n/FT /Tx\n/T (leaf3)\n/Subtype /Widget\n/F 4\n/Type /Annot\n/Rect [10 642 210 682]\n/Border [0 0 0]\n/C [0 0 0]\n>>',
       'endobj'
     ];
     const expected2 = [
