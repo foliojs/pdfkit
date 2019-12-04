@@ -2,6 +2,8 @@
 
 ### Unreleased
 
+### [v0.11.0] - 2019-12-03
+
 - Fix infinite loop when an individual character is bigger than the width of the text.
 - Fix infinite loop when text is positioned after page right margin
 - Allow links in continued text to be stopped by setting link to null
@@ -9,6 +11,7 @@
 - Do not emit \_interopDefault helper in commonjs build
 - Fix gradient with multiple stops (#1045)
 - Set link annotation flag to print by default
+- Add support for AcroForms
 - Drop support for (uncommon) cid less fonts on standalone build (reduces bundle size)
 
 ### [v0.10.0] - 2019-06-06
