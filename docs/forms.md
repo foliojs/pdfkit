@@ -267,7 +267,7 @@ Yes that's the same method as is used when setting the text font.
 The `font` method must be called before `initForm` and may be called before `formField` or any of the form annotation methods.
 
 ```js
-doc.setFont('Courier');
+doc.font('Courier');
 doc.formText('myfield', 10, 10, 200, 20);
 ```
 
