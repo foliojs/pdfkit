@@ -2,6 +2,8 @@
 
 ### Unreleased
 
+- Add support for mixed corner radius values for rounded rectangles
+
 ### [v0.11.0] - 2019-12-03
 
 - Fix infinite loop when an individual character is bigger than the width of the text.
