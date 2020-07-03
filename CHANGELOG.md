@@ -2,6 +2,8 @@
 
 ### Unreleased
 
+- Fix access permissions in PDF version 1.7ext3
+
 ### [v0.11.0] - 2019-12-03
 
 - Fix infinite loop when an individual character is bigger than the width of the text.
@@ -31,7 +33,7 @@
 - Add standalone virtual file system implementation
 - Add option (fontLayoutCache) to disable font layout cache
 
-### [v0.9.0] - 2019-1-28
+### [v0.9.0] - 2019-01-28
 
 - Convert to code base from coffescript to ES6+
 - Fix loading grayscale / transparent PNG files
