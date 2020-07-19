@@ -13,6 +13,17 @@ describe('virtual-fs', function() {
     fs.fileData = {};
   });
 
+  test('readFileSync', function () {
+    checkMissingFiles(['encoded', 'raw', 'binary']);
+
+    fs.bindFileData({
+      'files/binary': Buffer.from('Buffer content'),
+    });
+
+    const base64Data = fs.readFileSync('files/binary', 'base64');
+    expect(base64Data).toEqual('QnVmZmVyIGNvbnRlbnQ=');
+  });
+
   test('writeFileSync', function() {
     checkMissingFiles(['encoded', 'raw', 'binary']);
 
