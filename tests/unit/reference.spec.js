@@ -36,7 +36,7 @@ describe('PDFReference', () => {
 
   test('written data of reference with uncompressed data', () => {
     const docData = logData(document);
-    const chunk = new Buffer('test');
+    const chunk = Buffer.from('test');
     const ref = new PDFReference(document, 1);
     ref.compress = false;
     ref.write(chunk);
@@ -55,7 +55,7 @@ describe('PDFReference', () => {
 
   test('written data of reference with compressed data', () => {
     const docData = logData(document);
-    const chunk = new Buffer('test');
+    const chunk = Buffer.from('test');
     const compressed = zlib.deflateSync(chunk);
     const ref = new PDFReference(document, 1);
     ref.write(chunk);

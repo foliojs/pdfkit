@@ -6,7 +6,7 @@ var fs = require('fs');
 
 // manual mock for PDFSecurity to ensure stored id will be the same accross different systems
 PDFSecurity.generateFileID = () => {
-  return new Buffer('mocked-pdf-id');
+  return Buffer.from('mocked-pdf-id');
 };
 
 PDFSecurity.generateRandomWordArray = bytes => {

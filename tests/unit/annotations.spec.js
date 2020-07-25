@@ -4,7 +4,7 @@ import { logData } from './helpers';
 
 // manual mock for PDFSecurity to ensure stored id will be the same accross different systems
 PDFSecurity.generateFileID = () => {
-  return new Buffer('mocked-pdf-id');
+  return Buffer.from('mocked-pdf-id');
 };
 
 describe('Annotations', () => {
@@ -81,7 +81,7 @@ describe('Annotations', () => {
 
       document.text('Go to url', { link: 'http://www.example.com', continued: true });
       document.text('no continued link', { link: null });
-      
+
       // console.log(docData);
       expect(docData).toContainChunk([
         `11 0 obj`,

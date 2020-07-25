@@ -5,7 +5,7 @@ import PDFFontFactory from '../../lib/font_factory';
 
 // manual mock for PDFSecurity to ensure stored id will be the same accross different systems
 PDFSecurity.generateFileID = () => {
-  return new Buffer('mocked-pdf-id');
+  return Buffer.from('mocked-pdf-id');
 };
 
 function escapeRegExp(string) {
