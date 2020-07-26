@@ -4,6 +4,7 @@
 
 - Fix access permissions in PDF version 1.7ext3
 - Fix Buffer() is deprecation warning
+- Update Jest snapshots
 
 ### [v0.11.0] - 2019-12-03
 
