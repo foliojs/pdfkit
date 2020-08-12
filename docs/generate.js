@@ -181,7 +181,7 @@ class Node {
 
     const options = {};
     options.align = this.style.align;
-    options.link = this.attrs.href || false; // override continued link
+    options.link = this.attrs.href || null; // override continued link
     if (this.attrs.continued != null) {
       options.continued = this.attrs.continued;
     }
