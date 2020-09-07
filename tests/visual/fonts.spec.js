@@ -26,13 +26,13 @@ Cyrillic 2 (Extended)
 
 describe('fonts', function() {
   test('default (Helvetica)', function() {
-    return runDocTest(function(doc) {
+    return runDocTest({ systemFonts: true }, function(doc) {
       doc.text(characters, 10, 10);
     });
   });
 
   test('Helvetica Bold', function() {
-    return runDocTest(function(doc) {
+    return runDocTest({ systemFonts: true }, function(doc) {
       doc.font('Helvetica-Bold');
       doc.text(characters, 10, 10);
     });

@@ -2,7 +2,7 @@ import { runDocTest } from '../helpers';
 
 describe('pdfmake', function() {
   test('page references', function() {
-    return runDocTest(function(doc) {
+    return runDocTest({ systemFonts: true }, function(doc) {
       doc.fill('black');
       doc.fillColor('black');
       doc.fillOpacity(undefined);

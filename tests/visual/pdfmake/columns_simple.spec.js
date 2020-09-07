@@ -3,8 +3,6 @@ import { runDocTest } from '../helpers';
 describe('pdfmake', function() {
   test('columns_simple', function() {
     return runDocTest(function(doc) {
-      doc.font('tests/fonts/Roboto-Regular.ttf');
-      doc.font('tests/fonts/Roboto-Italic.ttf');
       doc.font('tests/fonts/Roboto-MediumItalic.ttf');
       doc.fill('black');
       doc.fillColor('black');

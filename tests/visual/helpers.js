@@ -19,7 +19,8 @@ function runDocTest(options, fn) {
     doc.on('data', buffers.push.bind(buffers));
     doc.on('end', async () => {
       const pdfData = Buffer.concat(buffers);
-      const images = await pdf2png(pdfData);
+      const { systemFonts = false } = options;
+      const images = await pdf2png(pdfData, { systemFonts });
       for (let image of images) {
         expect(image).toMatchImageSnapshot();
       }

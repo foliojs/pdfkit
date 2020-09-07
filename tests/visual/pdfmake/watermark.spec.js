@@ -3,8 +3,6 @@ import { runDocTest } from '../helpers';
 describe('pdfmake', function() {
   test('watermark', function() {
     return runDocTest(function(doc) {
-      doc.font('Helvetica');
-      doc.font('tests/fonts/Roboto-Regular.ttf');
       doc.font('tests/fonts/Roboto-Medium.ttf');
       doc.fill('black');
       doc.fillColor('black');

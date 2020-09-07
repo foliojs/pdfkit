@@ -2,13 +2,13 @@ import { runDocTest } from './helpers';
 
 describe('text', function() {
   test('simple text', function() {
-    return runDocTest(function(doc) {
+    return runDocTest({ systemFonts: true }, function(doc) {
       doc.text('Really simple text', 100, 100);
     });
   });
 
   test('alignment', function() {
-    return runDocTest(function(doc) {
+    return runDocTest({ systemFonts: true }, function(doc) {
       doc.text('Left aligned text', { align: 'left' });
       doc.text('Right aligned text', { align: 'right' });
       doc.text(
@@ -19,7 +19,7 @@ describe('text', function() {
   });
 
   test('decoration', function() {
-    return runDocTest(function(doc) {
+    return runDocTest({ systemFonts: true }, function(doc) {
       doc.fillColor('blue').text('Here is a link!', 100, 100, {
         link: 'http://google.com/',
         underline: true
@@ -31,7 +31,7 @@ describe('text', function() {
   });
 
   test('list', function() {
-    return runDocTest(function(doc) {
+    return runDocTest({ systemFonts: true }, function(doc) {
       doc.fillColor('#000').list(['One', 'Two', 'Three'], 100, 150);
     });
   });

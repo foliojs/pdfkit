@@ -6,8 +6,6 @@ describe('pdfmake', function() {
   test('absolute', function() {
     return runDocTest(function(doc) {
       const images = { bee: bee };
-
-      doc.font('tests/fonts/Roboto-Regular.ttf');
       doc.font('tests/fonts/Roboto-Italic.ttf');
       doc.image(images['bee'], 100, 100, { width: 50, height: 50 });
       doc.save();

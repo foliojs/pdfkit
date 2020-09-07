@@ -3,9 +3,6 @@ import { runDocTest } from '../helpers';
 describe('pdfmake', function() {
   test('tables', function() {
     return runDocTest(function(doc) {
-      doc.font('Helvetica');
-      doc.font('tests/fonts/Roboto-Medium.ttf');
-      doc.font('tests/fonts/Roboto-Regular.ttf');
       doc.font('tests/fonts/Roboto-Italic.ttf');
       doc.fill('black');
       doc.fillColor('black');

@@ -34,10 +34,11 @@ class NodeCanvasFactory {
   }
 }
 
-async function pdf2png(data) {
+async function pdf2png(data, { systemFonts } = {}) {
   // Load the PDF file.
   const loadingTask = pdfjsLib.getDocument({
-    data
+    data,
+    disableFontFace: !systemFonts
   });
 
   const pdfDocument = await loadingTask.promise;

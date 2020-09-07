@@ -3,7 +3,7 @@ import { jpeg as bee } from '../../images/bee';
 
 describe('pdfmake', function() {
   test('images', function() {
-    return runDocTest(function(doc) {
+    return runDocTest({ systemFonts: true }, function(doc) {
       const images = { bee: bee };
 
       doc.fill('black');

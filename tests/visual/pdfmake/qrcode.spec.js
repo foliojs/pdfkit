@@ -3,7 +3,6 @@ import { runDocTest } from '../helpers';
 describe('pdfmake', function() {
   test('qrcode', function() {
     return runDocTest(function(doc) {
-      doc.font('Helvetica');
       doc.font('tests/fonts/Roboto-Regular.ttf');
       doc.fill('black');
       doc.fillColor('black');
