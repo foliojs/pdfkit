@@ -23,19 +23,22 @@
   },
   "bugs": "https://github.com/foliojs/pdfkit/issues",
   "devDependencies": {
-    "@babel/core": "^7.7.2",
-    "@babel/plugin-external-helpers": "^7.0.0",
-    "@babel/preset-env": "^7.7.1",
-    "babel-jest": "^24.9.0",
+    "@babel/core": "^7.11.6",
+    "@babel/plugin-external-helpers": "^7.10.4",
+    "@babel/preset-env": "^7.11.5",
+    "babel-jest": "^26.3.0",
     "blob-stream": "^0.1.2",
     "brace": "^0.11.1",
     "brfs": "~2.0.2",
     "browserify": "^16.5.0",
+    "canvas": "^2.6.1",
     "codemirror": "~5.49.2",
     "eslint": "^6.6.0",
     "iconv-lite": "^0.5.0",
-    "jest": "^24.9.0",
+    "jest": "^26.4.2",
+    "jest-screenshot": "^0.3.1",
     "markdown": "~0.5.0",
+    "pdfjs-dist": "^2.4.456",
     "prettier": "1.19.1",
     "pug": "^2.0.4",
     "rollup": "^1.27.0",
@@ -58,7 +61,7 @@
     "docs": "npm run pdf-guide && npm run website && npm run browser-demo",
     "prettier": "prettier {lib,tests,demo,docs}/**/*.js",
     "test": "jest -i",
-    "test:integration": "jest integration/ -i",
+    "test:visual": "jest visual/ -i",
     "test:unit": "jest unit/"
   },
   "main": "js/pdfkit.js",
@@ -80,6 +83,10 @@
     "testURL": "http://localhost/",
     "setupFilesAfterEnv": [
       "<rootDir>/tests/unit/setupTests.js"
+    ],
+    "reporters": [
+      "default",
+      "jest-screenshot/reporter"
     ]
   }
 }
