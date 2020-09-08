@@ -2,6 +2,7 @@
 
 ### Unreleased
 
+- Replace integration tests by visual regression tests
 - Fix access permissions in PDF version 1.7ext3
 - Fix Buffer() is deprecation warning
 

@@ -11,5 +11,3 @@ demo/bundle.js
 !demo/browser.html
 .vscode
 coverage
-tests/integration/__pdfs__
-tests/integration/pdfmake/__pdfs__

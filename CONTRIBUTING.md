@@ -60,18 +60,18 @@ To install the project you need to have `node`
 
 ## Running and writing tests
 
-Tests are run using [Jest](http://jestjs.io/) and are categorized as integration and unit tests. 
+Tests are run using [Jest](http://jestjs.io/) and are categorized as unit and visual tests. 
 
-Integration tests check the pdf output against a reference stored as snapshots. While is served well to avoid regressions it has some disadvantages like small (correct) changes requiring to update all snapshots
+Visual tests check the pdf image screenshot against a reference stored as snapshots.
 
-Unit tests checks behavior os specific classes / methods isolatedly. It covers relatively small portion of code but is preferred way of writing new tests going forward
+Unit tests checks behavior os specific classes / methods isolatedly.
 
 Tests commands
 * `npm run test`: Run all tests
 * `npm run test:unit`: Run unit tests
-* `npm run test:integration`: Run integration tests
+* `npm run test:visual`: Run visual tests
 
-To write new tests, look for the *.spec.js files at `test/unit` and `test/integration` as examples
+To write new tests, look for the *.spec.js files at `test/unit` and `test/visual` as examples
 
 
 ## Submitting a Pull Request
@@ -80,4 +80,6 @@ Please go through existing issues and pull requests to check if somebody else is
 
 Also, make sure to run the tests and lint the code before you commit your changes.
 
-**Preferentially, tests should be added to check the changed behavior even if is a bug fix. Unit tests are preferred over integration ones**
+**Preferentially, tests should be added to check the changed behavior even if is a bug fix**
+**If the proposed change affects document structure a unit test should be added, if affects rendering, add a visual test**
+
