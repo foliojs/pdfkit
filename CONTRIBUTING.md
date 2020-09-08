@@ -73,6 +73,7 @@ Tests commands
 
 To write new tests, look for the *.spec.js files at `test/unit` and `test/visual` as examples
 
+> Visual tests should use an embedded font, instead of system fonts, to ensure uniform rendering between different environments
 
 ## Submitting a Pull Request
 
@@ -80,6 +81,6 @@ Please go through existing issues and pull requests to check if somebody else is
 
 Also, make sure to run the tests and lint the code before you commit your changes.
 
-**Preferentially, tests should be added to check the changed behavior even if is a bug fix**
-**If the proposed change affects document structure a unit test should be added, if affects rendering, add a visual test**
+> Tests should be added to check the changed behavior even if is a bug fix.
+If the proposed change affects document structure a unit test should be added, if affects rendering, add a visual test
 

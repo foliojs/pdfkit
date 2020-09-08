@@ -3,9 +3,9 @@ import { jpeg as bee } from '../../images/bee';
 
 describe('pdfmake', function() {
   test('images', function() {
-    return runDocTest({ systemFonts: true }, function(doc) {
+    return runDocTest(function(doc) {
       const images = { bee: bee };
-
+      doc.font('tests/fonts/Roboto-Regular.ttf');
       doc.fill('black');
       doc.fillColor('black');
       doc.fillOpacity(undefined);

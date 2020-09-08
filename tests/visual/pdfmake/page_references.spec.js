@@ -2,7 +2,8 @@ import { runDocTest } from '../helpers';
 
 describe('pdfmake', function() {
   test('page references', function() {
-    return runDocTest({ systemFonts: true }, function(doc) {
+    return runDocTest(function(doc) {
+      doc.font('tests/fonts/Roboto-Regular.ttf');
       doc.fill('black');
       doc.fillColor('black');
       doc.fillOpacity(undefined);
