@@ -286,7 +286,7 @@ const render = (doc, filename) => {
 };
 
 // renders the title page of the guide
-const renderTitlePage = (doc) => {
+const renderTitlePage = doc => {
   const title = 'PDFKit Guide';
   const author = 'By Devon Govett';
   const version = `Version ${require('../package.json').version}`;
