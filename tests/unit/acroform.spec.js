@@ -66,7 +66,7 @@ describe('acroform', () => {
   test('init no fonts', () => {
     doc.addPage();
     const docData = logData(doc);
-    const font = PDFFontFactory.open(doc, 'tests/fonts/Roboto-Regular.ttf');
+    PDFFontFactory.open(doc, 'tests/fonts/Roboto-Regular.ttf');
     doc.initForm();
     expect(docData.length).toBe(0);
   });
