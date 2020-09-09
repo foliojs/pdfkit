@@ -30,7 +30,7 @@ const failMessage = (utils, data, chunk, headIndex) => () => {
 };
 
 export default {
-  toContainChunk (data, chunk) {
+  toContainChunk(data, chunk) {
     const headIndex = data.indexOf(chunk[0]);
     let pass = headIndex !== -1;
     if (pass) {

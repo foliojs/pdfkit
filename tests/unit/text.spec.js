@@ -171,16 +171,16 @@ Q
       // we look out for a side effect of this infinite loop, witch is adding and infinite number of pages.
       // Nomaly, there should not be any page added to the document.
 
-      document.on("pageAdded", () => {
-		const pageRange = document.bufferedPageRange();
-		const newPageIndex = pageRange.start + pageRange.count;
+      document.on('pageAdded', () => {
+        const pageRange = document.bufferedPageRange();
+        const newPageIndex = pageRange.start + pageRange.count;
         // We try restrict the fail condition to only infinite loop, so we wait for several pages to be added.
         if (newPageIndex > 10) {
-          throw new Error("Infinite loop detected");
+          throw new Error('Infinite loop detected');
         }
       });
 
-      document.text(text, 10, 10, {width: 2});
+      document.text(text, 10, 10, { width: 2 });
       document.end();
 
       expect(docData).toContainChunk([

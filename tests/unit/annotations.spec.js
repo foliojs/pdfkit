@@ -54,7 +54,10 @@ describe('Annotations', () => {
 
       const docData = logData(document);
 
-      document.text('Go to url', { link: 'http://www.example.com', continued: true });
+      document.text('Go to url', {
+        link: 'http://www.example.com',
+        continued: true
+      });
       document.text('continued link');
 
       expect(docData).toContainChunk([
@@ -79,7 +82,10 @@ describe('Annotations', () => {
 
       const docData = logData(document);
 
-      document.text('Go to url', { link: 'http://www.example.com', continued: true });
+      document.text('Go to url', {
+        link: 'http://www.example.com',
+        continued: true
+      });
       document.text('no continued link', { link: null });
 
       // console.log(docData);
@@ -91,10 +97,7 @@ describe('Annotations', () => {
 >>`
       ]);
 
-      expect(docData).not.toContainChunk([
-        `14 0 obj`
-      ]);
+      expect(docData).not.toContainChunk([`14 0 obj`]);
     });
-
   });
 });
