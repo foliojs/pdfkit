@@ -23,5 +23,6 @@ jobs:
     - name: Install dependencies
       run: yarn --frozen-lockfile
     - name: Run ESLint
-      run: npm run eslint
-    - run: npm test
+      run: npm run lint
+    - name: Run tests
+      run: npm test
