@@ -87,15 +87,18 @@ const generateImages = function(tree) {
 
       // write the PDF, convert to PNG and trim with ImageMagick (https://imagemagick.org)
       file.on('finish', () => {
-        exec(`magick convert -density 150x150 -trim ${f}.pdf ${f}.png`, (err, stdout, stderr) => {
-          if (stderr) {
-            console.error(stderr);
+        exec(
+          `magick convert -density 150x150 -trim ${f}.pdf ${f}.png`,
+          (err, stdout, stderr) => {
+            if (stderr) {
+              console.error(stderr);
+            }
+            if (err) {
+              console.error(err);
+            }
+            fs.unlinkSync(`${f}.pdf`);
           }
-          if (err) {
-            console.error(err);
-          }
-          fs.unlinkSync(`${f}.pdf`);
-        });
+        );
       });
 
       doc.end();
