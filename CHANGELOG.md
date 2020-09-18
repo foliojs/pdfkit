@@ -5,6 +5,7 @@
 - Replace integration tests by visual regression tests
 - Fix access permissions in PDF version 1.7ext3
 - Fix Buffer() is deprecation warning
+- Add `forms.md` to generate documentation files
 
 ### [v0.11.0] - 2019-12-03
 
