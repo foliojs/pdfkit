@@ -80,6 +80,41 @@ EMC
       ]);
     });
 
+    test('with options', () => {
+      const docData = logData(document);
+
+      const stream = Buffer.from(
+        `1 0 0 -1 0 792 cm
+/Artifact <<
+/Type /Pagination
+/BBox [40 722 570 742]
+/Attached [/Top]
+>> BDC
+EMC
+`,
+        'binary'
+      );
+
+      document.markContent("Artifact", {
+        type: "Pagination",
+        bbox: [40, 50, 570, 70],
+        attached: [ "Top" ]
+      });
+      document.endMarkedContent();
+      document.end();
+
+      expect(docData).toContainChunk([
+        `5 0 obj`,
+        `<<
+/Length ${stream.length}
+>>`,
+        `stream`,
+        stream,
+        `\nendstream`,
+        `endobj`
+      ]);
+    });
+
     test('automatically closed', () => {
       const docData = logData(document);
 
@@ -96,6 +131,18 @@ EMC
 /MCID 1
 >> BDC
 EMC
+/Artifact BMC
+EMC
+/Artifact BMC
+EMC
+/P <<
+/MCID 2
+>> BDC
+EMC
+/P <<
+/MCID 3
+>> BDC
+EMC
 EMC
 `,
         'binary'
@@ -104,6 +151,10 @@ EMC
       document.markContent("Span");
       document.markStructureContent("P");
       document.markContent("Span");
+      document.markStructureContent("P");
+      document.markContent("Artifact");
+      document.markContent("Artifact");
+      document.markStructureContent("P");
       document.markStructureContent("P");
       document.end();
 
@@ -391,6 +442,32 @@ EMC
 /E (My Expansion)
 /ActualText (My Actual Text)
 /P 9 0 R
+>>`,
+        `endobj`
+      ]);
+    });
+
+    test('identified as tagged', () => {
+      document = new PDFDocument({
+        info: { CreationDate: new Date(Date.UTC(2018, 1, 1)) },
+        compress: false,
+        pdfVersion: '1.5',
+        tagged: true
+      });
+
+      const docData = logData(document);
+
+      document.end();
+
+      expect(docData).toContainChunk([
+        `3 0 obj`,
+        /\/Markings 5 0 R/,
+        `endobj`
+      ]);
+      expect(docData).toContainChunk([
+        `5 0 obj`,
+        `<<
+/Marked true
 >>`,
         `endobj`
       ]);
