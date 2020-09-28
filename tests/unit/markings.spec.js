@@ -91,6 +91,13 @@ EMC
 /Attached [/Top]
 >> BDC
 EMC
+/Span <<
+/Lang (en-AU)
+/Alt (Hi, earth! )
+/E (Greetings, terrestrial sphere! )
+/ActualText (Hello, world! )
+>> BDC
+EMC
 `,
         'binary'
       );
@@ -99,6 +106,13 @@ EMC
         type: "Pagination",
         bbox: [40, 50, 570, 70],
         attached: [ "Top" ]
+      });
+      document.endMarkedContent();
+      document.markContent("Span", {
+        lang: "en-AU",
+        alt: "Hi, earth! ",
+        actual: "Hello, world! ",
+        expanded: "Greetings, terrestrial sphere! "
       });
       document.endMarkedContent();
       document.end();
@@ -447,18 +461,24 @@ EMC
       ]);
     });
 
-    test('identified as tagged', () => {
+    test('identified as accessible', () => {
       document = new PDFDocument({
         info: { CreationDate: new Date(Date.UTC(2018, 1, 1)) },
         compress: false,
         pdfVersion: '1.5',
-        tagged: true
+        tagged: true,
+        lang: 'en-AU'
       });
 
       const docData = logData(document);
 
       document.end();
 
+      expect(docData).toContainChunk([
+        `3 0 obj`,
+        /\/Lang \(en-AU\)/,
+        `endobj`
+      ]);
       expect(docData).toContainChunk([
         `3 0 obj`,
         /\/Markings 5 0 R/,
