@@ -8,13 +8,16 @@ document's logical structure. These are detailed in the following sections.
 
 Some other simpler tasks are also required.
 
-This checklist covers everything that is required to create a conformant Tagged PDF:
+This checklist covers everything that is required to create a conformant PDF/UA (PDF for
+Universal Accessibility) document (which is an extension of Tagged PDF):
 
  * Pass the option `pdfVersion: '1.5'` (or a higher version) when creating your `PDFDocument`
    (depending on the features you use, you may only need 1.4; refer to the PDF reference for
    details).
  * Pass the option `tagged: true` when creating your `PDFDocument` (technically, this sets the
    `Marked` property in the `Markings` dictionary to `true` in the PDF).
+ * Provide a `Title` in the `info` option, and pass `displayTitle: true` when creating your
+   `PDFDocument`.
  * Specify natural language in the document options and/or logical structure and/or
    non-structure marked `Span` content.
  * Add logical structure with all significant content included.
@@ -26,6 +29,9 @@ This checklist covers everything that is required to create a conformant Tagged 
  * Mark all non-structure content as artifacts.
  * As well as creating the logical structure, write objects to the PDF in the natural
    "reading order".
+ * Do not convey information solely using visuals (such as colour,
+   contrast or position on the page).
+ * No flickering or flashing content.
 
 ## Marked Content
 
