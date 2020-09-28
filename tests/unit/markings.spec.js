@@ -463,7 +463,11 @@ EMC
 
     test('identified as accessible', () => {
       document = new PDFDocument({
-        info: { CreationDate: new Date(Date.UTC(2018, 1, 1)) },
+        info: {
+          CreationDate: new Date(Date.UTC(2018, 1, 1)),
+          Title: "My Title"
+        },
+        displayTitle: true,
         compress: false,
         pdfVersion: '1.5',
         tagged: true,
@@ -489,6 +493,31 @@ EMC
         `<<
 /Marked true
 >>`,
+        `endobj`
+      ]);
+      expect(docData).toContainChunk([
+        `3 0 obj`,
+        /\/ViewerPreferences 6 0 R/,
+        `endobj`
+      ]);
+      expect(docData).toContainChunk([
+        `6 0 obj`,
+        /\/DisplayDocTitle true/,
+        `endobj`
+      ]);
+      expect(docData).toContainChunk([
+        `trailer`,
+        /\/Info 10 0 R/,
+        `startxref`
+      ]);
+      expect(docData).toContainChunk([
+        `10 0 obj`,
+        /\/Title 14 0 R/,
+        `endobj`
+      ]);
+      expect(docData).toContainChunk([
+        `14 0 obj`,
+        `(My Title)`,
         `endobj`
       ]);
     });
