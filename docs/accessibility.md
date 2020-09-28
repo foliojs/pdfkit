@@ -15,9 +15,11 @@ This checklist covers everything that is required to create a conformant Tagged 
    details).
  * Pass the option `tagged: true` when creating your `PDFDocument` (technically, this sets the
    `Marked` property in the `Markings` dictionary to `true` in the PDF).
+ * Specify natural language in the document options and/or logical structure and/or
+   non-structure marked `Span` content.
  * Add logical structure with all significant content included.
  * Include accessibility information (such as alternative text, actual text, etc.) in the
-   logical structure.
+   logical structure and/or non-structure marked `Span` content.
  * Include all spaces which separate words/sentences/etc. in your marked structure content,
    even at the ends of lines, paragraphs, etc.. I.e. don't do `doc.text("Hello, world!")` but
    instead do `doc.text("Hello, world! ")`.
@@ -53,6 +55,17 @@ When marking content, you can provide options (take care to use correct capitali
    coordinates
  * `attached` - used for `Pagination` artifact content, array of one or more strings:
    `Top`, `Bottom`, `Left`, `Right`
+ * `lang` - used for `Span` content: human language code (e.g. `en-AU`) which overrides default
+   document language, and any enclosing structure element language
+ * `alt` - used for `Span` content: alternative text for an image or other visual content
+ * `expanded` - used for `Span` content: the expanded form of an abbreviation or acronym
+ * `actual` - used for `Span` content: the actual text the content represents (e.g. if it is
+   rendered as vector graphics)
+
+It is advisable not to use `Span` content for specifying alternative text, expanded form, or
+actual text, especially if there is a possibility of the content automatically wrapping, which
+would result in the text appearing twice. Set these options on an associated structure element
+instead.
 
 ## Logical Structure
 
