@@ -51,6 +51,7 @@ Installation uses the [npm](http://npmjs.org/) package manager. Just type the fo
 - PDF security
   - Encryption
   - Access privileges (printing, copying, modifying, annotating, form filling, content accessibility, document assembly)
+- Accessibility support (marked content, logical structure, Tagged PDF, PDF/UA)
 
 ## Coming soon!
 
