@@ -200,6 +200,43 @@ Example of a structure tree with options specified:
         ])
     ]);
 
+### Automatic Marking and Structure Construction for Text
+
+The `text()` method accepts a `structParent` option which you can use to specify a structure
+element to add each paragraph to. It will mark each paragraph of content, create a structure
+element for it, and then add it to the parent element you provided. It will use the `P` type,
+unless you specify a different type with a `structType` option.
+
+Example of creating structure automatically with `text()`:
+
+    // Create a section, add it to the document structure, then add paragraphs to it
+    const section = doc.struct('Sect');
+    doc.addStructure(section);
+    doc.text("Foo. \nBar. ", { structParent: section });
+
+    // Equivalent code if performed manually
+    const section = doc.struct('Sect');
+    doc.addStructure(section);
+    section.add(doc.struct('P', [ doc.markStructureContent('P') ]));
+    doc.text("Foo. ");
+    section.add(doc.struct('P', [ doc.markStructureContent('P') ]));
+    doc.text("Bar. ");
+
+The `list()` method also accepts a `structParent` option. By default, it add list items
+(type `LI`) to the parent, each of which contains a label (type `Lbl`, which holds the bullet,
+number, or letter) and a body (type `LBody`, which holds the actual item content). You can
+override the default types with a `structTypes` option, which is a list:
+`[ itemType, labelType, bodyType ]`. You can make any of the types `null` to omit that
+part of the structure (i.e. to add labels and bodies directly to the parent, and/or to collapse
+the label and body into a single element).
+
+Example of creating structure automatically with `list()`:
+
+    // Create a list, add it to the structure tree, then add items to it
+    const list = doc.struct('List');
+    someElement.add(list);
+    doc.list(["Foo. ", "Bar. "], { structParent: list });
+
 ## Tags and Structure Element Types
 
 Here are the tags and structure element types which are defined in Tagged PDF. You must

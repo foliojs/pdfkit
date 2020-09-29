@@ -275,56 +275,32 @@ EMC
       ]);
       expect(docData).toContainChunk([
         `12 0 obj`,
-        `<<
-/S /Section
-/K [11 0 R]
-/P 8 0 R
->>`,
+        `<<\n/S /Section\n/K [11 0 R]\n/P 8 0 R\n>>`,
         `endobj`
       ]);
       expect(docData).toContainChunk([
         `11 0 obj`,
-        `<<
-/S /P
-/K [0 10 0 R 2]
-/Pg 7 0 R
-/P 12 0 R
->>`,
+        `<<\n/S /P\n/K [0 10 0 R 2]\n/Pg 7 0 R\n/P 12 0 R\n>>`,
         `endobj`
       ]);
       expect(docData).toContainChunk([
         `10 0 obj`,
-        `<<
-/S /Link
-/K [1]
-/Pg 7 0 R
-/P 11 0 R
->>`,
+        `<<\n/S /Link\n/K [1]\n/Pg 7 0 R\n/P 11 0 R\n>>`,
         `endobj`
       ]);
       expect(docData).toContainChunk([
         `14 0 obj`,
-        `<<
-/S /Section
-/K [13 0 R]
-/P 8 0 R
->>`,
+        `<<\n/S /Section\n/K [13 0 R]\n/P 8 0 R\n>>`,
         `endobj`
       ]);
       expect(docData).toContainChunk([
         `13 0 obj`,
-        `<<
-/S /P
-/K [3]
-/Pg 7 0 R
-/P 14 0 R
->>`,
+        `<<\n/S /P\n/K [3]\n/Pg 7 0 R\n/P 14 0 R\n>>`,
         `endobj`
       ]);
       expect(docData).toContainChunk([
         `9 0 obj`,
-        `<<
->>`,
+        `<<\n>>`,
         `endobj`
       ]);
     });
@@ -379,56 +355,32 @@ EMC
       ]);
       expect(docData).toContainChunk([
         `10 0 obj`,
-        `<<
-/S /Section
-/P 8 0 R
-/K [13 0 R]
->>`,
+        `<<\n/S /Section\n/P 8 0 R\n/K [13 0 R]\n>>`,
         `endobj`
       ]);
       expect(docData).toContainChunk([
         `13 0 obj`,
-        `<<
-/S /P
-/P 10 0 R
-/K [0 12 0 R 2]
-/Pg 7 0 R
->>`,
+        `<<\n/S /P\n/P 10 0 R\n/K [0 12 0 R 2]\n/Pg 7 0 R\n>>`,
         `endobj`
       ]);
       expect(docData).toContainChunk([
         `12 0 obj`,
-        `<<
-/S /Link
-/K [1]
-/Pg 7 0 R
-/P 13 0 R
->>`,
+        `<<\n/S /Link\n/K [1]\n/Pg 7 0 R\n/P 13 0 R\n>>`,
         `endobj`
       ]);
       expect(docData).toContainChunk([
         `11 0 obj`,
-        `<<
-/S /Section
-/P 8 0 R
-/K [14 0 R]
->>`,
+        `<<\n/S /Section\n/P 8 0 R\n/K [14 0 R]\n>>`,
         `endobj`
       ]);
       expect(docData).toContainChunk([
         `14 0 obj`,
-        `<<
-/S /P
-/K [3]
-/Pg 7 0 R
-/P 11 0 R
->>`,
+        `<<\n/S /P\n/K [3]\n/Pg 7 0 R\n/P 11 0 R\n>>`,
         `endobj`
       ]);
       expect(docData).toContainChunk([
         `9 0 obj`,
-        `<<
->>`,
+        `<<\n>>`,
         `endobj`
       ]);
     });
@@ -460,7 +412,9 @@ EMC
         `endobj`
       ]);
     });
+  });
 
+  describe('accessible document', () => {
     test('identified as accessible', () => {
       document = new PDFDocument({
         info: {
@@ -490,9 +444,7 @@ EMC
       ]);
       expect(docData).toContainChunk([
         `5 0 obj`,
-        `<<
-/Marked true
->>`,
+        `<<\n/Marked true\n>>`,
         `endobj`
       ]);
       expect(docData).toContainChunk([
@@ -519,6 +471,180 @@ EMC
         `14 0 obj`,
         `(My Title)`,
         `endobj`
+      ]);
+    });
+  });
+
+  describe('text integration', () => {
+    test('adds paragraphs to structure', () => {
+      const docData = logData(document);
+
+      const stream = Buffer.from(
+        `1 0 0 -1 0 792 cm
+/P <<
+/MCID 0
+>> BDC
+q
+1 0 0 -1 0 792 cm
+BT
+1 0 0 1 72 711.384 Tm
+/F1 12 Tf
+[<50> 40 <6172> 10 <6167> 10 <72> 10 <6170682031> 0] TJ
+ET
+Q
+EMC
+/P <<
+/MCID 1
+>> BDC
+q
+1 0 0 -1 0 792 cm
+BT
+1 0 0 1 72 697.512 Tm
+/F1 12 Tf
+[<50> 40 <6172> 10 <6167> 10 <72> 10 <6170682032> 0] TJ
+ET
+Q
+EMC
+`,
+        'binary'
+      );
+
+      const section = document.struct('Sect');
+      document.addStructure(section);
+      document.text("Paragraph 1\nParagraph 2", { structParent: section });
+      document.end();
+
+      expect(docData).toContainChunk([
+        `5 0 obj`,
+        `<<
+/Length ${stream.length}
+>>`,
+        `stream`,
+        stream,
+        `\nendstream`,
+        `endobj`
+      ]);
+      expect(docData).toContainChunk([
+        '11 0 obj',
+        '<<\n/S /P\n/K [0]\n/Pg 7 0 R\n/P 8 0 R\n>>',
+        'endobj',
+      ]);
+      expect(docData).toContainChunk([
+        '13 0 obj',
+        '<<\n/S /P\n/K [1]\n/Pg 7 0 R\n/P 8 0 R\n>>',
+        'endobj',
+      ]);
+      expect(docData).toContainChunk([
+        '8 0 obj',
+        '<<\n/S /Sect\n/P 9 0 R\n/K [11 0 R 13 0 R]\n>>',
+        'endobj',
+      ]);
+    });
+
+    test('adds list items to structure', () => {
+      const docData = logData(document);
+
+      const stream = Buffer.from(
+        `1 0 0 -1 0 792 cm
+/Lbl <<
+/MCID 0
+>> BDC
+72 76.5 m
+72 74.843146 73.343146 73.5 75 73.5 c
+76.656854 73.5 78 74.843146 78 76.5 c
+78 78.156854 76.656854 79.5 75 79.5 c
+73.343146 79.5 72 78.156854 72 76.5 c
+h
+f
+EMC
+/LBody <<
+/MCID 1
+>> BDC
+q
+1 0 0 -1 0 792 cm
+BT
+1 0 0 1 87 711.384 Tm
+/F1 12 Tf
+[<4974656d2031> 0] TJ
+ET
+Q
+EMC
+/Lbl <<
+/MCID 2
+>> BDC
+72 90.372 m
+72 88.715146 73.343146 87.372 75 87.372 c
+76.656854 87.372 78 88.715146 78 90.372 c
+78 92.028854 76.656854 93.372 75 93.372 c
+73.343146 93.372 72 92.028854 72 90.372 c
+h
+f
+EMC
+/LBody <<
+/MCID 3
+>> BDC
+q
+1 0 0 -1 0 792 cm
+BT
+1 0 0 1 87 697.512 Tm
+/F1 12 Tf
+[<4974656d2032> 0] TJ
+ET
+Q
+EMC
+`,
+        'binary'
+      );
+
+      const list = document.struct('List');
+      document.addStructure(list);
+      document.list(["Item 1","Item 2"], { structParent: list });
+      document.end();
+
+      expect(docData).toContainChunk([
+        `5 0 obj`,
+        `<<
+/Length ${stream.length}
+>>`,
+        `stream`,
+        stream,
+        `\nendstream`,
+        `endobj`
+      ]);
+      expect(docData).toContainChunk([
+        '12 0 obj',
+        '<<\n/S /Lbl\n/K [0]\n/Pg 7 0 R\n/P 10 0 R\n>>',
+        'endobj'
+      ]);
+      expect(docData).toContainChunk([
+        '13 0 obj',
+        '<<\n/S /LBody\n/K [1]\n/Pg 7 0 R\n/P 10 0 R\n>>',
+        'endobj'
+      ]);
+      expect(docData).toContainChunk([
+        '16 0 obj',
+        '<<\n/S /Lbl\n/K [2]\n/Pg 7 0 R\n/P 15 0 R\n>>',
+        'endobj'
+      ]);
+      expect(docData).toContainChunk([
+        '17 0 obj',
+        '<<\n/S /LBody\n/K [3]\n/Pg 7 0 R\n/P 15 0 R\n>>',
+        'endobj'
+      ]);
+      expect(docData).toContainChunk([
+        '10 0 obj',
+        '<<\n/S /LI\n/P 8 0 R\n/K [12 0 R 13 0 R]\n>>',
+        'endobj'
+      ]);
+      expect(docData).toContainChunk([
+        '15 0 obj',
+        '<<\n/S /LI\n/P 8 0 R\n/K [16 0 R 17 0 R]\n>>',
+        'endobj'
+      ]);
+      expect(docData).toContainChunk([
+        '8 0 obj',
+        '<<\n/S /List\n/P 9 0 R\n/K [10 0 R 15 0 R]\n>>',
+        'endobj'
       ]);
     });
   });
