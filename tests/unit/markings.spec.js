@@ -425,6 +425,10 @@ EMC
       expect(() => {
         struct.add(document.struct('Bar'));
       }).toThrow();
+
+      expect(() => {
+        document.struct('Foo', [1]);
+      }).toThrow();
     });
   });
 
