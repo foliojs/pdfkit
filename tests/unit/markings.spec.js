@@ -412,6 +412,20 @@ EMC
         `endobj`
       ]);
     });
+
+    test('validation', () => {
+      let struct;
+
+      struct = document.struct('Foo').end();
+      expect(() => {
+        struct.add(document.struct('Bar'));
+      }).toThrow();
+
+      struct = document.struct('Foo', []);
+      expect(() => {
+        struct.add(document.struct('Bar'));
+      }).toThrow();
+    });
   });
 
   describe('accessible document', () => {
