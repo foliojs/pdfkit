@@ -426,6 +426,12 @@ EMC
         struct.add(document.struct('Bar'));
       }).toThrow();
 
+      struct = document.struct('Foo');
+      let parent = document.struct('Bar').add(struct);
+      expect(() => {
+        parent.add(struct);
+      }).toThrow();
+
       expect(() => {
         document.struct('Foo', [1]);
       }).toThrow();
