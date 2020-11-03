@@ -94,7 +94,7 @@ Example of marking structure content:
 Example of the simplest of structure trees:
 
     // Add a single structure element which includes the structure content to the document's structure
-    doc.addStructure(doc.struct('P', [ myStructContent ]));
+    doc.addStructure(doc.struct('P', myStructContent));
 
 Tags/element types to use are listed in a later section.
 
@@ -124,17 +124,17 @@ content (and any descendent marking):
 
 ### Complex Structure
 
-Multiple elements may be added directly to the document, and may nest:
+Multiple elements may be added directly to the document, or to structure elements, and may nest:
 
     // Create nested structure elements
     const section1 = doc.struct('Sect', [
         doc.struct('P', [
             someTextStructureContent,
-            doc.struct('Link', [ someLinkStructureContent ]),
+            doc.struct('Link', someLinkStructureContent),
             moreTextStructureContent
         ])
     ]);
-    const section2 = doc.struct('Sect', [ secondSectionStructureContent ]);
+    const section2 = doc.struct('Sect', secondSectionStructureContent);
 
     // Add them to the document's structure
     doc.addStructure(section1).addStructure(section2);
@@ -146,7 +146,7 @@ you have finished adding to them, allowing them to be flushed out as soon as pos
 
     // Begin a new section and add it to the document's structure
     const mySection = doc.struct('Sect');
-    doc.addToStructure(mySection);
+    doc.addStructure(mySection);
 
     // Create a new paragraph and add it to the section
     const myParagraph = doc.struct('P');
@@ -160,10 +160,70 @@ you have finished adding to them, allowing them to be flushed out as soon as pos
     // End the paragraph, allowing it to be flushed out, freeing memory
     myParagraph.end();
 
-Note that if you provide content when creating a structure element (i.e. providing it to
+Note that if you provide children when creating a structure element (i.e. providing them to
 `doc.struct()` rather than using `structElem.add()`) then `structElem.end()` is called
-automatically. You therefore should not add additional content, as the element may already have
-been flushed out. Do not mix atomic and incremental styles for the same structure element.
+automatically. You therefore cannot add additional children with `structElem.add()`, i.e.
+you cannot mix atomic and incremental styles for the same structure element.
+
+For an element to be flushed out, it must:
+
+ * be ended,
+ * have been added to its parent, and
+ * if it has content defined through closures (see next section), be attached to the document's
+   structure (through its ancestors)
+
+When you call `doc.end()`, the document's structure is recursively ended, resulting in all
+elements being flushed out. If you created elements but forgot to add them to the document's
+structure, they will not be flushed, but the PDF stream will wait for them to be flushed before
+ending, causing your application to hang. Make sure if you create any elements, you add them
+to a parent, so ultimately all elements are attached to the document. It's best to add
+elements to their parents as you go.
+
+### Shortcut for Elements Containing Only Marked Content
+
+The common case where a structure element contains only content marked with a tag matching
+the structure element type can be achieved by using a closure:
+
+    doc.addStructure(doc.struct('P', () => {
+        doc.text('Hello, world! ');
+    }));
+
+This is equivalent to:
+
+    const myStruct = doc.struct('P');
+    doc.addStructure(myStruct);
+    const myStructContent = doc.markStructureContent('P');
+    doc.text('Hello, world! ');
+    doc.endMarkedContent();
+    myStruct.add(myStructContent);
+    myStruct.end();
+
+Note that the content is marked and the closure is executed *if/when the element is attached to
+the document's structure*. This means that you can do something like this:
+
+    const myParagraph = doc.struct('P', [
+        () => { doc.text("Please see ", { continued: true }); },
+        doc.struct('Link', () => {
+            doc.text("something", { link: "http://www.example.com/", continued: true });
+        }),
+        () => { doc.text(" for details. ", { link: null }); }
+    ]);
+
+and no content will be added to the page until/unless something like this is done:
+
+    doc.addStructure(section1);
+    section1.add(myParagraph); // Content is added now
+
+or alternatively:
+
+    section1.add(myParagraph);
+    doc.addStructure(section1); // Content is added now
+
+This is important because otherwise when the `Link` element is constructed, its content
+will be added to the page, and then the list containing the link element will be passed to
+the construct the `P` element, and only during the construction of the `P` element will the
+other `P` content be added to the page, resulting in page content being out of order.
+It's best to add elements to their parents as you go.
 
 ### Structure Element Options
 
@@ -182,7 +242,7 @@ Example of a structure tree with options specified:
     }, [
         doc.struct('H', [
             doc.struct('Span', {
-                expanded: 'Portable Document Format/Universal Accessibility',
+                expanded: 'Portable Document Format for Universal Accessibility',
                 actual: 'PDF/UA'
             }, [
                 pdfUAStructureContent
@@ -214,13 +274,12 @@ Example of creating structure automatically with `text()`:
     doc.addStructure(section);
     doc.text("Foo. \nBar. ", { structParent: section });
 
-    // Equivalent code if performed manually
+This is equivalent to:
+
     const section = doc.struct('Sect');
     doc.addStructure(section);
-    section.add(doc.struct('P', [ doc.markStructureContent('P') ]));
-    doc.text("Foo. ");
-    section.add(doc.struct('P', [ doc.markStructureContent('P') ]));
-    doc.text("Bar. ");
+    section.add(doc.struct('P', () => { doc.text("Foo. "); });
+    section.add(doc.struct('P', () => { doc.text("Bar. "); });
 
 The `list()` method also accepts a `structParent` option. By default, it add list items
 (type `LI`) to the parent, each of which contains a label (type `Lbl`, which holds the bullet,
@@ -268,7 +327,7 @@ Non-structure tags:
    other formats like HTML, but 'transparent' to its content which is processed normally)
  * `Private` - content only meaningful to the creator (element and its content not intended to
    be exported to other formats like HTML)
- 
+
 "Block" elements:
 
  * `H` - heading (first element in a section, etc.)
@@ -279,7 +338,7 @@ Non-structure tags:
  * `LI` - list item; should contain `Lbl` and/or `LBody`
  * `Lbl` - label (bullet, number, or "dictionary headword")
  * `LBody` - list body (item text, or "dictionary definition"); may have nested lists or other blocks
- 
+
 "Table" elements:
 
  * `Table` - table; should either contain `TR`, or `THead`, `TBody` and/or `TFoot`
@@ -289,7 +348,7 @@ Non-structure tags:
  * `THead` - table header row group
  * `TBody` - table body row group; may have more than one per table
  * `TFoot` - table footer row group
- 
+
 "Inline" elements:
 
  * `Span` - generic inline content
@@ -307,7 +366,7 @@ Non-structure tags:
  * `Warichu` - Japanese/Chinese longer description
  * `WT` - Warichu text
  * `WP` - Warichu punctuation
- 
+
 "Illustration" elements (should have `alt` and/or `actualtext` set):
 
  * `Figure` - figure
