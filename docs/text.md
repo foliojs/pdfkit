@@ -83,7 +83,7 @@ PDFKit has many options for controlling the look of text added to PDF
 documents, which can be passed to the `text` method. They are enumerated
 below.
 
-* `lineBreak` - set to `false` to disable line wrapping all together
+* `lineBreak` - set to `false` to disable line wrapping all together. If you already set `width` attribute, this value will have no effect.
 * `width` - the width that text should be wrapped to (by default, the page width minus the left and right margin)
 * `height` - the maximum height that text should be clipped to
 * `ellipsis` - the character to display at the end of the text when it is too long. Set to `true` to use the default character.
