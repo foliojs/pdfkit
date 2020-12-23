@@ -137,6 +137,9 @@ pages are flushed to the output file yourself rather than letting PDFKit handle 
 it, just pass `bufferPages: true` as an option to the `PDFDocument` constructor. Then, you can call
 `doc.switchToPage(pageNumber)` to switch to a previous page (page numbers start at 0).
 
+When switching back to a previous page, text that flows off the end will run onto the next page
+(if it already exists), otherwise a new page will be added at the end of the document.
+
 When you're ready to flush the buffered pages to the output file, call `flushPages`.
 This method is automatically called by `doc.end()`, so if you just want to buffer all pages in the document, you
 never need to call it. Finally, there is a `bufferedPageRange` method, which returns the range
