@@ -5,6 +5,7 @@
 - Replace integration tests by visual regression tests
 - Fix access permissions in PDF version 1.7ext3
 - Fix Buffer() is deprecation warning
+- Fix _endChild() failing to end child refs without Kids prop
 
 ### [v0.11.0] - 2019-12-03
 
