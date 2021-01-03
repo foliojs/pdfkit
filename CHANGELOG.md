@@ -18,6 +18,10 @@
 - Add support for AcroForms
 - Drop support for (uncommon) cid less fonts on standalone build (reduces bundle size)
 
+### [v0.11.0] - 2019-07-09 [Joost Lubach]
+
+- Added support for inserting pages
+
 ### [v0.10.0] - 2019-06-06
 
 - Fix links to pages within the document
