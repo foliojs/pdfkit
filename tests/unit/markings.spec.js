@@ -80,6 +80,39 @@ EMC
       ]);
     });
 
+    test('marked using closure', () => {
+      const docData = logData(document);
+
+      const stream = Buffer.from(
+        `1 0 0 -1 0 792 cm
+/Span <<
+/MCID 0
+>> BDC
+EMC
+/Span <<
+/MCID 1
+>> BDC
+EMC
+`,
+        'binary'
+      );
+
+		document.addStructure(document.struct('Span', () => {}));
+		document.addStructure(document.struct('Span', () => {}));
+      document.end();
+
+      expect(docData).toContainChunk([
+        `5 0 obj`,
+        `<<
+/Length ${stream.length}
+>>`,
+        `stream`,
+        stream,
+        `\nendstream`,
+        `endobj`
+      ]);
+    });
+
     test('with options', () => {
       const docData = logData(document);
 

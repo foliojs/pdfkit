@@ -35,7 +35,7 @@ struct.add(doc.struct('P', () => {
 var imageSection = doc.struct('Sect');
 struct.add(imageSection);
 
-imageSection.add(doc.struct('H', () => {
+imageSection.add(doc.struct('H1', () => {
   doc
     .fontSize(18)
     .text('PNG and JPEG images: ');
@@ -68,7 +68,7 @@ doc.addPage();
 var vectorSection = doc.struct('Sect');
 struct.add(vectorSection);
 
-vectorSection.add(doc.struct('H', () => {
+vectorSection.add(doc.struct('H1', () => {
   doc
     .fontSize(25)
     .text('Here are some vector graphics... ', 100, 100);
@@ -110,7 +110,7 @@ vectorSection.end();
 var wrappedSection = doc.struct('Sect');
 struct.add(wrappedSection);
 
-wrappedSection.add(doc.struct('H', () => {
+wrappedSection.add(doc.struct('H1', () => {
   doc
     .text('And here is some wrapped text... ', 100, 300)
     .font('Helvetica', 13)
@@ -137,7 +137,7 @@ doc.addPage();
 var tigerSection = doc.struct('Sect');
 struct.add(tigerSection);
 
-tigerSection.add(doc.struct('H', () => {
+tigerSection.add(doc.struct('H1', () => {
   doc
     .font('Palatino', 25)
     .text('Rendering some SVG paths...', 100, 100)
@@ -179,7 +179,9 @@ doc.addPage();
 var linkSection = doc.struct('Sect');
 struct.add(linkSection);
 
-linkSection.add(doc.struct('Link', () => {
+linkSection.add(doc.struct('Link', {
+  alt: "Here is a link! "
+}, () => {
   doc
     .fillColor('blue')
     .text('Here is a link!', 100, 100, {
@@ -194,7 +196,7 @@ linkSection.end();
 var listSection = doc.struct('Sect');
 struct.add(listSection);
 
-var list = doc.struct('List');
+var list = doc.struct('L');
 listSection.add(list);
 
 doc
