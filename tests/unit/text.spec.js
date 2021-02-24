@@ -167,9 +167,9 @@ Q
       );
 
       // before this test, this case used to make the code run into an infinite loop.
-      // To handle regresion gracefully and avoid stucking this test into an infinite loop,
-      // we look out for a side effect of this infinite loop, witch is adding and infinite number of pages.
-      // Nomaly, there should not be any page added to the document.
+      // To handle regression gracefully and avoid sticking this test into an infinite loop,
+      // we look out for a side effect of this infinite loop, witch is adding an infinite number of pages.
+      // Normally, there should not be any page added to the document.
 
       document.on('pageAdded', () => {
         const pageRange = document.bufferedPageRange();
