@@ -40,7 +40,7 @@
     "markdown": "~0.5.0",
     "pdfjs-dist": "^2.4.456",
     "prettier": "1.19.1",
-    "pug": "^2.0.4",
+    "pug": "^3.0.1",
     "rollup": "^1.27.0",
     "rollup-plugin-babel": "^4.3.3",
     "rollup-plugin-cpy": "^2.0.1"
