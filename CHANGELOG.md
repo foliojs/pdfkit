@@ -2,6 +2,7 @@
 
 ### Unreleased
 
+- Add support for Embedded Files and File Attachment Annotations
 - Accessibility support
 - Replace integration tests by visual regression tests
 - Fix access permissions in PDF version 1.7ext3

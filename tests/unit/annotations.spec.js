@@ -100,4 +100,82 @@ describe('Annotations', () => {
       expect(docData).not.toContainChunk([`14 0 obj`]);
     });
   });
+
+  describe('fileAttachmentAnnotation', () => {
+    test('creating a fileAttachmentAnnotation', () => {
+      const docData = logData(document);
+
+      document.fileAttachmentAnnotation(100, 100, 20, 20, {
+        src: Buffer.from('example text'),
+        name: 'file.txt'
+      });
+
+      expect(docData).toContainChunk([
+        `10 0 obj`,
+        `<<
+/Subtype /FileAttachment
+/FS 9 0 R
+/Type /Annot
+/Rect [100 672 120 692]
+/Border [0 0 0]
+/C [0 0 0]
+>>`
+      ]);
+    });
+
+    test("using the file's description", () => {
+      const docData = logData(document);
+
+      document.fileAttachmentAnnotation(100, 100, 20, 20, {
+        src: Buffer.from('example text'),
+        name: 'file.txt',
+        description: 'file description'
+      });
+
+      expect(docData).toContainChunk([
+        `10 0 obj`,
+        `<<
+/Subtype /FileAttachment
+/FS 9 0 R
+/Contents (file description)
+/Type /Annot
+/Rect [100 672 120 692]
+/Border [0 0 0]
+/C [0 0 0]
+>>`
+      ]);
+    });
+
+    test("overriding the file's description", () => {
+      const docData = logData(document);
+
+      document.fileAttachmentAnnotation(
+        100,
+        100,
+        20,
+        20,
+        {
+          src: Buffer.from('example text'),
+          name: 'file.txt',
+          description: 'file description'
+        },
+        {
+          Contents: 'other description'
+        }
+      );
+
+      expect(docData).toContainChunk([
+        `10 0 obj`,
+        `<<
+/Contents (other description)
+/Subtype /FileAttachment
+/FS 9 0 R
+/Type /Annot
+/Rect [100 672 120 692]
+/Border [0 0 0]
+/C [0 0 0]
+>>`
+      ]);
+    });
+  });
 });
