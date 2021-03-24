@@ -49,7 +49,7 @@ describe('EmbeddedFont', () => {
       font.dictionary = dictionary;
       font.embed();
 
-      expect(dictionary.data.BaseFont).toBe('A@IIZZ+Roboto-Regular');
+      expect(dictionary.data.BaseFont).toBe('BAJJZZ+Roboto-Regular');
     });
   });
 });
