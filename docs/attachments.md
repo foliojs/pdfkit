@@ -28,18 +28,18 @@ There are a few other options for `doc.file`:
 If you are attaching a file from your file system, creationDate and modifiedDate will be set to the source file's creationDate and modifiedDate.
 
 Setting the `hidden` option prevents this file from showing up in the pdf viewer's attachment panel.
-While this may not be very useful for embedded files, it is absolutely necessary for the file attachment annotations, to prevent them from showing up twice in the attachment panel.
+While this may not be very useful for embedded files, it is absolutely necessary for file annotations, to prevent them from showing up twice in the attachment panel.
 
-## File Attachment Annotations
+## File Annotations
 
-A file attachment annotation contains a reference to an embedded file that can be placed anywhere in the document.
-File attachment annotations show up in your reader's annotation panel as well as the attachment panel.
+A file annotation contains a reference to an embedded file that can be placed anywhere in the document.
+File annotations show up in your reader's annotation panel as well as the attachment panel.
 
-In order to add a file attachment annotation, you should first read the chapter on annotations.
+In order to add a file annotation, you should first read the chapter on annotations.
 Like other annotations, you specify position and size with `x`, `y`, `width` and `height`, unlike other annotations you must also specify a file object.
 The file object may contain the same options as `doc.file` in the previous section with the addition of the source file or buffered data in `src`.
 
-Here is an example of adding a file attachment annotation:
+Here is an example of adding a file annotation:
 
     const file = {
       src: path.join(__dirname, 'example.txt'),
@@ -48,6 +48,6 @@ Here is an example of adding a file attachment annotation:
     }
     const options = { Name: 'Paperclip' }
 
-    doc.fileAttachmentAnnotation(100, 100, 100, 100, file, options)
+    doc.fileAnnotation(100, 100, 100, 100, file, options)
 
 The annotation's appearance may be changed by setting the `Name` option to one of the three predefined icons `GraphPush`, `Paperclip` or `Push` (default value).

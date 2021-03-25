@@ -29,12 +29,12 @@ const file = {
   creationDate: new Date(2020, 3, 1)
 };
 // then, add the annotation
-doc.fileAttachmentAnnotation(100, 150, 10, doc.currentLineHeight(), file);
+doc.fileAnnotation(100, 150, 10, doc.currentLineHeight(), file);
 
 // declared files can be reused, but they will show up separately in the PDF Viewer's attachments panel
 // we're going to use the paperclip icon for this one together with a short description
 // be aware that some PDF Viewers may not render the icon correctly — or not at all
-doc.fileAttachmentAnnotation(150, 150, 10, doc.currentLineHeight(), file, {
+doc.fileAnnotation(150, 150, 10, doc.currentLineHeight(), file, {
   Name: 'Paperclip',
   Contents: 'Paperclip attachment'
 });
