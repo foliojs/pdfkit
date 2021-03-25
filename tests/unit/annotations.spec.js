@@ -101,11 +101,11 @@ describe('Annotations', () => {
     });
   });
 
-  describe('fileAttachmentAnnotation', () => {
-    test('creating a fileAttachmentAnnotation', () => {
+  describe('fileAnnotation', () => {
+    test('creating a fileAnnotation', () => {
       const docData = logData(document);
 
-      document.fileAttachmentAnnotation(100, 100, 20, 20, {
+      document.fileAnnotation(100, 100, 20, 20, {
         src: Buffer.from('example text'),
         name: 'file.txt'
       });
@@ -126,7 +126,7 @@ describe('Annotations', () => {
     test("using the file's description", () => {
       const docData = logData(document);
 
-      document.fileAttachmentAnnotation(100, 100, 20, 20, {
+      document.fileAnnotation(100, 100, 20, 20, {
         src: Buffer.from('example text'),
         name: 'file.txt',
         description: 'file description'
@@ -149,7 +149,7 @@ describe('Annotations', () => {
     test("overriding the file's description", () => {
       const docData = logData(document);
 
-      document.fileAttachmentAnnotation(
+      document.fileAnnotation(
         100,
         100,
         20,
