@@ -164,7 +164,7 @@ class Node {
   }
 
   // sets the styles on the document for this node
-  setStyle(doc) {
+  setStyle (doc) {
     if (this.style.font) {
       doc.font(this.style.font);
     }
@@ -189,7 +189,7 @@ class Node {
   }
 
   // renders this node and its subnodes to the document
-  render(doc, continued) {
+  render (doc, continued) {
     let y;
     if (continued == null) {
       continued = false;
@@ -324,6 +324,7 @@ render(doc, 'text.md');
 render(doc, 'images.md');
 render(doc, 'outline.md');
 render(doc, 'annotations.md');
+render(doc, 'forms.md');
 render(doc, 'destinations.md');
 render(doc, 'attachments.md');
 render(doc, 'accessibility.md');
