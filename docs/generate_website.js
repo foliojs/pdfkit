@@ -22,6 +22,8 @@ const files = [
   'annotations.md',
   'forms.md',
   'destinations.md',
+  'attachments.md',
+  'accessibility.md',
   'you_made_it.md'
 ];
 

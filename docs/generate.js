@@ -326,5 +326,7 @@ render(doc, 'outline.md');
 render(doc, 'annotations.md');
 render(doc, 'forms.md');
 render(doc, 'destinations.md');
+render(doc, 'attachments.md');
+render(doc, 'accessibility.md');
 render(doc, 'you_made_it.md');
 doc.end();
