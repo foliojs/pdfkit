@@ -33,4 +33,23 @@ describe('EmbeddedFont', () => {
 
     expect(runSpy).toBeCalledTimes(4);
   });
+
+  describe('emebed', () => {
+    test('sets BaseName based on font id and postscript name', () => {
+      const document = new PDFDocument();
+      const font = PDFFontFactory.open(
+        document,
+        'tests/fonts/Roboto-Regular.ttf',
+        undefined,
+        'F1099'
+      );
+      const dictionary = {
+        end: () => {},
+      };
+      font.dictionary = dictionary;
+      font.embed();
+
+      expect(dictionary.data.BaseFont).toBe('BAJJZZ+Roboto-Regular');
+    });
+  });
 });
