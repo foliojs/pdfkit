@@ -1,0 +1,50 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>Paper Sizes</title><link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Source+Code+Pro:400,700|Alegreya:700|Merriweather"><link rel="stylesheet" href="/docs/css/index.css"><link rel="stylesheet" href="/docs/css/github.css"></head><body><nav class="sidebar"><ul><li><a href="/">Home</a></li><li><a href="/docs/../index.html">Documentation</a><ul><li><a href="/docs/getting_started.html">Getting Started </a></li><li><a class="selected" href="/docs/paper_sizes.html">Paper Sizes</a><ul><li><a href="#predefined_page_sizes">Predefined Page Sizes</a></li><li><a href="#a-series">A-series</a></li><li><a href="#b-series">B-series</a></li><li><a href="#c-series">C-series</a></li><li><a href="#ra-series">RA-series</a></li><li><a href="#sra-series">SRA-series</a></li><li><a href="#setting_the_page_size">Setting the page size</a></li></ul></li><li><a href="/docs/vector.html">Vector Graphics </a></li><li><a href="/docs/text.html">Text </a></li><li><a href="/docs/images.html">Images </a></li><li><a href="/docs/outline.html">Outlines </a></li><li><a href="/docs/annotations.html">Annotations </a></li><li><a href="/docs/forms.html">Forms </a></li><li><a href="/docs/destinations.html">Destinations</a></li><li><a href="/docs/attachments.html">Attachments </a></li><li><a href="/docs/accessibility.html">Accessibility</a></li><li><a href="/docs/you_made_it.html">You made it!</a></li></ul></li><li><a href="/docs/guide.pdf">PDF Guide</a></li><li><a href="/demo/out.pdf">Example PDF</a></li><li><a href="/demo/browser.html">Interactive Browser Demo</a></li><li><a href="http://github.com/foliojs/pdfkit">Source Code</a></li></ul></nav><div class="main"><h1 id="paper_sizes">Paper Sizes</h1>
+
+<p>When creating a new document or adding a new page to your current document, PDFKit allows you to set the page dimensions. To improve convenience, PDFKit has a number of predefined page sizes. These sizes are based on the most commonly used stndard page sizes. </p>
+
+<h2 id="predefined_page_sizes">Predefined Page Sizes</h2>
+
+<p>The following predefined sizes are based on the ISO (International) standards. All the dimensions in brackets are in PostScript points. </p>
+
+<h2 id="a-series">A-series</h2>
+
+<ul><li>A0 (2383.94 x 3370.39)</li><li>A1 (1683.78 x 2383.94)</li><li>A2 (1190.55 x 1683.78)</li><li>A3 (841.89 x 1190.55)</li><li>A4 (595.28 x 841.89)</li><li>A5 (419.53 x 595.28)</li><li>A6 (297.64 x 419.53)</li><li>A7 (209.76 x 297.64)</li><li>A8 (147.40 x 209.76)</li><li>A9 (104.88 x 147.40)</li><li>A10 (73.70 x 104.88)</li></ul>
+
+<h2 id="b-series">B-series</h2>
+
+<ul><li>B0 (2834.65 x 4008.19)</li><li>B1 (2004.09 x 2834.65)</li><li>B2 (1417.32 x 2004.09)</li><li>B3 (1000.63 x 1417.32)</li><li>B4 (708.66 x 1000.63)</li><li>B5 (498.90 x 708.66)</li><li>B6 (354.33 x 498.90)</li><li>B7 (249.45 x 354.33)</li><li>B8 (175.75 x 249.45)</li><li>B9 (124.72 x 175.75)</li><li>B10 (87.87 x 124.72)</li></ul>
+
+<h2 id="c-series">C-series</h2>
+
+<ul><li>C0 (2599.37 x 3676.54)</li><li>C1 (1836.85 x 2599.37)</li><li>C2 (1298.27 x 1836.85)</li><li>C3 (918.43 x 1298.27)</li><li>C4 (649.13 x 918.43)</li><li>C5 (459.21 x 649.13)</li><li>C6 (323.15 x 459.21)</li><li>C7 (229.61 x 323.15)</li><li>C8 (161.57 x 229.61)</li><li>C9 (113.39 x 161.57)</li><li>C10 (79.37 x 113.39)</li></ul>
+
+<h2 id="ra-series">RA-series</h2>
+
+<ul><li>RA0 (2437.80 x 3458.27)</li><li>RA1 (1729.13 x 2437.80)</li><li>RA2 (1218.90 x 1729.13)</li><li>RA3 (864.57 x 1218.90)</li><li>RA4 (609.45 x 864.57)</li></ul>
+
+<h2 id="sra-series">SRA-series</h2>
+
+<ul><li>SRA0 (2551.18 x 3628.35)</li><li>SRA1 (1814.17 x 2551.18)</li><li>SRA2 (1275.59 x 1814.17)</li><li>SRA3 (907.09 x 1275.59)</li><li>SRA4 (637.80 x 907.09)</li></ul>
+
+<p>The following predefined sizes are based on the common paper sizes used mainly in the United States of America and Canada. The dimensions in brackets are in PostScript points. </p>
+
+<ul><li>EXECUTIVE (521.86 x 756.00)</li><li>LEGAL (612.00 x 1008.00)</li><li>LETTER (612.00 X 792.00)</li><li>TABLOID (792.00 X 1224.00)</li></ul>
+
+<p>PDFKit supports also the following paper sizes. The dimensions in brackets are in PostScript points. </p>
+
+<ul><li>4A0 (4767.89 x 6740.79)</li><li>2A0 (3370.39 x 4767.87)</li><li>FOLIO (612.00 X 936.00)</li></ul>
+
+<h2 id="setting_the_page_size">Setting the page size</h2>
+
+<p>In order to use the predefined sizes, the name of the size (as named in the lists above) should be passed to either the <code>PDFDocument</code> constructor or the <code>addPage()</code> function in the <code>size</code> property of the <code>options</code> object, as shown in the example below, using <code>A7</code> as the preferred size. </p>
+
+<pre><code>// Passing size to the constructor
+const doc = new PDFDocument({size: &#39;A7&#39;});
+
+// Passing size to the addPage function
+doc.addPage({size: &#39;A7&#39;});</code></pre><nav><a class="previous" href="/docs/getting_started.html">Previous</a><a class="next" href="/docs/vector.html">Next</a></nav></div><script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script><script src="/docs/js/scroll.js"></script><script src="/docs/js/highlight.pack.js"></script><script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-48340245-1', 'pdfkit.org');
+ga('send', 'pageview');</script></body></html>

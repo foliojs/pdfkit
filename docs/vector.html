@@ -1,4 +1,4 @@
-<!DOCTYPE html><html><head><meta charset="utf-8"><title>Vector Graphics in PDFKit</title><link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Source+Code+Pro:400,700|Alegreya:700|Merriweather"><link rel="stylesheet" href="/docs/css/index.css"><link rel="stylesheet" href="/docs/css/github.css"></head><body><nav class="sidebar"><ul><li><a href="/">Home</a></li><li><a href="/docs/../index.html">Documentation</a><ul><li><a href="/docs/getting_started.html">Getting Started </a></li><li><a href="/docs/vector.html" class="selected">Vector Graphics </a><ul><li><a href="#an_introduction_to_vector_graphics">An introduction to vector graphics</a></li><li><a href="#creating_basic_shapes">Creating basic shapes</a></li><li><a href="#svg_paths">SVG paths</a></li><li><a href="#shape_helpers">Shape helpers</a></li><li><a href="#fill_and_stroke_styles">Fill and stroke styles</a></li><li><a href="#line_cap_and_line_join">Line cap and line join</a></li><li><a href="#dashed_lines">Dashed lines</a></li><li><a href="#color">Color</a></li><li><a href="#gradients">Gradients</a></li><li><a href="#winding_rules">Winding rules</a></li><li><a href="#saving_and_restoring_the_graphics_stack">Saving and restoring the graphics stack</a></li><li><a href="#transformations">Transformations</a></li><li><a href="#clipping">Clipping</a></li></ul></li><li><a href="/docs/text.html">Text </a></li><li><a href="/docs/images.html">Images </a></li><li><a href="/docs/annotations.html">Annotations </a></li></ul></li><li><a href="/docs/guide.pdf">PDF Guide</a></li><li><a href="/demo/out.pdf">Example PDF</a></li><li><a href="/demo/browser.html">Interactive Browser Demo</a></li><li><a href="http://github.com/devongovett/pdfkit">Source Code</a></li></ul></nav><div class="main"><h1 id="vector_graphics_in_pdfkit">Vector Graphics in PDFKit</h1>
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>Vector Graphics in PDFKit</title><link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Source+Code+Pro:400,700|Alegreya:700|Merriweather"><link rel="stylesheet" href="/docs/css/index.css"><link rel="stylesheet" href="/docs/css/github.css"></head><body><nav class="sidebar"><ul><li><a href="/">Home</a></li><li><a href="/docs/../index.html">Documentation</a><ul><li><a href="/docs/getting_started.html">Getting Started </a></li><li><a href="/docs/paper_sizes.html">Paper Sizes</a></li><li><a class="selected" href="/docs/vector.html">Vector Graphics </a><ul><li><a href="#an_introduction_to_vector_graphics">An introduction to vector graphics</a></li><li><a href="#creating_basic_shapes">Creating basic shapes</a></li><li><a href="#svg_paths">SVG paths</a></li><li><a href="#shape_helpers">Shape helpers</a></li><li><a href="#fill_and_stroke_styles">Fill and stroke styles</a></li><li><a href="#line_cap_and_line_join">Line cap and line join</a></li><li><a href="#dashed_lines">Dashed lines</a></li><li><a href="#color">Color</a></li><li><a href="#gradients">Gradients</a></li><li><a href="#winding_rules">Winding rules</a></li><li><a href="#saving_and_restoring_the_graphics_stack">Saving and restoring the graphics stack</a></li><li><a href="#transformations">Transformations</a></li><li><a href="#clipping">Clipping</a></li></ul></li><li><a href="/docs/text.html">Text </a></li><li><a href="/docs/images.html">Images </a></li><li><a href="/docs/outline.html">Outlines </a></li><li><a href="/docs/annotations.html">Annotations </a></li><li><a href="/docs/forms.html">Forms </a></li><li><a href="/docs/destinations.html">Destinations</a></li><li><a href="/docs/attachments.html">Attachments </a></li><li><a href="/docs/accessibility.html">Accessibility</a></li><li><a href="/docs/you_made_it.html">You made it!</a></li></ul></li><li><a href="/docs/guide.pdf">PDF Guide</a></li><li><a href="/demo/out.pdf">Example PDF</a></li><li><a href="/demo/browser.html">Interactive Browser Demo</a></li><li><a href="http://github.com/foliojs/pdfkit">Source Code</a></li></ul></nav><div class="main"><h1 id="vector_graphics_in_pdfkit">Vector Graphics in PDFKit</h1>
 
 <h2 id="an_introduction_to_vector_graphics">An introduction to vector graphics</h2>
 
@@ -18,12 +18,12 @@ and <code>quadraticCurveTo</code> all draw from the current point (which you can
 curves use two control points and quadratic curves use just one. Here is an
 example that illustrates defining a path.</p>
 
-<pre><code>doc.moveTo(0, 20)                               # set the current point
-   .lineTo(100, 160)                            # draw a line
-   .quadraticCurveTo(130, 200, 150, 120)        # draw a quadratic curve
-   .bezierCurveTo(190, -40, 200, 200, 300, 150) # draw a bezier curve
-   .lineTo(400, 90)                             # draw another line
-   .stroke()                                    # stroke the path</code></pre>
+<pre><code>doc.moveTo(0, 20)                               // set the current point
+   .lineTo(100, 160)                            // draw a line
+   .quadraticCurveTo(130, 200, 150, 120)        // draw a quadratic curve
+   .bezierCurveTo(190, -40, 200, 200, 300, 150) // draw a bezier curve
+   .lineTo(400, 90)                             // draw another line
+   .stroke();                                   // stroke the path</code></pre>
 
 <p>The output of this example looks like this:</p>
 
@@ -63,8 +63,8 @@ pairs), and it will create the shape by moving to the first point, and then
 drawing lines to each consecutive point. Here is how you&#39;d draw a triangle
 with the polygon helper.</p>
 
-<pre><code>doc.polygon [100, 0], [50, 100], [150, 100]
-doc.stroke()</code></pre>
+<pre><code>doc.polygon([100, 0], [50, 100], [150, 100]);
+doc.stroke();</code></pre>
 
 <p>The output of this example looks like this:</p>
 
@@ -91,38 +91,38 @@ style. PDFKit has many methods designed to do just that.</p>
 <p>The <code>lineCap</code> and <code>lineJoin</code> properties accept constants describing what they
 should do. This is best illustrated by an example.</p>
 
-<pre><code># these examples are easier to see with a large line width
-doc.lineWidth(25)
+<pre><code>// these examples are easier to see with a large line width
+doc.lineWidth(25);
 
-# line cap settings
+// line cap settings
 doc.lineCap(&#39;butt&#39;)
    .moveTo(50, 20)
    .lineTo(100, 20)
-   .stroke()
+   .stroke();
 
 doc.lineCap(&#39;round&#39;)
    .moveTo(150, 20)
    .lineTo(200, 20)
-   .stroke()
+   .stroke();
 
-# square line cap shown with a circle instead of a line so you can see it   
+// square line cap shown with a circle instead of a line so you can see it
 doc.lineCap(&#39;square&#39;)
    .moveTo(250, 20)
    .circle(275, 30, 15)
-   .stroke()
+   .stroke();
 
-# line join settings
+// line join settings
 doc.lineJoin(&#39;miter&#39;)
    .rect(50, 100, 50, 50)
-   .stroke()
+   .stroke();
 
 doc.lineJoin(&#39;round&#39;)
    .rect(150, 100, 50, 50)
-   .stroke()
+   .stroke();
 
 doc.lineJoin(&#39;bevel&#39;)
    .rect(250, 100, 50, 50)
-   .stroke()</code></pre>
+   .stroke();</code></pre>
 
 <p>The output of this example looks like this.</p>
 
@@ -132,7 +132,8 @@ doc.lineJoin(&#39;bevel&#39;)
 
 <p>The <code>dash</code> method allows you to create non-continuous dashed lines. It takes a
 length specifying how long each dash should be, as well as an optional hash
-describing the additional properties <code>space</code> and <code>phase</code>.</p>
+describing the additional properties <code>space</code> and <code>phase</code>. Lengths must be positive
+numbers; <code>dash</code> will throw if passed invalid lengths.</p>
 
 <p>The <code>space</code> option defines the length of the space between each dash, and the <code>phase</code> option
 defines the starting point of the sequence of dashes. By default the <code>space</code>
@@ -143,8 +144,8 @@ You can use the <code>undash</code> method to make the line solid again.</p>
 between the dashes is double the length of each dash.</p>
 
 <pre><code>doc.circle(100, 50, 50)
-   .dash(5, space: 10)
-   .stroke()</code></pre>
+   .dash(5, {space: 10})
+   .stroke();</code></pre>
 
 <p>The output of this example looks like this:</p>
 
@@ -183,31 +184,31 @@ you can apply a gradient with these methods, however, you must create a gradient
 <p>There are two types of gradients: linear and radial. They are created by the <code>linearGradient</code>
 and <code>radialGradient</code> methods.  Their function signatures are listed below:</p>
 
-<ul><li><code>linearGradient(x1, y1, x2, y2)</code> - <code>x1,y1</code> is the start point, <code>x2,y2</code> is the end point</li><li><code>radialGradient(x1, y2, r1, x2, y2, r2)</code> - <code>r1</code> is the inner radius, <code>r2</code> is the outer radius</li></ul>
+<ul><li><code>linearGradient(x1, y1, x2, y2)</code> - <code>x1,y1</code> is the start point, <code>x2,y2</code> is the end point</li><li><code>radialGradient(x1, y1, r1, x2, y2, r2)</code> - <code>r1</code> is the inner radius, <code>r2</code> is the outer radius</li></ul>
 
 <p>Once you have a gradient object, you need to create color stops at points along that gradient.
-Stops are defined at percentage values (0 to 1), and take a color value (any usable by the 
+Stops are defined at percentage values (0 to 1), and take a color value (any usable by the
 fillColor method), and an optional opacity.</p>
 
 <p>You can see both linear and radial gradients in the following example:</p>
 
-<pre><code># Create a linear gradient
-grad = doc.linearGradient(50, 0, 150, 100)
+<pre><code>// Create a linear gradient
+let grad = doc.linearGradient(50, 0, 150, 100);
 grad.stop(0, &#39;green&#39;)
-    .stop(1, &#39;red&#39;)
+    .stop(1, &#39;red&#39;);
 
-doc.rect 50, 0, 100, 100
-doc.fill grad
+doc.rect(50, 0, 100, 100);
+doc.fill(grad);
 
-# Create a radial gradient
-grad = doc.radialGradient(300, 50, 0, 300, 50, 50)
+// Create a radial gradient
+grad = doc.radialGradient(300, 50, 0, 300, 50, 50);
 grad.stop(0, &#39;orange&#39;, 0)
-    .stop(1, &#39;orange&#39;, 1)
+    .stop(1, &#39;orange&#39;, 1);
 
-doc.circle 300, 50, 50    
-doc.fill grad</code></pre>
+doc.circle(300, 50, 50);
+doc.fill(grad);</code></pre>
 
-<p>Here is the output from the this example: </p>
+<p>Here is the output from the this example:</p>
 
 <p><img src="img/6.png"/></p>
 
@@ -218,19 +219,19 @@ example. The winding rule is an optional attribute to the <code>fill</code> and
 <code>fillAndStroke</code> methods, and there are two values to choose from: <code>non-zero</code>
 and <code>even-odd</code>.</p>
 
-<pre><code># Initial setup
+<pre><code>// Initial setup
 doc.fillColor(&#39;red&#39;)
    .translate(-100, -50)
-   .scale(0.8)
+   .scale(0.8);
 
-# Draw the path with the non-zero winding rule
+// Draw the path with the non-zero winding rule
 doc.path(&#39;M 250,75 L 323,301 131,161 369,161 177,301 z&#39;)
-   .fill(&#39;non-zero&#39;)
+   .fill(&#39;non-zero&#39;);
 
-# Draw the path with the even-odd winding rule   
+// Draw the path with the even-odd winding rule
 doc.translate(280, 0)
    .path(&#39;M 250,75 L 323,301 131,161 369,161 177,301 z&#39;)
-   .fill(&#39;even-odd&#39;)</code></pre>
+   .fill(&#39;even-odd&#39;);</code></pre>
 
 <p>You&#39;ll notice that I used the <code>scale</code> and <code>translate</code> transformations in this
 example. We&#39;ll cover those in a minute. The output of this example, with some
@@ -256,17 +257,17 @@ the drawing itself. There are three types of transformations available, as
 well as a method for setting the transformation matrix yourself. They are
 <code>translate</code>, <code>rotate</code> and <code>scale</code>.</p>
 
-<p>The <code>translate</code> transformation takes two arguments, x and y, and effectively
-moves the origin of the document which is (0, 0) by default, to the left and
-right x and y units.</p>
+<p>The <code>translate</code> transformation takes two arguments, <code>x</code> and <code>y</code>, and effectively
+moves the origin of the page which is (0, 0) by default, to the left and
+right <code>x</code> and <code>y</code> units.</p>
 
 <p>The <code>rotate</code> transformation takes an angle and optionally, an object with an
 <code>origin</code> property. It rotates the document <code>angle</code> degrees around the passed
-<code>origin</code> or by default, the center of the page.</p>
+<code>origin</code> or by default, around the origin (top left corner) of the page.</p>
 
 <p>The <code>scale</code> transformation takes a scale factor and an optional <code>origin</code>
 passed in an options hash as with the <code>rotate</code> transformation. It is used to
-increase or decrease the size of the units in the drawing, or change it&#39;s
+increase or decrease the size of the units in the drawing, or change its
 size. For example, applying a scale of <code>0.5</code> would make the drawing appear at
 half size, and a scale of <code>2</code> would make it appear twice as large.</p>
 
@@ -277,9 +278,9 @@ matrix yourself using the <code>transform</code> method.</p>
 example of using the <code>rotate</code> transformation. We&#39;ll set the origin of the
 rotation to the center of the rectangle.</p>
 
-<pre><code>doc.rotate(20, origin: [150, 70])
+<pre><code>doc.rotate(20, {origin: [150, 70]})
    .rect(100, 20, 100, 100)
-   .fill(&#39;gray&#39;)</code></pre>
+   .fill(&#39;gray&#39;);</code></pre>
 
 <p>This example produces the following effect.</p>
 
@@ -293,23 +294,28 @@ parts of the drawing. Everything falling inside the clipping path after it is
 created is visible, and everything outside the path is invisible. Here is an
 example that clips a checkerboard pattern to the shape of a circle.</p>
 
-<pre><code># Create a clipping path   
+<pre><code>// Create a clipping path
 doc.circle(100, 100, 100)
-   .clip()
+   .clip();
 
-# Draw a checkerboard pattern
-for row in [0...10]
-  for col in [0...10]
-    color = if (col % 2) - (row % 2) then &#39;#eee&#39; else &#39;#4183C4&#39;
+// Draw a checkerboard pattern
+for (let row = 0; row &lt; 10; row++) {
+  for (let col = 0; col &lt; 10; col++) {
+    const color = (col % 2) - (row % 2) ? &#39;#eee&#39; : &#39;#4183C4&#39;;
     doc.rect(row * 20, col * 20, 20, 20)
-       .fill(color)</code></pre>
+       .fill(color);
+  }
+}</code></pre>
 
 <p>The result of this example is the following:</p>
 
 <p><img src="img/9.png"/></p>
 
+<p>If you want to &quot;unclip&quot;, you can use the <code>save</code> method before the clipping,
+and then use <code>restore</code> to retrieve access to the whole page.</p>
+
 <p>That&#39;s it for vector graphics in PDFKit. Now let&#39;s move on to learning about
-PDFKit&#39;s text support!</p><nav><a href="/docs/getting_started.html" class="previous">Previous</a><a href="/docs/text.html" class="next">Next</a></nav></div><script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script><script src="/docs/js/scroll.js"></script><script src="/docs/js/highlight.pack.js"></script><script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+PDFKit&#39;s text support!</p><nav><a class="previous" href="/docs/paper_sizes.html">Previous</a><a class="next" href="/docs/text.html">Next</a></nav></div><script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script><script src="/docs/js/scroll.js"></script><script src="/docs/js/highlight.pack.js"></script><script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
 (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
 m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
 })(window,document,'script','//www.google-analytics.com/analytics.js','ga');

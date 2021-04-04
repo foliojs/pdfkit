@@ -1,0 +1,317 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>Accessibility</title><link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Source+Code+Pro:400,700|Alegreya:700|Merriweather"><link rel="stylesheet" href="/docs/css/index.css"><link rel="stylesheet" href="/docs/css/github.css"></head><body><nav class="sidebar"><ul><li><a href="/">Home</a></li><li><a href="/docs/../index.html">Documentation</a><ul><li><a href="/docs/getting_started.html">Getting Started </a></li><li><a href="/docs/paper_sizes.html">Paper Sizes</a></li><li><a href="/docs/vector.html">Vector Graphics </a></li><li><a href="/docs/text.html">Text </a></li><li><a href="/docs/images.html">Images </a></li><li><a href="/docs/outline.html">Outlines </a></li><li><a href="/docs/annotations.html">Annotations </a></li><li><a href="/docs/forms.html">Forms </a></li><li><a href="/docs/destinations.html">Destinations</a></li><li><a href="/docs/attachments.html">Attachments </a></li><li><a class="selected" href="/docs/accessibility.html">Accessibility</a><ul><li><a href="#marked_content">Marked Content</a></li><li><a href="#marked_content_options">Marked Content Options</a></li><li><a href="#logical_structure">Logical Structure</a></li><li><a href="#automatic_ending_of_structure_content_and_artifacts">Automatic Ending of Structure Content and Artifacts</a></li><li><a href="#complex_structure">Complex Structure</a></li><li><a href="#incremental_construction_of_structure">Incremental Construction of Structure</a></li><li><a href="#shortcut_for_elements_containing_only_marked_content">Shortcut for Elements Containing Only Marked Content</a></li><li><a href="#structure_element_options">Structure Element Options</a></li><li><a href="#automatic_marking_and_structure_construction_for_text">Automatic Marking and Structure Construction for Text</a></li><li><a href="#tags_and_structure_element_types">Tags and Structure Element Types</a></li></ul></li><li><a href="/docs/you_made_it.html">You made it!</a></li></ul></li><li><a href="/docs/guide.pdf">PDF Guide</a></li><li><a href="/demo/out.pdf">Example PDF</a></li><li><a href="/demo/browser.html">Interactive Browser Demo</a></li><li><a href="http://github.com/foliojs/pdfkit">Source Code</a></li></ul></nav><div class="main"><h1 id="accessibility">Accessibility</h1>
+
+<p>Accessible PDFs are usable by visually impaired users who rely on
+screen readers/text-to-speech engines/vocalisation.</p>
+
+<p>The two main tasks required to create accessible PDFs are marking content and defining the
+document&#39;s logical structure. These are detailed in the following sections.</p>
+
+<p>Some other simpler tasks are also required.</p>
+
+<p>This checklist covers everything that is required to create a conformant PDF/UA (PDF for
+Universal Accessibility) document (which is an extension of Tagged PDF):</p>
+
+<ul><li>Pass the option <code>pdfVersion: &#39;1.5&#39;</code> (or a higher version) when creating your <code>PDFDocument</code>
+(depending on the features you use, you may only need 1.4; refer to the PDF reference for
+details).</li><li>Pass the option <code>tagged: true</code> when creating your <code>PDFDocument</code> (technically, this sets the
+<code>Marked</code> property in the <code>Markings</code> dictionary to <code>true</code> in the PDF).</li><li>Provide a <code>Title</code> in the <code>info</code> option, and pass <code>displayTitle: true</code> when creating your
+<code>PDFDocument</code>.</li><li>Specify natural language in the document options and/or logical structure and/or
+non-structure marked <code>Span</code> content.</li><li>Add logical structure with all significant content included.</li><li>Include accessibility information (such as alternative text, actual text, etc.) in the
+logical structure and/or non-structure marked <code>Span</code> content.</li><li>Include all spaces which separate words/sentences/etc. in your marked structure content,
+even at the ends of lines, paragraphs, etc.. I.e. don&#39;t do <code>doc.text(&quot;Hello, world!&quot;)</code> but
+instead do <code>doc.text(&quot;Hello, world! &quot;)</code>.</li><li>Mark all non-structure content as artifacts.</li><li>As well as creating the logical structure, write objects to the PDF in the natural
+&quot;reading order&quot;.</li><li>Do not convey information solely using visuals (such as colour,
+contrast or position on the page).</li><li>No flickering or flashing content.</li></ul>
+
+<h2 id="marked_content">Marked Content</h2>
+
+<p>Marked content sequences are foundational to creating accessible PDFs.</p>
+
+<p>All marked content sequences are associated with a registered tag, such as &#39;Span&#39;.</p>
+
+<p>Example of marking content:</p>
+
+<pre><code>// Mark some text as a &quot;Span&quot;
+doc.markContent(&#39;Span&#39;);
+doc.text(&#39;Hello, world! &#39;);
+doc.endMarkedContent();</code></pre>
+
+<p>Marked content is automatically ended when a page is ended, and if a new page is automatically
+added by text wrapping, marking is automatically begun again on the new page.</p>
+
+<p>Tags to use are listed in a later section.</p>
+
+<h2 id="marked_content_options">Marked Content Options</h2>
+
+<p>When marking content, you can provide options (take care to use correct capitalisation):</p>
+
+<ul><li><code>type</code> - used for artifact content; may be <code>Pagination</code> (e.g. headers and footers),
+<code>Layout</code> (e.g. rules and backgrounds) or <code>Page</code> (cut marks etc.)</li><li><code>bbox</code> - bounding box for artifact content: <code>[left, top, right, bottom]</code> in default
+coordinates</li><li><code>attached</code> - used for <code>Pagination</code> artifact content, array of one or more strings:
+<code>Top</code>, <code>Bottom</code>, <code>Left</code>, <code>Right</code></li><li><code>lang</code> - used for <code>Span</code> content: human language code (e.g. <code>en-AU</code>) which overrides default
+document language, and any enclosing structure element language</li><li><code>alt</code> - used for <code>Span</code> content: alternative text for an image or other visual content</li><li><code>expanded</code> - used for <code>Span</code> content: the expanded form of an abbreviation or acronym</li><li><code>actual</code> - used for <code>Span</code> content: the actual text the content represents (e.g. if it is
+rendered as vector graphics)</li></ul>
+
+<p>It is advisable not to use <code>Span</code> content for specifying alternative text, expanded form, or
+actual text, especially if there is a possibility of the content automatically wrapping, which
+would result in the text appearing twice. Set these options on an associated structure element
+instead.</p>
+
+<h2 id="logical_structure">Logical Structure</h2>
+
+<p>Logical structures defines the reading order of a document, and can provide alternative text
+for images and other visual content.</p>
+
+<p>To define logical structure, you need to mark the structure content, keep a reference to it,
+then incorporate it into a structure tree.</p>
+
+<blockquote><p>So far, PDFKit only supports marked content in the logical structure, not annotations, forms,
+or anything else.</p></blockquote>
+
+<p>Example of marking structure content:</p>
+
+<pre><code>// Mark some text as a paragraph (&quot;P&quot;); the tag should match the intended structure element&#39;s type
+const myStructContent = doc.markStructureContent(&#39;P&#39;);
+doc.text(&#39;Hello, world! &#39;);
+doc.endMarkedContent();</code></pre>
+
+<p>Example of the simplest of structure trees:</p>
+
+<pre><code>// Add a single structure element which includes the structure content to the document&#39;s structure
+doc.addStructure(doc.struct(&#39;P&#39;, myStructContent));</code></pre>
+
+<p>Tags/element types to use are listed in a later section.</p>
+
+<p>Note that to be conformant to Tagged PDF, all content not part of the logical structure should
+be marked as <code>Artifact</code>.</p>
+
+<h2 id="automatic_ending_of_structure_content_and_artifacts">Automatic Ending of Structure Content and Artifacts</h2>
+
+<p>Structure content does not nest, and is mutually exclusive with artifact content; marking
+structure or artifact content will automatically end current marking of structure or artifact
+content (and any descendent marking):</p>
+
+<pre><code>// Mark multiple paragraphs without needing to close them
+doc.markContent(&#39;Artifact&#39;, { type: &quot;Layout&quot; });
+doc.rect(x1, y1, w1, h1);
+const myStructContent = doc.markStructureContent(&#39;P&#39;);
+doc.text(&#39;Hello, world! &#39;);
+doc.markContent(&#39;Artifact&#39;, { type: &quot;Layout&quot; });
+doc.rect(x2, y2, w2, h2);
+const myStructContent = doc.markStructureContent(&#39;P&#39;);
+doc.markContent(&#39;Span&#39;);
+doc.text(&#39;Bonjour, tout le monde! &#39;);
+doc.markContent(&#39;Artifact&#39;, { type: &quot;Layout&quot; });
+doc.rect(x3, y3, w3, h3);
+const myStructContent = doc.markStructureContent(&#39;P&#39;);
+doc.text(&#39;Hello again! &#39;);</code></pre>
+
+<h2 id="complex_structure">Complex Structure</h2>
+
+<p>Multiple elements may be added directly to the document, or to structure elements, and may nest:</p>
+
+<pre><code>// Create nested structure elements
+const section1 = doc.struct(&#39;Sect&#39;, [
+    doc.struct(&#39;P&#39;, [
+        someTextStructureContent,
+        doc.struct(&#39;Link&#39;, someLinkStructureContent),
+        moreTextStructureContent
+    ])
+]);
+const section2 = doc.struct(&#39;Sect&#39;, secondSectionStructureContent);
+
+// Add them to the document&#39;s structure
+doc.addStructure(section1).addStructure(section2);</code></pre>
+
+<h2 id="incremental_construction_of_structure">Incremental Construction of Structure</h2>
+
+<p>Structure can be built incrementally. Elements can optionally be (recursively) ended once
+you have finished adding to them, allowing them to be flushed out as soon as possible:</p>
+
+<pre><code>// Begin a new section and add it to the document&#39;s structure
+const mySection = doc.struct(&#39;Sect&#39;);
+doc.addStructure(mySection);
+
+// Create a new paragraph and add it to the section
+const myParagraph = doc.struct(&#39;P&#39;);
+mySection.add(myParagraph);
+
+// Add content, both to the page, and the paragraph
+const myParagraphContent = doc.markStructureContent(&#39;P&#39;);
+myParagraph.add(myParagraphContent);
+doc.text(&#39;Hello, world! &#39;);
+
+// End the paragraph, allowing it to be flushed out, freeing memory
+myParagraph.end();</code></pre>
+
+<p>Note that if you provide children when creating a structure element (i.e. providing them to
+<code>doc.struct()</code> rather than using <code>structElem.add()</code>) then <code>structElem.end()</code> is called
+automatically. You therefore cannot add additional children with <code>structElem.add()</code>, i.e.
+you cannot mix atomic and incremental styles for the same structure element.</p>
+
+<p>For an element to be flushed out, it must:</p>
+
+<ul><li>be ended,</li><li>have been added to its parent, and</li><li>if it has content defined through closures (see next section), be attached to the document&#39;s
+structure (through its ancestors)</li></ul>
+
+<p>When you call <code>doc.end()</code>, the document&#39;s structure is recursively ended, resulting in all
+elements being flushed out. If you created elements but forgot to add them to the document&#39;s
+structure, they will not be flushed, but the PDF stream will wait for them to be flushed before
+ending, causing your application to hang. Make sure if you create any elements, you add them
+to a parent, so ultimately all elements are attached to the document. It&#39;s best to add
+elements to their parents as you go.</p>
+
+<h2 id="shortcut_for_elements_containing_only_marked_content">Shortcut for Elements Containing Only Marked Content</h2>
+
+<p>The common case where a structure element contains only content marked with a tag matching
+the structure element type can be achieved by using a closure:</p>
+
+<pre><code>doc.addStructure(doc.struct(&#39;P&#39;, () =&gt; {
+    doc.text(&#39;Hello, world! &#39;);
+}));</code></pre>
+
+<p>This is equivalent to:</p>
+
+<pre><code>const myStruct = doc.struct(&#39;P&#39;);
+doc.addStructure(myStruct);
+const myStructContent = doc.markStructureContent(&#39;P&#39;);
+doc.text(&#39;Hello, world! &#39;);
+doc.endMarkedContent();
+myStruct.add(myStructContent);
+myStruct.end();</code></pre>
+
+<p>Note that the content is marked and the closure is executed <em>if/when the element is attached to
+the document&#39;s structure</em>. This means that you can do something like this:</p>
+
+<pre><code>const myParagraph = doc.struct(&#39;P&#39;, [
+    () =&gt; { doc.text(&quot;Please see &quot;, { continued: true }); },
+    doc.struct(&#39;Link&#39;, () =&gt; {
+        doc.text(&quot;something&quot;, { link: &quot;http://www.example.com/&quot;, continued: true });
+    }),
+    () =&gt; { doc.text(&quot; for details. &quot;, { link: null }); }
+]);</code></pre>
+
+<p>and no content will be added to the page until/unless something like this is done:</p>
+
+<pre><code>doc.addStructure(section1);
+section1.add(myParagraph); // Content is added now</code></pre>
+
+<p>or alternatively:</p>
+
+<pre><code>section1.add(myParagraph);
+doc.addStructure(section1); // Content is added now</code></pre>
+
+<p>This is important because otherwise when the <code>Link</code> element is constructed, its content
+will be added to the page, and then the list containing the link element will be passed to
+the construct the <code>P</code> element, and only during the construction of the <code>P</code> element will the
+other <code>P</code> content be added to the page, resulting in page content being out of order.
+It&#39;s best to add elements to their parents as you go.</p>
+
+<h2 id="structure_element_options">Structure Element Options</h2>
+
+<p>When creating a structure element, you can provide options:</p>
+
+<ul><li><code>title</code> - title of the structure element (e.g. &quot;Chapter 1&quot;)</li><li><code>lang</code> - human language code (e.g. <code>en-AU</code>) which overrides default document language</li><li><code>alt</code> - alternative text for an image or other visual content</li><li><code>expanded</code> - the expanded form of an abbreviation or acronym</li><li><code>actual</code> - the actual text the content represents (e.g. if it is rendered as vector graphics)</li></ul>
+
+<p>Example of a structure tree with options specified:</p>
+
+<pre><code>const titlePage = doc.struct(&#39;Sect&#39;, {
+    title: &#39;Title Page&#39;
+}, [
+    doc.struct(&#39;H&#39;, [
+        doc.struct(&#39;Span&#39;, {
+            expanded: &#39;Portable Document Format for Universal Accessibility&#39;,
+            actual: &#39;PDF/UA&#39;
+        }, [
+            pdfUAStructureContent
+        ]),
+        doc.struct(&#39;Span&#39;, {
+            actual: &#39;in a Nutshell&#39;
+        }, [
+            inANutshellStructureContent
+        ]),
+    ]),
+    doc.struct(&#39;Figure&#39;, {
+        alt: &#39;photo of a concrete path with tactile paving&#39;
+    }, [
+        photoStructureContent
+    ])
+]);</code></pre>
+
+<h2 id="automatic_marking_and_structure_construction_for_text">Automatic Marking and Structure Construction for Text</h2>
+
+<p>The <code>text()</code> method accepts a <code>structParent</code> option which you can use to specify a structure
+element to add each paragraph to. It will mark each paragraph of content, create a structure
+element for it, and then add it to the parent element you provided. It will use the <code>P</code> type,
+unless you specify a different type with a <code>structType</code> option.</p>
+
+<p>Example of creating structure automatically with <code>text()</code>:</p>
+
+<pre><code>// Create a section, add it to the document structure, then add paragraphs to it
+const section = doc.struct(&#39;Sect&#39;);
+doc.addStructure(section);
+doc.text(&quot;Foo. \nBar. &quot;, { structParent: section });</code></pre>
+
+<p>This is equivalent to:</p>
+
+<pre><code>const section = doc.struct(&#39;Sect&#39;);
+doc.addStructure(section);
+section.add(doc.struct(&#39;P&#39;, () =&gt; { doc.text(&quot;Foo. &quot;); });
+section.add(doc.struct(&#39;P&#39;, () =&gt; { doc.text(&quot;Bar. &quot;); });</code></pre>
+
+<p>The <code>list()</code> method also accepts a <code>structParent</code> option. By default, it add list items
+(type <code>LI</code>) to the parent, each of which contains a label (type <code>Lbl</code>, which holds the bullet,
+number, or letter) and a body (type <code>LBody</code>, which holds the actual item content). You can
+override the default types with a <code>structTypes</code> option, which is a list:
+<code>[ itemType, labelType, bodyType ]</code>. You can make any of the types <code>null</code> to omit that
+part of the structure (i.e. to add labels and bodies directly to the parent, and/or to collapse
+the label and body into a single element).</p>
+
+<p>Example of creating structure automatically with <code>list()</code>:</p>
+
+<pre><code>// Create a list, add it to the structure tree, then add items to it
+const list = doc.struct(&#39;List&#39;);
+someElement.add(list);
+doc.list([&quot;Foo. &quot;, &quot;Bar. &quot;], { structParent: list });</code></pre>
+
+<h2 id="tags_and_structure_element_types">Tags and Structure Element Types</h2>
+
+<p>Here are the tags and structure element types which are defined in Tagged PDF. You must
+ensure you give them with the correct capitalisation.</p>
+
+<blockquote><p>Tagged PDF also supports custom types which map to standard types, but PDFKit does not
+have support for this.</p></blockquote>
+
+<p>Non-structure tags:</p>
+
+<ul><li><code>Artifact</code> - used to mark all content not part of the logical structure</li><li><code>ReversedChars</code> - every string of text has characters in reverse order for technical reasons
+(due to how fonts work for right-to-left languages); strings may have spaces at the
+beginning or end to separate words, but may not have spaces in the middle</li></ul>
+
+<p>&quot;Grouping&quot; elements:</p>
+
+<ul><li><code>Document</code> - whole document; must be used if there are multiple parts or articles</li><li><code>Part</code> - part of a document</li><li><code>Art</code> - article</li><li><code>Sect</code> - section; may nest</li><li><code>Div</code> - generic division</li><li><code>BlockQuote</code> - block quotation</li><li><code>Caption</code> - describing a figure or table</li><li><code>TOC</code> - table of contents, may be nested, and may be used for lists of figures, tables, etc.</li><li><code>TOCI</code> - table of contents (leaf) item</li><li><code>Index</code> - index (text with accompanying <code>Reference</code> content)</li><li><code>NonStruct</code> - non-structural grouping element (element itself not intended to be exported to
+other formats like HTML, but &#39;transparent&#39; to its content which is processed normally)</li><li><code>Private</code> - content only meaningful to the creator (element and its content not intended to
+be exported to other formats like HTML)</li></ul>
+
+<p>&quot;Block&quot; elements:</p>
+
+<ul><li><code>H</code> - heading (first element in a section, etc.)</li><li><code>H1</code> to <code>H6</code> - heading of a particular level intended for use only if nesting sections
+is not possible for some reason</li><li><code>P</code> - paragraph</li><li><code>L</code> - list; should include optional <code>Caption</code>, and list items</li><li><code>LI</code> - list item; should contain <code>Lbl</code> and/or <code>LBody</code></li><li><code>Lbl</code> - label (bullet, number, or &quot;dictionary headword&quot;)</li><li><code>LBody</code> - list body (item text, or &quot;dictionary definition&quot;); may have nested lists or other blocks</li></ul>
+
+<p>&quot;Table&quot; elements:</p>
+
+<ul><li><code>Table</code> - table; should either contain <code>TR</code>, or <code>THead</code>, <code>TBody</code> and/or <code>TFoot</code></li><li><code>TR</code> - table row</li><li><code>TH</code> - table heading cell</li><li><code>TD</code> - table data cell</li><li><code>THead</code> - table header row group</li><li><code>TBody</code> - table body row group; may have more than one per table</li><li><code>TFoot</code> - table footer row group</li></ul>
+
+<p>&quot;Inline&quot; elements:</p>
+
+<ul><li><code>Span</code> - generic inline content</li><li><code>Quote</code> - inline quotation</li><li><code>Note</code> - e.g. footnote; may have a <code>Lbl</code> (see &quot;block&quot; elements)</li><li><code>Reference</code> - content in a document that refers to other content (e.g. page number in an index)</li><li><code>BibEntry</code> - bibliography entry; may have a <code>Lbl</code> (see &quot;block&quot; elements)</li><li><code>Code</code> - code</li><li><code>Link</code> - hyperlink; should contain a link annotation</li><li><code>Annot</code> - annotation (other than a link)</li><li><code>Ruby</code> - Chinese/Japanese pronunciation/explanation</li><li><code>RB</code> - Ruby base text</li><li><code>RT</code> - Ruby annotation text</li><li><code>RP</code> - Ruby punctuation</li><li><code>Warichu</code> - Japanese/Chinese longer description</li><li><code>WT</code> - Warichu text</li><li><code>WP</code> - Warichu punctuation</li></ul>
+
+<p>&quot;Illustration&quot; elements (should have <code>alt</code> and/or <code>actualtext</code> set):</p>
+
+<ul><li><code>Figure</code> - figure</li><li><code>Formula</code> - formula</li><li><code>Form</code> - form widget</li></ul><nav><a class="previous" href="/docs/attachments.html">Previous</a><a class="next" href="/docs/you_made_it.html">Next</a></nav></div><script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script><script src="/docs/js/scroll.js"></script><script src="/docs/js/highlight.pack.js"></script><script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-48340245-1', 'pdfkit.org');
+ga('send', 'pageview');</script></body></html>
