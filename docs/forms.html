@@ -1,0 +1,279 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>Forms in PDFKit</title><link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Source+Code+Pro:400,700|Alegreya:700|Merriweather"><link rel="stylesheet" href="/docs/css/index.css"><link rel="stylesheet" href="/docs/css/github.css"></head><body><nav class="sidebar"><ul><li><a href="/">Home</a></li><li><a href="/docs/../index.html">Documentation</a><ul><li><a href="/docs/getting_started.html">Getting Started </a></li><li><a href="/docs/paper_sizes.html">Paper Sizes</a></li><li><a href="/docs/vector.html">Vector Graphics </a></li><li><a href="/docs/text.html">Text </a></li><li><a href="/docs/images.html">Images </a></li><li><a href="/docs/outline.html">Outlines </a></li><li><a href="/docs/annotations.html">Annotations </a></li><li><a class="selected" href="/docs/forms.html">Forms </a><ul><li><a href="#form_annotation_methods">Form Annotation Methods</a></li><li><a href="#name_parameter">name Parameter</a></li><li><a href="#options_parameter">options Parameter</a></li><li><a href="#common_options">Common Options</a></li><li><a href="#text_field_options">Text Field Options</a></li><li><a href="#combo_and_list_field_options">Combo and List Field Options</a></li><li><a href="#button_field_options">Button Field Options</a></li><li><a href="#text_field_formatting">Text Field Formatting</a></li><li><a href="#date_format">Date format</a></li><li><a href="#time_format">Time format</a></li><li><a href="#number_and_percent_format">Number and percent format</a></li><li><a href="#field_names">Field Names</a></li><li><a href="#advanced_form_field_use">Advanced Form Field Use</a></li><li><a href="#font">Font</a></li><li><a href="#named_javascript">Named JavaScript</a></li><li><a href="#limitations">Limitations</a></li><li><a href="#form_field_appearances">Form Field Appearances</a></li><li><a href="#document_javascript">Document JavaScript</a></li><li><a href="#radio_and_checkboxes">Radio and Checkboxes</a></li></ul></li><li><a href="/docs/destinations.html">Destinations</a></li><li><a href="/docs/attachments.html">Attachments </a></li><li><a href="/docs/accessibility.html">Accessibility</a></li><li><a href="/docs/you_made_it.html">You made it!</a></li></ul></li><li><a href="/docs/guide.pdf">PDF Guide</a></li><li><a href="/demo/out.pdf">Example PDF</a></li><li><a href="/demo/browser.html">Interactive Browser Demo</a></li><li><a href="http://github.com/foliojs/pdfkit">Source Code</a></li></ul></nav><div class="main"><h1 id="forms_in_pdfkit">Forms in PDFKit</h1>
+
+<p>Forms are an interactive feature of the PDF format. Forms make it possible to
+add form annotations such as text fields, combo boxes, buttons and actions.
+Before addings forms to a PDF you must call the document <code>initForm()</code> method.</p>
+
+<ul><li><p><code>initForm()</code> - Must be called before adding a form annotation to the document.</p><p>doc.font(&#39;Helvetica&#39;); // establishes the default form field font
+doc.initForm();</p></li></ul>
+
+<h2 id="form_annotation_methods">Form Annotation Methods</h2>
+
+<p>Form annotations are added using the following document methods.</p>
+
+<ul><li><code>formText( name, x, y, width, height, options)</code></li><li><code>formPushButton( name, x, y, width, height, name, options)</code></li><li><code>formCombo( name, x, y, width, height, options)</code></li><li><code>formList( name, x, y, width, height, options)</code></li></ul>
+
+<p>The above methods call the <code>formAnnotation</code> method with
+type set to one of <code>text</code>, <code>pushButton</code>, <code>radioButton</code>, <code>combo</code> or <code>list</code>.</p>
+
+<ul><li><code>formAnnotation( name, type, x, y, width, height, options)</code></li></ul>
+
+<h2 id="name_parameter"><code>name</code> Parameter</h2>
+
+<p>Form annotations are each given a <code>name</code> that is used for identification. Field
+names are hierarchical using a period (&#39;.&#39;) as a separaror (<em>e.g.</em>
+<em>shipping.address.street</em>). More than one form field can have the same name.
+When this happens, the fields will have the same value. There is more
+information on <code>name</code> in the <strong>Field Names</strong> section below.</p>
+
+<h2 id="options_parameter"><code>options</code> Parameter</h2>
+
+<h2 id="common_options">Common Options</h2>
+
+<p>Form Annotation <code>options</code> that are common across all form annotation types are:</p>
+
+<ul><li><code>required</code> [<em>boolean</em>] - The field must have a value by the time the form is submitted.</li><li><code>noExport</code> [<em>boolean</em>] - The field will not be exported if a form is submitted.</li><li><code>readOnly</code> [<em>boolean</em>] - The user may not change the value of the field, and
+the field will not respond to mouse clicks. This is useful for fields that have
+computed values.</li><li><code>value</code> [<em>number|string</em>] - The field&#39;s value.</li><li><code>defaultValue</code> [<em>number|string</em>] - The default value to which the field
+reverts if a reset-form action is executed.</li></ul>
+
+<p>Some form annotations have <code>color</code> options. You can use an array of RGB values,
+a hex color, or a named CSS color value for that option.</p>
+
+<ul><li><code>backgroundColor</code> - field background color</li><li><code>borderColor</code> - field border color</li></ul>
+
+<h2 id="text_field_options">Text Field Options</h2>
+
+<ul><li><code>align</code> [<em>string</em>] - Sets the alignment to <code>left</code>,
+<code>center</code> or <code>right</code>.</li><li><code>multiline</code> [<em>boolean</em>] - Allows the field to have multiple lines of text.</li><li><code>password</code> [<em>boolean</em>] - The text will be masked (<em>e.g.</em> with asterisks).</li><li><code>noSpell</code> [<em>boolean</em>] - If set, text entered in the field is not spell-checked</li><li><code>format</code> [<em>object</em>] - See the section on <strong>Text Field Formatting</strong> below.</li></ul>
+
+<p><code>js
+doc.formText(&#39;leaf2&#39;, 10, 60, 200, 40, {
+  multiline: true,
+  align: &#39;right&#39;,
+  format: {
+    type: &#39;date&#39;,
+    params: &#39;m/d&#39;
+  }
+});
+</code></p>
+
+<h2 id="combo_and_list_field_options">Combo and List Field Options</h2>
+
+<ul><li><code>sort</code> [<em>boolean</em>] - The field options will be sorted alphabetically.</li><li><code>edit</code> [<em>boolean</em>] - (combo only) Allow the user to enter a value in the field.</li><li><code>multiSelect</code> [<em>boolean</em>] - Allow more than one choice to be selected.</li><li><code>noSpell</code> [<em>boolean</em>] - (combo only) If set and <code>edit</code> is true, text entered in the field is not spell-checked.</li><li><code>select</code> [<em>array</em>] - Array of choices to display in the combo or list form field.</li></ul>
+
+<p><code>js
+opts = {
+  select: [&#39;&#39;, &#39;github&#39;, &#39;bitbucket&#39;, &#39;gitlab&#39;],
+  value: &#39;&#39;,
+  defaultValue: &#39;&#39;,
+  align: &#39;left&#39;
+};
+doc.formCombo(&#39;ch1&#39;, 10, y, 100, 20, opts);
+</code></p>
+
+<h2 id="button_field_options">Button Field Options</h2>
+
+<ul><li><code>label</code> [<em>string</em>] - Sets the label text. You can also set an icon, but for
+this you will need to &#39;expert-up&#39; and dig deeper into the PDF Reference manual.</li></ul>
+
+<p><code>js
+var opts = {
+  backgroundColor: &#39;yellow&#39;,
+  label: &#39;Test Button&#39;
+};
+doc.formPushButton(&#39;btn1&#39;, 10, 200, 100, 30, opts);
+</code></p>
+
+<h2 id="text_field_formatting">Text Field Formatting</h2>
+
+<p>When needing to format the text value of a Form Annotation, the following
+<code>options</code> are available. This will cause predefined document JavaScript actions
+to automatically format the text. Refer to the section <em>Formatting scripts</em> in
+<a href="https://help.adobe.com/en_US/acrobat/acrobat_dc_sdk/2015/HTMLHelp/#t=Acro12_MasterBook%2FIAC_API_FormsIntro%2FMethods1.htm">Acrobat Forms
+Plugin</a>
+of the Acrobat SDK documentation for more information.</p>
+
+<p>Add a format dictionary to <code>options</code>. The dictionary must contain a <code>type</code> attribute.</p>
+
+<ul><li><code>format</code> - generic object</li><li><code>format.type</code> - value must be one of <code>date</code>, <code>time</code>, <code>percent</code>, <code>number</code>, <code>zip</code>, <code>zipPlus4</code>, <code>phone</code> or <code>ssn</code>.</li></ul>
+
+<p>When <code>type</code> is <code>date</code>, <code>time</code>, <code>percent</code> or <code>number</code> the format dictionary must
+contain additional parameters as described below.</p>
+
+<h2 id="date_format">Date format</h2>
+
+<ul><li><code>format.param</code> (<em>string</em>) - specifies the value and display format and can include:<ul><li><code>d</code> - single digit day of month</li><li><code>dd</code> - double digit day of month</li><li><code>m</code> - month digit</li><li><code>mm</code> - month double digit</li><li><code>mmm</code> - abbreviated month name</li><li><code>mmmm</code> - full month name</li><li><code>yy</code> - two digit year</li><li><code>yyyy</code> - four digit year</li><li><code>hh</code> - hour for 12 hour clock</li><li><code>HH</code> - hour for 24 hour clock</li><li><code>MM</code> - two digit minute</li><li><code>tt</code> - am or pm</li></ul></li></ul>
+
+<p><code>js
+// Date text field formatting
+doc.formText(&#39;field.date&#39;, 10, 60, 200, 40, {
+  align: &#39;center&#39;,
+  format: {
+    type: &#39;date&#39;,
+    param: &#39;mmmm d, yyyy&#39;
+  }
+});
+</code></p>
+
+<h2 id="time_format">Time format</h2>
+
+<ul><li><code>format.param</code> - value must be a number between 0 and 3, representing
+the formats &quot;14:30&quot;, &quot;2:30 PM&quot;, &quot;14:30:15&quot; and &quot;2:30:15 PM&quot;.</li></ul>
+
+<p><code>js
+// Time text field formatting
+doc.formText(&#39;field.time&#39;, 10, 60, 200, 40, {
+  align: &#39;center&#39;,
+  format: {
+    type: &#39;time&#39;,
+    param: 2
+  }
+});
+</code></p>
+
+<h2 id="number_and_percent_format">Number and percent format</h2>
+
+<ul><li><code>format.nDec</code> [<em>number</em>] - the number of places after the decimal point</li><li><code>format.sepComma</code> [<em>boolean</em>] - display a comma separator, otherwise do not display a separator.</li><li><code>format.negStyle</code> <a href="number only"><em>string</em></a> - the value must be one of <code>MinusBlack</code> , <code>Red</code>, <code>ParensBlack</code>, <code>ParensRed</code></li><li><code>format.currency</code> <a href="number only"><em>string</em></a> - a currency symbol to display</li><li><code>format.currencyPrepend</code> <a href="number only"><em>boolean</em></a> - set to true to prepend the currency symbol</li></ul>
+
+<p><code>js
+// Currency text field formatting
+doc.formText(&#39;leaf2&#39;, 10, 60, 200, 40, {
+  multiline: true,
+  align: &#39;right&#39;,
+  format: {
+    type: &#39;number&#39;,
+    nDec: 2,
+    sepComma: true,
+    negStyle: &#39;ParensRed&#39;,
+    currency: &#39;$&#39;,
+    currencyPrepend: true
+  }
+});
+</code></p>
+
+<h2 id="field_names">Field Names</h2>
+
+<p>Form Annotations are, by default, added to the root of the PDF document. A PDF
+form is organized in a name heirarchy, for example <em>shipping.address.street</em>.
+Capture this heirarchy either by setting the <code>name</code> of each <em>form annotation</em> with
+the full hierarchical name (e.g. <em>shipping.address.street</em>) or by creating a
+hierarchy of <em>form fields</em> and <em>form annotations</em> and refering to a form field or form
+annotations parent using <code>options.parent</code>.</p>
+
+<p>A <em>form field</em> is an invisible node in the PDF form and is created using the
+document <code>formField</code> method. A form field must include the node&#39;s <code>name</code> (e.g.
+<em>shipping</em>) and may include other information such as the default font that is
+to be used by all child form annotations.</p>
+
+<p>Using the <code>formField</code> method you might create a <em>shipping</em> field that is added
+to the root of the document, an <em>address</em> field that refers to the <em>shipping</em>
+field as it&#39;s parent, and a <em>street</em> Form Annotation that would refer to the
+<em>address</em> field as it&#39;s parent.</p>
+
+<p>Create form fields using the document method:</p>
+
+<ul><li><code>formField( name, options )</code> - returns a reference to the field</li></ul>
+
+<p>-- <em>Example PDF using field hierarchy, three text fields and a push
+button</em> --</p>
+
+<pre><code>doc.font(&#39;Helvetica&#39;); // establishes the default font
+doc.initForm();
+
+let rootField = doc.formField(&#39;rootField&#39;);
+let child1Field = doc.formField(&#39;child1Field&#39;, { parent: rootField });
+let child2Field = doc.formField(&#39;child2Field&#39;, { parent: rootField });
+
+// Add text form annotation &#39;rootField.child1Field.leaf1&#39;
+doc.formText(&#39;leaf1&#39;, 10, 10, 200, 40, {
+  parent: child1Field,
+  multiline: true
+});
+// Add text form annotation &#39;rootField.child1Field.leaf2&#39;
+doc.formText(&#39;leaf2&#39;, 10, 60, 200, 40, {
+  parent: child1Field,
+  multiline: true
+});
+// Add text form annotation &#39;rootField.child2Field.leaf1&#39;
+doc.formText(&#39;leaf1&#39;, 10, 110, 200, 80, {
+  parent: child2Field,
+  multiline: true
+});
+
+// Add push button form annotation &#39;btn1&#39;
+var opts = {
+  backgroundColor: &#39;yellow&#39;,
+  label: &#39;Test Button&#39;
+};
+doc.formPushButton(&#39;btn1&#39;, 10, 200, 100, 30, opts);</code></pre>
+
+<p>The output of this example looks like this.</p>
+
+<p><img src="img/18.png"/></p>
+
+<h2 id="advanced_form_field_use">Advanced Form Field Use</h2>
+
+<p>Forms can be quite complicated and your needs will likely grow to sometimes need
+to directly specify the attributes that will go into the Form Annotation or
+Field dictionaries. Consult the <strong>PDF Reference</strong> and set these attributes in
+the <code>options</code> object. Any options that are not listed above will be added
+directly to the corresponding PDF Object.</p>
+
+<h2 id="font">Font</h2>
+
+<p>The font used for a Form Annotation is set using the <code>document.font</code> method.
+Yes that&#39;s the same method as is used when setting the text font.</p>
+
+<p>The <code>font</code> method must be called before <code>initForm</code> and may be called before <code>formField</code> or any of the form annotation methods.</p>
+
+<p><code>js
+doc.font(&#39;Courier&#39;);
+doc.formText(&#39;myfield&#39;, 10, 10, 200, 20);
+</code></p>
+
+<h2 id="named_javascript">Named JavaScript</h2>
+
+<p>In support of Form Annotations that execute JavaScript in PDF, you may use the
+following document method:</p>
+
+<ul><li><code>addNamedJavaScript( name, string )</code></li></ul>
+
+<h2 id="limitations">Limitations</h2>
+
+<p>It is recommended that you test your PDF form documents across all platforms and
+viewers that you wish to support.</p>
+
+<h2 id="form_field_appearances">Form Field Appearances</h2>
+
+<p>Form elements must each have an <em>appearance</em> set using the <code>AP</code> attribute of the
+annotation. If this attribute is not set, the form element&#39;s value <em>may</em> not be
+visible. Because appearances can be complex to generate, Adobe Acrobat has an
+option to build these apperances from form values and Form Annotation
+attributes when a PDF is first opened. To do this PDFKit always sets the Form dictionary&#39;s
+<code>NeedAppearances</code> attribute to true. This could mean that the PDF will be
+<em>dirty</em> upon open, meaning it will need to be saved.</p>
+
+<p>The <code>NeedAppearances</code> flag may not be honored by all PDF viewers.</p>
+
+<p>Some form documents may not need to generate appearances. This may be the case
+for text Form Annotations that initially have no value. This is not true for
+push button widget annotations. Please test</p>
+
+<h2 id="document_javascript">Document JavaScript</h2>
+
+<p>Many PDF Viewers, aside from Adobe Acrobat Reader, do not implement document
+JavaScript. Even Adobe Readers may not implement document JavaScript where it is
+not permitted by a device&#39;s app store terms of service (e.g. iOS devices).</p>
+
+<h2 id="radio_and_checkboxes">Radio and Checkboxes</h2>
+
+<p>Support for radio and checkboxes requires a more advanced attention to their
+rendered appearances and are not supported in this initial forms release.</p>
+
+<hr/><nav><a class="previous" href="/docs/annotations.html">Previous</a><a class="next" href="/docs/destinations.html">Next</a></nav></div><script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script><script src="/docs/js/scroll.js"></script><script src="/docs/js/highlight.pack.js"></script><script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-48340245-1', 'pdfkit.org');
+ga('send', 'pageview');</script></body></html>
