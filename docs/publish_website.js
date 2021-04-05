@@ -12,6 +12,8 @@ ghpages.publish(
       'docs/*.html',
       'docs/img/*.png',
       'docs/guide.pdf',
+      'demo/browser.html',
+      'demo/bundle.js',
       'demo/out.pdf'
     ],
     add: true,
