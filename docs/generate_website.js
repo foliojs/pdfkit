@@ -20,7 +20,10 @@ const files = [
   'images.md',
   'outline.md',
   'annotations.md',
+  'forms.md',
   'destinations.md',
+  'attachments.md',
+  'accessibility.md',
   'you_made_it.md'
 ];
 
@@ -28,20 +31,38 @@ const files = [
 const lorem =
   'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam in suscipit purus. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Vivamus nec hendrerit felis. Morbi aliquam facilisis risus eu lacinia. Sed eu leo in turpis fringilla hendrerit. Ut nec accumsan nisl. Suspendisse rhoncus nisl posuere tortor tempus et dapibus elit porta. Cras leo neque, elementum a rhoncus ut, vestibulum non nibh. Phasellus pretium justo turpis. Etiam vulputate, odio vitae tincidunt ultricies, eros odio dapibus nisi, ut tincidunt lacus arcu eu elit. Aenean velit erat, vehicula eget lacinia ut, dignissim non tellus. Aliquam nec lacus mi, sed vestibulum nunc. Suspendisse potenti. Curabitur vitae sem turpis. Vestibulum sed neque eget dolor dapibus porttitor at sit amet sem. Fusce a turpis lorem. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae;';
 
+const getNodeName = function(node) {
+  if (node.length === 3) {
+    return node[2];
+  }
+  const words = [];
+  for (let i = 2; i < node.length; i++) {
+    const part = node[i];
+    // e.g. ['inlinecode', 'value']
+    if (Array.isArray(part)) {
+      words.push(part[1]);
+    } else {
+      words.push(part);
+    }
+  }
+  return words.join('');
+};
+
 const extractHeaders = function(tree) {
   const headers = [];
 
   for (let index = 0; index < tree.length; index++) {
     const node = tree[index];
     if (node[0] === 'header' && (headers.length === 0 || node[1].level > 1)) {
+      const name = getNodeName(node);
       if (node[1].level > 2) {
         node[1].level = 2;
       }
-      const hash = node[2].toLowerCase().replace(/\s+/g, '_');
+      const hash = name.toLowerCase().replace(/\s+/g, '_');
       node[1].id = hash;
       headers.push({
         hash,
-        title: node[2]
+        title: name
       });
     }
   }

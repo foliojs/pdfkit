@@ -16,6 +16,7 @@ and some other properties. Here is a list of the available annotation methods:
 * `rectAnnotation(x, y, width, height, options)`
 * `ellipseAnnotation(x, y, width, height, options)`
 * `textAnnotation(x, y, width, height, text, options)`
+* `fileAnnotation(x, y, width, height, file, options)`
 
 Many of the annotations have a `color` option that you can specify. You can
 use an array of RGB values, a hex color, or a named CSS color value for that

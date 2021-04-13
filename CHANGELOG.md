@@ -2,9 +2,15 @@
 
 ### Unreleased
 
+### [v0.12.0] - 2021-04-04
+
+- Add support for Embedded Files and File Attachment Annotations
+- Accessibility support
 - Replace integration tests by visual regression tests
 - Fix access permissions in PDF version 1.7ext3
 - Fix Buffer() is deprecation warning
+- Add `forms.md` to generate documentation files
+- Fix "@" in FontName
 
 ### [v0.11.0] - 2019-12-03
 
