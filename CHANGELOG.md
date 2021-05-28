@@ -2,6 +2,8 @@
 
 ### Unreleased
 
+- Allow applying 'underline' and 'strike' text styling together on a text
+
 ### [v0.12.0] - 2021-04-04
 
 - Add support for Embedded Files and File Attachment Annotations

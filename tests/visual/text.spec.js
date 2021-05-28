@@ -30,6 +30,10 @@ describe('text', function() {
       doc.text('Strike', 100, 130, {
         strike: true
       });
+      doc.text('Strike', 100, 160, {
+        underline:true,
+        strike: true
+      });
     });
   });
 
