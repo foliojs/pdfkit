@@ -2,6 +2,10 @@
 
 ### Unreleased
 
+### [v0.12.1] - 2021-05-28
+
+- Bump crypto-js from 3.1.9-1 to 4.0.0
+
 ### [v0.12.0] - 2021-04-04
 
 - Add support for Embedded Files and File Attachment Annotations
