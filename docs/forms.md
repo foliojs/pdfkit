@@ -62,6 +62,7 @@ a hex color, or a named CSS color value for that option.
 - `password` [_boolean_] - The text will be masked (_e.g._ with asterisks).
 - `noSpell` [_boolean_] - If set, text entered in the field is not spell-checked
 - `format` [_object_] - See the section on **Text Field Formatting** below.
+- `fontSize` [_number_] - Sets the fontSize (default or 0 means auto sizing)
 
 ```js
 doc.formText('leaf2', 10, 60, 200, 40, {

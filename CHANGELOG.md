@@ -3,6 +3,7 @@
 ### Unreleased
 
 - Allow applying 'underline' and 'strike' text styling together on a text
+- Allow to specify the AcroForm text fontSize
 
 ### [v0.12.0] - 2021-04-04
 
