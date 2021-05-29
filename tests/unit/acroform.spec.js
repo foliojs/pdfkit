@@ -222,6 +222,40 @@ describe('acroform', () => {
     expect(docData).toContainChunk(expected);
   });
 
+  test('font size', () => {
+    const expected = [
+      '11 0 obj',
+      '<<\n' +
+        '/fontSize 16\n' +
+        '/FT /Tx\n' +
+        '/DR <<\n' +
+        '/Font <<\n' +
+        '/F2 10 0 R\n' +
+        '>>\n' +
+        '>>\n' +
+        '/DA (/F2 16 Tf 0 g)\n' +
+        '/T (text)\n' +
+        '/Subtype /Widget\n' +
+        '/F 4\n' +
+        '/Type /Annot\n' +
+        '/Rect [20 752 70 772]\n' +
+        '/Border [0 0 0]\n' +
+        '/C [0 0 0]\n' +
+        '/FontSize 16\n' +
+        '>>',
+      'endobj'
+    ];
+    doc.registerFont('myfont1', 'tests/fonts/Roboto-Regular.ttf');
+    doc.initForm();
+    const docData = logData(doc);
+    let opts = {
+      fontSize: 16
+    };
+    doc.font('myfont1').formText('text', 20, 20, 50, 20, opts);
+    expect(docData.length).toBe(3);
+    expect(docData).toContainChunk(expected);
+  });
+
   test('field heirarchy', () => {
     const expected = [
       '13 0 obj',
