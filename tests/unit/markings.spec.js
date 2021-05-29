@@ -23,7 +23,7 @@ EMC
         'binary'
       );
 
-      document.markContent("Span");
+      document.markContent('Span');
       document.endMarkedContent();
       document.end();
 
@@ -56,9 +56,9 @@ EMC
         'binary'
       );
 
-      const structureContent1 = document.markStructureContent("Span");
+      const structureContent1 = document.markStructureContent('Span');
       document.endMarkedContent();
-      const structureContent2 = document.markStructureContent("Span");
+      const structureContent2 = document.markStructureContent('Span');
       document.endMarkedContent();
       document.end();
 
@@ -97,8 +97,8 @@ EMC
         'binary'
       );
 
-		document.addStructure(document.struct('Span', () => {}));
-		document.addStructure(document.struct('Span', () => {}));
+      document.addStructure(document.struct('Span', () => {}));
+      document.addStructure(document.struct('Span', () => {}));
       document.end();
 
       expect(docData).toContainChunk([
@@ -135,17 +135,17 @@ EMC
         'binary'
       );
 
-      document.markContent("Artifact", {
-        type: "Pagination",
+      document.markContent('Artifact', {
+        type: 'Pagination',
         bbox: [40, 50, 570, 70],
-        attached: [ "Top" ]
+        attached: ['Top']
       });
       document.endMarkedContent();
-      document.markContent("Span", {
-        lang: "en-AU",
-        alt: "Hi, earth! ",
-        actual: "Hello, world! ",
-        expanded: "Greetings, terrestrial sphere! "
+      document.markContent('Span', {
+        lang: 'en-AU',
+        alt: 'Hi, earth! ',
+        actual: 'Hello, world! ',
+        expanded: 'Greetings, terrestrial sphere! '
       });
       document.endMarkedContent();
       document.end();
@@ -195,14 +195,14 @@ EMC
         'binary'
       );
 
-      document.markContent("Span");
-      document.markStructureContent("P");
-      document.markContent("Span");
-      document.markStructureContent("P");
-      document.markContent("Artifact");
-      document.markContent("Artifact");
-      document.markStructureContent("P");
-      document.markStructureContent("P");
+      document.markContent('Span');
+      document.markStructureContent('P');
+      document.markContent('Span');
+      document.markStructureContent('P');
+      document.markContent('Artifact');
+      document.markContent('Artifact');
+      document.markStructureContent('P');
+      document.markStructureContent('P');
       document.end();
 
       expect(docData).toContainChunk([
@@ -232,10 +232,10 @@ EMC
         'binary'
       );
 
-      const structureContent = document.markStructureContent("P");
-      document.markContent("Span");
-      document.text("on the first page");
-      document.continueOnNewPage();
+      const structureContent = document.markStructureContent('P');
+      document.markContent('Span');
+      document.text('on the first page');
+      document.continueOnNextPage();
       document.end();
 
       expect(structureContent.refs.length).toEqual(2);
@@ -260,11 +260,11 @@ EMC
     test('atomically constructed', () => {
       const docData = logData(document);
 
-      const pContent1 = document.markStructureContent("P");
-      const linkContent = document.markStructureContent("Link");
-      const pContent2 = document.markStructureContent("P");
-      const pContent3 = document.markStructureContent("P");
-      document.markContent("Span");
+      const pContent1 = document.markStructureContent('P');
+      const linkContent = document.markStructureContent('Link');
+      const pContent2 = document.markStructureContent('P');
+      const pContent3 = document.markStructureContent('P');
+      document.markContent('Span');
 
       const section1 = document.struct('Sect', [
         document.struct('P', [
@@ -274,9 +274,7 @@ EMC
         ])
       ]);
       const section2 = document.struct('Sect', [
-        document.struct('P', [
-          pContent3
-        ])
+        document.struct('P', [pContent3])
       ]);
       document.addStructure(section1).addStructure(section2);
 
@@ -287,11 +285,7 @@ EMC
         /\/StructTreeRoot 8 0 R/,
         `endobj`
       ]);
-      expect(docData).toContainChunk([
-        `3 0 obj`,
-        /\/Markings 9 0 R/,
-        `endobj`
-      ]);
+      expect(docData).toContainChunk([`3 0 obj`, /\/Markings 9 0 R/, `endobj`]);
       expect(docData).toContainChunk([
         `8 0 obj`,
         `<<
@@ -331,21 +325,17 @@ EMC
         `<<\n/S /P\n/P 14 0 R\n/K [3]\n/Pg 7 0 R\n>>`,
         `endobj`
       ]);
-      expect(docData).toContainChunk([
-        `9 0 obj`,
-        `<<\n>>`,
-        `endobj`
-      ]);
+      expect(docData).toContainChunk([`9 0 obj`, `<<\n>>`, `endobj`]);
     });
 
     test('incrementally constructed', () => {
       const docData = logData(document);
 
-      const pContent1 = document.markStructureContent("P");
-      const linkContent = document.markStructureContent("Link");
-      const pContent2 = document.markStructureContent("P");
-      const pContent3 = document.markStructureContent("P");
-      document.markContent("Span");
+      const pContent1 = document.markStructureContent('P');
+      const linkContent = document.markStructureContent('Link');
+      const pContent2 = document.markStructureContent('P');
+      const pContent3 = document.markStructureContent('P');
+      document.markContent('Span');
 
       const section1 = document.struct('Sect');
       document.addStructure(section1);
@@ -355,7 +345,10 @@ EMC
       link.add(linkContent);
       const p1 = document.struct('P');
       section1.add(p1);
-      p1.add(pContent1).add(link).add(pContent2).end();
+      p1.add(pContent1)
+        .add(link)
+        .add(pContent2)
+        .end();
       const p2 = document.struct('P');
       p2.add(pContent3);
       section2.add(p2);
@@ -367,11 +360,7 @@ EMC
         /\/StructTreeRoot 8 0 R/,
         `endobj`
       ]);
-      expect(docData).toContainChunk([
-        `3 0 obj`,
-        /\/Markings 9 0 R/,
-        `endobj`
-      ]);
+      expect(docData).toContainChunk([`3 0 obj`, /\/Markings 9 0 R/, `endobj`]);
       expect(docData).toContainChunk([
         `8 0 obj`,
         `<<
@@ -411,11 +400,7 @@ EMC
         `<<\n/S /P\n/P 11 0 R\n/K [3]\n/Pg 7 0 R\n>>`,
         `endobj`
       ]);
-      expect(docData).toContainChunk([
-        `9 0 obj`,
-        `<<\n>>`,
-        `endobj`
-      ]);
+      expect(docData).toContainChunk([`9 0 obj`, `<<\n>>`, `endobj`]);
     });
 
     test('constructed with closures', () => {
@@ -427,7 +412,10 @@ EMC
       const link = document.struct('Link', () => {});
       const p1 = document.struct('P');
       section1.add(p1);
-      p1.add(() => {}).add(link).add(() => {}).end();
+      p1.add(() => {})
+        .add(link)
+        .add(() => {})
+        .end();
       const p2 = document.struct('P', [() => {}]);
       section2.add(p2);
       document.addStructure(section2);
@@ -483,23 +471,21 @@ EMC
         `<<\n/S /P\n/P 10 0 R\n/K [3]\n/Pg 7 0 R\n>>`,
         `endobj`
       ]);
-      expect(docData).toContainChunk([
-        `13 0 obj`,
-        `<<\n>>`,
-        `endobj`
-      ]);
+      expect(docData).toContainChunk([`13 0 obj`, `<<\n>>`, `endobj`]);
     });
 
     test('with options', () => {
       const docData = logData(document);
 
-      document.addStructure(document.struct('P', {
-        title: "My Title",
-        lang: "en-AU",
-        alt: "My Alternative",
-        expanded: "My Expansion",
-        actual: "My Actual Text"
-      }));
+      document.addStructure(
+        document.struct('P', {
+          title: 'My Title',
+          lang: 'en-AU',
+          alt: 'My Alternative',
+          expanded: 'My Expansion',
+          actual: 'My Actual Text'
+        })
+      );
 
       document.end();
 
@@ -549,7 +535,7 @@ EMC
       document = new PDFDocument({
         info: {
           CreationDate: new Date(Date.UTC(2018, 1, 1)),
-          Title: "My Title"
+          Title: 'My Title'
         },
         displayTitle: true,
         compress: false,
@@ -562,16 +548,8 @@ EMC
 
       document.end();
 
-      expect(docData).toContainChunk([
-        `3 0 obj`,
-        /\/Lang \(en-AU\)/,
-        `endobj`
-      ]);
-      expect(docData).toContainChunk([
-        `3 0 obj`,
-        /\/Markings 5 0 R/,
-        `endobj`
-      ]);
+      expect(docData).toContainChunk([`3 0 obj`, /\/Lang \(en-AU\)/, `endobj`]);
+      expect(docData).toContainChunk([`3 0 obj`, /\/Markings 5 0 R/, `endobj`]);
       expect(docData).toContainChunk([
         `5 0 obj`,
         `<<\n/Marked true\n>>`,
@@ -587,21 +565,9 @@ EMC
         /\/DisplayDocTitle true/,
         `endobj`
       ]);
-      expect(docData).toContainChunk([
-        `trailer`,
-        /\/Info 10 0 R/,
-        `startxref`
-      ]);
-      expect(docData).toContainChunk([
-        `10 0 obj`,
-        /\/Title 14 0 R/,
-        `endobj`
-      ]);
-      expect(docData).toContainChunk([
-        `14 0 obj`,
-        `(My Title)`,
-        `endobj`
-      ]);
+      expect(docData).toContainChunk([`trailer`, /\/Info 10 0 R/, `startxref`]);
+      expect(docData).toContainChunk([`10 0 obj`, /\/Title 14 0 R/, `endobj`]);
+      expect(docData).toContainChunk([`14 0 obj`, `(My Title)`, `endobj`]);
     });
   });
 
@@ -641,7 +607,7 @@ EMC
 
       const section = document.struct('Sect');
       document.addStructure(section);
-      document.text("Paragraph 1\nParagraph 2", { structParent: section });
+      document.text('Paragraph 1\nParagraph 2', { structParent: section });
       document.end();
 
       expect(docData).toContainChunk([
@@ -657,17 +623,17 @@ EMC
       expect(docData).toContainChunk([
         '11 0 obj',
         '<<\n/S /P\n/P 8 0 R\n/K [0]\n/Pg 7 0 R\n>>',
-        'endobj',
+        'endobj'
       ]);
       expect(docData).toContainChunk([
         '13 0 obj',
         '<<\n/S /P\n/P 8 0 R\n/K [1]\n/Pg 7 0 R\n>>',
-        'endobj',
+        'endobj'
       ]);
       expect(docData).toContainChunk([
         '8 0 obj',
         '<<\n/S /Sect\n/P 9 0 R\n/K [11 0 R 13 0 R]\n>>',
-        'endobj',
+        'endobj'
       ]);
     });
 
@@ -728,7 +694,7 @@ EMC
 
       const list = document.struct('List');
       document.addStructure(list);
-      document.list(["Item 1","Item 2"], { structParent: list });
+      document.list(['Item 1', 'Item 2'], { structParent: list });
       document.end();
 
       expect(docData).toContainChunk([
