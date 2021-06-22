@@ -289,7 +289,7 @@ EMC
       ]);
       expect(docData).toContainChunk([
         `3 0 obj`,
-        /\/Markings 9 0 R/,
+        /\/MarkInfo 9 0 R/,
         `endobj`
       ]);
       expect(docData).toContainChunk([
@@ -369,7 +369,7 @@ EMC
       ]);
       expect(docData).toContainChunk([
         `3 0 obj`,
-        /\/Markings 9 0 R/,
+        /\/MarkInfo 9 0 R/,
         `endobj`
       ]);
       expect(docData).toContainChunk([
@@ -441,7 +441,7 @@ EMC
       ]);
       expect(docData).toContainChunk([
         `3 0 obj`,
-        /\/Markings 13 0 R/,
+        /\/MarkInfo 13 0 R/,
         `endobj`
       ]);
       expect(docData).toContainChunk([
@@ -569,7 +569,7 @@ EMC
       ]);
       expect(docData).toContainChunk([
         `3 0 obj`,
-        /\/Markings 5 0 R/,
+        /\/MarkInfo 5 0 R/,
         `endobj`
       ]);
       expect(docData).toContainChunk([
