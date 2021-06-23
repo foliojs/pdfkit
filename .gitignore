@@ -11,3 +11,14 @@ demo/bundle.js
 !demo/browser.html
 .vscode
 coverage
+package-lock.json # Shouldn't be here, so I will delete it!
+
+# Yarn v2 files
+
+.yarn/*
+!.yarn/patches
+!.yarn/releases
+!.yarn/plugins
+!.yarn/sdks
+!.yarn/versions
+.pnp.*

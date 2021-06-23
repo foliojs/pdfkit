@@ -17,3 +17,5 @@ index.html
 yarn.lock
 rollup.config.js
 .eslintrc
+.yarn/
+.pnp.*
