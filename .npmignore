@@ -1,5 +1,6 @@
 .github/
 .prettierrc
+.prettierignore
 .babelrc
 node-zlib/
 node-modules/
