@@ -4,7 +4,7 @@ var fs = require('fs');
 // Create a new PDFDocument
 var doc = new PDFDocument();
 
-doc.pipe(fs.createWriteStream('out-acroform.pdf'));
+doc.pipe(fs.createWriteStream('form.pdf'));
 
 // Set some meta data
 doc.info['Title'] = 'Test Form Document';

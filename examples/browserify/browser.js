@@ -1,4 +1,4 @@
-var PDFDocument = require('../');
+var PDFDocument = require('../..');
 var blobStream = require('blob-stream');
 var ace = require('brace');
 require('brace/mode/javascript');

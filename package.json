@@ -56,7 +56,7 @@
     "prepublishOnly": "npm run build",
     "build": "rollup -c && browserify --standalone PDFDocument --ignore iconv-lite js/pdfkit.js > js/pdfkit.standalone.js",
     "demo": "cd demo && node test.js",
-    "browser-demo": "browserify demo/browser.js > demo/bundle.js",
+    "browserify-example": "browserify examples/browserify/browser.js > examples/browserify/bundle.js",
     "pdf-guide": "node docs/generate.js",
     "website": "node docs/generate_website.js",
     "publish-website": "node docs/publish_website.js",

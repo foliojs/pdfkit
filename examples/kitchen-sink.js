@@ -1,11 +1,11 @@
-var PDFDocument = require('../');
+var PDFDocument = require('../js/pdfkit');
 var tiger = require('./tiger');
 var fs = require('fs');
 
 // Create a new PDFDocument
 var doc = new PDFDocument();
 
-doc.pipe(fs.createWriteStream('out.pdf'));
+doc.pipe(fs.createWriteStream('kitchen-sink.pdf'));
 
 // Set some meta data
 doc.info['Title'] = 'Test Document';
