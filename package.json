@@ -47,7 +47,7 @@
     "rollup-plugin-cpy": "^2.0.1"
   },
   "dependencies": {
-    "crypto-js": "^3.3.0",
+    "crypto-js": "^4.0.0",
     "fontkit": "^1.8.1",
     "linebreak": "^1.0.2",
     "png-js": "^1.0.0"
