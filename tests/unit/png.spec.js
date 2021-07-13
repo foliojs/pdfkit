@@ -43,7 +43,7 @@ describe('PNGImage', () => {
     // Filter = 0
     // Interlace = 0
 
-    const img = createImage('./demo/images/test2.png');
+    const img = createImage('./examples/images/test2.png');
 
     expect(img.finalize).toBeCalledTimes(1);
 
@@ -188,7 +188,7 @@ describe('PNGImage', () => {
     // Filter = 0
     // Interlace = 0
 
-    const img = createImage('./demo/images/test3.png');
+    const img = createImage('./examples/images/test3.png');
 
     expect(img.finalize).toBeCalledTimes(1);
 

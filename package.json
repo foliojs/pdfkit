@@ -55,14 +55,13 @@
   "scripts": {
     "prepublishOnly": "npm run build",
     "build": "rollup -c && browserify --standalone PDFDocument --ignore iconv-lite js/pdfkit.js > js/pdfkit.standalone.js",
-    "demo": "cd demo && node test.js",
     "browserify-example": "browserify examples/browserify/browser.js > examples/browserify/bundle.js",
     "pdf-guide": "node docs/generate.js",
     "website": "node docs/generate_website.js",
     "publish-website": "node docs/publish_website.js",
-    "docs": "npm run pdf-guide && npm run website && npm run browser-demo",
+    "docs": "npm run pdf-guide && npm run website && npm run browserify-example",
     "lint": "eslint {lib,tests}/**/*.js",
-    "prettier": "prettier {lib,tests,demo,docs}/**/*.js",
+    "prettier": "prettier {lib,tests,examples,docs}/**/*.js",
     "test": "jest -i",
     "test:visual": "jest visual/ -i",
     "test:unit": "jest unit/"
@@ -81,7 +80,7 @@
   "jest": {
     "testPathIgnorePatterns": [
       "/node_modules/",
-      "<rootDir>/demo/"
+      "<rootDir>/examples/"
     ],
     "testURL": "http://localhost/",
     "setupFilesAfterEnv": [
