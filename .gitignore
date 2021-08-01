@@ -2,7 +2,6 @@ lib/font/tables/.DS_Store
 .DS_Store
 /node_modules/
 node-zlib/
-src/
 playground/
 build/
 js/
