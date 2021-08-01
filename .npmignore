@@ -5,7 +5,7 @@
 node-zlib/
 node-modules/
 CONTRIBUTING.md
-demo/
+examples/
 src/
 lib/
 docs/
