@@ -2,6 +2,13 @@
 
 ### Unreleased
 
+### [v0.12.3] - 2021-08-01
+
+- Remove examples from published package
+
+### [v0.12.2] - 2021-08-01
+
+- Fix for PDF accessibility check. (#1265)
 - Allow applying 'underline' and 'strike' text styling together on a text
 - Allow to specify the AcroForm text fontSize
 - Update crypto-js to v4.0 (properly fix security issue)
