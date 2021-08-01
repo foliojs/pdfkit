@@ -1,7 +1,6 @@
 const path = require('path');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const TerserPlugin = require('terser-webpack-plugin');
 
 module.exports = {
   plugins: [
@@ -17,7 +16,7 @@ module.exports = {
     alias: {
       // maps fs to a virtual one allowing to register file content dynamically
       fs: 'pdfkit/js/virtual-fs.js',
-      // iconv-lite is used to load cid less fonts (uncommon)
+      // iconv-lite is used to load cid less fonts (not spec compliant)
       'iconv-lite': false
     },
     fallback: {
@@ -48,17 +47,10 @@ module.exports = {
         test: /src[/\\]lazy-assets/,
         type: 'asset/resource'
       },
+      // convert to base64 and include inline file system binary files used by fontkit and linebreak
       {
         enforce: 'post',
         test: /fontkit[/\\]index.js$/,
-        loader: 'transform-loader',
-        options: {
-          brfs: {}
-        }
-      },
-      {
-        enforce: 'post',
-        test: /unicode-properties[/\\]index.js$/,
         loader: 'transform-loader',
         options: {
           brfs: {}
@@ -72,13 +64,6 @@ module.exports = {
           brfs: {}
         }
       }
-    ]
-  },
-  optimization: {
-    minimizer: [
-      new TerserPlugin({
-        exclude: /src[/\\]index\.js$/ // not working. Probably related to dynamic function creation
-      })
     ]
   }
 };

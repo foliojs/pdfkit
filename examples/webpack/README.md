@@ -9,6 +9,6 @@ Simple example of using PdfKit with webpack
 - Register AFM fonts provided by pdfkit
 - Shows how to load and register files lazily
 
-### Caveats
+### Remarks
 
-Production build does not work. Probably how pdf document is created (inside a `new Function` call)
+Refer to webpack.config.js to details about configuration
