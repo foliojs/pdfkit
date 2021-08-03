@@ -25,7 +25,9 @@ module.exports = {
       // fallbacks for native node libraries
       buffer: require.resolve('buffer/'),
       stream: require.resolve('readable-stream'),
-      zlib: require.resolve('browserify-zlib')
+      zlib: require.resolve('browserify-zlib'),
+      util: require.resolve('util/'),
+      assert: require.resolve('assert/')
     }
   },
   module: {
