@@ -1,6 +1,6 @@
 # Paper Sizes
 
-When creating a new document or adding a new page to your current document, PDFKit allows you to set the page dimensions. To improve convenience, PDFKit has a number of predefined page sizes. These sizes are based on the most commonly used stndard page sizes. 
+When creating a new document or adding a new page to your current document, PDFKit allows you to set the page dimensions. To improve convenience, PDFKit has a number of predefined page sizes. These sizes are based on the most commonly used standard page sizes. 
 
 ### Predefined Page Sizes
 
