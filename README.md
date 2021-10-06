@@ -154,7 +154,7 @@ const stream = doc.pipe(blobStream());
 
 // add your content to the document here, as usual
 
-// get a blob when you're done
+// get a blob when you are done
 doc.end();
 stream.on('finish', function() {
   // get a blob you can do whatever you like with
