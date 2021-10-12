@@ -33,9 +33,31 @@ function makePDF(PDFDocument, blobStream, lorem, iframe) {
     .fill('red', 'even-odd')
     .restore();
 
+  doc.save();
+  // a gradient fill
+  var gradient = doc
+    .linearGradient(100, 300, 200, 300)
+    .stop(0, 'green')
+    .stop(0.5, 'red')
+    .stop(1, 'green');
+  doc.rect(100, 300, 100, 100).fill(gradient);
+
+  // stroke & fill uncolored tiling pattern
+
+  var p = doc.pattern([1, 1, 4, 4], 3, 3, '1 w 0 1 m 4 5 l s 2 0 m 5 3 l s');
+  doc.circle(280, 350, 50).fill([p, 'blue']);
+
+  doc
+    .rect(380, 300, 100, 100)
+    .fillColor('lime')
+    .strokeColor([p, 'orange'])
+    .lineWidth(5)
+    .fillAndStroke();
+  doc.restore();
+
   // and some justified text wrapped into columns
   doc
-    .text('And here is some wrapped text...', 100, 300)
+    .text('And here is some wrapped text...', 100, 450)
     .font('Times-Roman', 13)
     .moveDown()
     .text(lorem, {
