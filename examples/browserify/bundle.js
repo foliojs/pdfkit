@@ -1676,22 +1676,15 @@ class PDFTilingPattern {
     this.stream = stream;
   }
 
-  embed() {
-    // reused pattern
-    if (this.id) return; // if id is present then we surely must have embedded the color spaces
-
-    this.doc._embedPatternColorSpaces();
-
-    this.doc._patternCount = this.doc._patternCount + 1;
-    this.id = 'P' + this.doc._patternCount; // no resources needed for our current usage
+  createPattern() {
+    // no resources needed for our current usage
     // required entry
-
     const resources = this.doc.ref();
     resources.end(); // we don't define the Matrix here since the default identity is OK for our current usage
     // (uses the page initial coordinate system - see 8.7.2 General Properties of Patterns
     // in ISO  32000-1)
 
-    this.pattern = this.doc.ref({
+    const pattern = this.doc.ref({
       Type: 'Pattern',
       PatternType: 1,
       // tiling
@@ -1704,12 +1697,29 @@ class PDFTilingPattern {
       YStep: this.yStep,
       Resources: resources
     });
-    this.pattern.end(this.stream);
-    this.doc.page.patterns[this.id] = this.pattern;
+    pattern.end(this.stream);
+    return pattern;
+  }
+
+  embed() {
+    // reused pattern
+    if (!this.id) {
+      this.id = 'P' + this.doc._patternCount;
+      this.doc._patternCount = this.doc._patternCount + 1;
+      this.pattern = this.createPattern();
+    } // patterns are embedded in each page
+
+
+    if (!this.doc.page.patterns[this.id]) {
+      this.doc.page.patterns[this.id] = this.pattern;
+    }
   }
 
   apply(stroke, patternColor) {
     this.embed();
+
+    this.doc._embedPatternColorSpaces();
+
     const op = stroke ? 'SCN' : 'scn';
 
     const normalizedColor = this.doc._normalizeColor(patternColor);
@@ -1737,6 +1747,7 @@ const {
 const {
   PDFTilingPattern: PDFTilingPattern$1
 } = pattern;
+const underlyingColorSpaces = ['DeviceCMYK', 'DeviceRGB'];
 var ColorMixin = {
   initColor() {
     // The opacity dictionaries
@@ -1899,18 +1910,13 @@ var ColorMixin = {
   },
 
   _embedPatternColorSpaces() {
-    if (this._patternColorSpacesEmbeded) {
-      return;
-    }
-
-    this._patternColorSpacesEmbeded = true;
-    const underlyingColorSpaces = ['DeviceCMYK', 'DeviceRGB'];
     underlyingColorSpaces.forEach(csName => {
+      const csId = this._getPatternColorSpaceId(csName); // the color spaces must be included on each page
+
+
+      if (this.page.color_spaces[csId]) return;
       const cs = this.ref(['Pattern', csName]);
       cs.end();
-
-      const csId = this._getPatternColorSpaceId(csName);
-
       this.page.color_spaces[csId] = cs;
     });
   },
