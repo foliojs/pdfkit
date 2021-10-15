@@ -45,13 +45,18 @@ function makePDF(PDFDocument, blobStream, lorem, iframe) {
 
   // stroke & fill uncolored tiling pattern
 
-  var p = doc.pattern([1, 1, 4, 4], 3, 3, '1 w 0 1 m 4 5 l s 2 0 m 5 3 l s');
-  doc.circle(280, 350, 50).fill([p, 'blue']);
+  var stripe45d = doc.pattern(
+    [1, 1, 4, 4],
+    3,
+    3,
+    '1 w 0 1 m 4 5 l s 2 0 m 5 3 l s'
+  );
+  doc.circle(280, 350, 50).fill([stripe45d, 'blue']);
 
   doc
     .rect(380, 300, 100, 100)
     .fillColor('lime')
-    .strokeColor([p, 'orange'])
+    .strokeColor([stripe45d, 'orange'])
     .lineWidth(5)
     .fillAndStroke();
   doc.restore();
@@ -1664,9 +1669,10 @@ var Gradient = {
 };
 
 /*
-PDF tiling pattern support.
-uncolored only for now
-*/
+PDF tiling pattern support. Uncolored only.
+ */
+const underlyingColorSpaces = ['DeviceCMYK', 'DeviceRGB'];
+
 class PDFTilingPattern {
   constructor(doc, bBox, xStep, yStep, stream) {
     this.doc = doc;
@@ -1680,10 +1686,12 @@ class PDFTilingPattern {
     // no resources needed for our current usage
     // required entry
     const resources = this.doc.ref();
-    resources.end(); // we don't define the Matrix here since the default identity is OK for our current usage
-    // (uses the page initial coordinate system - see 8.7.2 General Properties of Patterns
-    // in ISO  32000-1)
+    resources.end(); // apply default transform matrix (flipped in the default doc._ctm)
+    // see document.js & gradient.js
 
+    const [m0, m1, m2, m3, m4, m5] = this.doc._ctm;
+    const [m11, m12, m21, m22, dx, dy] = [1, 0, 0, 1, 0, 0];
+    const m = [m0 * m11 + m2 * m12, m1 * m11 + m3 * m12, m0 * m21 + m2 * m22, m1 * m21 + m3 * m22, m0 * dx + m2 * dy + m4, m1 * dx + m3 * dy + m5];
     const pattern = this.doc.ref({
       Type: 'Pattern',
       PatternType: 1,
@@ -1695,17 +1703,33 @@ class PDFTilingPattern {
       BBox: this.bBox,
       XStep: this.xStep,
       YStep: this.yStep,
+      Matrix: m.map(v => +v.toFixed(5)),
       Resources: resources
     });
     pattern.end(this.stream);
     return pattern;
   }
 
+  embedPatternColorSpaces() {
+    // map each pattern to an underlying color space
+    // and embed on each page
+    underlyingColorSpaces.forEach(csName => {
+      const csId = this.getPatternColorSpaceId(csName);
+      if (this.doc.page.color_spaces[csId]) return;
+      const cs = this.doc.ref(['Pattern', csName]);
+      cs.end();
+      this.doc.page.color_spaces[csId] = cs;
+    });
+  }
+
+  getPatternColorSpaceId(underlyingColorspace) {
+    return `CsP${underlyingColorspace}`;
+  }
+
   embed() {
-    // reused pattern
     if (!this.id) {
-      this.id = 'P' + this.doc._patternCount;
       this.doc._patternCount = this.doc._patternCount + 1;
+      this.id = 'P' + this.doc._patternCount;
       this.pattern = this.createPattern();
     } // patterns are embedded in each page
 
@@ -1716,20 +1740,20 @@ class PDFTilingPattern {
   }
 
   apply(stroke, patternColor) {
+    // do any embedding/creating that might be needed
+    this.embedPatternColorSpaces();
     this.embed();
-
-    this.doc._embedPatternColorSpaces();
-
-    const op = stroke ? 'SCN' : 'scn';
 
     const normalizedColor = this.doc._normalizeColor(patternColor);
 
-    if (!normalizedColor) throw Error(`invalid pattern color. (value: ${patternColor})`);
+    if (!normalizedColor) throw Error(`invalid pattern color. (value: ${patternColor})`); // select one of the pattern color spaces
 
-    const csId = this.doc._getPatternColorSpaceId(this.doc._getColorSpace(normalizedColor));
+    const csId = this.getPatternColorSpaceId(this.doc._getColorSpace(normalizedColor));
 
-    this.doc._setColorSpace(csId, stroke);
+    this.doc._setColorSpace(csId, stroke); // stroke/fill using the pattern and color (in the above underlying color space)
 
+
+    const op = stroke ? 'SCN' : 'scn';
     return this.doc.addContent(`${normalizedColor.join(' ')} /${this.id} ${op}`);
   }
 
@@ -1747,7 +1771,6 @@ const {
 const {
   PDFTilingPattern: PDFTilingPattern$1
 } = pattern;
-const underlyingColorSpaces = ['DeviceCMYK', 'DeviceRGB'];
 var ColorMixin = {
   initColor() {
     // The opacity dictionaries
@@ -1907,22 +1930,6 @@ var ColorMixin = {
 
     this.page.ext_gstates[name] = dictionary;
     return this.addContent(`/${name} gs`);
-  },
-
-  _embedPatternColorSpaces() {
-    underlyingColorSpaces.forEach(csName => {
-      const csId = this._getPatternColorSpaceId(csName); // the color spaces must be included on each page
-
-
-      if (this.page.color_spaces[csId]) return;
-      const cs = this.ref(['Pattern', csName]);
-      cs.end();
-      this.page.color_spaces[csId] = cs;
-    });
-  },
-
-  _getPatternColorSpaceId(underlyingColorspace) {
-    return `CsP${underlyingColorspace}`;
   },
 
   linearGradient(x1, y1, x2, y2) {

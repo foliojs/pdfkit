@@ -21,6 +21,9 @@ describe('Pattern', function() {
       .fill([pattern, 'blue'])
       .end();
 
+    // empty resources
+    expect(docData).toContainChunk(['10 0 obj', `<<\n>>`]);
+
     // pattern dictionary
     expect(docData).toContainChunk([
       '11 0 obj',
@@ -32,6 +35,7 @@ describe('Pattern', function() {
 /BBox [1 1 4 4]
 /XStep 3
 /YStep 3
+/Matrix [1 0 0 -1 0 792]
 /Resources 10 0 R
 /Length 32
 >>`,

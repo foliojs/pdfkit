@@ -44,13 +44,18 @@ function makePDF(PDFDocument, blobStream, lorem, iframe) {
 
   // stroke & fill uncolored tiling pattern
 
-  var p = doc.pattern([1, 1, 4, 4], 3, 3, '1 w 0 1 m 4 5 l s 2 0 m 5 3 l s');
-  doc.circle(280, 350, 50).fill([p, 'blue']);
+  var stripe45d = doc.pattern(
+    [1, 1, 4, 4],
+    3,
+    3,
+    '1 w 0 1 m 4 5 l s 2 0 m 5 3 l s'
+  );
+  doc.circle(280, 350, 50).fill([stripe45d, 'blue']);
 
   doc
     .rect(380, 300, 100, 100)
     .fillColor('lime')
-    .strokeColor([p, 'orange'])
+    .strokeColor([stripe45d, 'orange'])
     .lineWidth(5)
     .fillAndStroke();
   doc.restore();
