@@ -2,6 +2,10 @@
 
 ### Unreleased
 
+### [v0.13.0] - 2021-10-24
+
+- Add tiling pattern support
+
 ### [v0.12.3] - 2021-08-01
 
 - Remove examples from published package
