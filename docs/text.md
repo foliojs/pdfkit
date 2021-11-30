@@ -253,5 +253,5 @@ every time you want to use it.
     doc.font('Heading Font')
        .text('This is a heading.');
 
-That's about all there is too it for text in PDFKit. Let's move on now to
+That's about all there is to it for text in PDFKit. Let's move on now to
 images.
