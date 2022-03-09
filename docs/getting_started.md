@@ -157,7 +157,7 @@ numbers to a document.
     // see the range of buffered pages
     const range = doc.bufferedPageRange(); // => { start: 0, count: 2 }
 
-    for (i = range.start, end = range.start + range.count, range.start <= end; i < end; i++;) {
+    for (i = range.start, end = range.start + range.count, range.start <= end; i < end; i++) {
       doc.switchToPage(i);
       doc.text(`Page ${i + 1} of ${range.count}`);
     }
