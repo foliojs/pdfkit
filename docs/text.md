@@ -125,7 +125,7 @@ Here is an example combining some of the options above, wrapping a piece of text
 
 The output looks like this:
 
-![3]()
+![3](images/text_styling.png)
 
 ## Text measurements
 
@@ -164,7 +164,7 @@ option from the first `text` call is retained by the second call.
 
 Here is the output:
 
-![4]()
+![4](images/rich_text.png)
 
 To cancel a link in rich text set the `link` option to `null`.
 
@@ -185,7 +185,7 @@ To cancel a link in rich text set the `link` option to `null`.
 
 Here is the output:
 
-![5]()
+![5](images/rich_text_link.png)
 
 ## Fonts
 
@@ -253,5 +253,5 @@ every time you want to use it.
     doc.font('Heading Font')
        .text('This is a heading.');
 
-That's about all there is too it for text in PDFKit. Let's move on now to
+That's about all there is to it for text in PDFKit. Let's move on now to
 images.
