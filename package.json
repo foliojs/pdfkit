@@ -48,8 +48,8 @@
   },
   "dependencies": {
     "crypto-js": "^4.0.0",
-    "fontkit": "^1.8.1",
-    "linebreak": "^1.0.2",
+    "fontkit": "^1.9.0",
+    "linebreak": "^1.1.0",
     "png-js": "^1.0.0"
   },
   "scripts": {
