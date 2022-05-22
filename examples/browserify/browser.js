@@ -1,4 +1,4 @@
-var PDFDocument = require('../..');
+var PDFDocument = require('../../');
 var blobStream = require('blob-stream');
 var ace = require('brace');
 require('brace/mode/javascript');
@@ -76,7 +76,7 @@ function makePDF(PDFDocument, blobStream, lorem, iframe) {
 
   // end and display the document in the iframe to the right
   doc.end();
-  stream.on('finish', function() {
+  stream.on('finish', function () {
     iframe.src = stream.toBlobURL('application/pdf');
   });
 }
@@ -85,6 +85,7 @@ var editor = ace.edit('editor');
 editor.setTheme('ace/theme/monokai');
 editor.getSession().setMode('ace/mode/javascript');
 editor.setValue(
+  localStorage.getItem('editorText') ||
   makePDF
     .toString()
     .split('\n')
@@ -102,11 +103,13 @@ makePDF(PDFDocument, blobStream, lorem, iframe);
 
 let debounceTimeout;
 
-editor.getSession().on('change', function() {
+editor.getSession().on('change', function () {
   try {
     if (debounceTimeout) {
       clearTimeout(debounceTimeout);
     }
+    const text = editor.getValue()
+    localStorage.setItem('editorText', text)
     var fn = new Function(
       'PDFDocument',
       'blobStream',
