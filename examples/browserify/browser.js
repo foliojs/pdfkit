@@ -115,7 +115,7 @@ editor.getSession().on('change', function() {
       'blobStream',
       'lorem',
       'iframe',
-      editor.getValue()
+      text
     );
     debounceTimeout = setTimeout(() => {
       fn(PDFDocument, blobStream, lorem, iframe);
