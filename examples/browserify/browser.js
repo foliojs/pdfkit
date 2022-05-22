@@ -76,7 +76,7 @@ function makePDF(PDFDocument, blobStream, lorem, iframe) {
 
   // end and display the document in the iframe to the right
   doc.end();
-  stream.on('finish', function () {
+  stream.on('finish', function() {
     iframe.src = stream.toBlobURL('application/pdf');
   });
 }
@@ -103,7 +103,7 @@ makePDF(PDFDocument, blobStream, lorem, iframe);
 
 let debounceTimeout;
 
-editor.getSession().on('change', function () {
+editor.getSession().on('change', function() {
   try {
     if (debounceTimeout) {
       clearTimeout(debounceTimeout);
