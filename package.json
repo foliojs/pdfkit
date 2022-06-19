@@ -35,7 +35,6 @@
     "codemirror": "~5.49.2",
     "eslint": "^7.8.1",
     "gh-pages": "^3.1.0",
-    "iconv-lite": "^0.5.0",
     "jest": "^26.4.2",
     "jest-screenshot": "^0.3.1",
     "markdown": "~0.5.0",
@@ -48,13 +47,13 @@
   },
   "dependencies": {
     "crypto-js": "^4.0.0",
-    "fontkit": "^1.9.0",
+    "fontkit": "^2.0.0",
     "linebreak": "^1.1.0",
     "png-js": "^1.0.0"
   },
   "scripts": {
     "prepublishOnly": "npm run build",
-    "build": "rollup -c && browserify --standalone PDFDocument --ignore crypto --ignore iconv-lite js/pdfkit.js > js/pdfkit.standalone.js",
+    "build": "rollup -c && browserify --standalone PDFDocument --ignore crypto js/pdfkit.js > js/pdfkit.standalone.js",
     "browserify-example": "browserify examples/browserify/browser.js > examples/browserify/bundle.js",
     "pdf-guide": "node docs/generate.js",
     "website": "node docs/generate_website.js",
