@@ -47,7 +47,7 @@
   },
   "dependencies": {
     "crypto-js": "^4.0.0",
-    "fontkit": "^2.0.0",
+    "fontkit": "^2.0.2",
     "linebreak": "^1.1.0",
     "png-js": "^1.0.0"
   },
