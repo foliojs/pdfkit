@@ -11,7 +11,8 @@ const external = [
   'linebreak',
   'png-js',
   'crypto-js',
-  'saslprep'
+  'saslprep',
+  'piexifjs'
 ];
 
 export default [

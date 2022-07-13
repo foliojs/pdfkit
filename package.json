@@ -50,6 +50,7 @@
     "crypto-js": "^4.0.0",
     "fontkit": "^1.8.1",
     "linebreak": "^1.0.2",
+    "piexifjs": "^1.0.6",
     "png-js": "^1.0.0"
   },
   "scripts": {
