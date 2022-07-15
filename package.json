@@ -49,6 +49,7 @@
   "dependencies": {
     "crypto-js": "^4.0.0",
     "fontkit": "^1.8.1",
+    "jpeg-exif": "^1.1.4",
     "linebreak": "^1.0.2",
     "png-js": "^1.0.0"
   },
