@@ -12,7 +12,7 @@ const external = [
   'png-js',
   'crypto-js',
   'saslprep',
-  'piexifjs'
+  'jpeg-exif'
 ];
 
 export default [
