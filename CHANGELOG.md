@@ -2,6 +2,8 @@
 
 ### Unreleased
 
+- Add support for EXIF orientation on JPEG images (#626 and #1353)
+
 ### [v0.13.0] - 2021-10-24
 
 - Add tiling pattern support

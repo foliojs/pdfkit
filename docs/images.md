@@ -17,6 +17,7 @@ be scaled according to the following options.
 * `link` - a URL to link this image to (shortcut to create an annotation)
 * `goTo` - go to anchor (shortcut to create an annotation)
 * `destination` - create anchor to this image
+* `obeyOrientation` - (true/false) if the image is a JPEG and has an EXIF orientation it will be properly rotated and/or flipped. Defaults to `false`, unless the similarly named `obeyOrientation` option set to `true` when creating the `PDFDocument` object (e.g. `new PDFDocument({obeyOrientation: true})`)
 
 When a `fit` or `cover` array is provided, PDFKit accepts these additional options:
 
