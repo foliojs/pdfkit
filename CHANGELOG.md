@@ -2,6 +2,7 @@
 
 ### Unreleased
 
+- Fix cache key collisions for fonts with bad TTF metadata
 - Add support for PDF/A-1b and PDF/A-1a
 
 ### [v0.13.0] - 2021-10-24
