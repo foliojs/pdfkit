@@ -259,6 +259,30 @@ Available options includes:
 When using PDF version 1.7 ExtensionLevel 3, password is truncated to 127 bytes of its UTF-8 representation.
 In older versions, password is truncated to 32 bytes, and only Latin-1 characters are allowed.
 
+## PDF/A
+
+PDF/A is a standard (ISO 19005-1:2005) which defines rules for electornic documents intended for long-term archiving.
+The restrictions on PDF/A documents are:
+
+- Cannot be encrypted
+- Fonts must be embedded
+- No JavaScript
+- No audio content
+- No video content
+- Addition of XMP metadata
+- Must define color spaces
+
+Currently, PDFKit aims to support PDF/A-1b and PDF/A-1a standards, also known as level B compliance and level A compliance, respectively.
+
+In order to create PDF/A documents, set `pdfa` to either `1b` or `1a` when creating the `PDFDocument` in `options` object.
+
+Futhermore, you will need to specify the other options relevant to the PDF/A subset you wish to use, for PDFA-1 being:
+
+- `pdfVersion` set to at least `1.4`
+- `tagged` set to `true` for PDF/A-1a
+
+In order to verify PDF/A compliance, veraPDF is an excellent open source validator.
+
 ### Adding content
 
 Once you've created a `PDFDocument` instance, you can add content to the
