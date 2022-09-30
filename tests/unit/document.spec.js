@@ -1,4 +1,5 @@
 import PDFDocument from '../../lib/document';
+import { logData } from './helpers';
 
 describe('PDFDocument', () => {
   describe('font option', () => {
@@ -46,4 +47,25 @@ describe('PDFDocument', () => {
       );
     });
   });
+
+  test('metadata is present for PDF 1.4', () => {
+    let doc = new PDFDocument({pdfVersion: '1.4'});
+    const data = logData(doc);
+    doc.end();
+
+    let catalog = data[data.length-28];
+    
+    expect(catalog).toContain('/Metadata');
+  });
+
+  test('metadata is NOT present for PDF 1.3', () => {
+    let doc = new PDFDocument({pdfVersion: '1.3'}); 
+    const data = logData(doc);
+    doc.end();
+
+    let catalog = data[data.length-27];
+
+    expect(catalog).not.toContain('/Metadata');
+  });
+
 });
