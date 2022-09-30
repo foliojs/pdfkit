@@ -274,7 +274,7 @@ The restrictions on PDF/A documents are:
 
 Currently, PDFKit aims to support PDF/A-1b and PDF/A-1a standards, also known as level B compliance and level A compliance, respectively.
 
-In order to create PDF/A documents, set `pdfa` to either `1b` or `1a` when creating the `PDFDocument` in `options` object.
+In order to create PDF/A documents, set `subset` to either `PDF/A-1` (`PDF/A-1a` or `PDF/A-1b` for A specific conformance level) when creating the `PDFDocument` in `options` object. If `PDF/A-1` is passed, conformance level `B` is used.
 
 Futhermore, you will need to specify the other options relevant to the PDF/A subset you wish to use, for PDFA-1 being:
 
