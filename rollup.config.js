@@ -42,7 +42,7 @@ export default [
         ]
       }),
       copy({
-        files: ['lib/font/data/*.afm'],
+        files: ['lib/font/data/*.afm', 'lib/color_profiles/*.icc'],
         dest: 'js/data'
       })
     ]
