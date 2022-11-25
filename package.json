@@ -1,5 +1,5 @@
 {
-  "name": "@feamzy/pdfkit",
+  "name": "pdfkit",
   "description": "A PDF generation library for Node.js",
   "keywords": [
     "pdf",
@@ -48,8 +48,6 @@
     "crypto-js": "^4.0.0",
     "fontkit": "^1.8.1",
     "linebreak": "^1.0.2",
-    "native-image-diff": "^0.1.14",
-    "node-libpng": "^0.2.20",
     "png-js": "^1.0.0"
   },
   "scripts": {
