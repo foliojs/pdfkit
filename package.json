@@ -9,19 +9,17 @@
     "document",
     "vector"
   ],
-  "version": "0.13.0",
+  "version": "0.13.1",
   "homepage": "http://pdfkit.org/",
-  "author": {
-    "name": "Devon Govett",
-    "email": "devongovett@gmail.com",
-    "url": "http://badassjs.com/"
-  },
+  "author": "Devon Govett <devongovett@gmail.com> (http://badassjs.com/)",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/foliojs/pdfkit.git"
+    "url": "git+https://github.com/foliojs/pdfkit.git"
   },
-  "bugs": "https://github.com/foliojs/pdfkit/issues",
+  "bugs": {
+    "url": "https://github.com/foliojs/pdfkit/issues"
+  },
   "devDependencies": {
     "@babel/core": "^7.11.6",
     "@babel/plugin-external-helpers": "^7.10.4",
@@ -90,5 +88,11 @@
       "default",
       "jest-screenshot/reporter"
     ]
+  },
+  "directories": {
+    "doc": "docs",
+    "example": "examples",
+    "lib": "lib",
+    "test": "tests"
   }
 }
