@@ -3,6 +3,7 @@
 ### Unreleased
 
 - Add support for EXIF orientation on JPEG images (#626 and #1353)
+- Add support for PDF/A-1b and PDF/A-1a
 
 ### [v0.13.0] - 2021-10-24
 
