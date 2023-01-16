@@ -1,6 +1,9 @@
 ## pdfkit changelog
 
-### Unreleased
+### [v0.14.0] - 2023-11-09
+
+- Add support for PDF/A-1b, PDF/A-1a, PDF/A-2b, PDF/A-2a, PDF/A-3b, PDF/A-3a
+- Update crypto-js to v4.2.0 (properly fix security issue)
 
 - Add support for EXIF orientation on JPEG images (#626 and #1353)
 

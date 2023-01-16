@@ -1,5 +1,5 @@
 import matcher from './toContainChunk';
-import { setupJestScreenshot } from 'jest-screenshot';
+import { toMatchImageSnapshot } from 'jest-image-snapshot';
 
 expect.extend(matcher);
-setupJestScreenshot();
+expect.extend({ toMatchImageSnapshot });
