@@ -38,7 +38,7 @@
     "iconv-lite": "^0.5.0",
     "jest": "^29.4.3",
     "jest-environment-jsdom": "^29.4.3",
-    "jest-screenshot": "^0.3.1",
+    "jest-image-snapshot": "^6.1.0",
     "markdown": "~0.5.0",
     "pdfjs-dist": "^2.4.456",
     "prettier": "1.19.1",
@@ -86,10 +86,6 @@
     ],
     "setupFilesAfterEnv": [
       "<rootDir>/tests/unit/setupTests.js"
-    ],
-    "reporters": [
-      "default",
-      "jest-screenshot/reporter"
     ]
   }
 }
