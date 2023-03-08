@@ -272,16 +272,20 @@ The restrictions on PDF/A documents are:
 - Addition of XMP metadata
 - Must define color spaces
 
-Currently, PDFKit aims to support PDF/A-1b and PDF/A-1a standards, also known as level B compliance and level A compliance, respectively.
+Currently, PDFKit aims to support PDF/A-1b, PDF/A-2b, PDF/A-3b and PDF/A-1a, PDF/A-2a, PDF/A-3a standards, also known as level B conformance and level A conformance, respectively.
 
-In order to create PDF/A documents, set `subset` to either `PDF/A-1` (`PDF/A-1a` or `PDF/A-1b` for A specific conformance level) when creating the `PDFDocument` in `options` object. If `PDF/A-1` is passed, conformance level `B` is used.
+In order to create PDF/A documents, set `subset` to either `PDF/A-1` or `PDF/A-1b` for level B (basic) conformance, or `PDF/A-1a` for level A (accessible) conformance when creating the `PDFDocument` in `options` object.
 
-Futhermore, you will need to specify the other options relevant to the PDF/A subset you wish to use, for PDFA-1 being:
+Similary, use `PDF/A-2` or `PDF/A-2b` for PDF/A-2 level B conformance and `PDF/A-2a` for PDF/A-2 level A conformance. `PDF/A-3` or `PDF/A-3b` can be used for PDF/A-3 level B conformance and `PDF/A-3a` for PDF/A-3 level A conformance.
+
+Futhermore, you will need to specify the other options relevant to the PDF/A subset you wish to use, for PDF/A-1 being:
 
 - `pdfVersion` set to at least `1.4`
 - `tagged` set to `true` for PDF/A-1a
 
-In order to verify PDF/A compliance, veraPDF is an excellent open source validator.
+For PDF/A-2 and PDF/A-3, the `pdfVersion` needs to be set to at least `1.7` and `tagged` needs to be `true` for level A conformance.
+
+In order to verify the generated document for PDF/A and its subsets conformance, veraPDF is an excellent open source validator.
 
 ### Adding content
 
