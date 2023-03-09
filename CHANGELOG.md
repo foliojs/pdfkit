@@ -2,7 +2,7 @@
 
 ### Unreleased
 
-- Add support for PDF/A-1b and PDF/A-1a
+- Add support for PDF/A-1b, PDF/A-1a, PDF/A-2b, PDF/A-2a, PDF/A-3b, PDF/A-3a
 
 ### [v0.13.0] - 2021-10-24
 
