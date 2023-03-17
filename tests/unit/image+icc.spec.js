@@ -1,5 +1,5 @@
 import PDFDocument from '../../lib/document';
-import { logData, joinTokens } from '../unit/helpers';
+import { logData} from '../unit/helpers';
 import { getICC } from '../../lib/image/icc';
 import fs from 'fs'
 describe('imageWithICC', () => {
