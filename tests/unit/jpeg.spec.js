@@ -6,19 +6,18 @@ describe('jpeg', () => {
   test('extractICCProfile1', () => {
     let filePath = 'tests/images/landscape+icc.jpg'
     let buf=fs.readFileSync(filePath);
-    let icc=extractICCProfile(buf);
-    //console.log(icc)
-    expect(icc.data.description).toBe('Display P3');
-    expect(icc.buffer.length).toBe(536);
+    let iccProfile=extractICCProfile(buf);
+    expect(iccProfile.data.description).toBe('Display P3');
+    expect(iccProfile.buffer.length).toBe(536);
   })
   test('extractICCProfile2', () => {
     let filePath = 'tests/images/landscape+micc.jpg'
     let buf=fs.readFileSync(filePath);
-    let icc=extractICCProfile(buf);
-    expect(icc.data.description).toBe('Modified Display P3');
-    expect(icc.buffer.length).toBe(76008);
+    let iccProfile=extractICCProfile(buf);
+    expect(iccProfile.data.description).toBe('Modified Display P3');
+    expect(iccProfile.buffer.length).toBe(76008);
   })
-  test('embedImageWithICC', () => {
+  test('embedICCProfile', () => {
       let doc = new PDFDocument(); 
       const data = logData(doc);
       doc.image('tests/images/landscape+icc.jpg', 40, 70, {
@@ -47,5 +46,28 @@ describe('jpeg', () => {
           '/Length 553372\n' +
           '>>',
       ]);
+  });
+  test('notEmbedICCProfile', () => {
+    let doc = new PDFDocument(); 
+    const data = logData(doc);
+    doc.image('tests/images/landscape+micc.jpg', 40, 70, {
+      width: 200,
+      height: 267,
+      embedICCProfile: false
+    });
+    doc.end();
+    expect(data).toContainChunk([
+      '8 0 obj',
+      '<<\n' +
+        '/Type /XObject\n' +
+        '/Subtype /Image\n' +
+        '/BitsPerComponent 8\n' +
+        '/Width 804\n' +
+        '/Height 1071\n' +
+        '/ColorSpace /DeviceRGB\n' +
+        '/Filter /DCTDecode\n' +
+        '/Length 626530\n' +
+        '>>',
+    ]);
   });
 })
