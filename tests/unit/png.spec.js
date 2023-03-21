@@ -26,7 +26,7 @@ describe('PNGImage', () => {
     };
     const finalizeFn = img.finalize;
     jest.spyOn(img, 'finalize').mockImplementation(() => finalizeFn.call(img));
-    img.embed(document);
+    img.embed(document, {embedICCProfile: false});
     return img;
   };
 
