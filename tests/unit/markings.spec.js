@@ -623,6 +623,11 @@ EMC
         `(My Title)`,
         `endobj`
       ]);
+      expect(docData).toContainChunk([
+        `10 0 obj`,
+        /\/Tabs \/S/,
+        `endobj`
+      ]);
     });
   });
 
