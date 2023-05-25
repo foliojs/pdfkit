@@ -631,6 +631,42 @@ EMC
     });
   });
 
+  describe('untagged document', () => {
+    test('taborder not set for unmarked content', () => {
+      document = new PDFDocument({
+        info: {
+          CreationDate: new Date(Date.UTC(2018, 1, 1)),
+          Title: "My Title"
+        },
+        displayTitle: true,
+        compress: false,
+        pdfVersion: '1.5',
+        tagged: false,
+        lang: 'en-AU'
+      });
+
+      const docData = logData(document);
+
+      document.end();
+
+      expect(docData).toContainChunk([
+        `3 0 obj`,
+        /\/Lang \(en-AU\)/,
+        `endobj`
+      ]);
+      expect(docData).not.toContainChunk([
+        `3 0 obj`,
+        /\/MarkInfo 5 0 R/,
+        `endobj`
+      ]);
+      expect(docData).not.toContainChunk([
+        `10 0 obj`,
+        /\/Tabs \/S/,
+        `endobj`
+      ]);
+    });
+  });
+
   describe('text integration', () => {
     test('adds paragraphs to structure', () => {
       const docData = logData(document);
