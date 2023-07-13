@@ -287,6 +287,8 @@ For PDF/A-2 and PDF/A-3, the `pdfVersion` needs to be set to at least `1.7` and 
 
 In order to verify the generated document for PDF/A and its subsets conformance, veraPDF is an excellent open source validator.
 
+Please note that PDF/A requires fonts to be embedded, as such the standard fonts PDFKit comes with cannot be used because they are in AFM format, which only provides neccessary metrics, without the font data. You should use `registerFont()` and use embeddable fonts such as `ttf`.
+
 ### Adding content
 
 Once you've created a `PDFDocument` instance, you can add content to the
