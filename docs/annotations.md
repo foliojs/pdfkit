@@ -19,8 +19,10 @@ and some other properties. Here is a list of the available annotation methods:
 * `fileAnnotation(x, y, width, height, file, options)`
 
 Many of the annotations have a `color` option that you can specify. You can
-use an array of RGB values, a hex color, or a named CSS color value for that
-option.
+use an array of RGB values, a hex color, a named CSS color value, or a named 
+spot color value for that option.
+
+
 
 If you are adding an annotation to a piece of text, such as a link or
 underline, you will need to know the width and height of the text in order to
@@ -57,6 +59,12 @@ Here is an example that uses a few of the annotation types.
        .fillColor('black')
        .highlight(20, doc.y, doc.widthOfString('This text is highlighted!'), height)
        .text('This text is highlighted!');
+
+    // Create text with a spot color
+    doc.addSpotColor('PANTONE185C', 0, 100, 78, 9)
+    doc.moveDown()
+       .fillColor('PANTONE185C')
+       .text('This text uses spot color!');
 
     // Create the crossed out text
     doc.moveDown()

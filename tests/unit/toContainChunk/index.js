@@ -1,4 +1,4 @@
-import diff from 'jest-diff';
+import { diff } from 'jest-diff';
 
 const buildMessage = (utils, data, chunk, headIndex) => {
   let message;
