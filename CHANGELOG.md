@@ -5,6 +5,8 @@
 - Add support for PDF/A-1b, PDF/A-1a, PDF/A-2b, PDF/A-2a, PDF/A-3b, PDF/A-3a
 - Update crypto-js to v4.2.0 (properly fix security issue)
 
+- Add support for EXIF orientation on JPEG images (#626 and #1353)
+
 ### [v0.13.0] - 2021-10-24
 
 - Add tiling pattern support
