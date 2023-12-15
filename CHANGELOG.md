@@ -1,5 +1,9 @@
 ## pdfkit changelog
 
+### Unreleased
+
+- Add subset for PDF/UA
+
 ### [v0.14.0] - 2023-11-09
 
 - Add support for PDF/A-1b, PDF/A-1a, PDF/A-2b, PDF/A-2a, PDF/A-3b, PDF/A-3a
