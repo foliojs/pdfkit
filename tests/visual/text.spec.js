@@ -44,10 +44,10 @@ describe('text', function() {
     });
   });
 
-  test('list with line breaks in value', function() {
+  test('list with line breaks in items', function() {
     return runDocTest(function(doc) {
       doc.font('tests/fonts/Roboto-Regular.ttf');
-      doc.list(['Foo\nBar'], [100, 150]);
+      doc.list(['Foo\nBar', 'Foo\rBar', 'Foo\r\nBar'], [100, 150]);
     })
   })
 });
