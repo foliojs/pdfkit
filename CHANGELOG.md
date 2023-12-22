@@ -3,6 +3,7 @@
 ### Unreleased
 
 - Add subset for PDF/UA
+- Fix for line breaks in list items (#1486)
 
 ### [v0.14.0] - 2023-11-09
 
