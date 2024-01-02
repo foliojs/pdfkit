@@ -31,7 +31,7 @@ Installation uses the [npm](http://npmjs.org/) package manager. Just type the fo
   - Transformations
   - Linear and radial gradients
 - Text
-  - Line wrapping
+  - Line wrapping (with soft hyphen recognition)
   - Text alignments
   - Bulleted lists
 - Font embedding

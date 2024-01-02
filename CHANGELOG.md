@@ -4,6 +4,7 @@
 
 - Add subset for PDF/UA
 - Fix for line breaks in list items (#1486)
+- Fix for soft hyphen not being replaced by visible hyphen if necessary (#457)
 
 ### [v0.14.0] - 2023-11-09
 
