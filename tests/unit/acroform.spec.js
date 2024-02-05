@@ -212,6 +212,33 @@ describe('acroform', () => {
     expect(docData).toContainChunk(expected);
   });
 
+  test('false flags should be ignored', () => {
+    const expectedDoc = new PDFDocument({
+      info: { CreationDate: new Date(Date.UTC(2018, 1, 1)) }
+    });
+    expectedDoc.initForm();
+    const expectedDocData = logData(expectedDoc);
+    let emptyOpts = {
+      align: 'center'
+    };
+    expectedDoc.formText('flags', 20, 20, 50, 20, emptyOpts);
+
+    doc.initForm();
+    const docData = logData(doc);
+    let opts = {
+      required: false,
+      noExport: false,
+      readOnly: false,
+      align: 'center',
+      multiline: false,
+      password: false,
+      noSpell: false
+    };
+    doc.formText('flags', 20, 20, 50, 20, opts);
+
+    expect(docData).toContainChunk(expectedDocData);
+  });
+
   test('font size', () => {
     const expected = [
       '11 0 obj',
