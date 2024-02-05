@@ -6,6 +6,7 @@
 - Fix for line breaks in list items (#1486)
 - Fix for soft hyphen not being replaced by visible hyphen if necessary (#457)
 - Optimize output files by ignoring identity transforms
+- Fix for Acroforms - setting an option to false will still apply the flag (#1495)
 
 ### [v0.14.0] - 2023-11-09
 
