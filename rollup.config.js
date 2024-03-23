@@ -12,7 +12,7 @@ const external = [
   'png-js',
   'crypto-js',
   'saslprep',
-  'jpeg-exif',
+  'jpeg-exif'
 ];
 
 export default [
@@ -43,7 +43,7 @@ export default [
         ]
       }),
       copy({
-        files: ['lib/font/data/*.afm', 'lib/color_profiles/*.icc'],
+        files: ['lib/font/data/*.afm', 'lib/mixins/data/*.icc'],
         dest: 'js/data'
       })
     ]
