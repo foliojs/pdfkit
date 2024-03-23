@@ -1,4 +1,4 @@
-var PDFDocument = require('../js/pdfkit');
+var PDFDocument = require('../');
 var tiger = require('./tiger');
 var fs = require('fs');
 
