@@ -9,6 +9,7 @@
 - Fix for Acroforms - setting an option to false will still apply the flag (#1495)
 - Fix for text extraction in PDFium-based viewers due to invalid ToUnicodeMap (#1498)
 - Remove deprecated `write` method
+- Drop support for Node.js < 18 and for browsers released before 2020
 
 ### [v0.14.0] - 2023-11-09
 

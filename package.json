@@ -69,15 +69,15 @@
     "test:unit": "jest unit/"
   },
   "main": "js/pdfkit.js",
-  "module": "js/pdfkit.es5.js",
-  "esnext": "js/pdfkit.esnext.js",
+  "module": "js/pdfkit.es.js",
+  "browser": "js/pdfkit.es.js",
   "browserify": {
     "transform": [
       "brfs"
     ]
   },
   "engine": [
-    "node >= v6.0.0"
+    "node >= v18.0.0"
   ],
   "jest": {
     "testEnvironment": "jest-environment-jsdom",
