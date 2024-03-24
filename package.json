@@ -56,7 +56,8 @@
   },
   "scripts": {
     "prepublishOnly": "npm run build",
-    "build": "rollup -c && browserify --standalone PDFDocument --ignore crypto --ignore iconv-lite js/pdfkit.js > js/pdfkit.standalone.js",
+    "build": "rollup -c && npm run build-standalone",
+    "build-standalone": "browserify --standalone PDFDocument --ignore crypto --ignore iconv-lite js/pdfkit.js > js/pdfkit.standalone.js",
     "browserify-example": "browserify examples/browserify/browser.js > examples/browserify/bundle.js",
     "pdf-guide": "node docs/generate.js",
     "website": "node docs/generate_website.js",
@@ -70,7 +71,6 @@
   },
   "main": "js/pdfkit.js",
   "module": "js/pdfkit.es.js",
-  "browser": "js/pdfkit.es.js",
   "browserify": {
     "transform": [
       "brfs"
