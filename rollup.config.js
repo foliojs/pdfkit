@@ -15,6 +15,12 @@ const external = [
   'jpeg-exif'
 ];
 
+const supportedBrowsers = [
+  'Firefox 102', // ESR from 2022
+  'iOS 14', // from 2020
+  'Safari 14' // from 2020
+];
+
 export default [
   // CommonJS build for Node
   {
@@ -36,7 +42,7 @@ export default [
             {
               modules: false,
               targets: {
-                node: '6.10'
+                node: '18'
               }
             }
           ]
@@ -48,12 +54,12 @@ export default [
       })
     ]
   },
-  // ES for legacy (IE11) browsers
+  // ES for green browsers
   {
     input: 'lib/document.js',
     external,
     output: {
-      name: 'pdfkit.es5',
+      name: 'pdfkit.es',
       file: pkg.module,
       format: 'es',
       sourcemap: true
@@ -67,41 +73,7 @@ export default [
             {
               modules: false,
               targets: {
-                browsers: ['ie 11']
-              },
-              exclude: ['@babel/plugin-transform-typeof-symbol']
-            }
-          ]
-        ]
-      })
-    ]
-  },
-  // ES for green browsers
-  {
-    input: 'lib/document.js',
-    external,
-    output: {
-      name: 'pdfkit.esnext',
-      file: pkg.esnext,
-      format: 'es',
-      sourcemap: true
-    },
-    plugins: [
-      babel({
-        babelrc: false,
-        presets: [
-          [
-            '@babel/preset-env',
-            {
-              modules: false,
-              targets: {
-                browsers: [
-                  'Firefox 57',
-                  'Edge 15',
-                  'Chrome 60',
-                  'iOS 10',
-                  'Safari 10'
-                ]
+                browsers: supportedBrowsers
               }
             }
           ]
@@ -128,7 +100,7 @@ export default [
               loose: true,
               modules: false,
               targets: {
-                browsers: ['ie 11']
+                browsers: supportedBrowsers
               }
             }
           ]
