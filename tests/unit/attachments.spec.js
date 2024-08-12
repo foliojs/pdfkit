@@ -166,6 +166,7 @@ describe('file', () => {
 
   test('attach multiple files', () => {
     const docData = logData(document);
+    const duplicateDate = new Date(date)
 
     document.file(Buffer.from('example text'), {
       name: 'file1.txt',
@@ -190,6 +191,41 @@ describe('file', () => {
   /Names [
     (file1.txt) 9 0 R
     (file2.txt) 11 0 R
+]
+>>
+>>`
+    ]);
+  });
+
+  test('attach the same file multiple times', () => {
+    const docData = logData(document);
+
+    document.file(Buffer.from('example text'), {
+      name: 'file1.txt',
+      creationDate: date,
+      modifiedDate: date
+    });
+    document.file(Buffer.from('example text'), {
+      name: 'file1.txt',
+      creationDate: new Date(date),
+      modifiedDate: new Date(date)
+    });
+    document.end();
+
+    const numFiles = docData.filter((str) => typeof str === 'string' && str.startsWith('<<\n/Type /EmbeddedFile\n'))
+    
+    expect(numFiles.length).toEqual(1)
+    
+    expect(docData).toContainChunk([
+      `2 0 obj`,
+      `<<
+/Dests <<
+  /Names [
+]
+>>
+/EmbeddedFiles <<
+  /Names [
+    (file1.txt) 10 0 R
 ]
 >>
 >>`
