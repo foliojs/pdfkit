@@ -166,7 +166,6 @@ describe('file', () => {
 
   test('attach multiple files', () => {
     const docData = logData(document);
-    const duplicateDate = new Date(date)
 
     document.file(Buffer.from('example text'), {
       name: 'file1.txt',
