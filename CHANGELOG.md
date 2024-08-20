@@ -2,6 +2,8 @@
 
 ### Unreleased
 
+- Fix browserify transform sRGB_IEC61966_2_1.icc file
+
 ### [v0.15.0] - 2024-03-23
 
 - Add subset for PDF/UA
