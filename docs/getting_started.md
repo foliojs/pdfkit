@@ -14,7 +14,7 @@ in your JavaScript source file and create an instance of the
 `PDFDocument` class.
 
     const PDFDocument = require('pdfkit');
-    const doc = new PDFDocument;
+    const doc = new PDFDocument();
 
 `PDFDocument` instances are readable Node streams. They don't get saved anywhere automatically,
 but you can call the `pipe` method to send the output of the PDF document to another
