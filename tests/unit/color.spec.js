@@ -35,4 +35,13 @@ describe('color', function() {
       1
     ]);
   });
+
+  test('normalize with spot color', function() {
+    const doc = new PDFDocument();
+    doc.addSpotColor('PANTONE 123 C', 0.1, 0.2, 0.3, 0.4);
+
+    const color = doc._normalizeColor('PANTONE 123 C');
+    expect(color.id).toEqual('CS0');
+    expect(color.values).toEqual([0.1, 0.2, 0.3, 0.4]);
+  });
 });
