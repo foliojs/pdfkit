@@ -1,9 +1,9 @@
 ## pdfkit changelog
 
-### Unreleased
+### [v0.15.1] - 2024-10-30
 
 - Fix browserify transform sRGB_IEC61966_2_1.icc file
-- Fix time comparison check equality embedded files 
+- Fix time comparison check equality embedded files
 
 ### [v0.15.0] - 2024-03-23
 
