@@ -78,4 +78,18 @@ describe('text', function() {
       doc.fillColor('#000').list(['One', 'Two', 'Three'], 100, 150, {listType: 'lettered'});
     });
   });
+
+  test('list with sub-list (unordered)', function() {
+    return runDocTest(function(doc) {
+      doc.font('tests/fonts/Roboto-Regular.ttf');
+      doc.fillColor('#000').list(['One', ['One.One', 'One.Two'], 'Three'], 100, 150);
+    })
+  })
+
+  test('list with sub-list (ordered)', function() {
+    return runDocTest(function(doc) {
+      doc.font('tests/fonts/Roboto-Regular.ttf');
+      doc.fillColor('#000').list(['One', ['One.One', 'One.Two'], 'Three'], 100, 150, {listType: 'numbered'});
+    })
+  })
 });
