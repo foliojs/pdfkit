@@ -48,7 +48,7 @@
   },
   "dependencies": {
     "crypto-js": "^4.2.0",
-    "fontkit": "^2.0.2",
+    "fontkit": "^2.0.4",
     "jpeg-exif": "^1.1.4",
     "linebreak": "^1.1.0",
     "png-js": "^1.0.0"
@@ -64,9 +64,9 @@
     "docs": "npm run pdf-guide && npm run website && npm run browserify-example",
     "lint": "eslint {lib,tests}/**/*.js",
     "prettier": "prettier {lib,tests,examples,docs}/**/*.js",
-    "test": "jest -i",
-    "test:visual": "jest visual/ -i",
-    "test:unit": "jest unit/"
+    "test": "jest -i --env=node",
+    "test:visual": "jest visual/ -i --env=node",
+    "test:unit": "jest unit/ --env=node"
   },
   "main": "js/pdfkit.js",
   "module": "js/pdfkit.es.js",
