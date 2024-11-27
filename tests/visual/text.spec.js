@@ -62,6 +62,20 @@ describe('text', function() {
     return runDocTest(function(doc) {
       doc.font('tests/fonts/Roboto-Regular.ttf');
       doc.list(['Foo\nBar', 'Foo\rBar', 'Foo\r\nBar'], [100, 150]);
-    })
-  })
+    });
+  });
+
+  test('list (numbered)', function() {
+    return runDocTest(function(doc) {
+      doc.font('tests/fonts/Roboto-Regular.ttf');
+      doc.fillColor('#000').list(['One', 'Two', 'Three'], 100, 150, {listType: 'numbered'});
+    });
+  });
+
+  test('list (lettered)', function() {
+    return runDocTest(function(doc) {
+      doc.font('tests/fonts/Roboto-Regular.ttf');
+      doc.fillColor('#000').list(['One', 'Two', 'Three'], 100, 150, {listType: 'lettered'});
+    });
+  });
 });
