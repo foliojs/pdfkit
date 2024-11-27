@@ -13,11 +13,10 @@ module.exports = {
     })
   ],
   resolve: {
+    symlinks: false,
     alias: {
       // maps fs to a virtual one allowing to register file content dynamically
-      fs: 'pdfkit/js/virtual-fs.js',
-      // iconv-lite is used to load cid less fonts (not spec compliant)
-      'iconv-lite': false
+      fs: __dirname + '/../../js/virtual-fs.js'
     },
     fallback: {
       // crypto module is not necessary at browser
@@ -48,23 +47,6 @@ module.exports = {
       {
         test: /src[/\\]lazy-assets/,
         type: 'asset/resource'
-      },
-      // convert to base64 and include inline file system binary files used by fontkit and linebreak
-      {
-        enforce: 'post',
-        test: /fontkit[/\\]index.js$/,
-        loader: 'transform-loader',
-        options: {
-          brfs: {}
-        }
-      },
-      {
-        enforce: 'post',
-        test: /linebreak[/\\]src[/\\]linebreaker.js/,
-        loader: 'transform-loader',
-        options: {
-          brfs: {}
-        }
       }
     ]
   }

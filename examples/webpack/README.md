@@ -14,7 +14,7 @@ Simple example of using PdfKit with webpack
 [`webpack.config.js`](webpack.config.js)
 
 - add alias to map `fs` calls to pdfkit virtual file system [implementation](../../lib/virtual-fs.js)
-- ignore iconv-lite and crypto packages to save bundle file size
+- ignore crypto package to save bundle file size
 - add aliases to native node packages (buffer, stream, zlib, util, assert)
 - configure `*.afm` files to be imported as text
 - configure all files in `src/static-assets` folder to be imported encoded as base64

@@ -1,6 +1,6 @@
 import Canvas from 'canvas';
 import { strict as assert } from 'assert';
-import * as pdfjsLib from 'pdfjs-dist/es5/build/pdf';
+import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf';
 
 // adapted from https://github.com/mozilla/pdf.js/tree/master/examples/node/pdf2png
 
