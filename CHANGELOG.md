@@ -1,5 +1,9 @@
 ## pdfkit changelog
 
+### Unreleased
+
+- Fix index not counting when rendering ordered lists (#1517)
+
 ### [v0.15.1] - 2024-10-30
 
 - Fix browserify transform sRGB_IEC61966_2_1.icc file
