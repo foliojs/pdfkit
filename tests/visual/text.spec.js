@@ -20,6 +20,20 @@ describe('text', function() {
     });
   });
 
+  test('soft hyphen', function() {
+    return runDocTest(function(doc) {
+      doc.font('tests/fonts/Roboto-Regular.ttf');
+      doc.text(
+        'Text with soft hyphen - Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lo ip\u00ADsum',
+        { align: 'justify' }
+      );
+      doc.text(
+        'Text with soft hyphen on the edge - ttttestttestttestttestttestttestttestttestttestttestttes\u00ADtt\u00ADt',
+        { align: 'justify' }
+      );
+    });
+  });
+
   test('decoration', function() {
     return runDocTest(function(doc) {
       doc.font('tests/fonts/Roboto-Regular.ttf');
@@ -31,7 +45,7 @@ describe('text', function() {
         strike: true
       });
       doc.text('Strike', 100, 160, {
-        underline:true,
+        underline: true,
         strike: true
       });
     });
@@ -43,4 +57,11 @@ describe('text', function() {
       doc.fillColor('#000').list(['One', 'Two', 'Three'], 100, 150);
     });
   });
+
+  test('list with line breaks in items', function() {
+    return runDocTest(function(doc) {
+      doc.font('tests/fonts/Roboto-Regular.ttf');
+      doc.list(['Foo\nBar', 'Foo\rBar', 'Foo\r\nBar'], [100, 150]);
+    })
+  })
 });

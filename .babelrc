@@ -5,7 +5,7 @@
       {
         "modules": false,
         "targets": {
-          "node": "6.10"
+          "node": "18"
         }
       }
     ]
@@ -17,7 +17,7 @@
           "@babel/preset-env",
           {
             "targets": {
-              "node": "6.10"
+              "node": "18"
             }
           }
         ]

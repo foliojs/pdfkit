@@ -14,7 +14,7 @@ in your JavaScript source file and create an instance of the
 `PDFDocument` class.
 
     const PDFDocument = require('pdfkit');
-    const doc = new PDFDocument;
+    const doc = new PDFDocument();
 
 `PDFDocument` instances are readable Node streams. They don't get saved anywhere automatically,
 but you can call the `pipe` method to send the output of the PDF document to another
@@ -258,6 +258,36 @@ Available options includes:
 
 When using PDF version 1.7 ExtensionLevel 3, password is truncated to 127 bytes of its UTF-8 representation.
 In older versions, password is truncated to 32 bytes, and only Latin-1 characters are allowed.
+
+## PDF/A
+
+PDF/A is a standard (ISO 19005-1:2005) which defines rules for electornic documents intended for long-term archiving.
+The restrictions on PDF/A documents are:
+
+- Cannot be encrypted
+- Fonts must be embedded
+- No JavaScript
+- No audio content
+- No video content
+- Addition of XMP metadata
+- Must define color spaces
+
+Currently, PDFKit aims to support PDF/A-1b, PDF/A-2b, PDF/A-3b and PDF/A-1a, PDF/A-2a, PDF/A-3a standards, also known as level B conformance and level A conformance, respectively.
+
+In order to create PDF/A documents, set `subset` to either `PDF/A-1` or `PDF/A-1b` for level B (basic) conformance, or `PDF/A-1a` for level A (accessible) conformance when creating the `PDFDocument` in `options` object.
+
+Similary, use `PDF/A-2` or `PDF/A-2b` for PDF/A-2 level B conformance and `PDF/A-2a` for PDF/A-2 level A conformance. `PDF/A-3` or `PDF/A-3b` can be used for PDF/A-3 level B conformance and `PDF/A-3a` for PDF/A-3 level A conformance.
+
+Futhermore, you will need to specify the other options relevant to the PDF/A subset you wish to use, for PDF/A-1 being:
+
+- `pdfVersion` set to at least `1.4`
+- `tagged` set to `true` for PDF/A-1a
+
+For PDF/A-2 and PDF/A-3, the `pdfVersion` needs to be set to at least `1.7` and `tagged` needs to be `true` for level A conformance.
+
+In order to verify the generated document for PDF/A and its subsets conformance, veraPDF is an excellent open source validator.
+
+Please note that PDF/A requires fonts to be embedded, as such the standard fonts PDFKit comes with cannot be used because they are in AFM format, which only provides neccessary metrics, without the font data. You should use `registerFont()` and use embeddable fonts such as `ttf`.
 
 ### Adding content
 

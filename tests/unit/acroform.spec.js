@@ -1,22 +1,12 @@
 import PDFDocument from '../../lib/document';
 import PDFSecurity from '../../lib/security';
-import { logData } from './helpers';
+import { logData, joinTokens } from './helpers';
 import PDFFontFactory from '../../lib/font_factory';
 
 // manual mock for PDFSecurity to ensure stored id will be the same accross different systems
 PDFSecurity.generateFileID = () => {
   return Buffer.from('mocked-pdf-id');
 };
-
-function escapeRegExp(string) {
-  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
-}
-
-function joinTokens(...args) {
-  let a = args.map(i => escapeRegExp(i));
-  let r = new RegExp('^' + a.join('\\s*') + '$');
-  return r;
-}
 
 describe('acroform', () => {
   let doc;
@@ -220,6 +210,33 @@ describe('acroform', () => {
     doc.formText('flags', 20, 20, 50, 20, opts);
     expect(docData.length).toBe(3);
     expect(docData).toContainChunk(expected);
+  });
+
+  test('false flags should be ignored', () => {
+    const expectedDoc = new PDFDocument({
+      info: { CreationDate: new Date(Date.UTC(2018, 1, 1)) }
+    });
+    expectedDoc.initForm();
+    const expectedDocData = logData(expectedDoc);
+    let emptyOpts = {
+      align: 'center'
+    };
+    expectedDoc.formText('flags', 20, 20, 50, 20, emptyOpts);
+
+    doc.initForm();
+    const docData = logData(doc);
+    let opts = {
+      required: false,
+      noExport: false,
+      readOnly: false,
+      align: 'center',
+      multiline: false,
+      password: false,
+      noSpell: false
+    };
+    doc.formText('flags', 20, 20, 50, 20, opts);
+
+    expect(docData).toContainChunk(expectedDocData);
   });
 
   test('font size', () => {

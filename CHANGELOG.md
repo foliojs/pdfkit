@@ -1,6 +1,27 @@
 ## pdfkit changelog
 
-### Unreleased
+### [v0.15.1] - 2024-10-30
+
+- Fix browserify transform sRGB_IEC61966_2_1.icc file
+- Fix time comparison check equality embedded files
+
+### [v0.15.0] - 2024-03-23
+
+- Add subset for PDF/UA
+- Fix for line breaks in list items (#1486)
+- Fix for soft hyphen not being replaced by visible hyphen if necessary (#457)
+- Optimize output files by ignoring identity transforms
+- Fix for Acroforms - setting an option to false will still apply the flag (#1495)
+- Fix for text extraction in PDFium-based viewers due to invalid ToUnicodeMap (#1498)
+- Remove deprecated `write` method
+- Drop support for Node.js < 18 and for browsers released before 2020
+
+### [v0.14.0] - 2023-11-09
+
+- Add support for PDF/A-1b, PDF/A-1a, PDF/A-2b, PDF/A-2a, PDF/A-3b, PDF/A-3a
+- Update crypto-js to v4.2.0 (properly fix security issue)
+
+- Add support for EXIF orientation on JPEG images (#626 and #1353)
 
 ### [v0.13.0] - 2021-10-24
 
