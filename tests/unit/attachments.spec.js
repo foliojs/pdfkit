@@ -54,6 +54,7 @@ describe('file', () => {
       `9 0 obj`,
       `<<
 /Type /Filespec
+/AFRelationship /Unspecified
 /F (file.txt)
 /EF <<
 /F 8 0 R
@@ -112,6 +113,7 @@ describe('file', () => {
       `9 0 obj`,
       `<<
 /Type /Filespec
+/AFRelationship /Unspecified
 /F (file.txt)
 /EF <<
 /F 8 0 R
