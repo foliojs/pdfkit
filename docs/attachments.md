@@ -24,6 +24,7 @@ There are a few other options for `doc.file`:
 * `hidden` - if true, do not show file in the list of embedded files
 * `creationDate` - override the date and time the file was created
 * `modifiedDate` - override the date and time the file was last updated
+* `relationship` - relationship between the PDF document and its attached file. Can be 'Alternative', 'Data', 'Source', 'Supplement' or 'Unspecified'.
 
 If you are attaching a file from your file system, creationDate and modifiedDate will be set to the source file's creationDate and modifiedDate.
 
