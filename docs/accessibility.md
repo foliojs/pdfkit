@@ -14,6 +14,8 @@ Universal Accessibility) document (which is an extension of Tagged PDF):
  * Pass the option `pdfVersion: '1.5'` (or a higher version) when creating your `PDFDocument`
    (depending on the features you use, you may only need 1.4; refer to the PDF reference for
    details).
+ * Pass the option `subset: 'PDF/UA'` when creating your `PDFDocument` (if you wish the PDF to
+   be identified as PDF/UA-1).
  * Pass the option `tagged: true` when creating your `PDFDocument` (technically, this sets the
    `Marked` property in the `Markings` dictionary to `true` in the PDF).
  * Provide a `Title` in the `info` option, and pass `displayTitle: true` when creating your

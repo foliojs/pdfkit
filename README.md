@@ -31,7 +31,7 @@ Installation uses the [npm](http://npmjs.org/) package manager. Just type the fo
   - Transformations
   - Linear and radial gradients
 - Text
-  - Line wrapping
+  - Line wrapping (with soft hyphen recognition)
   - Text alignments
   - Bulleted lists
 - Font embedding
@@ -129,7 +129,7 @@ complex documents with a very small amount of code. For more, see the `demo` fol
 There are three ways to use PDFKit in the browser:
 
 - Use [Browserify](http://browserify.org/). See demo [source code](demo/browser.js) and [build script](https://github.com/foliojs/pdfkit/blob/master/package.json#L56)
-- Use [webpack](https://webpack.js.org/). See [complete example](https://github.com/blikblum/pdfkit-webpack-example).
+- Use [webpack](https://webpack.js.org/). See [complete example](examples/webpack).
 - Use prebuilt version. Distributed as `pdfkit.standalone.js` file in the [releases](https://github.com/foliojs/pdfkit/releases) or in the package `js` folder.
 
 In addition to PDFKit, you'll need somewhere to stream the output to. HTML5 has a

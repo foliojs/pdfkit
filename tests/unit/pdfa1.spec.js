@@ -84,5 +84,24 @@ describe('PDF/A-1', () => {
 
         expect(metadata).toContain('pdfaid:conformance>A');
     });
+
+    test('font data contains CIDSet', () => {
+        let options = {
+            autoFirstPage: false,
+            pdfVersion: '1.4',
+            subset: 'PDF/A-1a'
+        };
+        let doc = new PDFDocument(options);
+        const data = logData(doc);
+        doc.addPage();
+        doc.registerFont('Roboto', 'tests/fonts/Roboto-Regular.ttf');
+        doc.font('Roboto');
+        doc.text('Text');
+        doc.end();
+
+        let fontDescriptor = data[data.length-41];
+
+        expect(fontDescriptor).toContain('/CIDSet');
+    });
     
 });

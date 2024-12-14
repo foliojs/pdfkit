@@ -9,7 +9,7 @@
     "document",
     "vector"
   ],
-  "version": "0.13.0",
+  "version": "0.15.1",
   "homepage": "http://pdfkit.org/",
   "author": {
     "name": "Devon Govett",
@@ -31,7 +31,7 @@
     "brace": "^0.11.1",
     "brfs": "~2.0.2",
     "browserify": "^16.5.0",
-    "canvas": "^2.11.0",
+    "canvas": "^2.11.2",
     "codemirror": "~5.49.2",
     "eslint": "^7.8.1",
     "gh-pages": "^3.1.0",
@@ -48,14 +48,16 @@
     "rollup-plugin-cpy": "^2.0.1"
   },
   "dependencies": {
-    "crypto-js": "^4.0.0",
+    "crypto-js": "^4.2.0",
     "fontkit": "^1.8.1",
+    "jpeg-exif": "^1.1.4",
     "linebreak": "^1.0.2",
     "png-js": "^1.0.0"
   },
   "scripts": {
     "prepublishOnly": "npm run build",
-    "build": "rollup -c && browserify --standalone PDFDocument --ignore crypto --ignore iconv-lite js/pdfkit.js > js/pdfkit.standalone.js",
+    "build": "rollup -c && npm run build-standalone",
+    "build-standalone": "browserify --standalone PDFDocument --ignore crypto --ignore iconv-lite js/pdfkit.js > js/pdfkit.standalone.js",
     "browserify-example": "browserify examples/browserify/browser.js > examples/browserify/bundle.js",
     "pdf-guide": "node docs/generate.js",
     "website": "node docs/generate_website.js",
@@ -68,15 +70,14 @@
     "test:unit": "jest unit/"
   },
   "main": "js/pdfkit.js",
-  "module": "js/pdfkit.es5.js",
-  "esnext": "js/pdfkit.esnext.js",
+  "module": "js/pdfkit.es.js",
   "browserify": {
     "transform": [
       "brfs"
     ]
   },
   "engine": [
-    "node >= v6.0.0"
+    "node >= v18.0.0"
   ],
   "jest": {
     "testEnvironment": "jest-environment-jsdom",
