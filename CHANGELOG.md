@@ -5,6 +5,7 @@
 - Fix index not counting when rendering ordered lists (#1517)
 - Fix PDF/A3 compliance of attachments
 - Fix CIDSet generation only for PDF/A1 subset
+- Fix missing acroform font dictionary
 
 ### [v0.15.1] - 2024-10-30
 
