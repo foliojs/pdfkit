@@ -1,6 +1,6 @@
 ## pdfkit changelog
 
-### Unreleased
+### [v0.15.2] - 2024-12-15
 
 - Fix index not counting when rendering ordered lists (#1517)
 - Fix PDF/A3 compliance of attachments
