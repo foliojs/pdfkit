@@ -2,14 +2,14 @@ import PDFDocument from '../../lib/document';
 import { logData, joinTokens } from './helpers';
 
 describe('PDF/A-2', () => {
-    
+
     test('metadata is present', () => {
         let options = {
             autoFirstPage: false,
             pdfVersion: '1.7',
             subset: 'PDF/A-2'
         };
-        let doc = new PDFDocument(options); 
+        let doc = new PDFDocument(options);
         const data = logData(doc);
         doc.end();
         expect(data).toContainChunk([
@@ -36,7 +36,7 @@ describe('PDF/A-2', () => {
             pdfVersion: '1.7',
             subset: 'PDF/A-2'
         };
-        let doc = new PDFDocument(options); 
+        let doc = new PDFDocument(options);
         const data = logData(doc);
         doc.end();
         expect(data).toContainChunk(expected);
@@ -48,7 +48,7 @@ describe('PDF/A-2', () => {
             pdfVersion: '1.7',
             subset: 'PDF/A-2'
         };
-        let doc = new PDFDocument(options); 
+        let doc = new PDFDocument(options);
         const data = logData(doc);
         doc.end();
         let metadata = Buffer.from(data[27]).toString();
@@ -63,7 +63,7 @@ describe('PDF/A-2', () => {
             pdfVersion: '1.7',
             subset: 'PDF/A-2b'
         };
-        let doc = new PDFDocument(options); 
+        let doc = new PDFDocument(options);
         const data = logData(doc);
         doc.end();
         let metadata = Buffer.from(data[27]).toString();
@@ -77,7 +77,7 @@ describe('PDF/A-2', () => {
             pdfVersion: '1.7',
             subset: 'PDF/A-2a'
         };
-        let doc = new PDFDocument(options); 
+        let doc = new PDFDocument(options);
         const data = logData(doc);
         doc.end();
         let metadata = Buffer.from(data[27]).toString();
@@ -103,5 +103,5 @@ describe('PDF/A-2', () => {
 
         expect(fontDescriptor).not.toContain('/CIDSet');
     });
-    
+
 });

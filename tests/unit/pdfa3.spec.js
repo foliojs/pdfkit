@@ -2,14 +2,14 @@ import PDFDocument from '../../lib/document';
 import { logData, joinTokens } from './helpers';
 
 describe('PDF/A-3', () => {
-    
+
     test('metadata is present', () => {
         let options = {
             autoFirstPage: false,
             pdfVersion: '1.7',
             subset: 'PDF/A-3'
         };
-        let doc = new PDFDocument(options); 
+        let doc = new PDFDocument(options);
         const data = logData(doc);
         doc.end();
         expect(data).toContainChunk([
@@ -36,7 +36,7 @@ describe('PDF/A-3', () => {
             pdfVersion: '1.7',
             subset: 'PDF/A-3'
         };
-        let doc = new PDFDocument(options); 
+        let doc = new PDFDocument(options);
         const data = logData(doc);
         doc.end();
         expect(data).toContainChunk(expected);
@@ -48,7 +48,7 @@ describe('PDF/A-3', () => {
             pdfVersion: '1.7',
             subset: 'PDF/A-3'
         };
-        let doc = new PDFDocument(options); 
+        let doc = new PDFDocument(options);
         const data = logData(doc);
         doc.end();
         let metadata = Buffer.from(data[27]).toString();
@@ -63,7 +63,7 @@ describe('PDF/A-3', () => {
             pdfVersion: '1.7',
             subset: 'PDF/A-3b'
         };
-        let doc = new PDFDocument(options); 
+        let doc = new PDFDocument(options);
         const data = logData(doc);
         doc.end();
         let metadata = Buffer.from(data[27]).toString();
@@ -77,7 +77,7 @@ describe('PDF/A-3', () => {
             pdfVersion: '1.7',
             subset: 'PDF/A-3a'
         };
-        let doc = new PDFDocument(options); 
+        let doc = new PDFDocument(options);
         const data = logData(doc);
         doc.end();
         let metadata = Buffer.from(data[27]).toString();
