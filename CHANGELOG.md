@@ -1,5 +1,13 @@
 ## pdfkit changelog
 
+### [v0.15.2] - 2024-12-15
+
+- Fix index not counting when rendering ordered lists (#1517)
+- Fix PDF/A3 compliance of attachments
+- Fix CIDSet generation only for PDF/A1 subset
+- Fix missing acroform font dictionary
+- Fix modify time comparison check equality embedded files
+
 ### [v0.15.1] - 2024-10-30
 
 - Fix browserify transform sRGB_IEC61966_2_1.icc file

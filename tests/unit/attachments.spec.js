@@ -54,6 +54,7 @@ describe('file', () => {
       `9 0 obj`,
       `<<
 /Type /Filespec
+/AFRelationship /Unspecified
 /F (file.txt)
 /EF <<
 /F 8 0 R
@@ -112,6 +113,7 @@ describe('file', () => {
       `9 0 obj`,
       `<<
 /Type /Filespec
+/AFRelationship /Unspecified
 /F (file.txt)
 /EF <<
 /F 8 0 R
@@ -212,9 +214,9 @@ describe('file', () => {
     document.end();
 
     const numFiles = docData.filter((str) => typeof str === 'string' && str.startsWith('<<\n/Type /EmbeddedFile\n'))
-    
+
     expect(numFiles.length).toEqual(1)
-    
+
     expect(docData).toContainChunk([
       `2 0 obj`,
       `<<
