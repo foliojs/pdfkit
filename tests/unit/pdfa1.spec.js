@@ -99,7 +99,11 @@ describe('PDF/A-1', () => {
         doc.text('Text');
         doc.end();
 
-        let fontDescriptor = data[data.length-41];
+        let fontDescriptor = data.find((v) => {
+            return v.includes('/Type /FontDescriptor');
+        });
+
+        expect(fontDescriptor).not.toBeUndefined();
 
         expect(fontDescriptor).toContain('/CIDSet');
     });
