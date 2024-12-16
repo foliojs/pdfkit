@@ -39,7 +39,7 @@
     "jest-environment-jsdom": "^29.4.3",
     "jest-image-snapshot": "^6.1.0",
     "markdown": "~0.5.0",
-    "pdfjs-dist": "^2.14.305",
+    "pdfjs-dist": "^4.2.67",
     "prettier": "1.19.1",
     "pug": "^2.0.4",
     "rollup": "^1.27.0",
