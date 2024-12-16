@@ -1,5 +1,10 @@
 ## pdfkit changelog
 
+### Unreleased
+
+- Update fontkit to 2.0
+- Update linebreak to 1.1
+
 ### [v0.15.2] - 2024-12-15
 
 - Fix index not counting when rendering ordered lists (#1517)
