@@ -1,4 +1,4 @@
-<!DOCTYPE html><html><head><meta charset="utf-8"><title>Getting Started with PDFKit</title><link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Source+Code+Pro:400,700|Alegreya:700|Merriweather"><link rel="stylesheet" href="/docs/css/index.css"><link rel="stylesheet" href="/docs/css/github.css"></head><body><nav class="sidebar"><ul><li><a href="/">Home</a></li><li><a href="/docs/../index.html">Documentation</a><ul><li><a class="selected" href="/docs/getting_started.html">Getting Started </a><ul><li><a href="#installation">Installation</a></li><li><a href="#creating_a_document">Creating a document</a></li><li><a href="#using_pdfkit_in_the_browser">Using PDFKit in the browser</a></li><li><a href="#adding_pages">Adding pages</a></li><li><a href="#switching_to_previous_pages">Switching to previous pages</a></li><li><a href="#setting_default_font">Setting default font</a></li><li><a href="#setting_document_metadata">Setting document metadata</a></li><li><a href="#encryption_and_access_privileges">Encryption and Access Privileges</a></li><li><a href="#adding_content">Adding content</a></li></ul></li><li><a href="/docs/paper_sizes.html">Paper Sizes</a></li><li><a href="/docs/vector.html">Vector Graphics </a></li><li><a href="/docs/text.html">Text </a></li><li><a href="/docs/images.html">Images </a></li><li><a href="/docs/outline.html">Outlines </a></li><li><a href="/docs/annotations.html">Annotations </a></li><li><a href="/docs/forms.html">Forms </a></li><li><a href="/docs/destinations.html">Destinations</a></li><li><a href="/docs/attachments.html">Attachments </a></li><li><a href="/docs/accessibility.html">Accessibility</a></li><li><a href="/docs/you_made_it.html">You made it!</a></li></ul></li><li><a href="/docs/guide.pdf">PDF Guide</a></li><li><a href="/demo/out.pdf">Example PDF</a></li><li><a href="/demo/browser.html">Interactive Browser Demo</a></li><li><a href="http://github.com/foliojs/pdfkit">Source Code</a></li></ul></nav><div class="main"><h1 id="getting_started_with_pdfkit">Getting Started with PDFKit</h1>
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>Getting Started with PDFKit</title><link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Source+Code+Pro:400,700|Alegreya:700|Merriweather"><link rel="stylesheet" href="/docs/css/index.css"><link rel="stylesheet" href="/docs/css/github.css"></head><body><nav class="sidebar"><ul><li><a href="/">Home</a></li><li><a href="/docs/../index.html">Documentation</a><ul><li><a class="selected" href="/docs/getting_started.html">Getting Started </a><ul><li><a href="#installation">Installation</a></li><li><a href="#creating_a_document">Creating a document</a></li><li><a href="#using_pdfkit_in_the_browser">Using PDFKit in the browser</a></li><li><a href="#adding_pages">Adding pages</a></li><li><a href="#switching_to_previous_pages">Switching to previous pages</a></li><li><a href="#setting_default_font">Setting default font</a></li><li><a href="#setting_document_metadata">Setting document metadata</a></li><li><a href="#encryption_and_access_privileges">Encryption and Access Privileges</a></li><li><a href="#pdf/a">PDF/A</a></li><li><a href="#adding_content">Adding content</a></li></ul></li><li><a href="/docs/paper_sizes.html">Paper Sizes</a></li><li><a href="/docs/vector.html">Vector Graphics </a></li><li><a href="/docs/text.html">Text </a></li><li><a href="/docs/images.html">Images </a></li><li><a href="/docs/outline.html">Outlines </a></li><li><a href="/docs/annotations.html">Annotations </a></li><li><a href="/docs/forms.html">Forms </a></li><li><a href="/docs/destinations.html">Destinations</a></li><li><a href="/docs/attachments.html">Attachments </a></li><li><a href="/docs/accessibility.html">Accessibility</a></li><li><a href="/docs/you_made_it.html">You made it!</a></li></ul></li><li><a href="/docs/guide.pdf">PDF Guide</a></li><li><a href="/examples/kitchen-sink.pdf">Example PDF</a></li><li><a href="/demo/browser.html">Interactive Browser Demo</a></li><li><a href="http://github.com/foliojs/pdfkit">Source Code</a></li></ul></nav><div class="main"><h1 id="getting_started_with_pdfkit">Getting Started with PDFKit</h1>
 
 <h2 id="installation">Installation</h2>
 
@@ -14,7 +14,7 @@ in your JavaScript source file and create an instance of the
 <code>PDFDocument</code> class.</p>
 
 <pre><code>const PDFDocument = require(&#39;pdfkit&#39;);
-const doc = new PDFDocument;</code></pre>
+const doc = new PDFDocument();</code></pre>
 
 <p><code>PDFDocument</code> instances are readable Node streams. They don&#39;t get saved anywhere automatically,
 but you can call the <code>pipe</code> method to send the output of the PDF document to another
@@ -157,7 +157,7 @@ doc.addPage();
 // see the range of buffered pages
 const range = doc.bufferedPageRange(); // =&gt; { start: 0, count: 2 }
 
-for (i = range.start, end = range.start + range.count, range.start &lt;= end; i &lt; end; i++;) {
+for (i = range.start, end = range.start + range.count, range.start &lt;= end; i &lt; end; i++) {
   doc.switchToPage(i);
   doc.text(`Page ${i + 1} of ${range.count}`);
 }
@@ -239,6 +239,29 @@ PDFKit will choose best encryption method available in the PDF version you speci
 
 <p>When using PDF version 1.7 ExtensionLevel 3, password is truncated to 127 bytes of its UTF-8 representation.
 In older versions, password is truncated to 32 bytes, and only Latin-1 characters are allowed.</p>
+
+<h2 id="pdf/a">PDF/A</h2>
+
+<p>PDF/A is a standard (ISO 19005-1:2005) which defines rules for electornic documents intended for long-term archiving.
+The restrictions on PDF/A documents are:</p>
+
+<ul><li>Cannot be encrypted</li><li>Fonts must be embedded</li><li>No JavaScript</li><li>No audio content</li><li>No video content</li><li>Addition of XMP metadata</li><li>Must define color spaces</li></ul>
+
+<p>Currently, PDFKit aims to support PDF/A-1b, PDF/A-2b, PDF/A-3b and PDF/A-1a, PDF/A-2a, PDF/A-3a standards, also known as level B conformance and level A conformance, respectively.</p>
+
+<p>In order to create PDF/A documents, set <code>subset</code> to either <code>PDF/A-1</code> or <code>PDF/A-1b</code> for level B (basic) conformance, or <code>PDF/A-1a</code> for level A (accessible) conformance when creating the <code>PDFDocument</code> in <code>options</code> object.</p>
+
+<p>Similary, use <code>PDF/A-2</code> or <code>PDF/A-2b</code> for PDF/A-2 level B conformance and <code>PDF/A-2a</code> for PDF/A-2 level A conformance. <code>PDF/A-3</code> or <code>PDF/A-3b</code> can be used for PDF/A-3 level B conformance and <code>PDF/A-3a</code> for PDF/A-3 level A conformance.</p>
+
+<p>Futhermore, you will need to specify the other options relevant to the PDF/A subset you wish to use, for PDF/A-1 being:</p>
+
+<ul><li><code>pdfVersion</code> set to at least <code>1.4</code></li><li><code>tagged</code> set to <code>true</code> for PDF/A-1a</li></ul>
+
+<p>For PDF/A-2 and PDF/A-3, the <code>pdfVersion</code> needs to be set to at least <code>1.7</code> and <code>tagged</code> needs to be <code>true</code> for level A conformance.</p>
+
+<p>In order to verify the generated document for PDF/A and its subsets conformance, veraPDF is an excellent open source validator.</p>
+
+<p>Please note that PDF/A requires fonts to be embedded, as such the standard fonts PDFKit comes with cannot be used because they are in AFM format, which only provides neccessary metrics, without the font data. You should use <code>registerFont()</code> and use embeddable fonts such as <code>ttf</code>.</p>
 
 <h2 id="adding_content">Adding content</h2>
 

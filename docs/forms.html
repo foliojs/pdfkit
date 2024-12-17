@@ -1,11 +1,15 @@
-<!DOCTYPE html><html><head><meta charset="utf-8"><title>Forms in PDFKit</title><link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Source+Code+Pro:400,700|Alegreya:700|Merriweather"><link rel="stylesheet" href="/docs/css/index.css"><link rel="stylesheet" href="/docs/css/github.css"></head><body><nav class="sidebar"><ul><li><a href="/">Home</a></li><li><a href="/docs/../index.html">Documentation</a><ul><li><a href="/docs/getting_started.html">Getting Started </a></li><li><a href="/docs/paper_sizes.html">Paper Sizes</a></li><li><a href="/docs/vector.html">Vector Graphics </a></li><li><a href="/docs/text.html">Text </a></li><li><a href="/docs/images.html">Images </a></li><li><a href="/docs/outline.html">Outlines </a></li><li><a href="/docs/annotations.html">Annotations </a></li><li><a class="selected" href="/docs/forms.html">Forms </a><ul><li><a href="#form_annotation_methods">Form Annotation Methods</a></li><li><a href="#name_parameter">name Parameter</a></li><li><a href="#options_parameter">options Parameter</a></li><li><a href="#common_options">Common Options</a></li><li><a href="#text_field_options">Text Field Options</a></li><li><a href="#combo_and_list_field_options">Combo and List Field Options</a></li><li><a href="#button_field_options">Button Field Options</a></li><li><a href="#text_field_formatting">Text Field Formatting</a></li><li><a href="#date_format">Date format</a></li><li><a href="#time_format">Time format</a></li><li><a href="#number_and_percent_format">Number and percent format</a></li><li><a href="#field_names">Field Names</a></li><li><a href="#advanced_form_field_use">Advanced Form Field Use</a></li><li><a href="#font">Font</a></li><li><a href="#named_javascript">Named JavaScript</a></li><li><a href="#limitations">Limitations</a></li><li><a href="#form_field_appearances">Form Field Appearances</a></li><li><a href="#document_javascript">Document JavaScript</a></li><li><a href="#radio_and_checkboxes">Radio and Checkboxes</a></li></ul></li><li><a href="/docs/destinations.html">Destinations</a></li><li><a href="/docs/attachments.html">Attachments </a></li><li><a href="/docs/accessibility.html">Accessibility</a></li><li><a href="/docs/you_made_it.html">You made it!</a></li></ul></li><li><a href="/docs/guide.pdf">PDF Guide</a></li><li><a href="/demo/out.pdf">Example PDF</a></li><li><a href="/demo/browser.html">Interactive Browser Demo</a></li><li><a href="http://github.com/foliojs/pdfkit">Source Code</a></li></ul></nav><div class="main"><h1 id="forms_in_pdfkit">Forms in PDFKit</h1>
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>Forms in PDFKit</title><link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Source+Code+Pro:400,700|Alegreya:700|Merriweather"><link rel="stylesheet" href="/docs/css/index.css"><link rel="stylesheet" href="/docs/css/github.css"></head><body><nav class="sidebar"><ul><li><a href="/">Home</a></li><li><a href="/docs/../index.html">Documentation</a><ul><li><a href="/docs/getting_started.html">Getting Started </a></li><li><a href="/docs/paper_sizes.html">Paper Sizes</a></li><li><a href="/docs/vector.html">Vector Graphics </a></li><li><a href="/docs/text.html">Text </a></li><li><a href="/docs/images.html">Images </a></li><li><a href="/docs/outline.html">Outlines </a></li><li><a href="/docs/annotations.html">Annotations </a></li><li><a class="selected" href="/docs/forms.html">Forms </a><ul><li><a href="#form_annotation_methods">Form Annotation Methods</a></li><li><a href="#name_parameter">name Parameter</a></li><li><a href="#options_parameter">options Parameter</a></li><li><a href="#common_options">Common Options</a></li><li><a href="#text_field_options">Text Field Options</a></li><li><a href="#combo_and_list_field_options">Combo and List Field Options</a></li><li><a href="#button_field_options">Button Field Options</a></li><li><a href="#text_field_formatting">Text Field Formatting</a></li><li><a href="#date_format">Date format</a></li><li><a href="#time_format">Time format</a></li><li><a href="#number_and_percent_format">Number and percent format</a></li><li><a href="#field_names">Field Names</a></li><li><a href="#advanced_form_field_use">Advanced Form Field Use</a></li><li><a href="#font">Font</a></li><li><a href="#named_javascript">Named JavaScript</a></li><li><a href="#limitations">Limitations</a></li><li><a href="#form_field_appearances">Form Field Appearances</a></li><li><a href="#document_javascript">Document JavaScript</a></li><li><a href="#radio_and_checkboxes">Radio and Checkboxes</a></li></ul></li><li><a href="/docs/destinations.html">Destinations</a></li><li><a href="/docs/attachments.html">Attachments </a></li><li><a href="/docs/accessibility.html">Accessibility</a></li><li><a href="/docs/you_made_it.html">You made it!</a></li></ul></li><li><a href="/docs/guide.pdf">PDF Guide</a></li><li><a href="/examples/kitchen-sink.pdf">Example PDF</a></li><li><a href="/demo/browser.html">Interactive Browser Demo</a></li><li><a href="http://github.com/foliojs/pdfkit">Source Code</a></li></ul></nav><div class="main"><h1 id="forms_in_pdfkit">Forms in PDFKit</h1>
 
 <p>Forms are an interactive feature of the PDF format. Forms make it possible to
 add form annotations such as text fields, combo boxes, buttons and actions.
 Before addings forms to a PDF you must call the document <code>initForm()</code> method.</p>
 
-<ul><li><p><code>initForm()</code> - Must be called before adding a form annotation to the document.</p><p>doc.font(&#39;Helvetica&#39;); // establishes the default form field font
-doc.initForm();</p></li></ul>
+<ul><li><code>initForm()</code> - Must be called before adding a form annotation to the document.</li></ul>
+
+<p><code>javascript
+doc.font(&#39;Helvetica&#39;); // establishes the default form field font
+doc.initForm();
+</code></p>
 
 <h2 id="form_annotation_methods">Form Annotation Methods</h2>
 
@@ -45,7 +49,7 @@ a hex color, or a named CSS color value for that option.</p>
 <h2 id="text_field_options">Text Field Options</h2>
 
 <ul><li><code>align</code> [<em>string</em>] - Sets the alignment to <code>left</code>,
-<code>center</code> or <code>right</code>.</li><li><code>multiline</code> [<em>boolean</em>] - Allows the field to have multiple lines of text.</li><li><code>password</code> [<em>boolean</em>] - The text will be masked (<em>e.g.</em> with asterisks).</li><li><code>noSpell</code> [<em>boolean</em>] - If set, text entered in the field is not spell-checked</li><li><code>format</code> [<em>object</em>] - See the section on <strong>Text Field Formatting</strong> below.</li></ul>
+<code>center</code> or <code>right</code>.</li><li><code>multiline</code> [<em>boolean</em>] - Allows the field to have multiple lines of text.</li><li><code>password</code> [<em>boolean</em>] - The text will be masked (<em>e.g.</em> with asterisks).</li><li><code>noSpell</code> [<em>boolean</em>] - If set, text entered in the field is not spell-checked</li><li><code>format</code> [<em>object</em>] - See the section on <strong>Text Field Formatting</strong> below.</li><li><code>fontSize</code> [<em>number</em>] - Sets the fontSize (default or 0 means auto sizing)</li></ul>
 
 <p><code>js
 doc.formText(&#39;leaf2&#39;, 10, 60, 200, 40, {
@@ -178,14 +182,15 @@ field as it&#39;s parent, and a <em>street</em> Form Annotation that would refer
 <p>-- <em>Example PDF using field hierarchy, three text fields and a push
 button</em> --</p>
 
-<pre><code>doc.font(&#39;Helvetica&#39;); // establishes the default font
-doc.initForm();
+<p><code></code>`javascript
+doc.font(&#39;Helvetica&#39;); // establishes the default font
+doc.initForm();</p>
 
-let rootField = doc.formField(&#39;rootField&#39;);
+<p>let rootField = doc.formField(&#39;rootField&#39;);
 let child1Field = doc.formField(&#39;child1Field&#39;, { parent: rootField });
-let child2Field = doc.formField(&#39;child2Field&#39;, { parent: rootField });
+let child2Field = doc.formField(&#39;child2Field&#39;, { parent: rootField });</p>
 
-// Add text form annotation &#39;rootField.child1Field.leaf1&#39;
+<p>// Add text form annotation &#39;rootField.child1Field.leaf1&#39;
 doc.formText(&#39;leaf1&#39;, 10, 10, 200, 40, {
   parent: child1Field,
   multiline: true
@@ -199,14 +204,15 @@ doc.formText(&#39;leaf2&#39;, 10, 60, 200, 40, {
 doc.formText(&#39;leaf1&#39;, 10, 110, 200, 80, {
   parent: child2Field,
   multiline: true
-});
+});</p>
 
-// Add push button form annotation &#39;btn1&#39;
+<p>// Add push button form annotation &#39;btn1&#39;
 var opts = {
   backgroundColor: &#39;yellow&#39;,
   label: &#39;Test Button&#39;
 };
-doc.formPushButton(&#39;btn1&#39;, 10, 200, 100, 30, opts);</code></pre>
+doc.formPushButton(&#39;btn1&#39;, 10, 200, 100, 30, opts);
+<code></code>`</p>
 
 <p>The output of this example looks like this.</p>
 

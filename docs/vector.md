@@ -145,7 +145,8 @@ The output of this example looks like this.
 
 The `dash` method allows you to create non-continuous dashed lines. It takes a
 length specifying how long each dash should be, as well as an optional hash
-describing the additional properties `space` and `phase`.
+describing the additional properties `space` and `phase`. Lengths must be positive
+numbers; `dash` will throw if passed invalid lengths.
 
 The `space` option defines the length of the space between each dash, and the `phase` option
 defines the starting point of the sequence of dashes. By default the `space`
