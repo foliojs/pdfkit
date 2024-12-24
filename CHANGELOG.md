@@ -6,6 +6,7 @@
 - Update linebreak to 1.1
 - Fix measuring text when OpenType features are passed in to .text()
 - Add support for dynamic sizing
+- Add table generation
 
 ### [v0.15.2] - 2024-12-15
 
