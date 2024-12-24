@@ -1,6 +1,6 @@
 import pkg from './package.json';
-import babel from 'rollup-plugin-babel';
-import copy from 'rollup-plugin-cpy';
+import { babel } from '@rollup/plugin-babel';
+import copy from 'rollup-plugin-copy';
 
 const external = [
   'stream',
@@ -12,7 +12,13 @@ const external = [
   'png-js',
   'crypto-js',
   'saslprep',
-  'jpeg-exif',
+  'jpeg-exif'
+];
+
+const supportedBrowsers = [
+  'Firefox 102', // ESR from 2022
+  'iOS 14', // from 2020
+  'Safari 14' // from 2020
 ];
 
 export default [
@@ -29,6 +35,7 @@ export default [
     },
     plugins: [
       babel({
+        babelHelpers: 'bundled',
         babelrc: false,
         presets: [
           [
@@ -36,42 +43,15 @@ export default [
             {
               modules: false,
               targets: {
-                node: '6.10'
+                node: '18'
               }
             }
           ]
         ]
       }),
       copy({
-        files: ['lib/font/data/*.afm', 'lib/color_profiles/*.icc'],
-        dest: 'js/data'
-      })
-    ]
-  },
-  // ES for legacy (IE11) browsers
-  {
-    input: 'lib/document.js',
-    external,
-    output: {
-      name: 'pdfkit.es5',
-      file: pkg.module,
-      format: 'es',
-      sourcemap: true
-    },
-    plugins: [
-      babel({
-        babelrc: false,
-        presets: [
-          [
-            '@babel/preset-env',
-            {
-              modules: false,
-              targets: {
-                browsers: ['ie 11']
-              },
-              exclude: ['@babel/plugin-transform-typeof-symbol']
-            }
-          ]
+        targets: [
+          { src: ['lib/font/data/*.afm', 'lib/mixins/data/*.icc'], dest: 'js/data' },
         ]
       })
     ]
@@ -81,13 +61,14 @@ export default [
     input: 'lib/document.js',
     external,
     output: {
-      name: 'pdfkit.esnext',
-      file: pkg.esnext,
+      name: 'pdfkit.es',
+      file: pkg.module,
       format: 'es',
       sourcemap: true
     },
     plugins: [
       babel({
+        babelHelpers: 'bundled',
         babelrc: false,
         presets: [
           [
@@ -95,13 +76,7 @@ export default [
             {
               modules: false,
               targets: {
-                browsers: [
-                  'Firefox 57',
-                  'Edge 15',
-                  'Chrome 60',
-                  'iOS 10',
-                  'Safari 10'
-                ]
+                browsers: supportedBrowsers
               }
             }
           ]
@@ -120,6 +95,7 @@ export default [
     },
     plugins: [
       babel({
+        babelHelpers: 'bundled',
         babelrc: false,
         presets: [
           [
@@ -128,7 +104,7 @@ export default [
               loose: true,
               modules: false,
               targets: {
-                browsers: ['ie 11']
+                browsers: supportedBrowsers
               }
             }
           ]

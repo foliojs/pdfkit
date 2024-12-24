@@ -2,9 +2,32 @@
 
 ### Unreleased
 
+- Update fontkit to 2.0
+- Update linebreak to 1.1
+
+### [v0.15.2] - 2024-12-15
+
+- Fix index not counting when rendering ordered lists (#1517)
+- Fix PDF/A3 compliance of attachments
+- Fix CIDSet generation only for PDF/A1 subset
+- Fix missing acroform font dictionary
+- Fix modify time comparison check equality embedded files
+
+### [v0.15.1] - 2024-10-30
+
+- Fix browserify transform sRGB_IEC61966_2_1.icc file
+- Fix time comparison check equality embedded files
+
+### [v0.15.0] - 2024-03-23
+
 - Add subset for PDF/UA
 - Fix for line breaks in list items (#1486)
 - Fix for soft hyphen not being replaced by visible hyphen if necessary (#457)
+- Optimize output files by ignoring identity transforms
+- Fix for Acroforms - setting an option to false will still apply the flag (#1495)
+- Fix for text extraction in PDFium-based viewers due to invalid ToUnicodeMap (#1498)
+- Remove deprecated `write` method
+- Drop support for Node.js < 18 and for browsers released before 2020
 
 ### [v0.14.0] - 2023-11-09
 

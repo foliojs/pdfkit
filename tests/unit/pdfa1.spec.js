@@ -2,14 +2,14 @@ import PDFDocument from '../../lib/document';
 import { logData, joinTokens } from './helpers';
 
 describe('PDF/A-1', () => {
-    
+
     test('metadata is present', () => {
         let options = {
             autoFirstPage: false,
             pdfVersion: '1.4',
             subset: 'PDF/A-1'
         };
-        let doc = new PDFDocument(options); 
+        let doc = new PDFDocument(options);
         const data = logData(doc);
         doc.end();
         expect(data).toContainChunk([
@@ -36,7 +36,7 @@ describe('PDF/A-1', () => {
             pdfVersion: '1.4',
             subset: 'PDF/A-1'
         };
-        let doc = new PDFDocument(options); 
+        let doc = new PDFDocument(options);
         const data = logData(doc);
         doc.end();
         expect(data).toContainChunk(expected);
@@ -48,7 +48,7 @@ describe('PDF/A-1', () => {
             pdfVersion: '1.4',
             subset: 'PDF/A-1'
         };
-        let doc = new PDFDocument(options); 
+        let doc = new PDFDocument(options);
         const data = logData(doc);
         doc.end();
         let metadata = Buffer.from(data[27]).toString();
@@ -63,7 +63,7 @@ describe('PDF/A-1', () => {
             pdfVersion: '1.4',
             subset: 'PDF/A-1b'
         };
-        let doc = new PDFDocument(options); 
+        let doc = new PDFDocument(options);
         const data = logData(doc);
         doc.end();
         let metadata = Buffer.from(data[27]).toString();
@@ -77,12 +77,35 @@ describe('PDF/A-1', () => {
             pdfVersion: '1.4',
             subset: 'PDF/A-1a'
         };
-        let doc = new PDFDocument(options); 
+        let doc = new PDFDocument(options);
         const data = logData(doc);
         doc.end();
         let metadata = Buffer.from(data[27]).toString();
 
         expect(metadata).toContain('pdfaid:conformance>A');
     });
-    
+
+    test('font data contains CIDSet', () => {
+        let options = {
+            autoFirstPage: false,
+            pdfVersion: '1.4',
+            subset: 'PDF/A-1a'
+        };
+        let doc = new PDFDocument(options);
+        const data = logData(doc);
+        doc.addPage();
+        doc.registerFont('Roboto', 'tests/fonts/Roboto-Regular.ttf');
+        doc.font('Roboto');
+        doc.text('Text');
+        doc.end();
+
+        let fontDescriptor = data.find((v) => {
+            return v.includes('/Type /FontDescriptor');
+        });
+
+        expect(fontDescriptor).not.toBeUndefined();
+
+        expect(fontDescriptor).toContain('/CIDSet');
+    });
+
 });
