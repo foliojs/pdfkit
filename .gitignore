@@ -1,12 +1,2 @@
-lib/font/tables/.DS_Store
 .DS_Store
-/node_modules/
-node-zlib/
-src/
-playground/
-build/
-js/
 .vscode
-coverage
-tests/integration/__pdfs__
-tests/integration/pdfmake/__pdfs__
