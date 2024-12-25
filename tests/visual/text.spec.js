@@ -92,4 +92,13 @@ describe('text', function() {
       doc.fillColor('#000').list(['One', ['One.One', 'One.Two'], 'Three'], 100, 150, {listType: 'numbered'});
     })
   })
+
+  test('continued text with OpenType features', function() {
+    return runDocTest(function(doc) {
+      doc.font('tests/fonts/Roboto-Regular.ttf');
+      doc.text('Really simple', 100, 100, {features: ['smcp'], continued: true, lineBreak: false})
+      doc.text(' text', {features: [], lineBreak: false});
+    });
+  });
+
 });
