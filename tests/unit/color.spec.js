@@ -53,7 +53,7 @@ describe('color', function() {
       doc.fillColor('PANTONE185C')
          .text('This text uses spot color!');
       doc.end();
-      console.log(data);
+
       expect(data).toContainChunk([
           `6 0 obj`,
           '<<\n' +
