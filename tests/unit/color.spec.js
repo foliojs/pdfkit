@@ -1,5 +1,5 @@
 import PDFDocument from '../../lib/document';
-import { logData, joinTokens } from './helpers';
+import { logData } from './helpers';
 
 describe('color', function() {
   test('normalize', function() {
