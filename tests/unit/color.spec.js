@@ -1,4 +1,5 @@
 import PDFDocument from '../../lib/document';
+import { logData, joinTokens } from './helpers';
 
 describe('color', function() {
   test('normalize', function() {
@@ -34,5 +35,36 @@ describe('color', function() {
       0.18,
       1
     ]);
+  });
+
+  test('normalize with spot color', function() {
+    const doc = new PDFDocument();
+    doc.addSpotColor('PANTONE 123 C', 0.1, 0.2, 0.3, 0.4);
+
+    const color = doc._normalizeColor('PANTONE 123 C');
+    expect(color.id).toEqual('CS0');
+    expect(color.values).toEqual([0.1, 0.2, 0.3, 0.4]);
+  });
+
+  test('spot color', function() {
+      const doc = new PDFDocument();
+      const data = logData(doc);
+      doc.addSpotColor('PANTONE185C', 0, 100, 78, 9)
+      doc.fillColor('PANTONE185C')
+         .text('This text uses spot color!');
+      doc.end();
+      console.log(data);
+      expect(data).toContainChunk([
+          `6 0 obj`,
+          '<<\n' +
+          '/ProcSet [/PDF /Text /ImageB /ImageC /ImageI]\n' +
+          '/ColorSpace <<\n' +
+          '/CS0 8 0 R\n' +
+          '>>\n' +
+          '/Font <<\n' +
+          '/F1 9 0 R\n' +
+          '>>\n' +
+          '>>',
+      ]);
   });
 });
