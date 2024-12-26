@@ -164,4 +164,26 @@ describe('Vector Graphics', () => {
       });
     });
   });
+
+  describe('translate', () => {
+    test('identity transform is ignored', () => {
+      const docData = logData(document);
+      const vectorStream = Buffer.from(`1 0 0 -1 0 792 cm\n1 0 0 1 0 0 cm\n`, 'binary');
+
+      document
+        .translate(0, 0);
+      document.end();
+
+      expect(docData).not.toContainChunk([
+        `5 0 obj`,
+        `<<
+/Length 33
+>>`,
+        `stream`,
+        vectorStream,
+        `\nendstream`,
+        `endobj`
+      ]);
+    });
+  });
 });

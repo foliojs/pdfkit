@@ -14,7 +14,7 @@ in your JavaScript source file and create an instance of the
 `PDFDocument` class.
 
     const PDFDocument = require('pdfkit');
-    const doc = new PDFDocument;
+    const doc = new PDFDocument();
 
 `PDFDocument` instances are readable Node streams. They don't get saved anywhere automatically,
 but you can call the `pipe` method to send the output of the PDF document to another
@@ -286,6 +286,8 @@ Futhermore, you will need to specify the other options relevant to the PDF/A sub
 For PDF/A-2 and PDF/A-3, the `pdfVersion` needs to be set to at least `1.7` and `tagged` needs to be `true` for level A conformance.
 
 In order to verify the generated document for PDF/A and its subsets conformance, veraPDF is an excellent open source validator.
+
+Please note that PDF/A requires fonts to be embedded, as such the standard fonts PDFKit comes with cannot be used because they are in AFM format, which only provides neccessary metrics, without the font data. You should use `registerFont()` and use embeddable fonts such as `ttf`.
 
 ### Adding content
 
