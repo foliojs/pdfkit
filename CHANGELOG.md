@@ -5,6 +5,7 @@
 - Update fontkit to 2.0
 - Update linebreak to 1.1
 - Add support for spot colors
+- Fix sets tab order to "Structure" when a document is tagged
 - Fix measuring text when OpenType features are passed in to .text()
 
 ### [v0.15.2] - 2024-12-15
