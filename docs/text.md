@@ -94,6 +94,7 @@ below.
 * `lineGap` - the amount of space between each line of text
 * `wordSpacing` - the amount of space between each word in the text
 * `characterSpacing` - the amount of space between each character in the text
+* `horizontalScaling` - ability to scale text horizontally (`100` percent by default)
 * `fill` - whether to fill the text (`true` by default)
 * `stroke` - whether to stroke the text
 * `link` - a URL to link this text to (shortcut to create an annotation)

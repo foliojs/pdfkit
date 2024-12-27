@@ -118,4 +118,36 @@ doc.moveDown()
     .fillColor('PANTONE185C')
     .text('This text uses spot color!');
 
+doc.moveDown();
+
+doc
+  .font('Helvetica')
+  .fillColor('#000')
+  .text('Horizontal scaling support:');
+
+doc.moveDown();
+
+doc
+  .text(loremIpsum, {
+    height: 100,
+    width: 300,
+    align: 'justify',
+  });
+
+doc
+  .text(loremIpsum, {
+    height: 100,
+    width: 300,
+    align: 'justify',
+    horizontalScaling: 75
+  });
+
+doc
+  .text(loremIpsum, {
+    height: 100,
+    width: 300,
+    align: 'justify',
+    horizontalScaling: 130
+  });
+
 doc.end();

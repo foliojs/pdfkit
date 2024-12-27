@@ -5,6 +5,7 @@
 - Update fontkit to 2.0
 - Update linebreak to 1.1
 - Add support for spot colors
+- Add support to scale text horizontally
 - Fix sets tab order to "Structure" when a document is tagged
 - Fix font cache collision for fonts with missing postscript name or bad TTF metadata
 - Fix measuring text when OpenType features are passed in to .text()
