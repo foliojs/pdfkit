@@ -1,24 +1,15 @@
-/*
- * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
- * DS103: Rewrite code to no longer use __guard__
- * DS205: Consider reworking code to avoid use of IIFEs
- * DS207: Consider shorter variations of null checks
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
 const fs = require('fs');
 const vm = require('vm');
-const md = require('markdown').markdown;
-const coffee = require('coffee-script');
+const { markdown } = require('markdown');
 const CodeMirror = require('codemirror/addon/runmode/runmode.node');
 const PDFDocument = require('../');
 
 process.chdir(__dirname);
 
-// setup code mirror coffeescript mode
-const filename = require.resolve('codemirror/mode/coffeescript/coffeescript');
-const coffeeMode = fs.readFileSync(filename, 'utf8');
-vm.runInNewContext(coffeeMode, {CodeMirror});
+// setup code mirror javascript mode
+const filename = require.resolve('codemirror/mode/javascript/javascript');
+const jsMode = fs.readFileSync(filename, 'utf8');
+vm.runInNewContext(jsMode, { CodeMirror });
 
 // style definitions for markdown
 const styles = {
@@ -72,7 +63,7 @@ const styles = {
     padding: 10
   }
 };
-    
+
 // syntax highlighting colors
 // based on Github's theme
 const colors = {
@@ -102,13 +93,14 @@ const colors = {
 };
 
 // shared lorem ipsum text so we don't need to copy it into every example
-const lorem = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam in suscipit purus. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Vivamus nec hendrerit felis. Morbi aliquam facilisis risus eu lacinia. Sed eu leo in turpis fringilla hendrerit. Ut nec accumsan nisl. Suspendisse rhoncus nisl posuere tortor tempus et dapibus elit porta. Cras leo neque, elementum a rhoncus ut, vestibulum non nibh. Phasellus pretium justo turpis. Etiam vulputate, odio vitae tincidunt ultricies, eros odio dapibus nisi, ut tincidunt lacus arcu eu elit. Aenean velit erat, vehicula eget lacinia ut, dignissim non tellus. Aliquam nec lacus mi, sed vestibulum nunc. Suspendisse potenti. Curabitur vitae sem turpis. Vestibulum sed neque eget dolor dapibus porttitor at sit amet sem. Fusce a turpis lorem. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae;';
+const lorem =
+  'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam in suscipit purus. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Vivamus nec hendrerit felis. Morbi aliquam facilisis risus eu lacinia. Sed eu leo in turpis fringilla hendrerit. Ut nec accumsan nisl. Suspendisse rhoncus nisl posuere tortor tempus et dapibus elit porta. Cras leo neque, elementum a rhoncus ut, vestibulum non nibh. Phasellus pretium justo turpis. Etiam vulputate, odio vitae tincidunt ultricies, eros odio dapibus nisi, ut tincidunt lacus arcu eu elit. Aenean velit erat, vehicula eget lacinia ut, dignissim non tellus. Aliquam nec lacus mi, sed vestibulum nunc. Suspendisse potenti. Curabitur vitae sem turpis. Vestibulum sed neque eget dolor dapibus porttitor at sit amet sem. Fusce a turpis lorem. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae;';
 
 let codeBlocks = [];
 let lastType = null;
 
 // This class represents a node in the markdown tree, and can render it to pdf
-class Node {  
+class Node {
   constructor(tree) {
     // special case for text nodes
     if (typeof tree === 'string') {
@@ -116,107 +108,111 @@ class Node {
       this.text = tree;
       return;
     }
-    
+
     this.type = tree.shift();
     this.attrs = {};
-  
-    if ((typeof tree[0] === 'object') && !Array.isArray(tree[0])) {
+
+    if (typeof tree[0] === 'object' && !Array.isArray(tree[0])) {
       this.attrs = tree.shift();
     }
-    
+
     // parse sub nodes
-    this.content = (() => {
-      const result = [];
-      while (tree.length) {
-        result.push(new Node(tree.shift()));
-      }
-      return result;
-    })();
-      
+    this.content = [];
+    while (tree.length) {
+      this.content.push(new Node(tree.shift()));
+    }
+
     switch (this.type) {
       case 'header':
         this.type = `h${this.attrs.level}`;
         break;
-        
+
       case 'code_block':
         // use code mirror to syntax highlight the code block
         var code = this.content[0].text;
         this.content = [];
-        CodeMirror.runMode(code, 'coffeescript', (text, style) => {
+        CodeMirror.runMode(code, 'javascript', (text, style) => {
           const color = colors[style] || colors.default;
           const opts = {
             color,
             continued: text !== '\n'
           };
-        
+
           return this.content.push(new Node(['code', opts, text]));
-      });
-    
-        __guard__(this.content[this.content.length - 1], x => x.attrs.continued = false);
+        });
+
+        if (this.content.length) {
+          this.content[this.content.length - 1].attrs.continued = false;
+        }
         codeBlocks.push(code);
         break;
-      
+
       case 'img':
         // images are used to generate inline example output
-        // compiles the coffeescript to JS so it can be run 
+        // stores the JS so it can be run
         // in the render method
         this.type = 'example';
         code = codeBlocks[this.attrs.alt];
-        if (code) { this.code = coffee.compile(code); }
+        if (code) {
+          this.code = code;
+        }
         this.height = +this.attrs.title || 0;
         break;
     }
-      
+
     this.style = styles[this.type] || styles.para;
   }
-      
+
   // sets the styles on the document for this node
-  setStyle(doc) {
+  setStyle (doc) {
     if (this.style.font) {
       doc.font(this.style.font);
     }
-  
+
     if (this.style.fontSize) {
       doc.fontSize(this.style.fontSize);
     }
-      
+
     if (this.style.color || this.attrs.color) {
       doc.fillColor(this.style.color || this.attrs.color);
     } else {
       doc.fillColor('black');
     }
-      
+
     const options = {};
     options.align = this.style.align;
-    options.link  = this.attrs.href || false; // override continued link
-    if (this.attrs.continued != null) { options.continued = this.attrs.continued; }
+    options.link = this.attrs.href || null; // override continued link
+    if (this.attrs.continued != null) {
+      options.continued = this.attrs.continued;
+    }
     return options;
   }
-      
+
   // renders this node and its subnodes to the document
-  render(doc, continued) {
+  render (doc, continued) {
     let y;
-    if (continued == null) { continued = false; }
+    if (continued == null) {
+      continued = false;
+    }
     switch (this.type) {
       case 'example':
         this.setStyle(doc);
-        
-        // translate all points in the example code to 
+
+        // translate all points in the example code to
         // the current point in the document
         doc.moveDown();
         doc.save();
         doc.translate(doc.x, doc.y);
         var { x } = doc;
         ({ y } = doc);
-        doc.x = (doc.y = 0);
-        
+        doc.x = doc.y = 0;
+
         // run the example code with the document
         vm.runInNewContext(this.code, {
           doc,
           lorem
-        }
-        );
-          
+        });
+
         // restore points and styles
         y += doc.y;
         doc.restore();
@@ -232,100 +228,105 @@ class Node {
           const fragment = this.content[index];
           if (fragment.type === 'text') {
             // add a new page for each heading, unless it follows another heading
-            if (['h1', 'h2'].includes(this.type) && (lastType != null) && (lastType !== 'h1')) {
+            if (
+              ['h1', 'h2'].includes(this.type) &&
+              lastType != null &&
+              lastType !== 'h1'
+            ) {
               doc.addPage();
             }
-              
+
             if (this.type === 'h1') {
               doc.h1Outline = doc.outline.addItem(fragment.text);
-            } else if ((this.type === 'h2') && (doc.h1Outline !== null)) {
+            } else if (this.type === 'h2' && doc.h1Outline !== null) {
               doc.h1Outline.addItem(fragment.text);
             }
 
             // set styles and whether this fragment is continued (for rich text wrapping)
             const options = this.setStyle(doc);
-            if (options.continued == null) { options.continued = continued || (index < (this.content.length - 1)); }
-  
+            if (options.continued == null) {
+              options.continued = continued || index < this.content.length - 1;
+            }
+
             // remove newlines unless this is code
             if (this.type !== 'code') {
               fragment.text = fragment.text.replace(/[\r\n]\s*/g, ' ');
             }
-    
+
             doc.text(fragment.text, options);
           } else {
-            fragment.render(doc, (index < (this.content.length - 1)) && (this.type !== 'bulletlist'));
+            fragment.render(
+              doc,
+              index < this.content.length - 1 && this.type !== 'bulletlist'
+            );
           }
-          
+
           lastType = this.type;
         }
     }
-        
+
     if (this.style.padding) {
-      return doc.y += this.style.padding;
+      return (doc.y += this.style.padding);
     }
   }
 }
 
-// reads and renders a markdown/literate coffeescript file to the document
-const render = function(doc, filename) {
+// reads and renders a markdown/literate javascript file to the document
+const render = (doc, filename) => {
   codeBlocks = [];
-  const tree = md.parse(fs.readFileSync(filename, 'utf8'));
+  const tree = markdown.parse(fs.readFileSync(filename, 'utf8'));
   tree.shift();
-  
-  return (() => {
-    const result = [];
-    while (tree.length) {
-      const node = new Node(tree.shift());
-      result.push(node.render(doc));
-    }
-    return result;
-  })();
+
+  const result = [];
+  while (tree.length) {
+    const node = new Node(tree.shift());
+    result.push(node.render(doc));
+  }
+  return result;
 };
 
-// renders the title page of the guide    
-const renderTitlePage = function(doc) {
+// renders the title page of the guide
+const renderTitlePage = doc => {
   const title = 'PDFKit Guide';
   const author = 'By Devon Govett';
   const version = `Version ${require('../package.json').version}`;
-  
+
   doc.font('fonts/AlegreyaSans-Light.ttf', 60);
-  doc.y = (doc.page.height / 2) - doc.currentLineHeight();
-  doc.text(title, {align: 'center'});
+  doc.y = doc.page.height / 2 - doc.currentLineHeight();
+  doc.text(title, { align: 'center' });
   const w = doc.widthOfString(title);
   doc.h1Outline = doc.outline.addItem(title);
-  
+
   doc.fontSize(20);
   doc.y -= 10;
   doc.text(author, {
     align: 'center',
     indent: w - doc.widthOfString(author)
-  }
-  );
-  
+  });
+
   doc.font(styles.para.font, 10);
   doc.text(version, {
     align: 'center',
     indent: w - doc.widthOfString(version)
-  }
-  );
-    
-  return doc.addPage();
+  });
+
+  doc.addPage();
 };
 
 // render all sections of the guide and write the pdf file
-(function() {
-  const doc = new PDFDocument;
-  doc.pipe(fs.createWriteStream('guide.pdf'));
-  renderTitlePage(doc);
-  render(doc, 'getting_started.coffee.md');
-  render(doc, 'vector.coffee.md');
-  render(doc, 'text.coffee.md');
-  render(doc, 'images.coffee.md');
-  render(doc, 'outline.coffee.md');
-  render(doc, 'annotations.coffee.md');
-  return doc.end();
-})();
-
-function __guard__(value, transform) {
-  return (typeof value !== 'undefined' && value !== null) ? transform(value) : undefined;
-}
+const doc = new PDFDocument();
+doc.pipe(fs.createWriteStream('guide.pdf'));
+renderTitlePage(doc);
+render(doc, 'getting_started.md');
+render(doc, 'paper_sizes.md');
+render(doc, 'vector.md');
+render(doc, 'text.md');
+render(doc, 'images.md');
+render(doc, 'outline.md');
+render(doc, 'annotations.md');
+render(doc, 'forms.md');
+render(doc, 'destinations.md');
+render(doc, 'attachments.md');
+render(doc, 'accessibility.md');
+render(doc, 'you_made_it.md');
+doc.end();

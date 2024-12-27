@@ -1,104 +1,115 @@
 import pkg from './package.json';
-import babel from 'rollup-plugin-babel';
-import copy from 'rollup-plugin-cpy';
+import { babel } from '@rollup/plugin-babel';
+import copy from 'rollup-plugin-copy';
 
-const external = ['stream', 'fs', 'zlib', 'fontkit', 'events', 'linebreak', 'png-js'];
+const external = [
+  'stream',
+  'fs',
+  'zlib',
+  'fontkit',
+  'events',
+  'linebreak',
+  'png-js',
+  'crypto-js',
+  'saslprep',
+  'jpeg-exif'
+];
 
-// supports using brfs transform
-const stripFSInterop = function () {
-  return {
-    renderChunk (code) {
-      code = code.replace('var fs = _interopDefault(require(\'fs\'));', 'var fs = require(\'fs\');');
-      return {
-        code,
-        map: null
-      }
-    }
-  }
-}
+const supportedBrowsers = [
+  'Firefox 102', // ESR from 2022
+  'iOS 14', // from 2020
+  'Safari 14' // from 2020
+];
 
 export default [
-	// CommonJS build for Node
-	{
+  // CommonJS build for Node
+  {
     input: 'lib/document.js',
     external,
-		output: {
-			name: 'pdfkit',
-			file: pkg.main,
+    output: {
+      name: 'pdfkit',
+      file: pkg.main,
       format: 'cjs',
-      sourcemap: true
-		},
-		plugins: [
-			babel({
+      sourcemap: true,
+      interop: false
+    },
+    plugins: [
+      babel({
+        babelHelpers: 'bundled',
         babelrc: false,
-        presets: [['env', { 
-          modules: false,
-          targets: {
-            node: '6.10'
-          }
-        }]],
-        plugins: ['external-helpers']
+        presets: [
+          [
+            '@babel/preset-env',
+            {
+              modules: false,
+              targets: {
+                node: '18'
+              }
+            }
+          ]
+        ]
       }),
       copy({
-        files: ['lib/font/data/*.afm'],
-        dest: 'js/font/data'
-      }),
-      stripFSInterop()
-		]
-	},
-	// ES for legacy (IE11) browsers
-	{
+        targets: [
+          { src: ['lib/font/data/*.afm', 'lib/mixins/data/*.icc'], dest: 'js/data' },
+        ]
+      })
+    ]
+  },
+  // ES for green browsers
+  {
     input: 'lib/document.js',
     external,
-		output: {
-			name: 'pdfkit.es5',
-			file: pkg.module,
+    output: {
+      name: 'pdfkit.es',
+      file: pkg.module,
       format: 'es',
       sourcemap: true
-		},
-		plugins: [
-			babel({
+    },
+    plugins: [
+      babel({
+        babelHelpers: 'bundled',
         babelrc: false,
-        presets: [['env', { 
-          modules: false,
-          targets: {
-            browsers: [
-              'ie 11'
-            ]
-          }
-        }]],
-        plugins: ['external-helpers'],
-        exclude: ['babel-plugin-transform-es2015-typeof-symbol']
+        presets: [
+          [
+            '@babel/preset-env',
+            {
+              modules: false,
+              targets: {
+                browsers: supportedBrowsers
+              }
+            }
+          ]
+        ]
       })
-		]
-	},
-	// ES for green browsers
-	{
-    input: 'lib/document.js',
+    ]
+  },
+  {
+    input: 'lib/virtual-fs.js',
     external,
-		output: {
-			name: 'pdfkit.esnext',
-			file: pkg.esnext,
-      format: 'es',
-      sourcemap: true
-		},
-		plugins: [
-			babel({
+    output: {
+      name: 'virtual-fs',
+      file: 'js/virtual-fs.js',
+      format: 'cjs',
+      sourcemap: false
+    },
+    plugins: [
+      babel({
+        babelHelpers: 'bundled',
         babelrc: false,
-        presets: [['env', { 
-          modules: false,
-          targets: {
-            browsers: [
-              'Firefox 57',
-              'Edge 15',
-              'Chrome 60',
-              'iOS 10',
-              'Safari 10'
-            ]
-          }
-        }]],
-        plugins: ['external-helpers']
+        presets: [
+          [
+            '@babel/preset-env',
+            {
+              loose: true,
+              modules: false,
+              targets: {
+                browsers: supportedBrowsers
+              }
+            }
+          ]
+        ]
       })
-		]
-	}
+    ]
+  }
 ];
