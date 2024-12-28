@@ -22,6 +22,10 @@ Many of the annotations have a `color` option that you can specify. You can
 use an array of RGB values, a hex color, a named CSS color value, or a named
 spot color value for that option.
 
+A custom icon can be set using option `Name` property. Possible values are:
+`'Comment'`, `'Key'`, `'Note'`, `'Help'`, `'NewParagraph'`, `'Paragraph'`
+and `'Insert'`.
+
 If you are adding an annotation to a piece of text, such as a link or
 underline, you will need to know the width and height of the text in order to
 create the required rectangle for the annotation. There are two methods that
@@ -68,6 +72,12 @@ Here is an example that uses a few of the annotation types.
     doc.moveDown()
        .strike(20, doc.y, doc.widthOfString('STRIKE!'), height)
        .text('STRIKE!');
+
+    // Create note
+    doc.note(10, 30, 30, 30, "Text of note");
+
+    // Create note with custom options
+    doc.note(10, 80, 30, 30, "Text of custom note", {Name: 'Key', color: 'red'});
 
     // Adding go to as annotation
     doc.goTo(20, doc.y, 10, 20, 'LINK', {});
