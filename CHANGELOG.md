@@ -9,6 +9,7 @@
 - Add an option to keep the indentation after a new line starts and allow to indent a whole paragraph/text element
 - Fix sets tab order to "Structure" when a document is tagged
 - Fix font cache collision for fonts with missing postscript name or bad TTF metadata or identical metadata for different fonts
+- Fix for embedding fonts into PDF (font name must not contain spaces)
 - Fix measuring text when OpenType features are passed in to .text()
 
 ### [v0.15.2] - 2024-12-15
