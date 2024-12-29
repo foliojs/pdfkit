@@ -17,4 +17,4 @@ index.js
 index.html
 yarn.lock
 rollup.config.js
-.eslintrc
+eslint.config.mjs
