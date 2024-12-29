@@ -12,6 +12,8 @@
 - Fix font cache collision for fonts with missing postscript name or bad TTF metadata or identical metadata for different fonts
 - Fix for embedding fonts into PDF (font name must not contain spaces)
 - Fix measuring text when OpenType features are passed in to .text()
+- Add support for dynamic sizing
+- Add table generation
 
 ### [v0.15.2] - 2024-12-15
 
