@@ -1,6 +1,6 @@
 ## pdfkit changelog
 
-### Unreleased
+### [v0.16.0] - 2024-12-29
 
 - Update fontkit to 2.0
 - Update linebreak to 1.1
