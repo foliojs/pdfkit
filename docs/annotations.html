@@ -1,4 +1,4 @@
-<!DOCTYPE html><html><head><meta charset="utf-8"><title>Annotations in PDFKit</title><link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Source+Code+Pro:400,700|Alegreya:700|Merriweather"><link rel="stylesheet" href="/docs/css/index.css"><link rel="stylesheet" href="/docs/css/github.css"></head><body><nav class="sidebar"><ul><li><a href="/">Home</a></li><li><a href="/docs/../index.html">Documentation</a><ul><li><a href="/docs/getting_started.html">Getting Started </a></li><li><a href="/docs/paper_sizes.html">Paper Sizes</a></li><li><a href="/docs/vector.html">Vector Graphics </a></li><li><a href="/docs/text.html">Text </a></li><li><a href="/docs/images.html">Images </a></li><li><a href="/docs/outline.html">Outlines </a></li><li><a class="selected" href="/docs/annotations.html">Annotations </a></li><li><a href="/docs/forms.html">Forms </a></li><li><a href="/docs/destinations.html">Destinations</a></li><li><a href="/docs/attachments.html">Attachments </a></li><li><a href="/docs/accessibility.html">Accessibility</a></li><li><a href="/docs/you_made_it.html">You made it!</a></li></ul></li><li><a href="/docs/guide.pdf">PDF Guide</a></li><li><a href="/examples/kitchen-sink.pdf">Example PDF</a></li><li><a href="/demo/browser.html">Interactive Browser Demo</a></li><li><a href="http://github.com/foliojs/pdfkit">Source Code</a></li></ul></nav><div class="main"><h1 id="annotations_in_pdfkit">Annotations in PDFKit</h1>
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>Annotations in PDFKit</title><link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Source+Code+Pro:400,700|Alegreya:700|Merriweather"><link rel="stylesheet" href="/docs/css/index.css"><link rel="stylesheet" href="/docs/css/github.css"></head><body><nav class="sidebar"><ul><li><a href="/">Home</a></li><li><a href="/docs/../index.html">Documentation</a><ul><li><a href="/docs/getting_started.html">Getting Started </a></li><li><a href="/docs/paper_sizes.html">Paper Sizes</a></li><li><a href="/docs/vector.html">Vector Graphics </a></li><li><a href="/docs/text.html">Text </a></li><li><a href="/docs/images.html">Images </a></li><li><a href="/docs/outline.html">Outlines </a></li><li><a class="selected" href="/docs/annotations.html">Annotations </a></li><li><a href="/docs/forms.html">Forms </a></li><li><a href="/docs/destinations.html">Destinations</a></li><li><a href="/docs/attachments.html">Attachments </a></li><li><a href="/docs/accessibility.html">Accessibility</a></li><li><a href="/docs/you_made_it.html">You made it!</a></li></ul></li><li><a href="/docs/guide.pdf">PDF Guide</a></li><li><a href="/examples/kitchen-sink.pdf">Example PDF</a></li><li><a href="/examples/browserify/browser.html">Interactive Browser Demo</a></li><li><a href="http://github.com/foliojs/pdfkit">Source Code</a></li></ul></nav><div class="main"><h1 id="annotations_in_pdfkit">Annotations in PDFKit</h1>
 
 <p>Annotations are interactive features of the PDF format, and they make it
 possible to include things like links and attached notes, or to highlight,
@@ -9,8 +9,12 @@ and some other properties. Here is a list of the available annotation methods:</
 <ul><li><code>note(x, y, width, height, contents, options)</code></li><li><code>link(x, y, width, height, url, options)</code></li><li><code>goTo(x, y, w, h, name, options)</code></li><li><code>highlight(x, y, width, height, options)</code></li><li><code>underline(x, y, width, height, options)</code></li><li><code>strike(x, y, width, height, options)</code></li><li><code>lineAnnotation(x1, y1, x2, y2, options)</code></li><li><code>rectAnnotation(x, y, width, height, options)</code></li><li><code>ellipseAnnotation(x, y, width, height, options)</code></li><li><code>textAnnotation(x, y, width, height, text, options)</code></li><li><code>fileAnnotation(x, y, width, height, file, options)</code></li></ul>
 
 <p>Many of the annotations have a <code>color</code> option that you can specify. You can
-use an array of RGB values, a hex color, or a named CSS color value for that
-option.</p>
+use an array of RGB values, a hex color, a named CSS color value, or a named
+spot color value for that option.</p>
+
+<p>A custom icon can be set using option <code>Name</code> property. Possible values are:
+<code>&#39;Comment&#39;</code>, <code>&#39;Key&#39;</code>, <code>&#39;Note&#39;</code>, <code>&#39;Help&#39;</code>, <code>&#39;NewParagraph&#39;</code>, <code>&#39;Paragraph&#39;</code>
+and <code>&#39;Insert&#39;</code>.</p>
 
 <p>If you are adding an annotation to a piece of text, such as a link or
 underline, you will need to know the width and height of the text in order to
@@ -48,10 +52,22 @@ doc.moveDown()
    .highlight(20, doc.y, doc.widthOfString(&#39;This text is highlighted!&#39;), height)
    .text(&#39;This text is highlighted!&#39;);
 
+// Create text with a spot color
+doc.addSpotColor(&#39;PANTONE185C&#39;, 0, 100, 78, 9)
+doc.moveDown()
+   .fillColor(&#39;PANTONE185C&#39;)
+   .text(&#39;This text uses spot color!&#39;);
+
 // Create the crossed out text
 doc.moveDown()
    .strike(20, doc.y, doc.widthOfString(&#39;STRIKE!&#39;), height)
    .text(&#39;STRIKE!&#39;);
+
+// Create note
+doc.note(10, 30, 30, 30, &quot;Text of note&quot;);
+
+// Create note with custom options
+doc.note(10, 80, 30, 30, &quot;Text of custom note&quot;, {Name: &#39;Key&#39;, color: &#39;red&#39;});
 
 // Adding go to as annotation
 doc.goTo(20, doc.y, 10, 20, &#39;LINK&#39;, {});</code></pre>
