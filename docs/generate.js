@@ -152,7 +152,8 @@ class Node {
         // stores the JS so it can be run
         // in the render method
         this.type = 'example';
-        code = codeBlocks[this.attrs.alt];
+        code =
+          codeBlocks[this.attrs.alt ? this.attrs.alt : codeBlocks.length - 1];
         if (code) {
           this.code = code;
         }

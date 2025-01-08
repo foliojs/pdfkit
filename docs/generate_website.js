@@ -74,17 +74,13 @@ let imageIndex = 0;
 const generateImages = function(tree) {
   // find code blocks
   const codeBlocks = [];
-  for (var node of tree) {
-    if (node[0] === 'code_block') {
+  for (const node of tree) {
+    if (node[0] === "code_block") {
       codeBlocks.push(node[1]);
-    }
-  }
-
-  for (node of tree) {
-    if (node[0] === 'para' && Array.isArray(node[1]) && node[1][0] === 'img') {
+    } else if (node[0] === "para" && Array.isArray(node[1]) && node[1][0] === "img") {
       // compile the code
       const attrs = node[1][1];
-      let code = codeBlocks[attrs.alt];
+      let code = codeBlocks[attrs.alt ? attrs.alt : codeBlocks.length - 1];
       delete attrs.height; // used for pdf generation
 
       // create a PDF and run the example
