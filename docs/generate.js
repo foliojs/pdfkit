@@ -237,6 +237,12 @@ class Node {
         // loop through subnodes and render them
         for (let index = 0; index < this.content.length; index++) {
           const fragment = this.content[index];
+
+          if (this.type === "numberlist") {
+            let node = new Node(["inlinecode", `${index + 1}. `]);
+            fragment.content.splice(0, 0, node);
+          }
+
           if (fragment.type === 'text') {
             // add a new page for each heading, unless it follows another heading
             if (
@@ -339,5 +345,6 @@ render(doc, 'forms.md');
 render(doc, 'destinations.md');
 render(doc, 'attachments.md');
 render(doc, 'accessibility.md');
+render(doc, 'table.md');
 render(doc, 'you_made_it.md');
 doc.end();

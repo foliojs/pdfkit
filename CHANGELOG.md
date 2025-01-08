@@ -4,6 +4,7 @@
 
 - Fix precision rounding issues in LineWrapper
 - Add support for dynamic sizing
+- Add table generation
 
 ### [v0.16.0] - 2024-12-29
 
