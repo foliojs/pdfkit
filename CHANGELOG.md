@@ -1,5 +1,9 @@
 ## pdfkit changelog
 
+### Unreleased
+
+- Fix precision rounding issues in LineWrapper
+
 ### [v0.16.0] - 2024-12-29
 
 - Update fontkit to 2.0
