@@ -106,7 +106,7 @@ below.
 * `oblique` - whether to slant the text (angle in degrees or `true`)
 * `baseline` - the vertical alignment of the text with respect to its insertion point (values as [canvas textBaseline](https://www.w3schools.com/tags/canvas_textbaseline.asp))
 * `continued` - whether the text segment will be followed immediately by another segment. Useful for changing styling in the middle of a paragraph.
-* `features` - an array of [OpenType feature tags](https://www.microsoft.com/typography/otspec/featuretags.htm) to apply. If not provided, a set of defaults is used.
+* `features` - an array of [OpenType feature tags](https://www.microsoft.com/typography/otspec/featuretags.htm) to apply. Can also be provided as an object with features as keys and boolean values. If not provided, a set of defaults is used. To deactivate default font features, you have to explicitly set them to false (`{ liga: false }`). When providing an empty array the default font features will still be used.
 
 Additionally, the fill and stroke color and opacity methods described in the
 [vector graphics section](vector.html) are applied to text content as well.
