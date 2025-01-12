@@ -101,18 +101,28 @@ Passing a page options object to the `PDFDocument` constructor will
 set the default paper size and layout for every page in the document, which is
 then overridden by individual options passed to the `addPage` method.
 
-You can set the page margins in two ways. The first is by setting the `margin`
-property (singular) to a number, which applies that margin to all edges. The
-other way is to set the `margins` property (plural) to an object with `top`,
-`bottom`, `left`, and `right` values. The default is a 1 inch (72 point) margin
+You can set the page margins in two ways. The first is by setting the `margin` / `margins`
+property to a single value, which applies that to all edges. The
+other way is to provide an object with `top`, `right`, `bottom`, and `left` values.
+By default, using a number this will be in points (the default PDF unit),
+however you can provide any of the following units inside a string
+and this will be converted for you:
+`em`, `in`, `px`, `cm`, `mm`, `pc`, `ex`, `ch`, `rem`, `vw`, `vmin`, `vmax`, `%`, `pt`.
+For those which are based on text sizes this will take the size of the font for the page 
+(excluding `rem` which is always the document root font size)
+The default is a 1 inch (72 point) margin
 on all sides.
 
 For example:
 
     // Add a 50 point margin on all sides
-    doc.addPage({
-      margin: 50});
+    doc.addPage({ margin: 50 });
 
+    // Add a 2 inch margin on all sides
+    doc.addPage({ margin: '2in' });
+
+    // Add a 2em(28pt) margin using the font size
+    doc.addPage({ fontSize: 14, margin: '2em' });
 
     // Add different margins on each side
     doc.addPage({
