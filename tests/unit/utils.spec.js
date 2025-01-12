@@ -22,6 +22,10 @@ describe("normalizeSides", () => {
       { top: "hi", right: undefined, bottom: "hi", left: undefined },
     ],
     [
+      { top: undefined },
+      { top: undefined, right: undefined, bottom: undefined, left: undefined },
+    ],
+    [
       null,
       { top: undefined, right: undefined, bottom: undefined, left: undefined },
     ],
