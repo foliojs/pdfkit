@@ -3,6 +3,7 @@
 ### Unreleased
 
 - Fix precision rounding issues in LineWrapper
+- Add support for dynamic sizing
 
 ### [v0.16.0] - 2024-12-29
 

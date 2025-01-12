@@ -16,13 +16,13 @@ describe('PDFDocument', () => {
     test('not defined', () => {
       new PDFDocument();
 
-      expect(fontSpy).toBeCalledWith('Helvetica');
+      expect(fontSpy).toBeCalledWith('Helvetica', null);
     });
 
     test('a string value', () => {
       new PDFDocument({ font: 'Roboto' });
 
-      expect(fontSpy).toBeCalledWith('Roboto');
+      expect(fontSpy).toBeCalledWith('Roboto', null);
     });
 
     test('a falsy value', () => {
