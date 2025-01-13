@@ -7,6 +7,7 @@
 - Add support for dynamic sizing
 - Add support for rotatable text
 - Fix page cascade options when text overflows
+- Add table generation
 
 ### [v0.16.0] - 2024-12-29
 
