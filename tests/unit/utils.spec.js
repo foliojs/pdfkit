@@ -33,6 +33,14 @@ describe("normalizeSides", () => {
       undefined,
       { top: undefined, right: undefined, bottom: undefined, left: undefined },
     ],
+    [
+      true,
+      { top: true, right: true, bottom: true, left: true },
+    ],
+    [
+      false,
+      { top: false, right: false, bottom: false, left: false },
+    ],
   ])("%s -> %s", (size, expected) => {
     expect(normalizeSides(size)).toEqual(expected);
   });
