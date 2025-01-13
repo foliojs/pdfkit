@@ -207,6 +207,13 @@ class Node {
         ({ y } = doc);
         doc.x = doc.y = 0;
 
+        // Update the page width for those which rely on the width of the document
+        var docPageWidth = doc.page.width;
+        var docPageHeight = doc.page.height;
+        var docPageMargins = doc.page.margins;
+        doc.page.width = doc.page.width - x - doc.page.margins.right;
+        doc.page.margins = { top: 0, left: 0, right: 0, bottom: 0 };
+
         // run the example code with the document
         vm.runInNewContext(this.code, {
           doc,
@@ -218,6 +225,9 @@ class Node {
         doc.restore();
         doc.x = x;
         doc.y = y + this.height;
+        doc.page.width = docPageWidth;
+        doc.page.height = docPageHeight;
+        doc.page.margins = docPageMargins;
         break;
       case 'hr':
         doc.addPage();
