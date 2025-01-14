@@ -101,4 +101,45 @@ describe('text', function() {
     });
   });
 
+  test('rotated text', function () {
+    let i = 0;
+    const cols = [
+      '#292f56',
+      '#492d73',
+      '#8c2f94',
+      '#b62d78',
+      '#d82d31',
+      '#e69541',
+      '#ecf157',
+      '#acfa70',
+    ];
+    function randColor() {
+      return cols[i++ % cols.length];
+    }
+
+    return runDocTest(function (doc) {
+      doc.font('tests/fonts/Roboto-Regular.ttf');
+      for (let i = -360; i < 360; i += 5) {
+        const withLabel = i % 45 === 0;
+        const margin = i < 0 ? '            ' : ' ';
+        let text = `—————————> ${withLabel ? `${margin}${i}` : ''}`;
+
+        if (withLabel) {
+          const bounds = doc.boundsOfString(text, 200, 200, { rotation: i });
+          doc
+            .save()
+            .rect(bounds.x, bounds.y, bounds.width, bounds.height)
+            .stroke(randColor())
+            .restore();
+        }
+
+        doc
+          .save()
+          .fill(withLabel ? 'red' : 'black')
+          .text(text, 200, 200, { rotation: i })
+          .restore();
+      }
+      doc.save().circle(200, 200, 1).fill('blue').restore();
+    });
+  });
 });
