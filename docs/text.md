@@ -86,6 +86,7 @@ below.
 * `lineBreak` - set to `false` to disable line wrapping all together
 * `width` - the width that text should be wrapped to (by default, the page width minus the left and right margin)
 * `height` - the maximum height that text should be clipped to
+* `rotation` - the rotation of the text in degrees (by default 0)
 * `ellipsis` - the character to display at the end of the text when it is too long. Set to `true` to use the default character.
 * `columns` - the number of columns to flow the text into
 * `columnGap` - the amount of space between each column (1/4 inch by default)
@@ -132,9 +133,13 @@ The output looks like this:
 ## Text measurements
 
 If you're working with documents that require precise layout, you may need to know the
-size of a piece of text. PDFKit has two methods to achieve this: `widthOfString(text, options)`
-and `heightOfString(text, options)`. Both methods use the same options described in the
+size of a piece of text. PDFKit has three methods to achieve this: `widthOfString(text, options)`
+, `heightOfString(text, options)` and `boundsOfString(text, options)/boundsOfString(text, x, y, options)`. All methods use the same options described in the
 Text styling section, and take into account the eventual line wrapping.
+
+However `boundsOfString` factors in text rotations and multi-line wrapped text,
+effectively producing the bounding box of the text, `{x: number, y: number, width: number, height: number}`.
+If `x` and `y` are not defined they will default to use `this.x` and `this.y`.
 
 ## Lists
 

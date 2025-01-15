@@ -4,6 +4,7 @@
 
 - Fix precision rounding issues in LineWrapper
 - Add support for dynamic sizing
+- Add support for rotatable text
 
 ### [v0.16.0] - 2024-12-29
 
