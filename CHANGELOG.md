@@ -3,6 +3,7 @@
 ### Unreleased
 
 - Fix precision rounding issues in LineWrapper
+- Fix fonts without a postscriptName
 - Add support for dynamic sizing
 - Add support for rotatable text
 
