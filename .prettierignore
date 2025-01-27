@@ -1,1 +1,5 @@
+**.html
+**.md
 demo/bundle.js
+tests/images/bee.js
+tests/visual/pdfmake/*.js
