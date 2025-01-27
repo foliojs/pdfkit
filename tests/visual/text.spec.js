@@ -142,4 +142,29 @@ describe('text', function() {
       doc.save().circle(200, 200, 1).fill('blue').restore();
     });
   });
+
+  test('rotated multi line text', function () {
+    return runDocTest(function (doc) {
+      doc.font('tests/fonts/Roboto-Regular.ttf');
+      let text = `Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.`;
+
+      // Compute text rect
+      const textBounds = doc.boundsOfString(text, 300, 300, { rotation: 0 });
+      // Compute rotated bounds
+      const bounds = doc.boundsOfString(text, 300, 300, { rotation: 45 });
+      doc
+        // Draw rotated bounds
+        .rect(bounds.x, bounds.y, bounds.width, bounds.height)
+        .stroke()
+        // Draw text
+        .text(text, 300, 300, { rotation: 45 })
+        // Draw text rect (rotation is negative because of the flipped axis
+        .rotate(-45, {origin: [300,300]})
+        .rect(300, 300, textBounds.width, textBounds.height)
+        .stroke("pink")
+        // Draw origin
+        .circle(300, 300, 2)
+        .fill('blue')
+    });
+  });
 });
