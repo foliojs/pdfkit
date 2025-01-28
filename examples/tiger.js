@@ -2,6 +2,7 @@
  * From Raphael.js demos - http://raphaeljs.com/tiger.js
  */
 
+// prettier-ignore
 module.exports = [
   {
     type: 'path',
