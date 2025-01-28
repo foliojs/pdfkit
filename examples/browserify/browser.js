@@ -16,6 +16,7 @@ function makePDF(PDFDocument, blobStream, lorem, iframe) {
   doc.fontSize(25).text('Here is some vector graphics...', 100, 80);
 
   // some vector graphics
+  // prettier-ignore
   doc
     .save()
     .moveTo(100, 150)
@@ -84,6 +85,8 @@ function makePDF(PDFDocument, blobStream, lorem, iframe) {
 var editor = ace.edit('editor');
 editor.setTheme('ace/theme/monokai');
 editor.getSession().setMode('ace/mode/javascript');
+
+// prettier-ignore
 editor.setValue(
   makePDF
     .toString()
@@ -92,6 +95,7 @@ editor.setValue(
     .join('\n')
     .replace(/^  /gm, '')
 );
+// prettier-ignore
 editor
   .getSession()
   .getSelection()
