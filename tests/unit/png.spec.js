@@ -6,7 +6,7 @@ import fs from 'fs';
 describe('PNGImage', () => {
   let document;
 
-  const createImage = fileName => {
+  const createImage = (fileName) => {
     const img = new PNGImage(fs.readFileSync(fileName), 'I1');
     // noop data manipulation methods
     img.loadIndexedAlphaChannel = () => {
@@ -56,14 +56,14 @@ describe('PNGImage', () => {
       Subtype: 'Image',
       Type: 'XObject',
       Width: 400,
-      DecodeParms: expect.any(PDFReference)
+      DecodeParms: expect.any(PDFReference),
     });
 
     expect(img.obj.data.DecodeParms.data).toMatchObject({
       BitsPerComponent: 8,
       Colors: 3,
       Columns: 400,
-      Predictor: 15
+      Predictor: 15,
     });
   });
 
@@ -77,7 +77,7 @@ describe('PNGImage', () => {
     // Interlace = 0
 
     const img = createImage(
-      './tests/images/pngsuite-rgb-transparent-white.png'
+      './tests/images/pngsuite-rgb-transparent-white.png',
     );
 
     expect(img.finalize).toBeCalledTimes(1);
@@ -92,14 +92,14 @@ describe('PNGImage', () => {
       Type: 'XObject',
       Width: 32,
       Mask: [255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255],
-      DecodeParms: expect.any(PDFReference)
+      DecodeParms: expect.any(PDFReference),
     });
 
     expect(img.obj.data.DecodeParms.data).toMatchObject({
       BitsPerComponent: 16,
       Colors: 3,
       Columns: 32,
-      Predictor: 15
+      Predictor: 15,
     });
   });
 
@@ -125,7 +125,7 @@ describe('PNGImage', () => {
       Subtype: 'Image',
       Type: 'XObject',
       Width: 409,
-      SMask: expect.any(PDFReference)
+      SMask: expect.any(PDFReference),
     });
 
     expect(img.obj.data.SMask.data).toMatchObject({
@@ -137,7 +137,7 @@ describe('PNGImage', () => {
       Length: 16,
       Subtype: 'Image',
       Type: 'XObject',
-      Width: 409
+      Width: 409,
     });
   });
 
@@ -163,7 +163,7 @@ describe('PNGImage', () => {
       Subtype: 'Image',
       Type: 'XObject',
       Width: 175,
-      SMask: expect.any(PDFReference)
+      SMask: expect.any(PDFReference),
     });
 
     expect(img.obj.data.SMask.data).toMatchObject({
@@ -175,7 +175,7 @@ describe('PNGImage', () => {
       Length: 16,
       Subtype: 'Image',
       Type: 'XObject',
-      Width: 175
+      Width: 175,
     });
   });
 
@@ -201,14 +201,14 @@ describe('PNGImage', () => {
       Subtype: 'Image',
       Type: 'XObject',
       Width: 980,
-      DecodeParms: expect.any(PDFReference)
+      DecodeParms: expect.any(PDFReference),
     });
 
     expect(img.obj.data.DecodeParms.data).toMatchObject({
       BitsPerComponent: 8,
       Colors: 1,
       Columns: 980,
-      Predictor: 15
+      Predictor: 15,
     });
   });
 
@@ -222,7 +222,7 @@ describe('PNGImage', () => {
     // Interlace = 0
 
     const img = createImage(
-      './tests/images/pngsuite-palette-transparent-white.png'
+      './tests/images/pngsuite-palette-transparent-white.png',
     );
 
     expect(img.finalize).toBeCalledTimes(1);
@@ -237,14 +237,14 @@ describe('PNGImage', () => {
       Type: 'XObject',
       Width: 32,
       DecodeParms: expect.any(PDFReference),
-      SMask: expect.any(PDFReference)
+      SMask: expect.any(PDFReference),
     });
 
     expect(img.obj.data.DecodeParms.data).toMatchObject({
       BitsPerComponent: 8,
       Colors: 1,
       Columns: 32,
-      Predictor: 15
+      Predictor: 15,
     });
 
     expect(img.obj.data.SMask.data).toMatchObject({
@@ -256,7 +256,7 @@ describe('PNGImage', () => {
       Length: 16,
       Subtype: 'Image',
       Type: 'XObject',
-      Width: 32
+      Width: 32,
     });
   });
 
@@ -282,7 +282,7 @@ describe('PNGImage', () => {
       Subtype: 'Image',
       Type: 'XObject',
       Width: 320,
-      DecodeParms: expect.any(PDFReference)
+      DecodeParms: expect.any(PDFReference),
     });
   });
 
@@ -296,7 +296,7 @@ describe('PNGImage', () => {
     // Interlace = 0
 
     const img = createImage(
-      './tests/images/pngsuite-gray-transparent-black.png'
+      './tests/images/pngsuite-gray-transparent-black.png',
     );
 
     expect(img.finalize).toBeCalledTimes(1);
@@ -311,14 +311,14 @@ describe('PNGImage', () => {
       Type: 'XObject',
       Width: 32,
       Mask: [0, 0],
-      DecodeParms: expect.any(PDFReference)
+      DecodeParms: expect.any(PDFReference),
     });
 
     expect(img.obj.data.DecodeParms.data).toMatchObject({
       BitsPerComponent: 4,
       Colors: 1,
       Columns: 32,
-      Predictor: 15
+      Predictor: 15,
     });
   });
 
@@ -332,7 +332,7 @@ describe('PNGImage', () => {
     // Interlace = 0
 
     const img = createImage(
-      './tests/images/pngsuite-gray-transparent-white.png'
+      './tests/images/pngsuite-gray-transparent-white.png',
     );
 
     expect(img.finalize).toBeCalledTimes(1);
@@ -347,14 +347,14 @@ describe('PNGImage', () => {
       Type: 'XObject',
       Width: 32,
       Mask: [255, 255],
-      DecodeParms: expect.any(PDFReference)
+      DecodeParms: expect.any(PDFReference),
     });
 
     expect(img.obj.data.DecodeParms.data).toMatchObject({
       BitsPerComponent: 16,
       Colors: 1,
       Columns: 32,
-      Predictor: 15
+      Predictor: 15,
     });
   });
 
@@ -380,7 +380,7 @@ describe('PNGImage', () => {
       Subtype: 'Image',
       Type: 'XObject',
       Width: 112,
-      SMask: expect.any(PDFReference)
+      SMask: expect.any(PDFReference),
     });
 
     expect(img.obj.data.SMask.data).toMatchObject({
@@ -392,7 +392,7 @@ describe('PNGImage', () => {
       Length: 16,
       Subtype: 'Image',
       Type: 'XObject',
-      Width: 112
+      Width: 112,
     });
   });
 
@@ -418,14 +418,14 @@ describe('PNGImage', () => {
       Subtype: 'Image',
       Type: 'XObject',
       Width: 32,
-      DecodeParms: expect.any(PDFReference)
+      DecodeParms: expect.any(PDFReference),
     });
 
     expect(img.obj.data.DecodeParms.data).toMatchObject({
       BitsPerComponent: 8,
       Colors: 1,
       Columns: 32,
-      Predictor: 1
+      Predictor: 1,
     });
   });
 
@@ -451,14 +451,14 @@ describe('PNGImage', () => {
       Subtype: 'Image',
       Type: 'XObject',
       Width: 32,
-      DecodeParms: expect.any(PDFReference)
+      DecodeParms: expect.any(PDFReference),
     });
 
     expect(img.obj.data.DecodeParms.data).toMatchObject({
       BitsPerComponent: 8,
       Colors: 1,
       Columns: 32,
-      Predictor: 1
+      Predictor: 1,
     });
   });
 
@@ -484,14 +484,14 @@ describe('PNGImage', () => {
       Subtype: 'Image',
       Type: 'XObject',
       Width: 32,
-      DecodeParms: expect.any(PDFReference)
+      DecodeParms: expect.any(PDFReference),
     });
 
     expect(img.obj.data.DecodeParms.data).toMatchObject({
       BitsPerComponent: 8,
       Colors: 3,
       Columns: 32,
-      Predictor: 1
+      Predictor: 1,
     });
   });
 
@@ -517,14 +517,14 @@ describe('PNGImage', () => {
       Subtype: 'Image',
       Type: 'XObject',
       Width: 32,
-      DecodeParms: expect.any(PDFReference)
+      DecodeParms: expect.any(PDFReference),
     });
 
     expect(img.obj.data.DecodeParms.data).toMatchObject({
       BitsPerComponent: 16,
       Colors: 3,
       Columns: 32,
-      Predictor: 1
+      Predictor: 1,
     });
   });
 
@@ -550,7 +550,7 @@ describe('PNGImage', () => {
       Subtype: 'Image',
       Type: 'XObject',
       Width: 32,
-      SMask: expect.any(PDFReference)
+      SMask: expect.any(PDFReference),
     });
   });
 });

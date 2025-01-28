@@ -27,7 +27,7 @@ function runDocTest(options, fn) {
         }
         resolve();
       } catch (err) {
-        reject(err)
+        reject(err);
       }
     });
     doc.end();

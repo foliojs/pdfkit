@@ -7,7 +7,7 @@ var doc = new PDFDocument({
   pdfVersion: '1.5',
   lang: 'en-US',
   tagged: true,
-  displayTitle: true
+  displayTitle: true,
 });
 
 doc.pipe(fs.createWriteStream('kitchen-sink-accessible.pdf'));
@@ -30,7 +30,7 @@ struct.add(
       .font('Palatino')
       .fontSize(25)
       .text('Some text with an embedded font! ', 100, 100);
-  })
+  }),
 );
 
 // Embed some images
@@ -40,36 +40,35 @@ struct.add(imageSection);
 imageSection.add(
   doc.struct('H1', () => {
     doc.fontSize(18).text('PNG and JPEG images: ');
-  })
+  }),
 );
 
 imageSection.add(
   doc.struct(
     'Figure',
     {
-      alt: 'Promotional image of an Apple laptop. '
+      alt: 'Promotional image of an Apple laptop. ',
     },
     () => {
       doc.image('images/test.png', 100, 160, {
-        width: 412
+        width: 412,
       });
-    }
-  )
+    },
+  ),
 );
 
 imageSection.add(
   doc.struct(
     'Figure',
     {
-      alt:
-        'Photograph of a path flanked by blossoming trees with surrounding hedges. '
+      alt: 'Photograph of a path flanked by blossoming trees with surrounding hedges. ',
     },
     () => {
       doc.image('images/test.jpeg', 190, 400, {
-        height: 300
+        height: 300,
       });
-    }
-  )
+    },
+  ),
 );
 
 imageSection.end();
@@ -84,14 +83,14 @@ struct.add(vectorSection);
 vectorSection.add(
   doc.struct('H1', () => {
     doc.fontSize(25).text('Here are some vector graphics... ', 100, 100);
-  })
+  }),
 );
 
 vectorSection.add(
   doc.struct(
     'Figure',
     {
-      alt: 'Orange triangle. '
+      alt: 'Orange triangle. ',
     },
     () => {
       doc
@@ -100,27 +99,27 @@ vectorSection.add(
         .lineTo(100, 250)
         .lineTo(200, 250)
         .fill('#FF8800');
-    }
-  )
+    },
+  ),
 );
 
 vectorSection.add(
   doc.struct(
     'Figure',
     {
-      alt: 'Purple circle. '
+      alt: 'Purple circle. ',
     },
     () => {
       doc.circle(280, 200, 50).fill('#7722FF');
-    }
-  )
+    },
+  ),
 );
 
 vectorSection.add(
   doc.struct(
     'Figure',
     {
-      alt: 'Red star with hollow center. '
+      alt: 'Red star with hollow center. ',
     },
     () => {
       doc
@@ -131,8 +130,8 @@ vectorSection.add(
         // fill using the even-odd winding rule
         .fill('red', 'even-odd')
         .restore();
-    }
-  )
+    },
+  ),
 );
 
 vectorSection.end();
@@ -148,7 +147,7 @@ wrappedSection.add(
       .font('Helvetica', 13)
       // move down 1 line
       .moveDown();
-  })
+  }),
 );
 
 var loremIpsum =
@@ -158,7 +157,7 @@ doc.text(loremIpsum, {
   align: 'justify',
   indent: 30,
   paragraphGap: 5,
-  structParent: wrappedSection
+  structParent: wrappedSection,
 });
 
 wrappedSection.end();
@@ -176,14 +175,14 @@ tigerSection.add(
       .font('Palatino', 25)
       .text('Rendering some SVG paths...', 100, 100)
       .translate(220, 300);
-  })
+  }),
 );
 
 tigerSection.add(
   doc.struct(
     'Figure',
     {
-      alt: 'Tiger line art. '
+      alt: 'Tiger line art. ',
     },
     () => {
       var i, len, part;
@@ -207,8 +206,8 @@ tigerSection.add(
         }
         doc.restore();
       }
-    }
-  )
+    },
+  ),
 );
 
 tigerSection.end();
@@ -224,15 +223,15 @@ linkSection.add(
   doc.struct(
     'Link',
     {
-      alt: 'Here is a link! '
+      alt: 'Here is a link! ',
     },
     () => {
       doc.fillColor('blue').text('Here is a link!', 100, 100, {
         link: 'http://google.com/',
-        underline: true
+        underline: true,
       });
-    }
-  )
+    },
+  ),
 );
 
 linkSection.end();

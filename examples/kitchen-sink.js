@@ -23,10 +23,10 @@ doc
   .fontSize(18)
   .text('PNG and JPEG images:')
   .image('images/test.png', 100, 160, {
-    width: 412
+    width: 412,
   })
   .image('images/test.jpeg', 190, 400, {
-    height: 300
+    height: 300,
   });
 
 // Add another page
@@ -67,7 +67,7 @@ doc
     width: 412,
     align: 'justify',
     indent: 30,
-    paragraphGap: 5
+    paragraphGap: 5,
   });
 
 // Add another page, and set the font back
@@ -133,27 +133,24 @@ doc
 
 doc.moveDown();
 
-doc
-  .text(loremIpsum, {
-    height: 100,
-    width: 300,
-    align: 'justify',
-  });
+doc.text(loremIpsum, {
+  height: 100,
+  width: 300,
+  align: 'justify',
+});
 
-doc
-  .text(loremIpsum, {
-    height: 100,
-    width: 300,
-    align: 'justify',
-    horizontalScaling: 75
-  });
+doc.text(loremIpsum, {
+  height: 100,
+  width: 300,
+  align: 'justify',
+  horizontalScaling: 75,
+});
 
-doc
-  .text(loremIpsum, {
-    height: 100,
-    width: 300,
-    align: 'justify',
-    horizontalScaling: 130
-  });
+doc.text(loremIpsum, {
+  height: 100,
+  width: 300,
+  align: 'justify',
+  horizontalScaling: 130,
+});
 
 doc.end();

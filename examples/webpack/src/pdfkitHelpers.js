@@ -1,4 +1,4 @@
-export const waitForData = async doc => {
+export const waitForData = async (doc) => {
   return new Promise((resolve, reject) => {
     const buffers = [];
     doc.on('data', buffers.push.bind(buffers));
