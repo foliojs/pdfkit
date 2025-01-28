@@ -7,7 +7,7 @@ describe('Text', () => {
   beforeEach(() => {
     document = new PDFDocument({
       info: { CreationDate: new Date(Date.UTC(2018, 1, 1)) },
-      compress: false
+      compress: false,
     });
   });
 
@@ -26,7 +26,7 @@ BT
 ET
 Q
 `,
-        'binary'
+        'binary',
       );
 
       document.text('simple text');
@@ -40,7 +40,7 @@ Q
         `stream`,
         textStream,
         `\nendstream`,
-        `endobj`
+        `endobj`,
       ]);
     });
 
@@ -58,7 +58,7 @@ BT
 ET
 Q
 `,
-        'binary'
+        'binary',
       );
 
       document.text('simple text', 600, 20);
@@ -72,7 +72,7 @@ Q
         `stream`,
         textStream,
         `\nendstream`,
-        `endobj`
+        `endobj`,
       ]);
     });
 
@@ -163,7 +163,7 @@ BT
 ET
 Q
 `,
-        'binary'
+        'binary',
       );
 
       // before this test, this case used to make the code run into an infinite loop.
@@ -191,7 +191,7 @@ Q
         `stream`,
         textStream,
         `\nendstream`,
-        `endobj`
+        `endobj`,
       ]);
     });
   });

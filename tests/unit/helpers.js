@@ -1,7 +1,7 @@
 function logData(doc) {
   const loggedData = [];
   const originalMethod = doc._write;
-  doc._write = function(data) {
+  doc._write = function (data) {
     loggedData.push(data);
     originalMethod.call(this, data);
   };
@@ -13,11 +13,9 @@ function escapeRegExp(string) {
 }
 
 function joinTokens(...args) {
-  let a = args.map(i => escapeRegExp(i));
+  let a = args.map((i) => escapeRegExp(i));
   let r = new RegExp('^' + a.join('\\s*') + '$');
   return r;
 }
 
-export { logData, joinTokens }
-
-
+export { logData, joinTokens };

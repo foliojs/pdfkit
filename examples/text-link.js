@@ -13,12 +13,12 @@ doc
   .text('with a link inside', {
     continued: true,
     link: 'http://pdfkit.org',
-    underline: true
+    underline: true,
   })
   .text(' and remaining text', {
     continued: false,
     link: null,
-    underline: false
+    underline: false,
   });
 doc.switchToPage(1);
 doc.text('Go To First Page', { link: 0 });

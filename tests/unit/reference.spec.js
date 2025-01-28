@@ -49,7 +49,7 @@ describe('PDFReference', () => {
       'stream',
       chunk,
       '\nendstream',
-      'endobj'
+      'endobj',
     ]);
   });
 
@@ -70,7 +70,7 @@ describe('PDFReference', () => {
       'stream',
       compressed,
       '\nendstream',
-      'endobj'
+      'endobj',
     ]);
   });
 });
