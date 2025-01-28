@@ -10,7 +10,7 @@ export function fetchFile(fileURL, { type = 'arraybuffer' } = {}) {
     request.open('GET', fileURL, true);
     request.responseType = type;
 
-    request.onload = function(e) {
+    request.onload = function (e) {
       if (request.status === 200) {
         resolve(request.response);
       } else {
@@ -18,7 +18,7 @@ export function fetchFile(fileURL, { type = 'arraybuffer' } = {}) {
       }
     };
 
-    request.onerror = error => reject(createFetchError(fileURL, error));
+    request.onerror = (error) => reject(createFetchError(fileURL, error));
 
     request.send();
   });

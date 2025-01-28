@@ -5,14 +5,14 @@ import Courier from 'pdfkit/js/data/Courier.afm';
 import CourierBold from 'pdfkit/js/data/Courier-Bold.afm';
 
 function registerBinaryFiles(ctx) {
-  ctx.keys().forEach(key => {
+  ctx.keys().forEach((key) => {
     // extracts "./" from beginning of the key
     fs.writeFileSync(key.substring(2), ctx(key));
   });
 }
 
 function registerAFMFonts(ctx) {
-  ctx.keys().forEach(key => {
+  ctx.keys().forEach((key) => {
     const match = key.match(/([^/]*\.afm$)/);
     if (match) {
       // afm files must be stored on data path

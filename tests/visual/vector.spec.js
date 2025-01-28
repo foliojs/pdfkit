@@ -1,9 +1,9 @@
 import { runDocTest } from './helpers';
 var tiger = require('../../examples/tiger');
 
-describe('vector', function() {
-  test('simple shapes', function() {
-    return runDocTest(function(doc) {
+describe('vector', function () {
+  test('simple shapes', function () {
+    return runDocTest(function (doc) {
       doc
         .save()
         .moveTo(100, 150)
@@ -23,8 +23,8 @@ describe('vector', function() {
     });
   });
 
-  test('complex svg', function() {
-    return runDocTest(function(doc) {
+  test('complex svg', function () {
+    return runDocTest(function (doc) {
       var i, len, part;
       doc.translate(220, 300);
       for (i = 0, len = tiger.length; i < len; i++) {
@@ -49,8 +49,8 @@ describe('vector', function() {
     });
   });
 
-  test('svg path', function() {
-    return runDocTest(function(doc) {
+  test('svg path', function () {
+    return runDocTest(function (doc) {
       // extracted from https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorial/Paths
       // lines
       doc.path('M10 10 H 90 V 90 H 10 L 10 10');

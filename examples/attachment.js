@@ -12,7 +12,7 @@ doc.info['Title'] = 'Attachment Test';
 doc.file(path.join(__dirname, 'images', 'test.png'), {
   name: 'test.png',
   type: 'image/png',
-  description: 'this is a test image'
+  description: 'this is a test image',
 });
 
 // add some text
@@ -26,7 +26,7 @@ hover over the paperclip to see its description!`);
 const file = {
   src: Buffer.from('buffered input!'),
   name: 'embedded.txt',
-  creationDate: new Date(2020, 3, 1)
+  creationDate: new Date(2020, 3, 1),
 };
 // then, add the annotation
 doc.fileAnnotation(100, 150, 10, doc.currentLineHeight(), file);
@@ -36,7 +36,7 @@ doc.fileAnnotation(100, 150, 10, doc.currentLineHeight(), file);
 // be aware that some PDF Viewers may not render the icon correctly — or not at all
 doc.fileAnnotation(150, 150, 10, doc.currentLineHeight(), file, {
   Name: 'Paperclip',
-  Contents: 'Paperclip attachment'
+  Contents: 'Paperclip attachment',
 });
 
 doc.end();

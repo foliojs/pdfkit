@@ -16,6 +16,7 @@ function makePDF(PDFDocument, blobStream, lorem, iframe) {
   doc.fontSize(25).text('Here is some vector graphics...', 100, 80);
 
   // some vector graphics
+  // prettier-ignore
   doc
     .save()
     .moveTo(100, 150)
@@ -48,7 +49,7 @@ function makePDF(PDFDocument, blobStream, lorem, iframe) {
     [1, 1, 4, 4],
     3,
     3,
-    '1 w 0 1 m 4 5 l s 2 0 m 5 3 l s'
+    '1 w 0 1 m 4 5 l s 2 0 m 5 3 l s',
   );
   doc.circle(280, 350, 50).fill([stripe45d, 'blue']);
 
@@ -71,12 +72,12 @@ function makePDF(PDFDocument, blobStream, lorem, iframe) {
       indent: 30,
       columns: 2,
       height: 300,
-      ellipsis: true
+      ellipsis: true,
     });
 
   // end and display the document in the iframe to the right
   doc.end();
-  stream.on('finish', function() {
+  stream.on('finish', function () {
     iframe.src = stream.toBlobURL('application/pdf');
   });
 }
@@ -84,6 +85,8 @@ function makePDF(PDFDocument, blobStream, lorem, iframe) {
 var editor = ace.edit('editor');
 editor.setTheme('ace/theme/monokai');
 editor.getSession().setMode('ace/mode/javascript');
+
+// prettier-ignore
 editor.setValue(
   makePDF
     .toString()
@@ -92,6 +95,7 @@ editor.setValue(
     .join('\n')
     .replace(/^  /gm, '')
 );
+// prettier-ignore
 editor
   .getSession()
   .getSelection()
@@ -102,7 +106,7 @@ makePDF(PDFDocument, blobStream, lorem, iframe);
 
 let debounceTimeout;
 
-editor.getSession().on('change', function() {
+editor.getSession().on('change', function () {
   try {
     if (debounceTimeout) {
       clearTimeout(debounceTimeout);
@@ -112,7 +116,7 @@ editor.getSession().on('change', function() {
       'blobStream',
       'lorem',
       'iframe',
-      editor.getValue()
+      editor.getValue(),
     );
     debounceTimeout = setTimeout(() => {
       fn(PDFDocument, blobStream, lorem, iframe);
