@@ -6,6 +6,7 @@
 - Fix fonts without a postscriptName
 - Add support for dynamic sizing
 - Add support for rotatable text
+- Fix page cascade options when text overflows
 
 ### [v0.16.0] - 2024-12-29
 
