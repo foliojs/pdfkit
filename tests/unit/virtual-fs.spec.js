@@ -3,33 +3,33 @@ import fs from '../../lib/virtual-fs';
 function checkMissingFiles(files) {
   for (let file of files) {
     expect(() => fs.readFileSync(`files/${file}`)).toThrow(
-      `File 'files/${file}' not found in virtual file system`
+      `File 'files/${file}' not found in virtual file system`,
     );
   }
 }
 
-describe('virtual-fs', function() {
+describe('virtual-fs', function () {
   beforeEach(() => {
     fs.fileData = {};
   });
 
-  test('readFileSync', function() {
+  test('readFileSync', function () {
     checkMissingFiles(['encoded', 'raw', 'binary']);
 
     fs.bindFileData({
-      'files/binary': Buffer.from('Buffer content')
+      'files/binary': Buffer.from('Buffer content'),
     });
 
     const base64Data = fs.readFileSync('files/binary', 'base64');
     expect(base64Data).toEqual('QnVmZmVyIGNvbnRlbnQ=');
   });
 
-  test('writeFileSync', function() {
+  test('writeFileSync', function () {
     checkMissingFiles(['encoded', 'raw', 'binary']);
 
     fs.writeFileSync(
       'files/encoded',
-      Buffer.from('File content').toString('base64')
+      Buffer.from('File content').toString('base64'),
     );
     fs.writeFileSync('files/raw', 'File content');
     fs.writeFileSync('files/binary', new Uint8Array([4, 3, 1, 2]));
@@ -46,16 +46,16 @@ describe('virtual-fs', function() {
     expect(binaryData.toJSON()).toEqual({ data: [4, 3, 1, 2], type: 'Buffer' });
   });
 
-  test('bindFileData', function() {
+  test('bindFileData', function () {
     checkMissingFiles(['encoded', 'raw', 'binary']);
 
     fs.bindFileData({
-      'files/encoded': Buffer.from('File content').toString('base64')
+      'files/encoded': Buffer.from('File content').toString('base64'),
     });
 
     fs.bindFileData({
       'files/raw': 'File content',
-      'files/binary': new Uint8Array([4, 3, 1, 2])
+      'files/binary': new Uint8Array([4, 3, 1, 2]),
     });
 
     const encodedData = fs.readFileSync('files/encoded');
@@ -73,9 +73,9 @@ describe('virtual-fs', function() {
     fs.bindFileData(
       {
         'files/raw': 'New File content',
-        'files/binary2': new Uint8Array([4, 3, 1, 2])
+        'files/binary2': new Uint8Array([4, 3, 1, 2]),
       },
-      { reset: true }
+      { reset: true },
     );
 
     checkMissingFiles(['encoded', 'binary']);

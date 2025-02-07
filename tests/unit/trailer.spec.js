@@ -12,7 +12,7 @@ describe('Document trailer', () => {
 
   beforeEach(() => {
     document = new PDFDocument({
-      info: { CreationDate: new Date(Date.UTC(2018, 1, 1)) }
+      info: { CreationDate: new Date(Date.UTC(2018, 1, 1)) },
     });
   });
 
@@ -21,14 +21,14 @@ describe('Document trailer', () => {
     document.end();
     expect(docData).toContainChunk([
       '8 0 obj',
-      '<<\n/Producer 9 0 R\n/Creator 10 0 R\n/CreationDate 11 0 R\n>>'
+      '<<\n/Producer 9 0 R\n/Creator 10 0 R\n/CreationDate 11 0 R\n>>',
     ]);
     expect(docData).toContainChunk(['9 0 obj', '(PDFKit)']);
     expect(docData).toContainChunk(['10 0 obj', '(PDFKit)']);
     expect(docData).toContainChunk(['11 0 obj', '(D:20180201000000Z)']);
     expect(docData).toContainChunk([
       'trailer',
-      `<<\n/Size 12\n/Root 3 0 R\n/Info 8 0 R\n/ID [<6d6f636b65642d7064662d6964> <6d6f636b65642d7064662d6964>]\n>>`
+      `<<\n/Size 12\n/Root 3 0 R\n/Info 8 0 R\n/ID [<6d6f636b65642d7064662d6964> <6d6f636b65642d7064662d6964>]\n>>`,
     ]);
   });
 
@@ -37,7 +37,7 @@ describe('Document trailer', () => {
     document.end();
     expect(docData).toContainChunk([
       '2 0 obj',
-      '<<\n/Dests <<\n  /Names [\n]\n>>\n>>'
+      '<<\n/Dests <<\n  /Names [\n]\n>>\n>>',
     ]);
   });
 
@@ -60,7 +60,7 @@ describe('Document trailer', () => {
     (LINK3) [7 0 R /XYZ 36 756 50]
 ]
 >>
->>`
+>>`,
     ]);
     expect(docData).toContainChunk([
       '7 0 obj',
@@ -71,7 +71,7 @@ describe('Document trailer', () => {
 /Contents 5 0 R
 /Resources 6 0 R
 /Annots [9 0 R]
->>`
+>>`,
     ]);
   });
 });

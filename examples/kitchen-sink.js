@@ -23,19 +23,21 @@ doc
   .fontSize(18)
   .text('PNG and JPEG images:')
   .image('images/test.png', 100, 160, {
-    width: 412
+    width: 412,
   })
   .image('images/test.jpeg', 190, 400, {
-    height: 300
+    height: 300,
   });
 
 // Add another page
+// prettier-ignore
 doc
   .addPage()
   .fontSize(25)
   .text('Here is some vector graphics...', 100, 100);
 
 // Draw a triangle and a circle
+// prettier-ignore
 doc
   .save()
   .moveTo(100, 150)
@@ -65,7 +67,7 @@ doc
     width: 412,
     align: 'justify',
     indent: 30,
-    paragraphGap: 5
+    paragraphGap: 5,
   });
 
 // Add another page, and set the font back
@@ -98,6 +100,7 @@ for (i = 0, len = tiger.length; i < len; i++) {
 }
 
 // Add some text with annotations
+// prettier-ignore
 doc
   .addPage()
   .fillColor('blue')
@@ -107,19 +110,22 @@ doc
   });
 
 // Add a list with a font loaded from a TrueType collection file
+// prettier-ignore
 doc
   .fillColor('#000')
   .font('fonts/Chalkboard.ttc', 'Chalkboard', 16)
   .list(['One', 'Two', 'Three'], 100, 150);
 
 // Create text with a spot color
-doc.addSpotColor('PANTONE185C', 0, 100, 78, 9)
+doc.addSpotColor('PANTONE185C', 0, 100, 78, 9);
+// prettier-ignore
 doc.moveDown()
     .fillColor('PANTONE185C')
     .text('This text uses spot color!');
 
 doc.moveDown();
 
+// prettier-ignore
 doc
   .font('Helvetica')
   .fillColor('#000')
@@ -127,27 +133,24 @@ doc
 
 doc.moveDown();
 
-doc
-  .text(loremIpsum, {
-    height: 100,
-    width: 300,
-    align: 'justify',
-  });
+doc.text(loremIpsum, {
+  height: 100,
+  width: 300,
+  align: 'justify',
+});
 
-doc
-  .text(loremIpsum, {
-    height: 100,
-    width: 300,
-    align: 'justify',
-    horizontalScaling: 75
-  });
+doc.text(loremIpsum, {
+  height: 100,
+  width: 300,
+  align: 'justify',
+  horizontalScaling: 75,
+});
 
-doc
-  .text(loremIpsum, {
-    height: 100,
-    width: 300,
-    align: 'justify',
-    horizontalScaling: 130
-  });
+doc.text(loremIpsum, {
+  height: 100,
+  width: 300,
+  align: 'justify',
+  horizontalScaling: 130,
+});
 
 doc.end();

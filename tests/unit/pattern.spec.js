@@ -1,13 +1,13 @@
 import PDFDocument from '../../lib/document';
 import { logData } from './helpers';
 
-describe('Pattern', function() {
+describe('Pattern', function () {
   let document;
 
   beforeEach(() => {
     document = new PDFDocument({
       info: { CreationDate: new Date(Date.UTC(2018, 1, 1)) },
-      compress: false
+      compress: false,
     });
   });
 
@@ -16,10 +16,7 @@ describe('Pattern', function() {
     const patternStream = '1 w 0 1 m 4 5 l s 2 0 m 5 3 l s';
     const binaryStream = Buffer.from(`${patternStream}\n`, 'binary');
     const pattern = document.pattern([1, 1, 4, 4], 3, 3, patternStream);
-    document
-      .rect(0, 0, 100, 100)
-      .fill([pattern, 'blue'])
-      .end();
+    document.rect(0, 0, 100, 100).fill([pattern, 'blue']).end();
 
     // empty resources
     expect(docData).toContainChunk(['10 0 obj', `<<\n>>`]);
@@ -41,7 +38,7 @@ describe('Pattern', function() {
 >>`,
       'stream',
       binaryStream,
-      '\nendstream'
+      '\nendstream',
     ]);
 
     // page resource dictionary with color space and pattern
@@ -56,7 +53,7 @@ describe('Pattern', function() {
 /Pattern <<
 /P1 11 0 R
 >>
->>`
+>>`,
     ]);
     // map to the underlying color space
     expect(docData).toContainChunk(['8 0 obj', `[/Pattern /DeviceCMYK]`]);
@@ -68,7 +65,7 @@ describe('Pattern', function() {
 /CsPDeviceRGB cs
 0 0 1 /P1 scn
 f\n`,
-      'binary'
+      'binary',
     );
     expect(docData).toContainChunk([
       '5 0 obj',
@@ -77,7 +74,7 @@ f\n`,
 >>`,
       'stream',
       graphicsStream,
-      '\nendstream'
+      '\nendstream',
     ]);
   });
 
@@ -87,19 +84,16 @@ f\n`,
       [1, 1, 4, 4],
       3,
       3,
-      '1 w 0 1 m 4 5 l s 2 0 m 5 3 l s'
+      '1 w 0 1 m 4 5 l s 2 0 m 5 3 l s',
     );
     const pattern2 = document.pattern(
       [1, 1, 7, 7],
       6,
       6,
-      '1 w 0 1 m 7 8 l s 5 0 m 8 3 l s'
+      '1 w 0 1 m 7 8 l s 5 0 m 8 3 l s',
     );
     document.rect(0, 0, 100, 100).fill([pattern1, 'blue']);
-    document
-      .rect(0, 0, 100, 100)
-      .fill([pattern2, 'red'])
-      .end();
+    document.rect(0, 0, 100, 100).fill([pattern2, 'red']).end();
 
     // patterns P1 and P2
     expect(docData).toContainChunk([
@@ -114,7 +108,7 @@ f\n`,
 /P1 11 0 R
 /P2 13 0 R
 >>
->>`
+>>`,
     ]);
   });
 });
