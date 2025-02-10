@@ -47,7 +47,8 @@ export default [
               }
             }
           ]
-        ]
+        ],
+        comments: false
       }),
       copy({
         targets: [
@@ -80,7 +81,8 @@ export default [
               }
             }
           ]
-        ]
+        ],
+        comments: false
       })
     ]
   },
