@@ -1,6 +1,6 @@
-import { normalizeSides } from "../../lib/utils";
+import { normalizeSides } from '../../lib/utils';
 
-describe("normalizeSides", () => {
+describe('normalizeSides', () => {
   test.each([
     [1, { top: 1, right: 1, bottom: 1, left: 1 }],
     [[1, 2], { top: 1, right: 2, bottom: 1, left: 2 }],
@@ -14,12 +14,12 @@ describe("normalizeSides", () => {
       { top: 1, right: 2, bottom: 3, left: 4 },
     ],
     [
-      { a: "hi" },
+      { a: 'hi' },
       { top: undefined, right: undefined, bottom: undefined, left: undefined },
     ],
     [
-      { vertical: "hi" },
-      { top: "hi", right: undefined, bottom: "hi", left: undefined },
+      { vertical: 'hi' },
+      { top: 'hi', right: undefined, bottom: 'hi', left: undefined },
     ],
     [
       { top: undefined },
@@ -33,23 +33,17 @@ describe("normalizeSides", () => {
       undefined,
       { top: undefined, right: undefined, bottom: undefined, left: undefined },
     ],
-    [
-      true,
-      { top: true, right: true, bottom: true, left: true },
-    ],
-    [
-      false,
-      { top: false, right: false, bottom: false, left: false },
-    ],
-  ])("%s -> %s", (size, expected) => {
+    [true, { top: true, right: true, bottom: true, left: true }],
+    [false, { top: false, right: false, bottom: false, left: false }],
+  ])('%s -> %s', (size, expected) => {
     expect(normalizeSides(size)).toEqual(expected);
   });
 
-  test("with transformer", () => {
+  test('with transformer', () => {
     expect(
       normalizeSides(
         undefined,
-        { top: "1", right: "2", bottom: "3", left: "4" },
+        { top: '1', right: '2', bottom: '3', left: '4' },
         Number,
       ),
     ).toEqual({
