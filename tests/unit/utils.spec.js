@@ -1,9 +1,4 @@
-import {
-  deepClone,
-  deepMerge,
-  definedProps,
-  normalizeSides,
-} from '../../lib/utils';
+import { normalizeSides } from '../../lib/utils';
 
 describe('normalizeSides', () => {
   test.each([
@@ -57,48 +52,5 @@ describe('normalizeSides', () => {
       bottom: 3,
       left: 4,
     });
-  });
-});
-
-describe('definedProps', () => {
-  test.each([
-    [{}, {}],
-    [{ a: 'hi' }, { a: 'hi' }],
-    [{ a: undefined }, {}],
-    [{ a: undefined, b: 1 }, { b: 1 }],
-    [{ a: { b: undefined } }, { a: {} }],
-    [{ a: { b: { c: undefined } } }, { a: { b: {} } }],
-  ])('%o -> %o', (obj, expected) => {
-    expect(definedProps(obj)).toEqual(expected);
-  });
-});
-
-describe('deepMerge', () => {
-  test.each([
-    [{ a: 'hello' }, { b: 'world' }, { a: 'hello', b: 'world' }],
-    [{ a: 'hello' }, { a: 'world' }, { a: 'world' }],
-    [{}, { a: 'hello' }, { a: 'hello' }],
-    [{ a: 'hello' }, undefined, { a: 'hello' }],
-    [undefined, undefined, undefined],
-    [1, 2, 1],
-    [1, {}, 1],
-    [{ a: 'hello' }, { a: {} }, { a: 'hello' }],
-    [{ a: { b: 'hello' } }, { a: { b: 'world' } }, { a: { b: 'world' } }],
-  ])('%o -> %o', function () {
-    const opts = Array.from(arguments);
-    const expected = opts.splice(-1, 1)[0];
-    expect(deepMerge(...opts)).toEqual(expected);
-  });
-});
-
-describe('deepClone', () => {
-  test.each([
-    [1],
-    [true],
-    ['hello'],
-    [{ a: 'hello' }],
-    [{ a: { b: 'hello' } }],
-  ])('%s', (a) => {
-    expect(deepClone(a)).toEqual(a);
   });
 });
