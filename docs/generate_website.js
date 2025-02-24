@@ -24,6 +24,7 @@ const files = [
   'destinations.md',
   'attachments.md',
   'accessibility.md',
+  'table.md',
   'you_made_it.md'
 ];
 
