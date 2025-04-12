@@ -65,7 +65,7 @@
     "publish-website": "node docs/publish_website.js",
     "docs": "npm run pdf-guide && npm run website && npm run browserify-example",
     "lint": "eslint {lib,tests}/**/*.js",
-    "prettier": "prettier {lib,tests,examples,docs}/**/*.js",
+    "prettier": "prettier lib tests docs",
     "test": "jest -i --env=node",
     "test:visual": "jest visual/ -i --env=node",
     "test:unit": "jest unit/ --env=node"
