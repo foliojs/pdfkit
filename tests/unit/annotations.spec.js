@@ -12,7 +12,7 @@ describe('Annotations', () => {
 
   beforeEach(() => {
     document = new PDFDocument({
-      info: { CreationDate: new Date(Date.UTC(2018, 1, 1)) }
+      info: { CreationDate: new Date(Date.UTC(2018, 1, 1)) },
     });
   });
 
@@ -29,7 +29,7 @@ describe('Annotations', () => {
         `<<
 /S /GoTo
 /D [7 0 R /XYZ null null null]
->>`
+>>`,
       ]);
     });
 
@@ -45,7 +45,7 @@ describe('Annotations', () => {
         `<<
 /S /URI
 /URI (http://www.example.com)
->>`
+>>`,
       ]);
     });
 
@@ -56,7 +56,7 @@ describe('Annotations', () => {
 
       document.text('Go to url', {
         link: 'http://www.example.com',
-        continued: true
+        continued: true,
       });
       document.text('continued link');
 
@@ -65,7 +65,7 @@ describe('Annotations', () => {
         `<<
 /S /URI
 /URI (http://www.example.com)
->>`
+>>`,
       ]);
 
       expect(docData).toContainChunk([
@@ -73,7 +73,7 @@ describe('Annotations', () => {
         `<<
 /S /URI
 /URI (http://www.example.com)
->>`
+>>`,
       ]);
     });
 
@@ -84,7 +84,7 @@ describe('Annotations', () => {
 
       document.text('Go to url', {
         link: 'http://www.example.com',
-        continued: true
+        continued: true,
       });
       document.text('no continued link', { link: null });
 
@@ -94,7 +94,7 @@ describe('Annotations', () => {
         `<<
 /S /URI
 /URI (http://www.example.com)
->>`
+>>`,
       ]);
 
       expect(docData).not.toContainChunk([`14 0 obj`]);
@@ -107,7 +107,7 @@ describe('Annotations', () => {
 
       document.fileAnnotation(100, 100, 20, 20, {
         src: Buffer.from('example text'),
-        name: 'file.txt'
+        name: 'file.txt',
       });
 
       expect(docData).toContainChunk([
@@ -119,7 +119,7 @@ describe('Annotations', () => {
 /Rect [100 672 120 692]
 /Border [0 0 0]
 /C [0 0 0]
->>`
+>>`,
       ]);
     });
 
@@ -129,7 +129,7 @@ describe('Annotations', () => {
       document.fileAnnotation(100, 100, 20, 20, {
         src: Buffer.from('example text'),
         name: 'file.txt',
-        description: 'file description'
+        description: 'file description',
       });
 
       expect(docData).toContainChunk([
@@ -142,7 +142,7 @@ describe('Annotations', () => {
 /Rect [100 672 120 692]
 /Border [0 0 0]
 /C [0 0 0]
->>`
+>>`,
       ]);
     });
 
@@ -157,11 +157,11 @@ describe('Annotations', () => {
         {
           src: Buffer.from('example text'),
           name: 'file.txt',
-          description: 'file description'
+          description: 'file description',
         },
         {
-          Contents: 'other description'
-        }
+          Contents: 'other description',
+        },
       );
 
       expect(docData).toContainChunk([
@@ -174,7 +174,7 @@ describe('Annotations', () => {
 /Rect [100 672 120 692]
 /Border [0 0 0]
 /C [0 0 0]
->>`
+>>`,
       ]);
     });
   });

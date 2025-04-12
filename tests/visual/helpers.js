@@ -15,25 +15,27 @@ function runDocTest(options, fn) {
     const buffers = [];
 
     (async () => {
-      await fn(doc)
-    })().then(() => {
-      doc.on('error', (err) => reject(err))
-      doc.on('data', buffers.push.bind(buffers));
-      doc.on('end', async () => {
-        try {
-          const pdfData = Buffer.concat(buffers);
-          const { systemFonts = false } = options;
-          const images = await pdf2png(pdfData, { systemFonts });
-          for (let image of images) {
-            expect(image).toMatchImageSnapshot();
+      await fn(doc);
+    })()
+      .then(() => {
+        doc.on('error', (err) => reject(err));
+        doc.on('data', buffers.push.bind(buffers));
+        doc.on('end', async () => {
+          try {
+            const pdfData = Buffer.concat(buffers);
+            const { systemFonts = false } = options;
+            const images = await pdf2png(pdfData, { systemFonts });
+            for (let image of images) {
+              expect(image).toMatchImageSnapshot();
+            }
+            resolve();
+          } catch (err) {
+            reject(err);
           }
-          resolve();
-        } catch (err) {
-          reject(err)
-        }
-      });
-      doc.end();
-    }).catch(err => reject(err));
+        });
+        doc.end();
+      })
+      .catch((err) => reject(err));
   });
 }
 

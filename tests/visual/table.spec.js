@@ -400,11 +400,7 @@ describe('table', function () {
           debug: true,
           defaultStyle: { align: 'center', width: 200, height: 200 },
           columnStyles: [{ textOptions: { rotation: 90 } }],
-          data: [
-            [
-              'Hello\nWorld',
-            ],
-          ],
+          data: [['Hello\nWorld']],
         });
       },
     );

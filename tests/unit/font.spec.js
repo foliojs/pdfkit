@@ -7,7 +7,7 @@ describe('EmbeddedFont', () => {
     const document = new PDFDocument();
     const font = PDFFontFactory.open(
       document,
-      'tests/fonts/Roboto-Regular.ttf'
+      'tests/fonts/Roboto-Regular.ttf',
     );
     const runSpy = jest.spyOn(font, 'layoutRun');
 
@@ -23,7 +23,7 @@ describe('EmbeddedFont', () => {
     const document = new PDFDocument({ fontLayoutCache: false });
     const font = PDFFontFactory.open(
       document,
-      'tests/fonts/Roboto-Regular.ttf'
+      'tests/fonts/Roboto-Regular.ttf',
     );
     const runSpy = jest.spyOn(font, 'layoutRun');
 
@@ -42,7 +42,7 @@ describe('EmbeddedFont', () => {
         document,
         'tests/fonts/Roboto-Regular.ttf',
         undefined,
-        'F1099'
+        'F1099',
       );
       const dictionary = {
         end: () => {},
@@ -61,7 +61,7 @@ describe('EmbeddedFont', () => {
         doc,
         'tests/fonts/Roboto-Regular.ttf',
         undefined,
-        'F1099'
+        'F1099',
       );
 
       // 398 different glyphs
@@ -80,15 +80,19 @@ describe('EmbeddedFont', () => {
 
       const docData = logData(doc);
       font.toUnicodeCmap();
-      const text = docData.map((d) => d.toString("utf8")).join("");
+      const text = docData.map((d) => d.toString('utf8')).join('');
 
-      let glyphs = 0
-      for (const block of text.matchAll(/beginbfrange\n((?:.|\n)*?)\nendbfrange/g)) {
-        for (const line of block[1].matchAll(/^<([0-9a-f]+)>\s+<([0-9a-f]+)>\s+\[/igm)) {
+      let glyphs = 0;
+      for (const block of text.matchAll(
+        /beginbfrange\n((?:.|\n)*?)\nendbfrange/g,
+      )) {
+        for (const line of block[1].matchAll(
+          /^<([0-9a-f]+)>\s+<([0-9a-f]+)>\s+\[/gim,
+        )) {
           const low = parseInt(line[1], 16);
           const high = parseInt(line[2], 16);
           glyphs += high - low + 1;
-          expect(high & 0xFFFFFF00).toBe(low & 0xFFFFFF00);
+          expect(high & 0xffffff00).toBe(low & 0xffffff00);
         }
       }
 

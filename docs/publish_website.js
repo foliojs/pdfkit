@@ -14,14 +14,14 @@ ghpages.publish(
       'docs/guide.pdf',
       'examples/browserify/browser.html',
       'examples/browserify/bundle.js',
-      'examples/kitchen-sink.pdf'
+      'examples/kitchen-sink.pdf',
     ],
     add: true,
-    message
+    message,
   },
-  function(err) {
+  function (err) {
     if (err) {
       console.error(err);
     }
-  }
+  },
 );
