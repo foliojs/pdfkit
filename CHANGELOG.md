@@ -2,12 +2,16 @@
 
 ### Unreleased
 
+### [v0.17.0] - 2025-04-12
+
 - Fix precision rounding issues in LineWrapper
 - Fix fonts without a postscriptName
 - Add support for dynamic sizing
 - Add support for rotatable text
 - Fix page cascade options when text overflows
 - Add table generation
+- Fix y position when using `image()` without x and y coordinates
+- Improve Prettier configuration
 
 ### [v0.16.0] - 2024-12-29
 
