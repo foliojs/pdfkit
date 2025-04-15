@@ -23,7 +23,7 @@ describe('utils', () => {
       [{ a: 'hello' }, { a: 'world' }, { a: 'world' }],
       [{}, { a: 'hello' }, { a: 'hello' }],
       [{ a: 'hello' }, undefined, { a: 'hello' }],
-      [undefined, undefined, undefined],
+      [undefined, null, undefined],
       [1, 2, 1],
       [1, {}, 1],
       [{ a: 'hello' }, { a: {} }, { a: 'hello' }],
