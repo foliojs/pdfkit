@@ -1,4 +1,5 @@
 .github/
+.git-blame-ignore-revs
 .prettierrc
 .prettierignore
 .babelrc
