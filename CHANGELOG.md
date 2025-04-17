@@ -2,6 +2,8 @@
 
 ### Unreleased
 
+- Fix null values in table cells rendering as `[object Object]`
+ 
 ### [v0.17.0] - 2025-04-12
 
 - Fix precision rounding issues in LineWrapper
