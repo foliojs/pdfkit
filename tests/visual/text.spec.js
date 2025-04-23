@@ -127,6 +127,7 @@ describe('text', function () {
       '#ecf157',
       '#acfa70',
     ];
+
     function randColor() {
       return cols[i++ % cols.length];
     }
@@ -179,6 +180,26 @@ describe('text', function () {
         // Draw origin
         .circle(300, 300, 2)
         .fill('blue');
+    });
+  });
+
+  test('bounded text precision', function () {
+    return runDocTest({ systemFonts: true }, function (doc) {
+      const text = 'New york';
+      const bounds = doc.boundsOfString(text);
+      doc
+        // Draw text which is constrained to the bounds
+        .text(text, {
+          ellipsis: true,
+          width: bounds.width,
+          height: bounds.height,
+        })
+        // Draw bounds
+        .rect(bounds.x, bounds.y, bounds.width, bounds.height)
+        .dash(1, { space: 1 })
+        .lineWidth(1)
+        .strokeOpacity(0.3)
+        .stroke('blue');
     });
   });
 });
