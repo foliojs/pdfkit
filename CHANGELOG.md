@@ -3,6 +3,7 @@
 ### Unreleased
 
 - Fix null values in table cells rendering as `[object Object]`
+- Fix further LineWrapper precision issues
  
 ### [v0.17.0] - 2025-04-12
 
