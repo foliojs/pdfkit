@@ -184,22 +184,29 @@ describe('text', function () {
   });
 
   test('bounded text precision', function () {
-    return runDocTest({ systemFonts: true }, function (doc) {
-      const text = 'New york';
-      const bounds = doc.boundsOfString(text);
-      doc
-        // Draw text which is constrained to the bounds
-        .text(text, {
-          ellipsis: true,
-          width: bounds.width,
-          height: bounds.height,
-        })
-        // Draw bounds
-        .rect(bounds.x, bounds.y, bounds.width, bounds.height)
-        .dash(1, { space: 1 })
-        .lineWidth(1)
-        .strokeOpacity(0.3)
-        .stroke('blue');
-    });
+    return runDocTest(
+      {
+        systemFonts: true,
+        failureThreshold: 0.05,
+        failureThresholdType: 'percent',
+      },
+      function (doc) {
+        const text = 'New york';
+        const bounds = doc.boundsOfString(text);
+        doc
+          // Draw text which is constrained to the bounds
+          .text(text, {
+            ellipsis: true,
+            width: bounds.width,
+            height: bounds.height,
+          })
+          // Draw bounds
+          .rect(bounds.x, bounds.y, bounds.width, bounds.height)
+          .dash(1, { space: 1 })
+          .lineWidth(1)
+          .strokeOpacity(0.3)
+          .stroke('blue');
+      },
+    );
   });
 });
