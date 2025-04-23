@@ -405,4 +405,24 @@ describe('table', function () {
       },
     );
   });
+
+  test('multi page table', function () {
+    return runDocTest({ size: [500, 300] }, function (doc) {
+      doc.font('tests/fonts/Roboto-Italic.ttf');
+      doc.table({
+        debug: true,
+        data: [
+          [
+            {
+              rowSpan: 3,
+              text: 'LEFT_COLUMN',
+            },
+            'RIGHT_COLUM_ROW_1\n'.repeat(5),
+          ],
+          ['RIGHT_COLUM_ROW_2\n'.repeat(5)],
+          ['RIGHT_COLUM_ROW_3'],
+        ],
+      });
+    });
+  });
 });
