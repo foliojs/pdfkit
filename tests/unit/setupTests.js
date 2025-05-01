@@ -1,5 +1,7 @@
-import matcher from './toContainChunk';
+import toContainChunk from './toContainChunk';
+import toContainText from './toContainText';
 import { toMatchImageSnapshot } from 'jest-image-snapshot';
 
-expect.extend(matcher);
+expect.extend(toContainChunk);
+expect.extend(toContainText);
 expect.extend({ toMatchImageSnapshot });
