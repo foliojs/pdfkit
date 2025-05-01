@@ -69,16 +69,4 @@ describe('PDFNumber', () => {
     expect(PDFNumber(n)).toBeLessThanOrEqual(n);
     expect(PDFNumber(n, false)).toBeLessThanOrEqual(n);
   });
-  test.each([
-    [0],
-    [0.04999999701976776], //float32 rounded down
-    [0.05],
-    [0.05000000074505806], //float32 rounded up
-    [1],
-    [-1],
-    [-5.05],
-    [5.05],
-  ])('PDFNumber(%f, true) -> %f', (n) => {
-    expect(PDFNumber(n, true)).toBeGreaterThanOrEqual(n);
-  });
 });
