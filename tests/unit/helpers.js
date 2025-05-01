@@ -101,7 +101,17 @@ function parseTextStream(textStream) {
     // Convert hex to string
     const hex = m[1];
     for (let i = 0; i < hex.length; i += 2) {
-      text += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
+      const code = parseInt(hex.substr(i, 2), 16);
+      let char = String.fromCharCode(code);
+      // Handle special cases
+      if (code === 0x0a) {
+        char = '\n'; // Newline
+      } else if (code === 0x0d) {
+        char = '\r'; // Carriage return
+      } else if (code === 0x85) {
+        char = '...';
+      }
+      text += char;
     }
   }
 

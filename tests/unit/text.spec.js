@@ -176,5 +176,21 @@ Q
         `endobj`,
       ]);
     });
+
+    test('bounded text precision - issue #1611', () => {
+      const docData = logData(document);
+      const text = 'New york';
+      const bounds = document.boundsOfString(text);
+      // Draw text which is constrained to the bounds
+      document.text(text, {
+        ellipsis: true,
+        width: bounds.width,
+        height: bounds.height,
+      });
+
+      document.end();
+
+      expect(docData).toContainText({ text });
+    });
   });
 });
