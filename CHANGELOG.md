@@ -2,8 +2,11 @@
 
 ### Unreleased
 
+### [v0.17.1] - 2025-05-02
+
 - Fix null values in table cells rendering as `[object Object]`
 - Fix further LineWrapper precision issues
+- Optmize standard font handling. Less code, less memory usage
  
 ### [v0.17.0] - 2025-04-12
 
