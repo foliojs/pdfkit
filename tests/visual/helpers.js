@@ -26,7 +26,7 @@ function runDocTest(options, fn) {
             const { systemFonts = false } = options;
             const images = await pdf2png(pdfData, { systemFonts });
             for (let image of images) {
-              expect(image).toMatchImageSnapshot();
+              expect(image).toMatchImageSnapshot(options);
             }
             resolve();
           } catch (err) {

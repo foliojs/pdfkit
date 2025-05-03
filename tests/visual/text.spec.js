@@ -127,6 +127,7 @@ describe('text', function () {
       '#ecf157',
       '#acfa70',
     ];
+
     function randColor() {
       return cols[i++ % cols.length];
     }

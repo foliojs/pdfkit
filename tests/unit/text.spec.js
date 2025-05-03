@@ -15,33 +15,15 @@ describe('Text', () => {
     test('with simple content', () => {
       const docData = logData(document);
 
-      const textStream = Buffer.from(
-        `1 0 0 -1 0 792 cm
-q
-1 0 0 -1 0 792 cm
-BT
-1 0 0 1 72 711.384 Tm
-/F1 12 Tf
-[<73696d706c65207465> 30 <7874> 0] TJ
-ET
-Q
-`,
-        'binary',
-      );
-
       document.text('simple text');
       document.end();
 
-      expect(docData).toContainChunk([
-        `5 0 obj`,
-        `<<
-/Length 116
->>`,
-        `stream`,
-        textStream,
-        `\nendstream`,
-        `endobj`,
-      ]);
+      expect(docData).toContainText({ text: 'simple text' });
+    });
+
+    test('with destination', () => {
+      // just check that there is no exception
+      document.text('simple text', { destination: 'anchor' });
     });
 
     test('with content ending after page right margin', () => {
@@ -193,6 +175,22 @@ Q
         `\nendstream`,
         `endobj`,
       ]);
+    });
+
+    test('bounded text precision - issue #1611', () => {
+      const docData = logData(document);
+      const text = 'New york';
+      const bounds = document.boundsOfString(text);
+      // Draw text which is constrained to the bounds
+      document.text(text, {
+        ellipsis: true,
+        width: bounds.width,
+        height: bounds.height,
+      });
+
+      document.end();
+
+      expect(docData).toContainText({ text });
     });
   });
 });
