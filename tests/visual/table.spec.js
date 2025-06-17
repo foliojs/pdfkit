@@ -426,21 +426,24 @@ describe('table', function () {
     });
   });
 
-  test('ignore trailing line break - issue #1620', function() {
-    return runDocTest({
-      systemFonts: true,
-      failureThreshold: 0.0002,
-      failureThresholdType: 'percent',
-    }, function(doc) {
-      doc.table({
-        debug: true,
-        data: [['trailingLineBreak\ndefault (true)']],
-      });
-      doc.table({
-        debug: true,
-        defaultStyle: { textOptions: { trailingLineBreak: false } },
-        data: [['trailingLineBreak\nfalse']],
-      });
-    });
+  test('ignore trailing line break - issue #1620', function () {
+    return runDocTest(
+      {
+        systemFonts: true,
+        failureThreshold: 0.0002,
+        failureThresholdType: 'percent',
+      },
+      function (doc) {
+        doc.table({
+          debug: true,
+          data: [['trailingLineBreak\ndefault (true)']],
+        });
+        doc.table({
+          debug: true,
+          defaultStyle: { textOptions: { trailingLineBreak: false } },
+          data: [['trailingLineBreak\nfalse']],
+        });
+      },
+    );
   });
 });

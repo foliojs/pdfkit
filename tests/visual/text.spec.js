@@ -183,30 +183,33 @@ describe('text', function () {
     });
   });
 
-  test('ignore trailing line break - issue #1620', function() {
-    return runDocTest({
-      systemFonts: true,
-      failureThreshold: 0.0002,
-      failureThresholdType: 'percent',
-    }, function(doc) {
-      const text = 'test\ntest';
-      let heightWithout = doc.heightOfString(text, {
-        trailingLineBreak: false,
-      });
-      doc
-        .save()
-        .rect(doc.x, doc.y, doc.page.contentWidth, heightWithout)
-        .strokeColor('red', 0.3)
-        .stroke()
-        .restore();
-      let height = doc.heightOfString(text);
-      doc
-        .save()
-        .rect(doc.x, doc.y, doc.page.contentWidth, height)
-        .strokeColor('blue', 0.3)
-        .stroke()
-        .restore();
-      doc.text(text, { height });
-    });
+  test('ignore trailing line break - issue #1620', function () {
+    return runDocTest(
+      {
+        systemFonts: true,
+        failureThreshold: 0.0002,
+        failureThresholdType: 'percent',
+      },
+      function (doc) {
+        const text = 'test\ntest';
+        let heightWithout = doc.heightOfString(text, {
+          trailingLineBreak: false,
+        });
+        doc
+          .save()
+          .rect(doc.x, doc.y, doc.page.contentWidth, heightWithout)
+          .strokeColor('red', 0.3)
+          .stroke()
+          .restore();
+        let height = doc.heightOfString(text);
+        doc
+          .save()
+          .rect(doc.x, doc.y, doc.page.contentWidth, height)
+          .strokeColor('blue', 0.3)
+          .stroke()
+          .restore();
+        doc.text(text, { height });
+      },
+    );
   });
 });
