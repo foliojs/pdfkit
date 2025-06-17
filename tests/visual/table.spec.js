@@ -426,8 +426,8 @@ describe('table', function () {
     });
   });
 
-  test('ignore trailing line break - issue #1620', function() {
-    return runDocTest({systemFonts: true}, function(doc) {
+  test('ignore trailing line break - issue #1620', function () {
+    return runDocTest({ systemFonts: true }, function (doc) {
       doc.table({
         debug: true,
         data: [['trailingLineBreak\ndefault (true)']],
