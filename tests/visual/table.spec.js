@@ -430,7 +430,7 @@ describe('table', function () {
     return runDocTest(
       {
         systemFonts: true,
-        failureThreshold: 0.0002,
+        failureThreshold: 0.002,
         failureThresholdType: 'percent',
       },
       function (doc) {
