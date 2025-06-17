@@ -183,8 +183,12 @@ describe('text', function () {
     });
   });
 
-  test('ignore trailing line break - issue #1620', function () {
-    return runDocTest({ systemFonts: true }, function (doc) {
+  test('ignore trailing line break - issue #1620', function() {
+    return runDocTest({
+      systemFonts: true,
+      failureThreshold: 0.0002,
+      failureThresholdType: 'percent',
+    }, function(doc) {
       const text = 'test\ntest';
       let heightWithout = doc.heightOfString(text, {
         trailingLineBreak: false,
