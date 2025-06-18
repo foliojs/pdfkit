@@ -6,11 +6,11 @@ describe('PDFDocument', () => {
     let fontSpy;
 
     beforeEach(() => {
-      fontSpy = jest.spyOn(PDFDocument.prototype, 'font').mockReturnThis();
+      fontSpy = vi.spyOn(PDFDocument.prototype, 'font').mockReturnThis();
     });
 
     afterEach(() => {
-      fontSpy.mockRestore();
+      vi.restoreAllMocks();
     });
 
     test('not defined', () => {

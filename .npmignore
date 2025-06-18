@@ -2,7 +2,6 @@
 .git-blame-ignore-revs
 .prettierrc
 .prettierignore
-.babelrc
 node-zlib/
 node-modules/
 CONTRIBUTING.md
@@ -19,3 +18,4 @@ index.html
 yarn.lock
 rollup.config.js
 eslint.config.mjs
+vitest.config.js

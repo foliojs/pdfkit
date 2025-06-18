@@ -25,7 +25,7 @@ describe('PNGImage', () => {
       img.finalize();
     };
     const finalizeFn = img.finalize;
-    jest.spyOn(img, 'finalize').mockImplementation(() => finalizeFn.call(img));
+    vi.spyOn(img, 'finalize').mockImplementation(() => finalizeFn.call(img));
     img.embed(document);
     return img;
   };
@@ -33,6 +33,8 @@ describe('PNGImage', () => {
   beforeEach(() => {
     document = new PDFDocument();
   });
+
+  afterEach(() => vi.restoreAllMocks());
 
   test('RGB', () => {
     // ImageWidth = 400
