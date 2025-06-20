@@ -1,9 +1,9 @@
 import { runDocTest } from './helpers';
 import LayoutEngine from '../../lib/text/layout';
 
-describe('text', function() {
-  test('rewrite', function() {
-    return runDocTest(function(doc) {
+describe('text', function () {
+  test('rewrite', function () {
+    return runDocTest(function (doc) {
       doc.font('tests/fonts/Roboto-Regular.ttf');
 
       // TODO: add these methods to the base document
@@ -13,23 +13,46 @@ describe('text', function() {
       layout.box(doc.x, doc.y, doc.page.contentWidth, doc.page.contentHeight);
 
       // Draw textBox
-      layout.textBox('fancy textBox()', { rotation: 20, border: 1, borderColor: 'red', backgroundColor: 'salmon' });
+      layout.textBox('fancy textBox()', {
+        rotation: 20,
+        border: 1,
+        borderColor: 'red',
+        backgroundColor: 'salmon',
+      });
       doc.save().circle(doc.x, doc.y, 2).fill('pink').restore(); // Display the origin
 
       // Draw normal text
       // Render the bounding box
-      const normalOpts = { y: 200, rotation: 20 }
-      const boundingBox = layout.boundsOfString('some normal text()', normalOpts);
-      layout.box(boundingBox.x, boundingBox.y, boundingBox.width, boundingBox.height, { borderColor: 'green', backgroundColor: 'lightgreen' });
+      const normalOpts = { y: 200, rotation: 20 };
+      const boundingBox = layout.boundsOfString(
+        'some normal text()',
+        normalOpts,
+      );
+      layout.box(
+        boundingBox.x,
+        boundingBox.y,
+        boundingBox.width,
+        boundingBox.height,
+        { borderColor: 'green', backgroundColor: 'lightgreen' },
+      );
       // Render the text bounds
       // This is achieved by getting the size of the text without rotation and then rendering it as a rotated box
-      const textBounds = layout.boundsOfString('some normal text()', { ...normalOpts, rotation: 0 });
-      layout.box(textBounds.x, textBounds.y, textBounds.width, textBounds.height, {
+      const textBounds = layout.boundsOfString('some normal text()', {
         ...normalOpts,
-        borderColor: 'blue',
-        backgroundColor: 'black',
-        backgroundOpacity: 0.5,
+        rotation: 0,
       });
+      layout.box(
+        textBounds.x,
+        textBounds.y,
+        textBounds.width,
+        textBounds.height,
+        {
+          ...normalOpts,
+          borderColor: 'blue',
+          backgroundColor: 'black',
+          backgroundOpacity: 0.5,
+        },
+      );
       // Display the origin
       doc.save().circle(doc.x, 200, 2).fill('darkgreen').restore();
       // Render the text
@@ -37,15 +60,15 @@ describe('text', function() {
     });
   });
 
-  test('simple text', function() {
-    return runDocTest(function(doc) {
+  test('simple text', function () {
+    return runDocTest(function (doc) {
       doc.font('tests/fonts/Roboto-Regular.ttf');
       doc.text('Really simple text', 100, 100);
     });
   });
 
-  test('alignment', function() {
-    return runDocTest(function(doc) {
+  test('alignment', function () {
+    return runDocTest(function (doc) {
       doc.font('tests/fonts/Roboto-Regular.ttf');
       doc.text('Left aligned text', { align: 'left' });
       doc.text('Right aligned text', { align: 'right' });
@@ -56,8 +79,8 @@ describe('text', function() {
     });
   });
 
-  test('soft hyphen', function() {
-    return runDocTest(function(doc) {
+  test('soft hyphen', function () {
+    return runDocTest(function (doc) {
       doc.font('tests/fonts/Roboto-Regular.ttf');
       doc.text(
         'Text with soft hyphen - Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lo ip\u00ADsum',
@@ -70,8 +93,8 @@ describe('text', function() {
     });
   });
 
-  test('decoration', function() {
-    return runDocTest(function(doc) {
+  test('decoration', function () {
+    return runDocTest(function (doc) {
       doc.font('tests/fonts/Roboto-Regular.ttf');
       doc.fillColor('blue').text('Here is a link!', 100, 100, {
         link: 'http://google.com/',
@@ -87,22 +110,22 @@ describe('text', function() {
     });
   });
 
-  test('list', function() {
-    return runDocTest(function(doc) {
+  test('list', function () {
+    return runDocTest(function (doc) {
       doc.font('tests/fonts/Roboto-Regular.ttf');
       doc.fillColor('#000').list(['One', 'Two', 'Three'], 100, 150);
     });
   });
 
-  test('list with line breaks in items', function() {
-    return runDocTest(function(doc) {
+  test('list with line breaks in items', function () {
+    return runDocTest(function (doc) {
       doc.font('tests/fonts/Roboto-Regular.ttf');
       doc.list(['Foo\nBar', 'Foo\rBar', 'Foo\r\nBar'], [100, 150]);
     });
   });
 
-  test('list (numbered)', function() {
-    return runDocTest(function(doc) {
+  test('list (numbered)', function () {
+    return runDocTest(function (doc) {
       doc.font('tests/fonts/Roboto-Regular.ttf');
       doc
         .fillColor('#000')
@@ -110,8 +133,8 @@ describe('text', function() {
     });
   });
 
-  test('list (lettered)', function() {
-    return runDocTest(function(doc) {
+  test('list (lettered)', function () {
+    return runDocTest(function (doc) {
       doc.font('tests/fonts/Roboto-Regular.ttf');
       doc
         .fillColor('#000')
@@ -119,8 +142,8 @@ describe('text', function() {
     });
   });
 
-  test('list with sub-list (unordered)', function() {
-    return runDocTest(function(doc) {
+  test('list with sub-list (unordered)', function () {
+    return runDocTest(function (doc) {
       doc.font('tests/fonts/Roboto-Regular.ttf');
       doc
         .fillColor('#000')
@@ -128,8 +151,8 @@ describe('text', function() {
     });
   });
 
-  test('list with sub-list (ordered)', function() {
-    return runDocTest(function(doc) {
+  test('list with sub-list (ordered)', function () {
+    return runDocTest(function (doc) {
       doc.font('tests/fonts/Roboto-Regular.ttf');
       doc
         .fillColor('#000')
@@ -139,8 +162,8 @@ describe('text', function() {
     });
   });
 
-  test('continued text with OpenType features', function() {
-    return runDocTest(function(doc) {
+  test('continued text with OpenType features', function () {
+    return runDocTest(function (doc) {
       doc.font('tests/fonts/Roboto-Regular.ttf');
       doc.text('Really simple', 100, 100, {
         features: ['smcp'],
@@ -151,7 +174,7 @@ describe('text', function() {
     });
   });
 
-  test('rotated text', function() {
+  test('rotated text', function () {
     let i = 0;
     const cols = [
       '#292f56',
@@ -168,7 +191,7 @@ describe('text', function() {
       return cols[i++ % cols.length];
     }
 
-    return runDocTest(function(doc) {
+    return runDocTest(function (doc) {
       doc.font('tests/fonts/Roboto-Regular.ttf');
       for (let i = -360; i < 360; i += 5) {
         const withLabel = i % 45 === 0;
@@ -194,8 +217,8 @@ describe('text', function() {
     });
   });
 
-  test('rotated multi line text', function() {
-    return runDocTest(function(doc) {
+  test('rotated multi line text', function () {
+    return runDocTest(function (doc) {
       doc.font('tests/fonts/Roboto-Regular.ttf');
       let text = `Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.`;
 
