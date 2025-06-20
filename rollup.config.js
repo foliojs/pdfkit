@@ -9,6 +9,7 @@ const external = [
   'fontkit',
   'events',
   'linebreak',
+  '@cto.af/linebreak',
   'png-js',
   'crypto-js',
   'saslprep',
@@ -43,7 +44,7 @@ export default [
             {
               modules: false,
               targets: {
-                node: '18'
+                node: '20'
               }
             }
           ]

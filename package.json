@@ -53,6 +53,7 @@
     "fontkit": "^2.0.4",
     "jpeg-exif": "^1.1.4",
     "linebreak": "^1.1.0",
+    "@cto.af/linebreak": "^3.0.0",
     "png-js": "^1.0.0"
   },
   "scripts": {
@@ -77,8 +78,7 @@
       "brfs"
     ]
   },
-  "engine": [
-    "node >= v18.0.0"
-  ],
+  "engines": {
+    "node": ">=20"
   }
 }
