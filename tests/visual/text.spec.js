@@ -18,19 +18,20 @@ describe('text', function() {
 
       // Draw normal text
       // Render the bounding box
-      const boundingBox = layout.boundsOfString('some normal text()', { y: 200, rotation: 20 });
+      const normalOpts = { y: 200, rotation: 20 }
+      const boundingBox = layout.boundsOfString('some normal text()', normalOpts);
       layout.box(boundingBox.x, boundingBox.y, boundingBox.width, boundingBox.height, { borderColor: 'lightgreen' });
       // Render the text bounds
       // This is achieved by getting the size of the text without rotation and then rendering it as a rotated box
-      const textBounds = layout.boundsOfString('some normal text()', { y: 200, rotation: 0 });
+      const textBounds = layout.boundsOfString('some normal text()', { ...normalOpts, rotation: 0 });
       layout.box(textBounds.x, textBounds.y, textBounds.width, textBounds.height, {
+        ...normalOpts,
         borderColor: 'lightgreen',
-        rotation: 20,
       });
       // Display the origin
       doc.save().circle(doc.x, 200, 2).fill('darkgreen').restore();
       // Render the text
-      layout.text('some normal text()', { y: 200, rotation: 20 });
+      layout.text('some normal text()', normalOpts);
     });
   });
 
