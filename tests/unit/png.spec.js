@@ -2,6 +2,7 @@ import PDFDocument from '../../lib/document';
 import PDFReference from '../../lib/reference';
 import PNGImage from '../../lib/image/png';
 import fs from 'fs';
+import { vi } from 'vitest';
 
 describe('PNGImage', () => {
   let document;

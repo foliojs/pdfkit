@@ -1,6 +1,7 @@
 import PDFDocument from '../../lib/document';
 import PDFFontFactory from '../../lib/font_factory';
 import { logData } from './helpers';
+import { vi } from 'vitest';
 
 describe('EmbeddedFont', () => {
   afterEach(() => vi.restoreAllMocks());

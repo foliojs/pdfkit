@@ -1,5 +1,6 @@
 import PDFDocument from '../../lib/document';
 import { logData } from './helpers';
+import { vi } from 'vitest';
 
 describe('PDFDocument', () => {
   describe('font option', () => {
