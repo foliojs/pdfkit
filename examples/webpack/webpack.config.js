@@ -16,7 +16,7 @@ module.exports = {
     symlinks: false,
     alias: {
       // maps fs to a virtual one allowing to register file content dynamically
-      fs: __dirname + '/../../js/virtual-fs.js'
+      fs: 'pdfkit/virtual-fs'
     },
     fallback: {
       // crypto module is not necessary at browser

@@ -1,15 +1,18 @@
 import PDFDocument from '../../lib/document';
 import PDFFontFactory from '../../lib/font_factory';
 import { logData } from './helpers';
+import { vi } from 'vitest';
 
 describe('EmbeddedFont', () => {
+  afterEach(() => vi.restoreAllMocks());
+
   test('no fontLayoutCache option', () => {
     const document = new PDFDocument();
     const font = PDFFontFactory.open(
       document,
       'tests/fonts/Roboto-Regular.ttf',
     );
-    const runSpy = jest.spyOn(font, 'layoutRun');
+    const runSpy = vi.spyOn(font, 'layoutRun');
 
     font.layout('test');
     font.layout('test');
@@ -25,7 +28,7 @@ describe('EmbeddedFont', () => {
       document,
       'tests/fonts/Roboto-Regular.ttf',
     );
-    const runSpy = jest.spyOn(font, 'layoutRun');
+    const runSpy = vi.spyOn(font, 'layoutRun');
 
     font.layout('test');
     font.layout('test');

@@ -15,6 +15,9 @@ export default [
       globals: {
         ...globals.jest,
       },
+    },
+    rules: {
+      "no-empty-pattern": "off"
     }
   },
 ];

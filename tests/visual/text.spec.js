@@ -1,6 +1,65 @@
 import { runDocTest } from './helpers';
+import LayoutEngine from '../../lib/text/layout';
 
 describe('text', function () {
+  test('rewrite', function () {
+    return runDocTest(function (doc) {
+      doc.font('tests/fonts/Roboto-Regular.ttf');
+
+      // TODO: add these methods to the base document
+      const layout = new LayoutEngine(doc);
+
+      // Draw bounds of the page
+      layout.box(doc.x, doc.y, doc.page.contentWidth, doc.page.contentHeight);
+
+      // Draw textBox
+      layout.textBox('fancy textBox()', {
+        rotation: 20,
+        border: 1,
+        borderColor: 'red',
+        backgroundColor: 'salmon',
+      });
+      doc.save().circle(doc.x, doc.y, 2).fill('pink').restore(); // Display the origin
+
+      // Draw normal text
+      // Render the bounding box
+      const normalOpts = { y: 200, rotation: 20 };
+      const boundingBox = layout.boundsOfString(
+        'some normal text()',
+        normalOpts,
+      );
+      layout.box(
+        boundingBox.x,
+        boundingBox.y,
+        boundingBox.width,
+        boundingBox.height,
+        { borderColor: 'green', backgroundColor: 'lightgreen' },
+      );
+      // Render the text bounds
+      // This is achieved by getting the size of the text without rotation and then rendering it as a rotated box
+      const textBounds = layout.boundsOfString('some normal text()', {
+        ...normalOpts,
+        rotation: 0,
+      });
+      layout.box(
+        textBounds.x,
+        textBounds.y,
+        textBounds.width,
+        textBounds.height,
+        {
+          ...normalOpts,
+          borderColor: 'blue',
+          backgroundColor: 'black',
+          backgroundOpacity: 0.5,
+        },
+      );
+      // Display the origin
+      doc.save().circle(doc.x, 200, 2).fill('darkgreen').restore();
+      // Render the text
+      layout.text('some normal text()', normalOpts);
+    });
+  });
+
   test('simple text', function () {
     return runDocTest(function (doc) {
       doc.font('tests/fonts/Roboto-Regular.ttf');

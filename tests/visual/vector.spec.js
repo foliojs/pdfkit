@@ -1,5 +1,5 @@
 import { runDocTest } from './helpers';
-var tiger = require('../../examples/tiger');
+import tiger from '../../examples/tiger';
 
 describe('vector', function () {
   test('simple shapes', function () {
@@ -24,29 +24,32 @@ describe('vector', function () {
   });
 
   test('complex svg', function () {
-    return runDocTest(function (doc) {
-      var i, len, part;
-      doc.translate(220, 300);
-      for (i = 0, len = tiger.length; i < len; i++) {
-        part = tiger[i];
-        doc.save();
-        doc.path(part.path);
-        if (part['stroke-width']) {
-          doc.lineWidth(part['stroke-width']);
-        }
-        if (part.fill !== 'none' && part.stroke !== 'none') {
-          doc.fillAndStroke(part.fill, part.stroke);
-        } else {
-          if (part.fill !== 'none') {
-            doc.fill(part.fill);
+    return runDocTest(
+      { failureThreshold: 0.0001, failureThresholdType: 'percent' },
+      function (doc) {
+        var i, len, part;
+        doc.translate(220, 300);
+        for (i = 0, len = tiger.length; i < len; i++) {
+          part = tiger[i];
+          doc.save();
+          doc.path(part.path);
+          if (part['stroke-width']) {
+            doc.lineWidth(part['stroke-width']);
           }
-          if (part.stroke !== 'none') {
-            doc.stroke(part.stroke);
+          if (part.fill !== 'none' && part.stroke !== 'none') {
+            doc.fillAndStroke(part.fill, part.stroke);
+          } else {
+            if (part.fill !== 'none') {
+              doc.fill(part.fill);
+            }
+            if (part.stroke !== 'none') {
+              doc.stroke(part.stroke);
+            }
           }
+          doc.restore();
         }
-        doc.restore();
-      }
-    });
+      },
+    );
   });
 
   test('svg path', function () {

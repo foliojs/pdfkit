@@ -1,16 +1,17 @@
 import PDFDocument from '../../lib/document';
 import { logData } from './helpers';
+import { vi } from 'vitest';
 
 describe('PDFDocument', () => {
   describe('font option', () => {
     let fontSpy;
 
     beforeEach(() => {
-      fontSpy = jest.spyOn(PDFDocument.prototype, 'font').mockReturnThis();
+      fontSpy = vi.spyOn(PDFDocument.prototype, 'font').mockReturnThis();
     });
 
     afterEach(() => {
-      fontSpy.mockRestore();
+      vi.restoreAllMocks();
     });
 
     test('not defined', () => {
