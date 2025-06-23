@@ -1,5 +1,5 @@
 import { runDocTest } from './helpers';
-var tiger = require('../../examples/tiger');
+import tiger from '../../examples/tiger';
 
 describe('vector', function () {
   test('simple shapes', function () {
