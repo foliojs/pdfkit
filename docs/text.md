@@ -150,6 +150,7 @@ Lists use the following additional options:
 * `bulletRadius`
 * `textIndent`
 * `bulletIndent`
+* `listType` - `bullet`, `numbered`, `roman`, `roman-lower`, `lettered` (`bullet` by default)
 
 ## Rich Text
 
