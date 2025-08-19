@@ -74,6 +74,24 @@ describe('text', function () {
     });
   });
 
+  test('list (roman numerals)', function () {
+    return runDocTest(function (doc) {
+      doc.font('tests/fonts/Roboto-Regular.ttf');
+      doc
+        .fillColor('#000')
+        .list(['One', 'Two', 'Three'], 100, 150, { listType: 'roman' });
+    });
+  });
+
+  test('list (roman numerals lowercase)', function () {
+    return runDocTest(function (doc) {
+      doc.font('tests/fonts/Roboto-Regular.ttf');
+      doc
+        .fillColor('#000')
+        .list(['One', 'Two', 'Three'], 100, 150, { listType: 'roman-lower' });
+    });
+  });
+
   test('list (lettered)', function () {
     return runDocTest(function (doc) {
       doc.font('tests/fonts/Roboto-Regular.ttf');
