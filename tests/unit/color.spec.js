@@ -56,4 +56,25 @@ describe('color', function () {
         '>>',
     ]);
   });
+
+  test('spot color with rgb', function () {
+    const doc = new PDFDocument();
+    const data = logData(doc);
+    doc.addSpotColor('MAGENTA', 255, 0, 255);
+    doc.fillColor('MAGENTA').text('This text uses spot color!');
+    doc.end();
+
+    expect(data).toContainChunk([
+      `6 0 obj`,
+      '<<\n' +
+        '/ProcSet [/PDF /Text /ImageB /ImageC /ImageI]\n' +
+        '/ColorSpace <<\n' +
+        '/CS0 8 0 R\n' +
+        '>>\n' +
+        '/Font <<\n' +
+        '/F1 9 0 R\n' +
+        '>>\n' +
+        '>>',
+    ]);
+  });
 });
