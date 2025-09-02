@@ -2,6 +2,8 @@
 
 ### Unreleased
 
+-- Add support for rgb values in a spot color
+
 ### [v0.17.1] - 2025-05-02
 
 - Fix null values in table cells rendering as `[object Object]`
