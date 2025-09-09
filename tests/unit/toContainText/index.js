@@ -1,4 +1,4 @@
-import { getObjects, parseTextStream } from '../helpers.js';
+import { getObjects, parseTextStreams } from '../helpers.js';
 
 /**
  * @import { TextStream, PDFDataObject } from '../helpers.js';
@@ -6,8 +6,12 @@ import { getObjects, parseTextStream } from '../helpers.js';
  */
 
 /**
+ * @typedef {Partial<TextStream> & Pick<Required<TextStream>, 'text'>} TextStreamMatcher
+ */
+
+/**
  * @param {JestMatchedUtils} utils
- * @param {TextStream} argument
+ * @param {TextStreamMatcher} argument
  * @return {string}
  */
 const passMessage = (utils, argument) => () => {
@@ -32,6 +36,19 @@ const failMessage = (utils, received, argument) => () => {
   );
 };
 
+// Compare position if provided, using Jest's toBeCloseTo-like logic
+const isNumber = (v) => typeof v === 'number' && Number.isFinite(v);
+const toBeClose = (received, expected, precision = 2) => {
+  if (!isNumber(received) || !isNumber(expected)) return false;
+  const tolerance = Math.pow(10, -precision) / 2;
+  return Math.abs(received - expected) < tolerance;
+};
+
+/**
+ * @param {TextStreamMatcher} expected
+ * @param {TextStream} actual
+ * @return {boolean}
+ */
 function textStreamMatches(expected, actual) {
   if (expected.text !== actual.text) {
     return false;
@@ -45,14 +62,31 @@ function textStreamMatches(expected, actual) {
     return false;
   }
 
+  if (isNumber(expected.x)) {
+    if (!toBeClose(actual.x, expected.x)) return false;
+  }
+
+  if (isNumber(expected.y)) {
+    if (!toBeClose(actual.y, expected.y)) return false;
+  }
+
   return true;
 }
 
 /**
- * @param {PDFDataObject} object
- * @return {TextStream | undefined}
+ * @param {TextStreamMatcher} expected
+ * @param {TextStream[]} list
+ * @return {boolean}
  */
-function getTextStream(object) {
+function containsTextStream(expected, list) {
+  return list.some((actual) => textStreamMatches(expected, actual));
+}
+
+/**
+ * @param {PDFDataObject} object
+ * @return {TextStream[] | undefined}
+ */
+function getTextStreams(object) {
   // text stream objects have 4 items
   // first item is a string containing the Length of the stream
   // second item 'stream'
@@ -75,28 +109,34 @@ function getTextStream(object) {
     return;
   }
 
-  return parseTextStream(object.items[2]);
+  const decodedStream = object.items[2].toString('utf8');
+
+  return parseTextStreams(decodedStream);
 }
 
 export default {
   /**
    *
    * @param {(string | Buffer)[]} data
-   * @param {Partial<TextStream>} textStream
+   * @param {TextStreamMatcher} expected
    * @returns
    */
-  toContainText(data, textStream) {
+  toContainText(data, expected) {
     const objects = getObjects(data);
+    /**
+     * @type {TextStream[]}
+     */
     const foundTextStreams = [];
     let pass = false;
 
     for (const object of objects) {
-      const objectTextStream = getTextStream(object, textStream);
-      if (!objectTextStream) {
+      const textStreamObjects = getTextStreams(object);
+      if (!textStreamObjects) {
         continue;
       }
-      foundTextStreams.push(objectTextStream);
-      if (textStreamMatches(textStream, objectTextStream)) {
+      foundTextStreams.push(...textStreamObjects);
+
+      if (containsTextStream(expected, textStreamObjects)) {
         pass = true;
         break;
       }
@@ -105,13 +145,13 @@ export default {
     if (pass) {
       return {
         pass: true,
-        message: passMessage(this.utils, textStream),
+        message: passMessage(this.utils, expected),
       };
     }
 
     return {
       pass: false,
-      message: failMessage(this.utils, foundTextStreams, textStream),
+      message: failMessage(this.utils, foundTextStreams, expected),
     };
   },
 };

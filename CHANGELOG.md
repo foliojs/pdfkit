@@ -2,10 +2,15 @@
 
 ### Unreleased
 
-### [v0.17.2] - 2025-08-01
+### [v0.17.3] - 2025-09-09
 
 - fixed png images rendering issues for qrcode
  
+ 
+### [v0.17.2] - 2025-08-30
+
+- Fix rendering lists that spans across pages
+
 
 ### [v0.17.1] - 2025-05-02
 
