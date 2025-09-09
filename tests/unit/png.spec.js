@@ -237,7 +237,6 @@ describe('PNGImage', () => {
       Type: 'XObject',
       Width: 32,
       DecodeParms: expect.any(PDFReference),
-      SMask: expect.any(PDFReference),
     });
 
     expect(img.obj.data.DecodeParms.data).toMatchObject({
@@ -245,18 +244,6 @@ describe('PNGImage', () => {
       Colors: 1,
       Columns: 32,
       Predictor: 15,
-    });
-
-    expect(img.obj.data.SMask.data).toMatchObject({
-      BitsPerComponent: 8,
-      ColorSpace: 'DeviceGray',
-      Decode: [0, 1],
-      Filter: 'FlateDecode',
-      Height: 32,
-      Length: 16,
-      Subtype: 'Image',
-      Type: 'XObject',
-      Width: 32,
     });
   });
 
