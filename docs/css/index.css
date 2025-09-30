@@ -25,6 +25,7 @@ body > nav {
   background: #F4F4F4;
   font-size: 15px;
   padding-right: 10px;
+  overflow-y: auto;
 }
 
 nav > ul {
