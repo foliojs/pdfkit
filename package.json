@@ -33,7 +33,7 @@
     "brace": "^0.11.1",
     "brfs": "~2.0.2",
     "browserify": "^17.0.1",
-    "canvas": "^3.1.0",
+    "canvas": "^3.2.0",
     "codemirror": "~5.65.18",
     "eslint": "^9.17.0",
     "gh-pages": "^6.2.0",
@@ -88,5 +88,6 @@
     "setupFilesAfterEnv": [
       "<rootDir>/tests/unit/setupTests.js"
     ]
-  }
+  },
+  "packageManager": "yarn@4.10.3"
 }

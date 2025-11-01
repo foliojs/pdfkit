@@ -10,3 +10,4 @@ coverage
 package-lock.json
 /examples/browserify/bundle.js
 index.html
+/.yarn/install-state.gz

@@ -18,9 +18,15 @@ You can also try out an interactive in-browser demo of PDFKit [here](http://pdfk
 
 ## Installation
 
-Installation uses the [npm](http://npmjs.org/) package manager. Just type the following command after installing npm.
+Use [npm](http://npmjs.org/) or [yarn](https://yarnpkg.com/) package manager. Just type the following command:
 
-    npm install pdfkit
+```bash
+# with npm
+npm install pdfkit
+
+# with yarn
+yarn add pdfkit
+```
 
 ## Features
 
@@ -40,6 +46,7 @@ Installation uses the [npm](http://npmjs.org/) package manager. Just type the fo
   - See [fontkit](http://github.com/foliojs/fontkit) for more details on advanced glyph layout support.
 - Image embedding
   - Supports JPEG and PNG files (including indexed PNGs, and PNGs with transparency)
+- Tables
 - Annotations
   - Links
   - Notes
@@ -56,7 +63,7 @@ Installation uses the [npm](http://npmjs.org/) package manager. Just type the fo
 ## Coming soon!
 
 - Patterns fills
-- Higher level APIs for creating tables and laying out content
+- Higher level APIs for laying out content
 - More performance optimizations
 - Even more awesomeness, perhaps written by you! Please fork this repository and send me pull requests.
 
@@ -168,7 +175,7 @@ stream.on('finish', function() {
 
 You can see an interactive in-browser demo of PDFKit [here](http://pdfkit.org/demo/browser.html).
 
-Note that in order to Browserify a project using PDFKit, you need to install the `brfs` module with npm,
+Note that in order to Browserify a project using PDFKit, you need to install the `brfs` module,
 which is used to load built-in font data into the package. It is listed as a `devDependency` in
 PDFKit's `package.json`, so it isn't installed by default for Node users.
 If you forget to install it, Browserify will print an error message.
