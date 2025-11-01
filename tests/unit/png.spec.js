@@ -212,7 +212,7 @@ describe('PNGImage', () => {
     });
   });
 
-  test('Pallete indexed transparency', () => {
+  test('Pallete indexed transparency 8bit', () => {
     // ImageWidth = 32
     // ImageHeight = 32
     // BitDepth = 8
@@ -257,6 +257,54 @@ describe('PNGImage', () => {
       Subtype: 'Image',
       Type: 'XObject',
       Width: 32,
+    });
+  });
+
+  test('Pallete indexed transparency 1bit', () => {
+    // ImageWidth = 290
+    // ImageHeight = 50
+    // BitDepth = 1
+    // ColorType = 3
+    // Compression = 0
+    // Filter = 0
+    // Interlace = 0
+
+    const img = createImage(
+      './tests/images/pallete-transparent-white-1bit.png',
+    );
+
+    expect(img.finalize).toBeCalledTimes(1);
+
+    expect(img.obj.data).toMatchObject({
+      BitsPerComponent: 1,
+      ColorSpace: ['Indexed', 'DeviceRGB', 1, expect.any(PDFReference)],
+      Filter: 'FlateDecode',
+      Height: 50,
+      Length: 64,
+      Subtype: 'Image',
+      Type: 'XObject',
+      Width: 290,
+      DecodeParms: expect.any(PDFReference),
+      SMask: expect.any(PDFReference),
+    });
+
+    expect(img.obj.data.DecodeParms.data).toMatchObject({
+      BitsPerComponent: 1,
+      Colors: 1,
+      Columns: 290,
+      Predictor: 15,
+    });
+
+    expect(img.obj.data.SMask.data).toMatchObject({
+      BitsPerComponent: 8, // ????
+      ColorSpace: 'DeviceGray',
+      Decode: [0, 1],
+      Filter: 'FlateDecode',
+      Height: 50,
+      Length: 16,
+      Subtype: 'Image',
+      Type: 'XObject',
+      Width: 290,
     });
   });
 
