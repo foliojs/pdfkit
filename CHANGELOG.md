@@ -2,7 +2,11 @@
 
 ### Unreleased
 
--- Add support for rgb values in a spot color
+- Add support for rgb values in a spot color
+
+### [v0.17.2] - 2025-08-30
+
+- Fix rendering lists that spans across pages
 
 ### [v0.17.1] - 2025-05-02
 

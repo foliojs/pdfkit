@@ -9,7 +9,7 @@
     "document",
     "vector"
   ],
-  "version": "0.17.1",
+  "version": "0.17.2",
   "homepage": "http://pdfkit.org/",
   "author": {
     "name": "Devon Govett",
@@ -33,13 +33,12 @@
     "brace": "^0.11.1",
     "brfs": "~2.0.2",
     "browserify": "^17.0.1",
-    "canvas": "^3.1.0",
+    "canvas": "^3.2.0",
     "codemirror": "~5.65.18",
     "eslint": "^9.17.0",
     "gh-pages": "^6.2.0",
     "globals": "^15.14.0",
     "jest": "^29.7.0",
-    "jest-environment-jsdom": "^29.7.0",
     "jest-image-snapshot": "^6.4.0",
     "markdown": "~0.5.0",
     "pdfjs-dist": "^2.14.305",
@@ -66,9 +65,9 @@
     "docs": "npm run pdf-guide && npm run website && npm run browserify-example",
     "lint": "eslint {lib,tests}/**/*.js",
     "prettier": "prettier lib tests docs",
-    "test": "jest -i --env=node",
-    "test:visual": "jest visual/ -i --env=node",
-    "test:unit": "jest unit/ --env=node"
+    "test": "jest",
+    "test:visual": "jest visual/",
+    "test:unit": "jest unit/"
   },
   "main": "js/pdfkit.js",
   "module": "js/pdfkit.es.js",
@@ -81,7 +80,7 @@
     "node >= v18.0.0"
   ],
   "jest": {
-    "testEnvironment": "jest-environment-jsdom",
+    "testEnvironment": "node",
     "testPathIgnorePatterns": [
       "/node_modules/",
       "<rootDir>/examples/"
@@ -89,5 +88,6 @@
     "setupFilesAfterEnv": [
       "<rootDir>/tests/unit/setupTests.js"
     ]
-  }
+  },
+  "packageManager": "yarn@4.10.3"
 }

@@ -7,6 +7,8 @@
  * @property {string} text
  * @property {string} font
  * @property {number} fontSize
+ * @property {number} x
+ * @property {number} y
  *
  * @typedef {string | Buffer} PDFDataItem
  * @typedef {Array<PDFDataItem>} PDFData
@@ -68,54 +70,99 @@ function getObjects(data) {
 }
 
 /**
- * @param {Buffer} textStream
- * @return {TextStream | undefined}
+ * Parse all text objects (multiple TJ) in a decoded stream.
+ * @param {string} decodedStream
+ * @return {TextStream[]}
  */
-function parseTextStream(textStream) {
-  const decodedStream = textStream.toString('utf8');
+function parseTextStreams(decodedStream) {
+  const tjRegex = /\[([^\]]+)\]\s+TJ/g;
+  const fontRegex = /\/([A-Za-z0-9]+)\s+(\d+(?:\.\d+)?)\s+Tf/g;
+  const tmRegex =
+    /([+-]?\d+(?:\.\d+)?)\s+([+-]?\d+(?:\.\d+)?)\s+([+-]?\d+(?:\.\d+)?)\s+([+-]?\d+(?:\.\d+)?)\s+([+-]?\d+(?:\.\d+)?)\s+([+-]?\d+(?:\.\d+)?)\s+Tm/g;
+  const cmRegex =
+    /([+-]?\d+(?:\.\d+)?)\s+([+-]?\d+(?:\.\d+)?)\s+([+-]?\d+(?:\.\d+)?)\s+([+-]?\d+(?:\.\d+)?)\s+([+-]?\d+(?:\.\d+)?)\s+([+-]?\d+(?:\.\d+)?)\s+cm/g;
+  /** @type {TextStream[]} */
+  const results = [];
+  let tjMatch;
 
-  // Extract font and font size
-  const fontMatch = decodedStream.match(/\/([A-Za-z0-9]+)\s+(\d+)\s+Tf/);
-
-  if (!fontMatch) {
-    return undefined;
-  }
-
-  const font = fontMatch[1];
-  const fontSize = parseInt(fontMatch[2], 10);
-
-  // Extract hex strings inside TJ array
-  const tjMatch = decodedStream.match(/\[([^\]]+)\]\s+TJ/);
-  if (!tjMatch) {
-    return undefined;
-  }
-  let text = '';
-
-  // this is a simplified version
-  // the correct way is to retrieve the encoding from /Resources /Font dictionary and decode using it
-  // https://stackoverflow.com/a/29468049/5724645
-
-  // Match all hex strings like <...>
-  const hexMatches = [...tjMatch[1].matchAll(/<([0-9a-fA-F]+)>/g)];
-  for (const m of hexMatches) {
-    // Convert hex to string
-    const hex = m[1];
-    for (let i = 0; i < hex.length; i += 2) {
-      const code = parseInt(hex.substr(i, 2), 16);
-      let char = String.fromCharCode(code);
-      // Handle special cases
-      if (code === 0x0a) {
-        char = '\n'; // Newline
-      } else if (code === 0x0d) {
-        char = '\r'; // Carriage return
-      } else if (code === 0x85) {
-        char = '...';
-      }
-      text += char;
+  while ((tjMatch = tjRegex.exec(decodedStream)) !== null) {
+    const tjIndex = tjMatch.index;
+    let fMatch;
+    let lastFontName;
+    let lastFontSize;
+    fontRegex.lastIndex = 0;
+    while (
+      (fMatch = fontRegex.exec(decodedStream)) !== null &&
+      fMatch.index < tjIndex
+    ) {
+      lastFontName = fMatch[1];
+      lastFontSize = parseFloat(fMatch[2]);
     }
+    if (!lastFontName || !lastFontSize) continue;
+
+    // Find the nearest preceding text matrix (Tm) and current transformation (cm)
+    let tmMatch;
+    let lastTm = undefined;
+    tmRegex.lastIndex = 0;
+    while (
+      (tmMatch = tmRegex.exec(decodedStream)) !== null &&
+      tmMatch.index < tjIndex
+    ) {
+      lastTm = tmMatch;
+    }
+    // Default to origin if no Tm found
+    let tx = 0;
+    let ty = 0;
+    if (lastTm) {
+      tx = parseFloat(lastTm[5]);
+      ty = parseFloat(lastTm[6]);
+    }
+
+    // Find the nearest preceding cm (CTM)
+    let cmMatch;
+    let lastCm = undefined;
+    cmRegex.lastIndex = 0;
+    while (
+      (cmMatch = cmRegex.exec(decodedStream)) !== null &&
+      cmMatch.index < tjIndex
+    ) {
+      lastCm = cmMatch;
+    }
+    // Apply transform: [a b c d e f] to point (tx, ty)
+    let x = tx;
+    let y = ty;
+    if (lastCm) {
+      const a = parseFloat(lastCm[1]);
+      const b = parseFloat(lastCm[2]);
+      const c = parseFloat(lastCm[3]);
+      const d = parseFloat(lastCm[4]);
+      const e = parseFloat(lastCm[5]);
+      const f = parseFloat(lastCm[6]);
+      x = a * tx + c * ty + e;
+      y = b * tx + d * ty + f;
+    }
+
+    const arrayContent = tjMatch[1];
+    let text = '';
+    const hexMatches = [...arrayContent.matchAll(/<([0-9a-fA-F]+)>/g)];
+    for (const m of hexMatches) {
+      const hex = m[1];
+      for (let i = 0; i < hex.length; i += 2) {
+        // this is a simplified version
+        // the correct way is to retrieve the encoding from /Resources /Font dictionary and decode using it
+        // https://stackoverflow.com/a/29468049/5724645
+        const code = parseInt(hex.substring(i, i + 2), 16);
+        let char = String.fromCharCode(code);
+        if (code === 0x0a) char = '\n';
+        else if (code === 0x0d) char = '\r';
+        else if (code === 0x85) char = '...';
+        text += char;
+      }
+    }
+    results.push({ text, font: lastFontName, fontSize: lastFontSize, x, y });
   }
 
-  return { text, font, fontSize };
+  return results;
 }
 
-export { logData, joinTokens, parseTextStream, getObjects };
+export { logData, joinTokens, parseTextStreams, getObjects };
