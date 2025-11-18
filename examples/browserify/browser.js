@@ -85,6 +85,7 @@ var editor = ace.edit('editor');
 editor.setTheme('ace/theme/monokai');
 editor.getSession().setMode('ace/mode/javascript');
 editor.setValue(
+  localStorage.getItem('editorText') ||
   makePDF
     .toString()
     .split('\n')
@@ -107,12 +108,14 @@ editor.getSession().on('change', function() {
     if (debounceTimeout) {
       clearTimeout(debounceTimeout);
     }
+    const text = editor.getValue()
+    localStorage.setItem('editorText', text)
     var fn = new Function(
       'PDFDocument',
       'blobStream',
       'lorem',
       'iframe',
-      editor.getValue()
+      text
     );
     debounceTimeout = setTimeout(() => {
       fn(PDFDocument, blobStream, lorem, iframe);
