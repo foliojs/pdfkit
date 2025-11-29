@@ -149,9 +149,7 @@ describe('EmbeddedFont', () => {
         const rangeMatches = bfrangeContent.matchAll(
           /^<([0-9a-f]+)>\s+<([0-9a-f]+)>\s+\[/gm,
         );
-        for (const match of rangeMatches) {
-          actualRangeCount++;
-        }
+        actualRangeCount = [...rangeMatches].length;
       }
 
       // The declared count must match the actual number of ranges
@@ -194,9 +192,7 @@ describe('EmbeddedFont', () => {
         const rangeMatches = bfrangeContent.matchAll(
           /^<([0-9a-f]+)>\s+<([0-9a-f]+)>\s+\[/gm,
         );
-        for (const match of rangeMatches) {
-          actualRangeCount++;
-        }
+        actualRangeCount = [...rangeMatches].length;
       }
 
       // For <=256 characters, should have exactly 1 range
