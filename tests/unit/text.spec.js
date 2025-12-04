@@ -193,4 +193,47 @@ Q
       expect(docData).toContainText({ text });
     });
   });
+
+  describe('text with structure parent links', () => {
+    beforeEach(() => {
+      document = new PDFDocument({
+        info: { CreationDate: new Date(Date.UTC(2018, 1, 1)) },
+        compress: false,
+        tagged: true,
+      });
+    });
+
+    test('should auto-link text inside Link structure element', () => {
+      const docData = logData(document);
+
+      const linkElement = document.struct('Link', () => {
+        document.text('Click here', 100, 100, {
+          link: 'http://example.com',
+        });
+      });
+
+      document.addStructure(linkElement);
+      linkElement.end();
+      document.end();
+
+      const dataStr = docData.join('\n');
+      expect(dataStr).toContain('/S /Link');
+      expect(dataStr).toContain('/StructParent');
+    });
+
+    test('should not add StructParent outside Link structure', () => {
+      const docData = logData(document);
+
+      document.text('Click here', 100, 100, {
+        link: 'http://example.com',
+      });
+
+      document.end();
+
+      const dataStr = docData.join('\n');
+      expect(dataStr).toContain('/Subtype /Link');
+      expect(dataStr).not.toContain('/StructParent');
+    });
+  });
 });
+

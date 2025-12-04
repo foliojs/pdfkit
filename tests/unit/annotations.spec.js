@@ -178,4 +178,41 @@ describe('Annotations', () => {
       ]);
     });
   });
+
+  describe('annotations with structure parent', () => {
+    test('should add structParent to link annotations', () => {
+      document = new PDFDocument({
+        info: { CreationDate: new Date(Date.UTC(2018, 1, 1)) },
+        compress: false,
+        tagged: true,
+      });
+
+      const docData = logData(document);
+
+      const linkElement = document.struct('Link');
+      document.addStructure(linkElement);
+
+      document.link(100, 100, 100, 20, 'http://example.com', {
+        structParent: linkElement,
+      });
+
+      linkElement.end();
+      document.end();
+
+      const dataStr = docData.join('\n');
+      expect(dataStr).toContain('/StructParent 0');
+      expect(dataStr).toContain('/Contents ()');
+    });
+
+    test('should work without structParent (backwards compatibility)', () => {
+      const docData = logData(document);
+
+      document.link(100, 100, 100, 20, 'http://example.com');
+      document.end();
+
+      const dataStr = docData.join('\n');
+      expect(dataStr).toContain('/Subtype /Link');
+      expect(dataStr).not.toContain('/StructParent');
+    });
+  });
 });

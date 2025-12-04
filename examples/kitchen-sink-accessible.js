@@ -7,7 +7,9 @@ var doc = new PDFDocument({
   pdfVersion: '1.5',
   lang: 'en-US',
   tagged: true,
-  displayTitle: true
+  displayTitle: true,
+  // @ts-ignore PDF/UA needs to be enforced for PAC accessibility checker
+  subset: 'PDF/UA',
 });
 
 doc.pipe(fs.createWriteStream('kitchen-sink-accessible.pdf'));
