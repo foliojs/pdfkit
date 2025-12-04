@@ -3,6 +3,7 @@
 ### Unreleased
 
 - Fix garbled text copying in Chrome/Edge for PDFs with >256 unique characters (#1659)
+- Fix Link accessibility issues
 
 ### [v0.17.2] - 2025-08-30
 
