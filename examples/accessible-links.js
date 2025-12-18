@@ -1,4 +1,4 @@
-var PDFDocument = require('../');
+var PDFDocument = require('../js/pdfkit');
 var fs = require('fs');
 
 // Create a new PDFDocument
@@ -45,21 +45,40 @@ doc.addPage();
 var linkSection = doc.struct('Sect');
 struct.add(linkSection);
 
-linkSection.add(
+var paragraph = doc.struct('P');
+linkSection.add(paragraph);
+
+paragraph.add(
+  doc.struct('Span', () => {
+    doc.font('Palatino').fillColor('black').text('This is some text before ', 100, 100, {
+      continued: true
+    });
+  })
+);
+
+paragraph.add(
   doc.struct(
     'Link',
     {
       alt: 'Here is a link! '
     },
     () => {
-      doc.font('Palatino').fillColor('blue').text('Here is a link!', 100, 100, {
+      doc.fillColor('blue').text('Here is a link!', {
         link: 'http://google.com/',
-        underline: true
+        underline: true,
+        continued: true
       });
     }
   )
 );
 
+paragraph.add(
+  doc.struct('Span', () => {
+    doc.fillColor('black').text(' and this is text after the link.');
+  })
+);
+
+paragraph.end();
 linkSection.end();
 
 

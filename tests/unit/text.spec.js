@@ -234,6 +234,50 @@ Q
       expect(dataStr).toContain('/Subtype /Link');
       expect(dataStr).not.toContain('/StructParent');
     });
+
+    test('should not leak link options to subsequent structure elements with continued text', () => {
+      const docData = logData(document);
+
+      const paragraph = document.struct('P');
+      document.addStructure(paragraph);
+
+      paragraph.add(
+        document.struct('Span', () => {
+          document.text('This is some text before ', 100, 100, {
+            continued: true,
+          });
+        })
+      );
+
+      paragraph.add(
+        document.struct('Link', () => {
+          document.text('Here is a link!', {
+            link: 'http://google.com/',
+            underline: true,
+            continued: true,
+          });
+        })
+      );
+
+      paragraph.add(
+        document.struct('Span', () => {
+          document.text(' and this is text after the link.');
+        })
+      );
+
+      paragraph.end();
+      document.end();
+
+      const dataStr = docData.join('\n');
+      
+      // Count how many link annotations exist - should be exactly 1
+      const linkMatches = dataStr.match(/\/Subtype \/Link/g);
+      expect(linkMatches).toBeTruthy();
+      expect(linkMatches.length).toBe(1);
+      
+      expect(dataStr).toContain('/S /Span');
+      expect(dataStr).toContain('/S /Link');
+    });
   });
 });
 
