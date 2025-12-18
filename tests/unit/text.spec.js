@@ -246,7 +246,7 @@ Q
           document.text('This is some text before ', 100, 100, {
             continued: true,
           });
-        })
+        }),
       );
 
       paragraph.add(
@@ -256,28 +256,27 @@ Q
             underline: true,
             continued: true,
           });
-        })
+        }),
       );
 
       paragraph.add(
         document.struct('Span', () => {
           document.text(' and this is text after the link.');
-        })
+        }),
       );
 
       paragraph.end();
       document.end();
 
       const dataStr = docData.join('\n');
-      
+
       // Count how many link annotations exist - should be exactly 1
       const linkMatches = dataStr.match(/\/Subtype \/Link/g);
       expect(linkMatches).toBeTruthy();
       expect(linkMatches.length).toBe(1);
-      
+
       expect(dataStr).toContain('/S /Span');
       expect(dataStr).toContain('/S /Link');
     });
   });
 });
-

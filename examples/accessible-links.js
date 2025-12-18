@@ -1,4 +1,4 @@
-var PDFDocument = require('../js/pdfkit');
+var PDFDocument = require('../');
 var fs = require('fs');
 
 // Create a new PDFDocument
@@ -34,9 +34,8 @@ struct.add(
       .font('Palatino')
       .fontSize(25)
       .text('Some text with an embedded font! ', 100, 100);
-  })
+  }),
 );
-
 
 // Add another page
 doc.addPage();
@@ -50,37 +49,39 @@ linkSection.add(paragraph);
 
 paragraph.add(
   doc.struct('Span', () => {
-    doc.font('Palatino').fillColor('black').text('This is some text before ', 100, 100, {
-      continued: true
-    });
-  })
+    doc
+      .font('Palatino')
+      .fillColor('black')
+      .text('This is some text before ', 100, 100, {
+        continued: true,
+      });
+  }),
 );
 
 paragraph.add(
   doc.struct(
     'Link',
     {
-      alt: 'Here is a link! '
+      alt: 'Here is a link! ',
     },
     () => {
       doc.fillColor('blue').text('Here is a link!', {
         link: 'http://google.com/',
         underline: true,
-        continued: true
+        continued: true,
       });
-    }
-  )
+    },
+  ),
 );
 
 paragraph.add(
   doc.struct('Span', () => {
     doc.fillColor('black').text(' and this is text after the link.');
-  })
+  }),
 );
 
 paragraph.end();
 linkSection.end();
-
 
 // End and flush the document
 doc.end();
