@@ -12,7 +12,7 @@ const external = [
   'png-js',
   'crypto-js',
   'saslprep',
-  'jpeg-exif'
+  'jay-peg'
 ];
 
 const supportedBrowsers = [

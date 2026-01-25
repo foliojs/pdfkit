@@ -9,6 +9,7 @@
 - Fix Interlaced PNG with indexed transparency rendered incorrectly
 - Preserve existing PageMode instead of overwriting when adding outlines
 - Support outlines that jump to specific page positions with custom zoom level
+- Replace deprecated jpeg-exif with jay-peg for JPEG parsing
 
 ### [v0.17.2] - 2025-08-30
 

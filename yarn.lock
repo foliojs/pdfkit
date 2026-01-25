@@ -4864,6 +4864,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"jay-peg@npm:^1.1.1":
+  version: 1.1.1
+  resolution: "jay-peg@npm:1.1.1"
+  dependencies:
+    restructure: "npm:^3.0.0"
+  checksum: 10c0/654ea1e1938dac5af24d4bf8fc9a2ac91faf39a18295b40e02b1c8bd08e9f17df78d383a538891e29ed5f7097e098bbae256d5dab39854314f5771eceeea2088
+  languageName: node
+  linkType: hard
+
 "jest-changed-files@npm:^29.7.0":
   version: 29.7.0
   resolution: "jest-changed-files@npm:29.7.0"
@@ -5321,13 +5330,6 @@ __metadata:
   bin:
     jest: bin/jest.js
   checksum: 10c0/f40eb8171cf147c617cc6ada49d062fbb03b4da666cb8d39cdbfb739a7d75eea4c3ca150fb072d0d273dce0c753db4d0467d54906ad0293f59c54f9db4a09d8b
-  languageName: node
-  linkType: hard
-
-"jpeg-exif@npm:^1.1.4":
-  version: 1.1.4
-  resolution: "jpeg-exif@npm:1.1.4"
-  checksum: 10c0/0f9225b2423184d60c66b3d7361176801c17ede92fc9b3c044fcf00f379a5a1d424b360ecf0027dda47d405d253c7b62bf5b353fb08b2589e3650f38cc575e82
   languageName: node
   linkType: hard
 
@@ -6323,9 +6325,9 @@ __metadata:
     fontkit: "npm:^2.0.4"
     gh-pages: "npm:^6.2.0"
     globals: "npm:^15.14.0"
+    jay-peg: "npm:^1.1.1"
     jest: "npm:^29.7.0"
     jest-image-snapshot: "npm:^6.4.0"
-    jpeg-exif: "npm:^1.1.4"
     linebreak: "npm:^1.1.0"
     markdown: "npm:~0.5.0"
     pdfjs-dist: "npm:^2.14.305"
