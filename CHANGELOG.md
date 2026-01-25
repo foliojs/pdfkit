@@ -6,6 +6,7 @@
 - Fix Link accessibility issues
 - Fix Table Accessibility Issue: Operator CS/cs not allowed in this current state
 - Preserve existing PageMode instead of overwriting when adding outlines
+- Support outlines that jump to specific page positions with custom zoom level
 
 ### [v0.17.2] - 2025-08-30
 
