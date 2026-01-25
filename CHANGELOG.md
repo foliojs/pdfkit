@@ -5,7 +5,7 @@
 - Fix garbled text copying in Chrome/Edge for PDFs with >256 unique characters (#1659)
 - Fix Link accessibility issues
 - Fix Table Accessibility Issue: Operator CS/cs not allowed in this current state
-
+- Fix Interlaced PNG with indexed transparency rendered incorrectly
 
 ### [v0.17.2] - 2025-08-30
 
