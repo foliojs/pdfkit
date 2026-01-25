@@ -83,6 +83,18 @@ In order to use the predefined sizes, the name of the size (as named in the list
 
     // Passing size to the constructor
     const doc = new PDFDocument({size: 'A7'});
-        
+
     // Passing size to the addPage function
     doc.addPage({size: 'A7'});
+
+### User Unit (PDF 1.6+)
+
+The `userUnit` option allows you to scale the physical size of a page without changing the coordinate system. This is useful for creating large format documents like posters or banners that exceed the standard PDF coordinate limit (200 inches or 14400 points).
+
+The default value is `1.0`, where 1 unit equals 1/72 inch (1 point). Setting `userUnit: 2.0` means 1 unit equals 2/72 inch, effectively doubling the physical size of the page.
+
+    // Create a page with 2x physical size
+    doc.addPage({ size: 'A4', userUnit: 2.0 });
+
+    // Create a large poster (4x scale)
+    doc.addPage({ size: [612, 792], userUnit: 4.0 });

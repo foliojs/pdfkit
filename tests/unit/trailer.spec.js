@@ -70,6 +70,7 @@ describe('Document trailer', () => {
 /MediaBox [0 0 612 792]
 /Contents 5 0 R
 /Resources 6 0 R
+/UserUnit 1
 /Annots [9 0 R]
 >>`,
     ]);
