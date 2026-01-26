@@ -11,6 +11,8 @@
 - Preserve existing PageMode instead of overwriting when adding outlines
 - Add userUnit option for custom page units (PDF 1.6)
 - Support outlines that jump to specific page positions with custom zoom level
+- Add robust handling of null byte padding in JPEG images
+- Replace outdated jpeg-exif with minimal implementation
 
 ### [v0.17.2] - 2025-08-30
 
