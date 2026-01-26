@@ -77,6 +77,25 @@ which is used to load built-in font data into the package. It is listed as a `de
 PDFKit's `package.json`, so it isn't installed by default for Node users.
 If you forget to install it, Browserify will print an error message.
 
+## Document options
+
+When creating a PDFDocument, you can pass various options to control the document behavior.
+
+### Page Layout
+
+The `pageLayout` option specifies how pages should be displayed in a PDF viewer:
+
+| Value | Description |
+|-------|-------------|
+| `singlePage` | Display one page at a time |
+| `oneColumn` | Display pages in one column |
+| `twoColumnLeft` | Display pages in two columns, odd pages on left |
+| `twoColumnRight` | Display pages in two columns, odd pages on right |
+| `twoPageLeft` | Display two pages at a time, odd pages on left |
+| `twoPageRight` | Display two pages at a time, odd pages on right |
+
+    const doc = new PDFDocument({ pageLayout: 'twoColumnLeft' });
+
 ## Adding pages
 
 The first page of a PDFKit document is added for you automatically when you

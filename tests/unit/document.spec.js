@@ -67,4 +67,28 @@ describe('PDFDocument', () => {
 
     expect(catalog).not.toContain('/Metadata');
   });
+
+  describe('pageLayout', () => {
+    test('sets PageLayout in catalog when provided', () => {
+      const doc = new PDFDocument({ pageLayout: 'twoColumnLeft' });
+      expect(doc._root.data.PageLayout).toBe('TwoColumnLeft');
+    });
+
+    test('does not set PageLayout when not provided', () => {
+      const doc = new PDFDocument();
+      expect(doc._root.data.PageLayout).toBeUndefined();
+    });
+
+    test.each([
+      ['singlePage', 'SinglePage'],
+      ['oneColumn', 'OneColumn'],
+      ['twoColumnLeft', 'TwoColumnLeft'],
+      ['twoColumnRight', 'TwoColumnRight'],
+      ['twoPageLeft', 'TwoPageLeft'],
+      ['twoPageRight', 'TwoPageRight'],
+    ])('converts %s to %s', (input, expected) => {
+      const doc = new PDFDocument({ pageLayout: input });
+      expect(doc._root.data.PageLayout).toBe(expected);
+    });
+  });
 });
