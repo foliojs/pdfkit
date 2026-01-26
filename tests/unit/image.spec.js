@@ -1,4 +1,6 @@
 import PDFDocument from '../../lib/document';
+import fs from 'fs';
+import JPEG from '../../lib/image/jpeg';
 
 describe('Image', function () {
   /**
@@ -17,5 +19,13 @@ describe('Image', function () {
     const imageHeight = 400;
     document.image('./tests/images/bee.png');
     expect(document.y).toBe(originalY + imageHeight);
+  });
+
+  test('should parse JPEG with EXIF data (issue #1175)', () => {
+    const data = fs.readFileSync('./tests/images/issue-1175.jpeg');
+    const jpeg = new JPEG(data, 'test');
+    expect(jpeg.width).toBe(375);
+    expect(jpeg.height).toBe(500);
+    expect(jpeg.orientation).toBe(1);
   });
 });
