@@ -6,6 +6,7 @@
 - Fix Link accessibility issues
 - Fix Table Accessibility Issue: Operator CS/cs not allowed in this current state
 - Fix Interlaced PNG with indexed transparency rendered incorrectly
+- Preserve existing PageMode instead of overwriting when adding outlines
 
 ### [v0.17.2] - 2025-08-30
 
