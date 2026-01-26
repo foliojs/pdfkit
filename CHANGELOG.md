@@ -6,6 +6,7 @@
 - Fix Link accessibility issues
 - Fix Table Accessibility Issue: Operator CS/cs not allowed in this current state
 - Add pageLayout option to control how pages are displayed in PDF viewers
+- Preserve existing PageMode instead of overwriting when adding outlines
 
 ### [v0.17.2] - 2025-08-30
 
