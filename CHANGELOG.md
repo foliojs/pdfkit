@@ -5,8 +5,9 @@
 - Fix garbled text copying in Chrome/Edge for PDFs with >256 unique characters (#1659)
 - Fix Link accessibility issues
 - Fix Table Accessibility Issue: Operator CS/cs not allowed in this current state
-- Add pageLayout option to control how pages are displayed in PDF viewers
 - Fix Interlaced PNG with indexed transparency rendered incorrectly
+- Fix SVG path parser incorrectly handle arc flags without separators
+- Add pageLayout option to control how pages are displayed in PDF viewers
 - Preserve existing PageMode instead of overwriting when adding outlines
 - Support outlines that jump to specific page positions with custom zoom level
 
