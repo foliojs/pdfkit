@@ -11,8 +11,7 @@ const external = [
   'linebreak',
   'png-js',
   'crypto-js',
-  'saslprep',
-  'jpeg-exif'
+  'saslprep'
 ];
 
 const supportedBrowsers = [

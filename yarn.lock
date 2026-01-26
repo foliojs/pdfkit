@@ -5324,13 +5324,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jpeg-exif@npm:^1.1.4":
-  version: 1.1.4
-  resolution: "jpeg-exif@npm:1.1.4"
-  checksum: 10c0/0f9225b2423184d60c66b3d7361176801c17ede92fc9b3c044fcf00f379a5a1d424b360ecf0027dda47d405d253c7b62bf5b353fb08b2589e3650f38cc575e82
-  languageName: node
-  linkType: hard
-
 "js-stringify@npm:^1.0.2":
   version: 1.0.2
   resolution: "js-stringify@npm:1.0.2"
@@ -6325,7 +6318,6 @@ __metadata:
     globals: "npm:^15.14.0"
     jest: "npm:^29.7.0"
     jest-image-snapshot: "npm:^6.4.0"
-    jpeg-exif: "npm:^1.1.4"
     linebreak: "npm:^1.1.0"
     markdown: "npm:~0.5.0"
     pdfjs-dist: "npm:^2.14.305"
