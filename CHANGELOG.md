@@ -5,6 +5,7 @@
 - Fix garbled text copying in Chrome/Edge for PDFs with >256 unique characters (#1659)
 - Fix Link accessibility issues
 - Fix Table Accessibility Issue: Operator CS/cs not allowed in this current state
+- Preserve existing PageMode instead of overwriting when adding outlines
 - Add userUnit option for custom page units (PDF 1.6)
 
 ### [v0.17.2] - 2025-08-30
