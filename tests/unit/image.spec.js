@@ -21,7 +21,7 @@ describe('Image', function () {
     expect(document.y).toBe(originalY + imageHeight);
   });
 
-  test('should parse JPEG with EXIF data (issue #1175)', () => {
+  test('parse JPEG with null byte padding in EXIF (issue #1175)', () => {
     const data = fs.readFileSync('./tests/images/issue-1175.jpeg');
     const jpeg = new JPEG(data, 'test');
     expect(jpeg.width).toBe(375);
