@@ -10,7 +10,10 @@ const external = [
   'events',
   'linebreak',
   'png-js',
-  'crypto-js',
+  'js-md5',
+  '@noble/hashes/utils',
+  '@noble/hashes/sha256',
+  '@noble/ciphers/aes',
   'saslprep'
 ];
 
