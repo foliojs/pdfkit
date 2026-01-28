@@ -54,8 +54,8 @@ describe('PDFSecurity', () => {
   describe('generateRandomWordArray', () => {
     test('returns Uint8Array of correct length', () => {
       const result = PDFSecurity.generateRandomWordArray(16);
-      expect(result).toBeInstanceOf(Object);
-      expect(result.sigBytes).toBe(16);
+      expect(result).toBeInstanceOf(Uint8Array);
+      expect(result.length).toBe(16);
     });
 
     test('returns different values each time', () => {
