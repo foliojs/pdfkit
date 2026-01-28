@@ -14,6 +14,7 @@ const external = [
   '@noble/hashes/utils',
   '@noble/hashes/sha256',
   '@noble/ciphers/aes',
+  'crypto',
   'saslprep'
 ];
 
