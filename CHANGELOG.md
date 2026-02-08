@@ -14,6 +14,7 @@
 - Add robust handling of null byte padding in JPEG images
 - Replace outdated jpeg-exif with minimal implementation
 - Replace outdated crypto-js with maintained small alternatives
+- Fix issue with indentation with `indentAllLines: true` when a new page is created 
 
 ### [v0.17.2] - 2025-08-30
 
