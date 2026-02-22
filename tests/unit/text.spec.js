@@ -11,7 +11,7 @@ function createMockFont(overrides = {}) {
   return {
     unitsPerEm: 2048,
     ascent: 1900,
-    layout(text) {
+    layout() {
       return {
         glyphs: overrides.glyphs || [],
         positions: overrides.positions || [],
@@ -818,7 +818,7 @@ Q
 
       // This may throw because pngHeader isn't a valid full PNG,
       // but the type check should pass (it won't return null for unsupported type)
-      const result = document._getEmojiImage(glyph, 20, font);
+      document._getEmojiImage(glyph, 20, font);
       // Either returns an image or null due to invalid PNG data — but NOT null due to type check
       // The key assertion is that "png " is accepted as a valid type
       expect(glyph.getImageForSize).toHaveBeenCalledWith(20);
