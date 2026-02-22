@@ -71,6 +71,10 @@ function probeFont(path, family) {
     if (!has) { console.log(); continue; }
 
     const glyph = font.glyphForCodePoint(cp);
+    if (!glyph) {
+      console.log('  glyph=null');
+      continue;
+    }
     process.stdout.write(`  type=${glyph.type}  id=${glyph.id}  advW=${glyph.advanceWidth}`);
 
     if (glyph.type === 'SBIX') {
