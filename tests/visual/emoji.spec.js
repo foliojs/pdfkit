@@ -1,22 +1,37 @@
+import fs from 'fs';
 import { runDocTest } from './helpers';
+
+const APPLE_EMOJI_PATH = '/System/Library/Fonts/Apple Color Emoji.ttc';
 
 describe('emoji', function () {
 
-  const docOptions =  {
+  const docOptions =  [{
     compress: false,
     emojiFont: 'tests/fonts/Twemoji.Mozilla.ttf',
     emojiFontFamily: 'TwemojiMozilla',
-  }
+  },
+  {
+    compress: false,
+    emojiFont: 'tests/fonts/NotoColorEmoji.ttf',
+    emojiFontFamily: 'NotoColorEmoji',
+  },
+];
 
-  test('simple emoji mixed with text',  function () {
-        return runDocTest(docOptions, function (doc) {
+const appleTest = {
+    compress: false,
+    emojiFont: APPLE_EMOJI_PATH,
+    emojiFontFamily: 'AppleColorEmoji',
+  };
+
+ const fontTest = (options) => 
+          runDocTest(options, function (doc) {
       doc.font('tests/fonts/Roboto-Regular.ttf');
       let y = 30;
       const gap = 2;
 
       // --- Basic emoji mixed with text ---
       doc.fontSize(18);
-      doc.text('Hello 😀 World 🎉 Test 🚀', 50, y);
+      doc.text('Hello 😀 World 🎉 Test 🚀 from ' + options.emojiFontFamily + ' font', 50, y);
       y += 24 + gap;
 
       // --- Emoji-only line (no surrounding text) ---
@@ -109,7 +124,13 @@ describe('emoji', function () {
       doc.fontSize(24);
       doc.text('👨‍🚀 👩‍🔬 👨‍🍳 👩‍🎤', 50, y);
       });
+      
+  test('simple emoji mixed with text multiple fonts',  function () {
+    return Promise.all(docOptions.map(fontTest));
     
   });
+
+  (fs.existsSync(appleTest.emojiFont) ? test : test.skip)('Apple Color Emoji', () => fontTest(appleTest));
+
 });
 
