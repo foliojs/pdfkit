@@ -66,6 +66,8 @@
     "docs": "npm run pdf-guide && npm run website && npm run browserify-example",
     "lint": "eslint {lib,tests}/**/*.js",
     "prettier": "prettier lib tests docs",
+    "prettier:fix": "prettier --write lib tests docs",
+    "prettier:check": "prettier --check lib tests docs",
     "test": "jest",
     "test:visual": "jest visual/",
     "test:unit": "jest unit/"
