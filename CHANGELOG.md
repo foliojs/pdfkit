@@ -2,7 +2,7 @@
 
 ### Unreleased
 
-- Add color emoji support via SBIX bitmap rendering (#1690)
+- Add COLR/CPAL and CBDT/CBLC color emoji support (#1692)
 - Fix garbled text copying in Chrome/Edge for PDFs with >256 unique characters (#1659)
 - Fix Link accessibility issues
 - Fix Table Accessibility Issue: Operator CS/cs not allowed in this current state
