@@ -75,7 +75,7 @@ Test commands
 
 To write new tests, look for the *.spec.js files at `test/unit` and `test/visual` as examples
 
-> Visual tests should use an embedded font, instead of system fonts, to ensure uniform rendering between different environments
+> Visual tests should use an embedded font, instead of system fonts, to ensure uniform rendering between different environments. In addition it should only have 1 test per file.
 
 ## Documentation
 
