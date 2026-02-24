@@ -847,7 +847,13 @@ Q
         .mockImplementation(() => {});
 
       document._emojiFragment('😀', 100, 200, {});
-      expect(spy).toHaveBeenCalledWith(mockGlyph, 100, 200, 16, document._emojiFont);
+      expect(spy).toHaveBeenCalledWith(
+        mockGlyph,
+        100,
+        200,
+        16,
+        document._emojiFont,
+      );
 
       spy.mockRestore();
     });
@@ -1023,7 +1029,9 @@ Q
 
       const dataStr = contentCalls.join('\n');
       // Should contain a bezier curve ('c' operator) not a quadratic ('v' or 'y')
-      expect(dataStr).toMatch(/[0-9.]+ [0-9.]+ [0-9.]+ [0-9.]+ [0-9.]+ [0-9.]+ c/);
+      expect(dataStr).toMatch(
+        /[0-9.]+ [0-9.]+ [0-9.]+ [0-9.]+ [0-9.]+ [0-9.]+ c/,
+      );
       document.addContent.mockRestore();
     });
   });
@@ -1054,7 +1062,7 @@ Q
     });
 
     test('glyphForCodePoint returns COLR glyph for U+1F600', () => {
-      const glyph = twFont.glyphForCodePoint(0x1F600);
+      const glyph = twFont.glyphForCodePoint(0x1f600);
       expect(glyph).toBeTruthy();
       expect(glyph.type).toBe('COLR');
       expect(glyph.layers).toBeTruthy();
@@ -1062,7 +1070,7 @@ Q
     });
 
     test('COLR layers have valid color and path data', () => {
-      const glyph = twFont.glyphForCodePoint(0x1F600);
+      const glyph = twFont.glyphForCodePoint(0x1f600);
       for (const layer of glyph.layers) {
         expect(layer.color).toHaveProperty('red');
         expect(layer.color).toHaveProperty('green');
@@ -1075,7 +1083,7 @@ Q
     });
 
     test('_renderCOLREmoji produces PDF operators from real glyph', () => {
-      const glyph = twFont.glyphForCodePoint(0x1F600);
+      const glyph = twFont.glyphForCodePoint(0x1f600);
 
       const contentCalls = [];
       const origAddContent = document.addContent.bind(document);
@@ -1088,16 +1096,10 @@ Q
 
       const dataStr = contentCalls.join('\n');
       // save/restore for each layer
-      expect((dataStr.match(/\bq\b/g) || []).length).toBe(
-        glyph.layers.length,
-      );
-      expect((dataStr.match(/\bQ\b/g) || []).length).toBe(
-        glyph.layers.length,
-      );
+      expect((dataStr.match(/\bq\b/g) || []).length).toBe(glyph.layers.length);
+      expect((dataStr.match(/\bQ\b/g) || []).length).toBe(glyph.layers.length);
       // fill operator for each non-empty layer
-      expect((dataStr.match(/\bf\b/g) || []).length).toBe(
-        glyph.layers.length,
-      );
+      expect((dataStr.match(/\bf\b/g) || []).length).toBe(glyph.layers.length);
       // RGB color (via fillColor → /DeviceRGB cs + scn) + path moveTo operators
       expect(dataStr).toMatch(/[0-9.]+ [0-9.]+ [0-9.]+ scn/);
       expect(dataStr).toMatch(/[0-9.]+ [0-9.]+ m/);
@@ -1107,7 +1109,7 @@ Q
 
     test('multiple emoji codepoints produce COLR glyphs', () => {
       // Test a few different emoji codepoints
-      const codepoints = [0x2764, 0x1F44D, 0x1F680]; // heart, thumbs up, rocket
+      const codepoints = [0x2764, 0x1f44d, 0x1f680]; // heart, thumbs up, rocket
       for (const cp of codepoints) {
         const glyph = twFont.glyphForCodePoint(cp);
         if (glyph && glyph.type === 'COLR') {
