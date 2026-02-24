@@ -71,6 +71,7 @@ Test commands
 * `npm run test:unit`: Run unit tests
 * `npm run test:visual`: Run visual tests
 * `npm run lint`: Run linter
+* `npm run prettier`: Run prettier
 
 To write new tests, look for the *.spec.js files at `test/unit` and `test/visual` as examples
 
