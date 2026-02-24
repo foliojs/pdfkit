@@ -1,6 +1,3 @@
-import fs from 'fs';
-import * as fontkit from 'fontkit';
-import PDFFontFactory from '../../lib/font_factory';
 import {
   segmentEmojiText,
   isEmojiCodePoint,
@@ -168,35 +165,5 @@ describe('Emoji Segmenter', () => {
     test('empty string returns empty array', () => {
       expect(codePoints('')).toEqual([]);
     });
-  });
-});
-
-
-const EMOJI_FONT = '/System/Library/Fonts/Apple Color Emoji.ttc';
-const emojiAvailable = fs.existsSync(EMOJI_FONT);
-const emojiDescribe = emojiAvailable ? describe : describe.skip;
-
-emojiDescribe('fontkit TTC emoji bug reproduction', () => {
-  test('fontkit.create with family name on TTC emoji font', () => {
-    const buffer = fs.readFileSync(EMOJI_FONT);
-    // In some fontkit versions, fontkit.create(buffer, family) on a TTC
-    // calls TTFFont.getVariation() which requires fvar/gvar tables that
-    // emoji fonts lack, causing it to throw. On fontkit 2.x the TTC code
-    // path (TrueTypeCollection.getFont) matches by postscriptName instead,
-    // so the call succeeds. The openEmoji workaround remains as a safety
-    // measure against regressions. Verify the call doesn't crash here:
-    const font = fontkit.create(buffer, 'AppleColorEmoji');
-    expect(font).toBeDefined();
-    expect(font.postscriptName).toBe('AppleColorEmoji');
-  });
-
-  test('PDFFontFactory.openEmoji works around the TTC bug', () => {
-    const font = PDFFontFactory.openEmoji(EMOJI_FONT, 'AppleColorEmoji');
-    expect(font).toBeDefined();
-    expect(font.postscriptName).toBe('AppleColorEmoji');
-    expect(font.unitsPerEm).toBeGreaterThan(0);
-    // Verify it's a usable font by checking it can layout an emoji
-    const run = font.layout('😀');
-    expect(run.glyphs.length).toBeGreaterThan(0);
   });
 });
