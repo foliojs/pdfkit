@@ -72,6 +72,7 @@
   },
   "main": "js/pdfkit.js",
   "module": "js/pdfkit.es.js",
+  "types": "types/index.d.ts",
   "browserify": {
     "transform": [
       "brfs"
@@ -90,5 +91,5 @@
       "<rootDir>/tests/unit/setupTests.js"
     ]
   },
-  "packageManager": "yarn@4.10.3"
+  "packageManager": "yarn@4.13.0"
 }
