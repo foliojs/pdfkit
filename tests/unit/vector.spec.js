@@ -1,5 +1,5 @@
 import PDFDocument from '../../lib/document';
-import { logData } from './helpers';
+import { logData, getObjects } from './helpers';
 
 describe('Vector Graphics', () => {
   let document;
@@ -174,6 +174,76 @@ describe('Vector Graphics', () => {
         `\nendstream`,
         `endobj`,
       ]);
+    });
+  });
+
+  describe('roundedRect', () => {
+    test('uses cornerRadius to draw rounded corners by default', () => {
+      const docData = logData(document);
+
+      document.roundedRect(50, 50, 100, 80, 20).stroke();
+      document.end();
+
+      const objects = getObjects(docData);
+      const vectorObject = objects.find((obj) =>
+        obj.items.some((item) => item instanceof Buffer),
+      );
+      const streamBuffer =
+        vectorObject && vectorObject.items.find((item) => item instanceof Buffer);
+      const streamString = streamBuffer?.toString('ascii') || '';
+
+      // Expect at least one Bezier curve command (`c`) in the vector stream
+      expect(streamString).toMatch(/\sc[\s\n]/);
+    });
+
+    test('cornerConfig can disable rounded corners', () => {
+      const docData = logData(document);
+
+      document.roundedRect(50, 50, 100, 80, 20, '0000').stroke();
+      document.end();
+
+      const objects = getObjects(docData);
+      const vectorObject = objects.find((obj) =>
+        obj.items.some((item) => item instanceof Buffer),
+      );
+      const streamBuffer =
+        vectorObject && vectorObject.items.find((item) => item instanceof Buffer);
+      const streamString = streamBuffer?.toString('ascii') || '';
+
+      // No Bezier curve command (`c`) should be present when all corners are disabled
+      expect(streamString).not.toMatch(/\sc[\s\n]/);
+    });
+
+    test('top-right corner ends at expected point', () => {
+      const docData = logData(document);
+
+      const x = 10;
+      const y = 20;
+      const w = 30;
+      const r = 5;
+
+      // Only the top-right corner is rounded
+      document.roundedRect(x, y, w, 40, r, '1000').stroke();
+      document.end();
+
+      const objects = getObjects(docData);
+      const vectorObject = objects.find((obj) =>
+        obj.items.some((item) => item instanceof Buffer),
+      );
+      const streamBuffer =
+        vectorObject && vectorObject.items.find((item) => item instanceof Buffer);
+      const streamString = streamBuffer?.toString('ascii') || '';
+
+      const expectedX = x + w; // 40
+      const expectedY = y + r; // 25
+
+      // Look for a cubic Bezier segment whose end point is (expectedX, expectedY)
+      // Numbers are written using PDFObject.number, but these coordinates are integers.
+      const endPointPattern = new RegExp(
+        `\\b${expectedX}(?:\\.0+)?\\s+${expectedY}(?:\\.0+)?\\s+c\\b`,
+      );
+
+      expect(streamString).toMatch(endPointPattern);
     });
   });
 });

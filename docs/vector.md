@@ -57,7 +57,7 @@ PDFKit also includes some helpers that make defining common shapes much
 easier. Here is a list of the helpers.
 
 * `rect(x, y, width, height)`
-* `roundedRect(x, y, width, height, cornerRadius)`
+* `roundedRect(x, y, width, height, cornerRadius, cornerConfig)`
 * `ellipse(centerX, centerY, radiusX, radiusY = radiusX)`
 * `circle(centerX, centerY, radius)`
 * `polygon(points...)`
@@ -86,16 +86,16 @@ path.
 In order to make our drawings interesting, we really need to give them some
 style. PDFKit has many methods designed to do just that.
 
-  * `lineWidth`
-  * `lineCap`
-  * `lineJoin`
-  * `miterLimit`
-  * `dash`
-  * `fillColor`
-  * `strokeColor`
-  * `opacity`
-  * `fillOpacity`
-  * `strokeOpacity`
+* `lineWidth`
+* `lineCap`
+* `lineJoin`
+* `miterLimit`
+* `dash`
+* `fillColor`
+* `strokeColor`
+* `opacity`
+* `fillOpacity`
+* `strokeOpacity`
 
 Some of these are pretty self explanatory, but let's go through a few of them.
 
