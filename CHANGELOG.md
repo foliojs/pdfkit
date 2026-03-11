@@ -15,7 +15,7 @@
 - Replace outdated jpeg-exif with minimal implementation
 - Replace outdated crypto-js with maintained small alternatives
 - Fix issue with indentation with `indentAllLines: true` when a new page is created
-- Extend roundedRect with a new param that allows you to optionally configure rounded corner selection
+- Extend cornerRadius param to accept an array of radii
 
 ### [v0.17.2] - 2025-08-30
 

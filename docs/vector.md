@@ -57,10 +57,14 @@ PDFKit also includes some helpers that make defining common shapes much
 easier. Here is a list of the helpers.
 
 * `rect(x, y, width, height)`
-* `roundedRect(x, y, width, height, cornerRadius, cornerConfig)`
+* `roundedRect(x, y, width, height, cornerRadius)`
 * `ellipse(centerX, centerY, radiusX, radiusY = radiusX)`
 * `circle(centerX, centerY, radius)`
 * `polygon(points...)`
+
+`roundedRect` `cornerRadius` param accepts a single radius (number) or per-corner radii (array).
+If an array, the order is: `[topRight, bottomRight, bottomLeft, topLeft]`.
+For example, to round only the right side corners: `roundedRect(x, y, w, h, [20, 20, 0, 0])`.
 
 The last one, `polygon`, allows you to pass in a list of points (arrays of x,y
 pairs), and it will create the shape by moving to the first point, and then

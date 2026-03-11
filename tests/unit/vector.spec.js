@@ -196,10 +196,10 @@ describe('Vector Graphics', () => {
       expect(streamString).toMatch(/\sc[\s\n]/);
     });
 
-    test('cornerConfig can disable rounded corners', () => {
+    test('cornerRadius array can disable rounded corners', () => {
       const docData = logData(document);
 
-      document.roundedRect(50, 50, 100, 80, 20, '0000').stroke();
+      document.roundedRect(50, 50, 100, 80, [0, 0, 0, 0]).stroke();
       document.end();
 
       const objects = getObjects(docData);
@@ -223,7 +223,7 @@ describe('Vector Graphics', () => {
       const r = 5;
 
       // Only the top-right corner is rounded
-      document.roundedRect(x, y, w, 40, r, '1000').stroke();
+      document.roundedRect(x, y, w, 40, [r, 0, 0, 0]).stroke();
       document.end();
 
       const objects = getObjects(docData);
