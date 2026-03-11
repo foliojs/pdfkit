@@ -189,7 +189,8 @@ describe('Vector Graphics', () => {
         obj.items.some((item) => item instanceof Buffer),
       );
       const streamBuffer =
-        vectorObject && vectorObject.items.find((item) => item instanceof Buffer);
+        vectorObject &&
+        vectorObject.items.find((item) => item instanceof Buffer);
       const streamString = streamBuffer?.toString('ascii') || '';
 
       // Expect at least one Bezier curve command (`c`) in the vector stream
@@ -207,7 +208,8 @@ describe('Vector Graphics', () => {
         obj.items.some((item) => item instanceof Buffer),
       );
       const streamBuffer =
-        vectorObject && vectorObject.items.find((item) => item instanceof Buffer);
+        vectorObject &&
+        vectorObject.items.find((item) => item instanceof Buffer);
       const streamString = streamBuffer?.toString('ascii') || '';
 
       // No Bezier curve command (`c`) should be present when all corners are disabled
@@ -231,7 +233,8 @@ describe('Vector Graphics', () => {
         obj.items.some((item) => item instanceof Buffer),
       );
       const streamBuffer =
-        vectorObject && vectorObject.items.find((item) => item instanceof Buffer);
+        vectorObject &&
+        vectorObject.items.find((item) => item instanceof Buffer);
       const streamString = streamBuffer?.toString('ascii') || '';
 
       const expectedX = x + w; // 40
