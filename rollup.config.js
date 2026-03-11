@@ -1,4 +1,3 @@
-import pkg from './package.json';
 import { babel } from '@rollup/plugin-babel';
 import copy from 'rollup-plugin-copy';
 

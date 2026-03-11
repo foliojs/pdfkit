@@ -958,11 +958,6 @@ declare namespace PDFKit {
     }
 }
 
-declare module "pdfkit" {
-    var doc: PDFKit.PDFDocument;
-    export = doc;
-}
-
 declare module "pdfkit/js/pdfkit.standalone" {
     var doc: PDFKit.PDFDocument;
     export = doc;
@@ -1158,3 +1153,5 @@ declare module "pdfkit/js/mixins/output_intent" {
   var PDFKitOutputIntent: PDFKit.Mixins.PDFOutputIntent;
   export = PDFKitOutputIntent;
 }
+
+export default class PDFDocument extends PDFKit.PDFDocument {}

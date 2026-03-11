@@ -1,4 +1,4 @@
-import PDFKit from './index';
+import PDFKit from './pdfkit';
 
 /**
  * Insert SVG into a PDF document created with PDFKit.
@@ -43,7 +43,7 @@ declare namespace SVGtoPDF {
     ) => string;
 
     /** same as above for the images (for Node.js) */
-    imageCallback?: (link: string) => string;
+    imageCallback?: (link: string) => {src: string | Uint8Array, properties?: BitmapProperties };
 
     /** same as above for the external SVG documents */
     documentCallback?: (
@@ -57,12 +57,20 @@ declare namespace SVGtoPDF {
     ) => RGBColor | CMYKColor;
 
     /** function called when there is a warning */
-    warningCallback?: (warning: string) => void;
+    warningCallback?: (warning: string, error?: unknown) => void;
 
     /** assume that units are PDF points instead of SVG pixels */
     assumePt?: boolean;
 
     /** precision factor for approximate calculations (default = 3) */
     precision?: number;
+  }
+
+  interface BitmapProperties {
+    width: number;
+    height: number;
+    channels: number;
+    colorSpace: string;
+    isBitmap: true;
   }
 }
