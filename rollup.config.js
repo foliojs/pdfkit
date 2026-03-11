@@ -27,14 +27,17 @@ const supportedBrowsers = [
 export default [
   // CommonJS build for Node
   {
-    input: 'lib/document.js',
+    input: {
+      pdfkit: 'lib/document.js',
+      write_svg: 'lib/write_svg.js'
+    },
     external,
     output: {
-      name: 'pdfkit',
-      file: pkg.main,
+      entryFileNames: '[name].js',
+      dir: 'js',
       format: 'cjs',
       sourcemap: true,
-      interop: false
+      interop: false,
     },
     plugins: [
       babel({
@@ -62,11 +65,14 @@ export default [
   },
   // ES for green browsers
   {
-    input: 'lib/document.js',
+    input: {
+      pdfkit: 'lib/document.js',
+      write_svg: 'lib/write_svg.js'
+    },
     external,
     output: {
-      name: 'pdfkit.es',
-      file: pkg.module,
+      dir: 'js',
+      entryFileNames: '[name].es.js',
       format: 'es',
       sourcemap: true
     },

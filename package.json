@@ -9,7 +9,7 @@
     "document",
     "vector"
   ],
-  "version": "0.17.3",
+  "version": "0.17.4",
   "homepage": "http://pdfkit.org/",
   "author": {
     "name": "Devon Govett",
@@ -70,9 +70,19 @@
     "test:visual": "jest visual/",
     "test:unit": "jest unit/"
   },
-  "main": "js/pdfkit.js",
-  "module": "js/pdfkit.es.js",
-  "types": "types/index.d.ts",
+  "exports": {
+    ".": {
+      "main": "./js/pdfkit.js",
+      "module": "./js/pdfkit.es.js",
+      "types": "./types/index.d.ts"
+    },
+    "./writeSVG": {
+      "main": "./js/writeSVG.js",
+      "module": "./js/writeSVG.es.js",
+      "types": "./types/write_svg.d.ts"
+    },
+    "./js/virtual-fs.js": "./js/virtual-fs.js"
+  },
   "browserify": {
     "transform": [
       "brfs"

@@ -14,15 +14,16 @@ describe('color', function () {
     ]);
 
     expect(doc._normalizeColor([255, 255, 255])).toEqual([1, 1, 1]);
-    expect(doc._normalizeColor([255, 255, 255, 255])).toEqual([1, 1, 1, 1]);
+    expect(doc._normalizeColor([255, 255, 255, 255])).toEqual([
+      2.55, 2.55, 2.55, 2.55,
+    ]);
     expect(doc._normalizeColor([0, 0, 0])).toEqual([0, 0, 0]);
     expect(doc._normalizeColor([0, 0, 0, 0])).toEqual([0, 0, 0, 0]);
     expect(doc._normalizeColor([128, 10, 18])).toEqual([
       0.5019607843137255, 0.0392156862745098, 0.07058823529411765,
     ]);
     expect(doc._normalizeColor([128, 10, 18, 100])).toEqual([
-      0.5019607843137255, 0.0392156862745098, 0.07058823529411765,
-      0.39215686274509803,
+      1.28, 0.1, 0.18, 1,
     ]);
   });
 
