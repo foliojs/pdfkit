@@ -40,7 +40,7 @@
     "jest-diff": "^30.3.0",
     "jest-image-snapshot": "^6.5.2",
     "markdown": "~0.5.0",
-    "pdfjs-dist": "^2.14.305",
+    "pdfjs-dist": "^5.5.207",
     "prettier": "3.4.2",
     "pug": "^3.0.3",
     "rollup": "^2.79.2",
@@ -65,7 +65,7 @@
     "publish-website": "node docs/publish_website.js",
     "docs": "npm run pdf-guide && npm run website && npm run browserify-example",
     "lint": "eslint {lib,tests}/**/*.js",
-    "prettier": "prettier lib tests docs",
+    "prettier": "prettier --check lib tests docs",
     "test": "vitest --testTimeout 8000 run",
     "test:visual": "vitest --testTimeout 8000 run tests/visual",
     "test:unit": "vitest run tests/unit"
