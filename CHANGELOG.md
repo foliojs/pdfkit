@@ -3,6 +3,7 @@
 ### Unreleased
 
 - Bump node version requirement to 20+
+- Bump minimum supported browsers to Firefox 115, iOS/Safari 16
 
 ### [v0.18.0] - 2026-03-14
 
