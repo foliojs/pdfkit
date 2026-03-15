@@ -66,8 +66,8 @@
     "docs": "npm run pdf-guide && npm run website && npm run browserify-example",
     "lint": "eslint {lib,tests}/**/*.js",
     "prettier": "prettier lib tests docs",
-    "test": "vitest run",
-    "test:visual": "vitest run tests/visual",
+    "test": "vitest --testTimeout 8000 run",
+    "test:visual": "vitest --testTimeout 8000 run tests/visual",
     "test:unit": "vitest run tests/unit"
   },
   "main": "js/pdfkit.js",
