@@ -7,6 +7,7 @@
   - [Code Organization](#code-organization)
   - [Setting Up the project locally](#setting-up-the-project-locally)
   - [Running and writing tests](#running-and-writing-tests)
+  - [Documentation](#documentation)
   - [Submitting a Pull Request](#submitting-a-pull-request)
 
 
@@ -60,7 +61,7 @@ To install the project you need to have `node`
 
 ## Running and writing tests
 
-Tests are run using [Jest](http://jestjs.io/) and are categorized as unit and visual tests. 
+Tests are run using [Vitest](https://vitest.dev/) and are categorized as unit and visual tests. 
 
 Visual tests check the pdf image screenshot against a reference stored as snapshots.
 
