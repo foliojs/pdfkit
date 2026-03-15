@@ -2,6 +2,8 @@
 
 ### Unreleased
 
+- Bump node version requirement to 20+
+
 ### [v0.18.0] - 2026-03-14
 
 - Fix garbled text copying in Chrome/Edge for PDFs with >256 unique characters (#1659)

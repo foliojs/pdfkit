@@ -78,7 +78,7 @@
     ]
   },
   "engine": [
-    "node >= v18.0.0"
+    "node >= v20.0.0"
   ],
   "packageManager": "yarn@4.10.3"
 }
