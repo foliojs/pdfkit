@@ -7,10 +7,10 @@ async function pdf2png(data) {
   // Load the PDF file.
   const loadingTask = getDocument({
     data: new Uint8Array(data),
-    useSystemFonts: true,
+    useSystemFonts: false,
     standardFontDataUrl: path.join(
       path.dirname(fileURLToPath(import.meta.url)),
-      'node_modules/pdfjs-dist/standard_fonts/',
+      '../../node_modules/pdfjs-dist/standard_fonts/',
     ),
   });
 
