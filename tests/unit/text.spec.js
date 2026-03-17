@@ -201,7 +201,6 @@ Q
 
       expect(docData).toContainText({ text: 'text with null x' });
     });
-
   });
 
   describe('text with structure parent links', () => {
