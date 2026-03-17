@@ -192,6 +192,15 @@ Q
 
       expect(docData).toContainText({ text });
     });
+
+    test('with null x coordinate', () => {
+      const docData = logData(document);
+
+      document.text('text with null x', null, 50);
+      document.end();
+
+      expect(docData).toContainText({ text: 'text with null x' });
+    });
   });
 
   describe('text with structure parent links', () => {
