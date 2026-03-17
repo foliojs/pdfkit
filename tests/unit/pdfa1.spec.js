@@ -119,6 +119,8 @@ describe('PDF/A-1', () => {
     doc.end();
     let metadata = Buffer.from(data[27]).toString();
 
-    expect(metadata).toContain('<pdf:Producer>Unit Test for PDFKit</pdf:Producer>');
+    expect(metadata).toContain(
+      '<pdf:Producer>Unit Test for PDFKit</pdf:Producer>',
+    );
   });
 });
