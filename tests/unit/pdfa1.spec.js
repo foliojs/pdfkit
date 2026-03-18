@@ -123,4 +123,41 @@ describe('PDF/A-1', () => {
       '<pdf:Producer>Unit Test for PDFKit</pdf:Producer>',
     );
   });
+  
+  test('CIDSet correctly identifies all glyphs in the subset', () => {
+    let options = {
+      autoFirstPage: false,
+      compress: false,
+      pdfVersion: '1.4',
+      subset: 'PDF/A-1a',
+    };
+    let doc = new PDFDocument(options);
+    const data = logData(doc);
+    doc.addPage();
+    doc.registerFont('Roboto', 'tests/fonts/Roboto-Regular.ttf');
+    doc.font('Roboto');
+    doc.text('Text');
+    const widths = doc._font.widths.slice();
+    doc.end();
+
+    const maxCID = widths.length - 1;
+    const CIDSet = Buffer.alloc(Math.ceil((maxCID + 1) / 8), 0);
+    for (let cid = 0; cid <= maxCID; cid++) {
+      if (widths[cid] != null) {
+        CIDSet[Math.floor(cid / 8)] |= 0x80 >> cid % 8;
+      }
+    }
+
+    let found = false;
+    for (let i = 0; i < data.length - 1; i++) {
+      if (data[i] === 'stream' && data[i + 1] instanceof Buffer) {
+        if (data[i + 1].equals(CIDSet)) {
+          found = true;
+          break;
+        }
+      }
+    }
+
+    expect(found).toBe(true);
+  });
 });
