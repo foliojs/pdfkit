@@ -123,7 +123,7 @@ describe('PDF/A-1', () => {
       '<pdf:Producer>Unit Test for PDFKit</pdf:Producer>',
     );
   });
-  
+
   test('CIDSet correctly identifies all glyphs in the subset', () => {
     let options = {
       autoFirstPage: false,
