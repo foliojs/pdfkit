@@ -107,6 +107,23 @@ describe('PDF/A-1', () => {
     expect(fontDescriptor).toContain('/CIDSet');
   });
 
+  test('metadata producer matches document info producer', () => {
+    let options = {
+      autoFirstPage: false,
+      pdfVersion: '1.7',
+      subset: 'PDF/A-1a',
+    };
+    let doc = new PDFDocument(options);
+    doc.info.Producer = 'Unit Test for PDFKit';
+    const data = logData(doc);
+    doc.end();
+    let metadata = Buffer.from(data[27]).toString();
+
+    expect(metadata).toContain(
+      '<pdf:Producer>Unit Test for PDFKit</pdf:Producer>',
+    );
+  });
+
   test('CIDSet correctly identifies all glyphs in the subset', () => {
     let options = {
       autoFirstPage: false,
