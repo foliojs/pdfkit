@@ -1,7 +1,7 @@
 import { runDocTest } from './helpers';
 import fs from 'fs';
 
-const EMOJI_FONT = '/System/Library/Fonts/Apple Color Emoji.ttc';
+const EMOJI_FONT = './fonts/AppleColorEmoji-Linux.ttf';
 const emojiAvailable = fs.existsSync(EMOJI_FONT);
 const emojiDescribe = emojiAvailable ? describe : describe.skip;
 
