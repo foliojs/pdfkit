@@ -5,23 +5,9 @@
       {
         "modules": false,
         "targets": {
-          "node": "18"
+          "node": "20"
         }
       }
     ]
-  ],
-  "env": {
-    "test": {
-      "presets": [
-        [
-          "@babel/preset-env",
-          {
-            "targets": {
-              "node": "18"
-            }
-          }
-        ]
-      ]
-    }
-  }
+  ]
 }

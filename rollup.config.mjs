@@ -1,4 +1,4 @@
-import pkg from './package.json';
+import pkg from './package.json' with { type: 'json' };
 import { babel } from '@rollup/plugin-babel';
 import copy from 'rollup-plugin-copy';
 
@@ -15,13 +15,13 @@ const external = [
   '@noble/hashes/sha256',
   '@noble/ciphers/aes',
   'crypto',
-  'saslprep'
+  'saslprep',
 ];
 
 const supportedBrowsers = [
-  'Firefox 102', // ESR from 2022
-  'iOS 14', // from 2020
-  'Safari 14' // from 2020
+  'Firefox 115', // ESR from 2023
+  'iOS 16', // from 2022
+  'Safari 16', // from 2022
 ];
 
 export default [
@@ -34,7 +34,7 @@ export default [
       file: pkg.main,
       format: 'cjs',
       sourcemap: true,
-      interop: false
+      interop: 'default',
     },
     plugins: [
       babel({
@@ -46,19 +46,22 @@ export default [
             {
               modules: false,
               targets: {
-                node: '18'
-              }
-            }
-          ]
+                node: '20',
+              },
+            },
+          ],
         ],
-        comments: false
+        comments: false,
       }),
       copy({
         targets: [
-          { src: ['lib/font/data/*.afm', 'lib/mixins/data/*.icc'], dest: 'js/data' },
-        ]
-      })
-    ]
+          {
+            src: ['lib/font/data/*.afm', 'lib/mixins/data/*.icc'],
+            dest: 'js/data',
+          },
+        ],
+      }),
+    ],
   },
   // ES for green browsers
   {
@@ -68,7 +71,7 @@ export default [
       name: 'pdfkit.es',
       file: pkg.module,
       format: 'es',
-      sourcemap: true
+      sourcemap: true,
     },
     plugins: [
       babel({
@@ -79,15 +82,16 @@ export default [
             '@babel/preset-env',
             {
               modules: false,
+              bugfixes: true,
               targets: {
-                browsers: supportedBrowsers
-              }
-            }
-          ]
+                browsers: supportedBrowsers,
+              },
+            },
+          ],
         ],
-        comments: false
-      })
-    ]
+        comments: false,
+      }),
+    ],
   },
   {
     input: 'lib/virtual-fs.js',
@@ -95,8 +99,8 @@ export default [
     output: {
       name: 'virtual-fs',
       file: 'js/virtual-fs.js',
-      format: 'cjs',
-      sourcemap: false
+      format: 'es',
+      sourcemap: false,
     },
     plugins: [
       babel({
@@ -109,12 +113,12 @@ export default [
               loose: true,
               modules: false,
               targets: {
-                browsers: supportedBrowsers
-              }
-            }
-          ]
-        ]
-      })
-    ]
-  }
+                browsers: supportedBrowsers,
+              },
+            },
+          ],
+        ],
+      }),
+    ],
+  },
 ];

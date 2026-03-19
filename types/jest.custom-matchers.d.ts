@@ -1,4 +1,4 @@
-// Ambient typings to make custom Jest matchers available to the TS language server in tests.
+// Ambient typings to make custom Vitest matchers available to the TS language server in tests.
 // No external @types packages required.
 
 type PartialExceptTheseRequired<T, K extends keyof T> = Partial<T> &
@@ -13,15 +13,15 @@ declare global {
   }
 
   type TextStreamMatcher = PartialExceptTheseRequired<TextStream, 'text'>;
+}
 
-  namespace jest {
-    interface Matchers<R> {
-      // Expect the PDF data array to contain a specific chunk sequence
-      toContainChunk(chunk: Array<string | RegExp>): R;
+declare module 'vitest' {
+  interface Matchers<R> {
+    // Expect the PDF data array to contain a specific chunk sequence
+    toContainChunk(chunk: Array<string | RegExp>): R;
 
-      // Expect the PDF data array to contain a text stream matching the TextStream
-      toContainText(textStream: TextStreamMatcher): R;
-    }
+    // Expect the PDF data array to contain a text stream matching the TextStream
+    toContainText(textStream: TextStreamMatcher): R;
   }
 }
 

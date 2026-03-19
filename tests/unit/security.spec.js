@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 import PDFSecurity from '../../lib/security';
 
 // Mock document object
@@ -9,7 +10,7 @@ function createMockDocument(id = null) {
     _id: mockId,
     ref: (obj) => ({
       data: obj,
-      end: jest.fn(),
+      end: vi.fn(),
     }),
   };
 }

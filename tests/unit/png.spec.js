@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 import PDFDocument from '../../lib/document';
 import PDFReference from '../../lib/reference';
 import PNGImage from '../../lib/image/png';
@@ -25,7 +26,7 @@ describe('PNGImage', () => {
       img.finalize();
     };
     const finalizeFn = img.finalize;
-    jest.spyOn(img, 'finalize').mockImplementation(() => finalizeFn.call(img));
+    vi.spyOn(img, 'finalize').mockImplementation(() => finalizeFn.call(img));
     img.embed(document);
     return img;
   };

@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 import PDFDocument from '../../lib/document';
 import { logData } from './helpers';
 
@@ -6,7 +7,7 @@ describe('PDFDocument', () => {
     let fontSpy;
 
     beforeEach(() => {
-      fontSpy = jest.spyOn(PDFDocument.prototype, 'font').mockReturnThis();
+      fontSpy = vi.spyOn(PDFDocument.prototype, 'font').mockReturnThis();
     });
 
     afterEach(() => {
