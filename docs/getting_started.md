@@ -318,6 +318,51 @@ In order to verify the generated document for PDF/A and its subsets conformance,
 
 Please note that PDF/A requires fonts to be embedded, as such the standard fonts PDFKit comes with cannot be used because they are in AFM format, which only provides neccessary metrics, without the font data. You should use `registerFont()` and use embeddable fonts such as `ttf`.
 
+## E-invoices
+
+Electronic invoices are hybrid PDFs that are both human-readable and machine-processable, which is achieved by embedding structured XML documents.
+
+Currently, PDFKit aims to support ZUGFeRD v2.X and Factur-X, which both require the e-invoices to be embedded into a PDF/A-3 document. Make sure your `PDFDocument` is created with the `subset` set to either `PDF/A-3b` or `PDF/A-3a`:
+
+    const doc = new PDFDocument({ subset: 'PDF/A-3b', pdfVersion: '1.7' });
+
+Call `doc.einvoice(format, src, options = {})` after creating the document and pass the invoice XML as a `Buffer`, `ArrayBuffer` or base64 encoded `string` or path to file:
+
+    // for ZUGFeRD
+    doc.einvoice('zugferd', '/invoices/invoice1234.xml');
+
+    // or for Factur-X
+    doc.einvoice('facturx', '/invoices/invoice1234.xml');
+
+Note: only one e-invoice can be embedded per document and a second call will throw an error.
+
+The following options are supported for both ZUGFeRD and Factur-X:
+
+- `profile` a string indicating the conformance profile, defaults to 'EN 16931' and the value is case insensitive
+- `documentType` a string indicating the type of document, e.g. 'INVOICE', 'ORDER'. Defaults to 'INVOICE'. See the ZUGFeRD/Factur-X specification for all accepted values.
+- `version` a string to override the default version PDFKit chooses from the profile
+
+The following profiles are supported for ZUGFeRD:
+
+- `minimum` default version 2.4
+- `basic wl` default version 2.4
+- `basic` default version 2.4
+- `en 16931` default version 2.4
+- `extended` default version 2.4
+- `xrechnung` default version 3.0
+
+The following profiles are supported for Factur-X:
+
+- `minimum` default version 1.0
+- `basic wl` default version 1.0
+- `basic` default version 1.0
+- `en 16931` default version 1.0
+- `extended` default version 1.0
+
+PDFKit does not validate your XML against the selected profile, therefore please ensure you select the adequate profile based on your XML.
+
+Note: Unknown profiles fall back to 'EN 16931'.
+
 ### Adding content
 
 Once you've created a `PDFDocument` instance, you can add content to the

@@ -59,6 +59,8 @@ yarn add pdfkit
   - Encryption
   - Access privileges (printing, copying, modifying, annotating, form filling, content accessibility, document assembly)
 - Accessibility support (marked content, logical structure, Tagged PDF, PDF/UA)
+- Long-term preservation of electronic documents (PDF/A)
+- E-invoice PDFs (ZUGFeRD, Factur-X)
 
 ## Coming soon!
 
