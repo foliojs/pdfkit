@@ -236,6 +236,8 @@ When creating a structure element, you can provide options:
  * `alt` - alternative text for an image or other visual content
  * `expanded` - the expanded form of an abbreviation or acronym
  * `actual` - the actual text the content represents (e.g. if it is rendered as vector graphics)
+ * `bbox` - bounding box of the element's content in PDFKit coordinates `[left, top, right, bottom]`, required for `Figure` elements in PDF/UA
+ * `placement` - layout placement of the element: `'Block'` (the default when `bbox` is set) or `'Inline'`
 
 Example of a structure tree with options specified:
 
@@ -256,7 +258,8 @@ Example of a structure tree with options specified:
             ]),
         ]),
         doc.struct('Figure', {
-            alt: 'photo of a concrete path with tactile paving'
+            alt: 'photo of a concrete path with tactile paving',
+            bbox: [100, 200, 500, 600]
         }, [
             photoStructureContent
         ])
@@ -359,7 +362,7 @@ Non-structure tags:
  * `Reference` - content in a document that refers to other content (e.g. page number in an index)
  * `BibEntry` - bibliography entry; may have a `Lbl` (see "block" elements)
  * `Code` - code
- * `Link` - hyperlink; should contain a link annotation
+ * `Link` - hyperlink
  * `Annot` - annotation (other than a link)
  * `Ruby` - Chinese/Japanese pronunciation/explanation
  * `RB` - Ruby base text
@@ -371,6 +374,16 @@ Non-structure tags:
 
 "Illustration" elements (should have `alt` and/or `actualtext` set):
 
- * `Figure` - figure
+ * `Figure` - figure, should also have `bbox` set
  * `Formula` - formula
  * `Form` - form widget
+
+## Limitations
+
+### Built-in fonts
+
+PDFKit ships with the 14 standard PDF fonts (Helvetica, Times-Roman, Courier, etc.) as AFM metric files only.
+Because of this, these fonts cannot be embedded in the PDF output. Both PDF/UA and PDF/A require all fonts to
+be embedded, so using any of the built-in fonts will result in a non-compliant document.
+If you need to produce a compliant PDF, use embedded TrueType or OpenType fonts instead by loading them from
+a file with `doc.font('path/to/font.ttf')`.
