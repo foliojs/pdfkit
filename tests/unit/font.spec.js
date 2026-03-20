@@ -1,7 +1,8 @@
 import { vi } from 'vitest';
+import { readFileSync } from 'fs';
 import PDFDocument from '../../lib/document';
 import PDFFontFactory from '../../lib/font_factory';
-import { logData } from './helpers';
+import { logData, collectPdf, missingObjects } from './helpers';
 
 describe('EmbeddedFont', () => {
   test('no fontLayoutCache option', () => {
@@ -242,5 +243,82 @@ describe('sizeToPoint', () => {
     doc.fontSize(15);
     expect(doc.sizeToPoint('1em')).toEqual(15);
     expect(doc.sizeToPoint('1rem')).toEqual(12);
+  });
+});
+
+describe('font name collision', () => {
+  // fake font with a bogus checksum so isEqualFont always returns false
+  const makeCachedFont = (name, id) => ({
+    name,
+    id,
+    font: { _tables: { head: { checkSumAdjustment: -1 } } },
+    ref: vi.fn(),
+    finalize: vi.fn(),
+    embedded: false,
+  });
+
+  afterEach(() => vi.restoreAllMocks());
+
+  describe('name-alias slot is not overwritten when already occupied', () => {
+    test('does not overwrite existing font on postscript name collision', () => {
+      const doc = new PDFDocument({ font: null, compress: false });
+      const existingFont = makeCachedFont('Roboto-Regular', 'F0');
+      doc._fontFamilies['Roboto-Regular'] = existingFont;
+
+      doc.registerFont('Roboto', 'tests/fonts/Roboto-Regular.ttf');
+      doc.font('Roboto');
+
+      expect(doc._fontFamilies['Roboto-Regular']).toBe(existingFont);
+      expect(doc._fontFamilies['Roboto']).toBeDefined();
+      expect(doc._fontFamilies['Roboto']).not.toBe(existingFont);
+    });
+  });
+
+  describe('buffer-loaded font with name collision is registered under its id', () => {
+    test('registers under id when postscript name slot is taken', () => {
+      const doc = new PDFDocument({ font: null, compress: false });
+      const existingFont = makeCachedFont('Roboto-Regular', 'F0');
+      doc._fontFamilies['Roboto-Regular'] = existingFont;
+
+      const buf = readFileSync('tests/fonts/Roboto-Regular.ttf');
+      doc.font(buf);
+
+      const loaded = doc._font;
+      expect(doc._fontFamilies[loaded.id]).toBe(loaded);
+      expect(doc._fontFamilies['Roboto-Regular']).toBe(existingFont);
+    });
+  });
+
+  describe('document completes without dangling references', () => {
+    test('standard + registered embedded font', () => {
+      const doc = new PDFDocument({ compress: false });
+
+      doc.text('standard helvetica');
+      doc.registerFont('Roboto', 'tests/fonts/Roboto-Regular.ttf');
+      doc.font('Roboto').text('embedded roboto');
+
+      const pdf = collectPdf(doc);
+
+      expect(pdf).toContain('startxref');
+      expect(pdf).toContain('%%EOF');
+      expect(missingObjects(pdf)).toHaveLength(0);
+    });
+
+    test('buffer font with name collision', () => {
+      const doc = new PDFDocument({ compress: false });
+      doc._fontFamilies['Roboto-Regular'] = makeCachedFont(
+        'Roboto-Regular',
+        'F0',
+      );
+
+      const buf = readFileSync('tests/fonts/Roboto-Regular.ttf');
+      doc.font(buf).text('buffer roboto');
+
+      const pdf = collectPdf(doc);
+
+      expect(pdf).toContain('startxref');
+      expect(pdf).toContain('%%EOF');
+      expect(missingObjects(pdf)).toHaveLength(0);
+    });
   });
 });

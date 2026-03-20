@@ -165,4 +165,34 @@ function parseTextStreams(decodedStream) {
   return results;
 }
 
-export { logData, joinTokens, parseTextStreams, getObjects };
+/**
+ * Collect all PDF output from a document into a single binary string.
+ * @param {PDFDocument} doc
+ * @return {string}
+ */
+function collectPdf(doc) {
+  const data = logData(doc);
+  doc.end();
+  return data.map((d) => d.toString('binary')).join('');
+}
+
+/**
+ * Return object ids that are referenced but never defined in a PDF string.
+ * An empty result means no dangling references.
+ * @param {string} pdf
+ * @return {string[]}
+ */
+function missingObjects(pdf) {
+  const defined = [...pdf.matchAll(/(\d+) 0 obj/g)].map((m) => m[1]);
+  const refs = [...new Set([...pdf.matchAll(/(\d+) 0 R/g)].map((m) => m[1]))];
+  return refs.filter((r) => !defined.includes(r));
+}
+
+export {
+  logData,
+  joinTokens,
+  parseTextStreams,
+  getObjects,
+  collectPdf,
+  missingObjects,
+};
