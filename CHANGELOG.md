@@ -6,6 +6,8 @@
 - Bump minimum supported browsers to Firefox 115, iOS/Safari 16
 - Fix text with input x as null
 - Fix corrupted PDF when mixing standard and embedded fonts that share postscript name
+- Fix PDF/UA compliance issues in kitchen-sink-accessible example
+- Add bbox and placement options to PDFStructureElement for PDF/UA compliance
 
 ### [v0.18.0] - 2026-03-14
 
