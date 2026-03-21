@@ -184,6 +184,26 @@ that you don't have to call `fillColor` or `strokeColor` beforehand. The
        .fillOpacity(0.8)
        .fillAndStroke("red", "#900")
 
+Note that if you are producing a PDF/UA-compliant PDF, `fillColor` and `strokeColor`
+must be called before beginning path construction (i.e. before `moveTo`, `path`, `rect`,
+`circle` and similar methods). The PDF spec (ISO 32000-2) does not allow color space operators
+to be emitted during path construction, and passing a color directly to `fill`, `stroke` or
+`fillAndStroke` can produce a non-compliant PDF. The safest approach is to always set
+colors before defining the path:
+
+    // good: emits color operators before path
+    doc.fillColor('red')
+       .moveTo(100, 150)
+       .lineTo(100, 250)
+       .lineTo(200, 250)
+       .fill();
+
+    // not good: may emit color operators throughout path construction
+    doc.moveTo(100, 150)
+       .lineTo(100, 250)
+       .lineTo(200, 250)
+       .fill('red');
+
 This example produces the following output:
 
 ![5](images/color.png "100")
