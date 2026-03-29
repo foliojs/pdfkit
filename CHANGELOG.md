@@ -15,7 +15,7 @@
 - Replace outdated jpeg-exif with minimal implementation
 - Replace outdated crypto-js with maintained small alternatives
 - Fix issue with indentation with `indentAllLines: true` when a new page is created
-- Extend cornerRadius param to accept an array of radii
+- Extend `roundedRect` with `borderRadius` as number for all corners or per-corner array (CSS order)
 
 ### [v0.17.2] - 2025-08-30
 

@@ -178,7 +178,7 @@ describe('Vector Graphics', () => {
   });
 
   describe('roundedRect', () => {
-    test('uses cornerRadius to draw rounded corners by default', () => {
+    test('uses borderRadius to draw rounded corners by default', () => {
       const docData = logData(document);
 
       document.roundedRect(50, 50, 100, 80, 20).stroke();
@@ -197,7 +197,7 @@ describe('Vector Graphics', () => {
       expect(streamString).toMatch(/\sc[\s\n]/);
     });
 
-    test('cornerRadius array can disable rounded corners', () => {
+    test('borderRadius array can disable rounded corners', () => {
       const docData = logData(document);
 
       document.roundedRect(50, 50, 100, 80, [0, 0, 0, 0]).stroke();
@@ -224,8 +224,8 @@ describe('Vector Graphics', () => {
       const w = 30;
       const r = 5;
 
-      // Only the top-right corner is rounded
-      document.roundedRect(x, y, w, 40, [r, 0, 0, 0]).stroke();
+      // Only the top-right corner is rounded (CSS order: TL, TR, BR, BL)
+      document.roundedRect(x, y, w, 40, [0, r, 0, 0]).stroke();
       document.end();
 
       const objects = getObjects(docData);
