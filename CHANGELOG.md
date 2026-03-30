@@ -22,7 +22,8 @@
 - Add robust handling of null byte padding in JPEG images
 - Replace outdated jpeg-exif with minimal implementation
 - Replace outdated crypto-js with maintained small alternatives
-- Fix issue with indentation with `indentAllLines: true` when a new page is created 
+- Fix issue with indentation with `indentAllLines: true` when a new page is created
+- Extend `roundedRect` with `borderRadius` as number for all corners or per-corner array (CSS order)
 
 ### [v0.17.2] - 2025-08-30
 
@@ -33,7 +34,7 @@
 - Fix null values in table cells rendering as `[object Object]`
 - Fix further LineWrapper precision issues
 - Optmize standard font handling. Less code, less memory usage
- 
+
 ### [v0.17.0] - 2025-04-12
 
 - Fix precision rounding issues in LineWrapper

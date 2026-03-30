@@ -57,10 +57,15 @@ PDFKit also includes some helpers that make defining common shapes much
 easier. Here is a list of the helpers.
 
 * `rect(x, y, width, height)`
-* `roundedRect(x, y, width, height, cornerRadius)`
+* `roundedRect(x, y, width, height, borderRadius)`
 * `ellipse(centerX, centerY, radiusX, radiusY = radiusX)`
 * `circle(centerX, centerY, radius)`
 * `polygon(points...)`
+
+`roundedRect` `borderRadius` accepts a single radius (number) or per-corner radii (array).
+If an array with four values, the order matches CSS `border-radius`:
+`/* top-left | top-right | bottom-right | bottom-left */`
+For example, to round only the right-side corners: `roundedRect(x, y, w, h, [0, 20, 20, 0])`.
 
 The last one, `polygon`, allows you to pass in a list of points (arrays of x,y
 pairs), and it will create the shape by moving to the first point, and then
@@ -86,16 +91,16 @@ path.
 In order to make our drawings interesting, we really need to give them some
 style. PDFKit has many methods designed to do just that.
 
-  * `lineWidth`
-  * `lineCap`
-  * `lineJoin`
-  * `miterLimit`
-  * `dash`
-  * `fillColor`
-  * `strokeColor`
-  * `opacity`
-  * `fillOpacity`
-  * `strokeOpacity`
+* `lineWidth`
+* `lineCap`
+* `lineJoin`
+* `miterLimit`
+* `dash`
+* `fillColor`
+* `strokeColor`
+* `opacity`
+* `fillOpacity`
+* `strokeOpacity`
 
 Some of these are pretty self explanatory, but let's go through a few of them.
 
