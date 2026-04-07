@@ -18,6 +18,7 @@ be scaled according to the following options.
 - `goTo` - go to anchor (shortcut to create an annotation)
 - `destination` - create anchor to this image
 - `ignoreOrientation` - (true/false) ignore JPEG EXIF orientation. By default, images with JPEG EXIF orientation are properly rotated and/or flipped. Defaults to `false`, unless `ignoreOrientation` option set to `true` when creating the `PDFDocument` object (e.g. `new PDFDocument({ignoreOrientation: true})`)
+- `opacity` - a value between `0` (fully transparent) and `1` (fully opaque). For PNGs that already have an alpha channel, this compounds with the existing transparency
 
 When a `fit` or `cover` array is provided, PDFKit accepts these additional options:
 

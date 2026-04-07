@@ -5,9 +5,11 @@
 - Bump node version requirement to 20+
 - Bump minimum supported browsers to Firefox 115, iOS/Safari 16
 - Fix text with input x as null
+- Add opacity option to `doc.image()` to control image transparency
 - Fix corrupted PDF when mixing standard and embedded fonts that share postscript name
 - Fix PDF/UA compliance issues in kitchen-sink-accessible example
 - Add bbox and placement options to PDFStructureElement for PDF/UA compliance
+- Extend `roundedRect` with `borderRadius` as number for all corners or per-corner array (CSS order)
 
 ### [v0.18.0] - 2026-03-14
 
@@ -24,7 +26,6 @@
 - Replace outdated jpeg-exif with minimal implementation
 - Replace outdated crypto-js with maintained small alternatives
 - Fix issue with indentation with `indentAllLines: true` when a new page is created
-- Extend `roundedRect` with `borderRadius` as number for all corners or per-corner array (CSS order)
 
 ### [v0.17.2] - 2025-08-30
 
