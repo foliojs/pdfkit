@@ -19,8 +19,10 @@ describe('PDFObject', () => {
     });
 
     test('String object with spaces should not escape', () => {
-      // Objects are not used to represent PDF object names, so they should not be escaped
-      expect(PDFObject.convert(new String('test with spaces'))).toEqual('(test with spaces)');
+      // Objects are not used to represent PDF object names directly, so they should not be escaped
+      expect(PDFObject.convert(new String('test with spaces'))).toEqual(
+        '(test with spaces)',
+      );
     });
 
     test('String object with unicode', () => {
