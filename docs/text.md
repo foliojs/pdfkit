@@ -260,5 +260,91 @@ every time you want to use it.
     doc.font('Heading Font')
        .text('This is a heading.');
 
-That's about all there is too it for text in PDFKit. Let's move on now to
+## Color Emoji
+
+PDFKit supports rendering color emoji as inline bitmap images when an emoji
+font is registered. Emoji are automatically detected in your text and rendered
+using the glyphs from the emoji font, while surrounding text continues to use
+the current document font.
+
+### Registering an emoji font
+
+To enable emoji support, register an emoji font that contains an `sbix`
+(Standard Bitmap Graphics) table. On macOS, the built-in Apple Color Emoji
+font works out of the box.
+
+You can register the emoji font via constructor options:
+
+```javascript
+const doc = new PDFDocument({
+  emojiFont: '/System/Library/Fonts/Apple Color Emoji.ttc',
+  emojiFontFamily: 'AppleColorEmoji',
+});
+```
+
+Or register it at any time using the `registerEmojiFont` method:
+
+```javascript
+doc.registerEmojiFont('/System/Library/Fonts/Apple Color Emoji.ttc', 'AppleColorEmoji');
+```
+
+The `emojiFontFamily` (or second argument) is the PostScript name or family
+name used to select the correct font from a TrueType Collection (`.ttc`) file.
+If the font file contains only a single font, this parameter can be omitted.
+
+### Using emoji in text
+
+Once an emoji font is registered, you can use emoji characters directly in
+any `text` call. PDFKit automatically segments the string into text and emoji
+runs, rendering each with the appropriate font.
+
+```javascript
+doc.font('Helvetica')
+   .fontSize(18)
+   .text('Hello 😀 World 🎉 PDFKit 🚀');
+```
+
+All standard text options (alignment, line wrapping, `continued`, columns,
+etc.) work with emoji. The `widthOfString` method is also emoji-aware, so
+layout calculations account for emoji width correctly.
+
+### Supported emoji types
+
+The emoji segmenter handles the full range of modern emoji sequences:
+
+* **Simple emoji** — single code point emoji like 😀, 🎉, 🚀
+* **ZWJ sequences** — composite emoji joined with Zero-Width Joiner, such as
+  family groups (👨‍👩‍👧‍👦) and profession emoji (👩‍💻)
+* **Flag emoji** — regional indicator pairs like 🇺🇸, 🇯🇵, 🇫🇷
+* **Skin tone modifiers** — emoji with Fitzpatrick skin tone modifiers (👋🏻 👋🏿)
+* **Variation selectors** — text vs emoji presentation (❤️)
+* **Keycap sequences** — digit + variation selector + combining enclosing
+  keycap (1️⃣ 2️⃣ 3️⃣)
+
+### Different font sizes
+
+Emoji scale to match the current font size. The emoji font's SBIX table
+contains bitmaps at several predefined sizes; PDFKit selects the closest
+available size and scales it to fit.
+
+```javascript
+doc.font('Helvetica');
+
+doc.fontSize(12).text('Small emoji: 🎉');
+doc.fontSize(24).text('Medium emoji: 🎉');
+doc.fontSize(48).text('Large emoji: 🎉');
+```
+
+### Limitations
+
+* Currently only `sbix` (bitmap) emoji fonts are supported. This includes
+  Apple Color Emoji on macOS. Support for `COLR`/`CPAL` (vector) and
+  `CBDT`/`CBLC` (Google Noto Color Emoji) formats may be added in the future.
+* The emoji font file must be accessible on the system where the PDF is
+  generated. Apple Color Emoji is included with macOS but is not
+  redistributable.
+* Emoji are rendered as raster images (PNG), so they may appear slightly
+  less sharp than vector text at very large sizes.
+
+That's about all there is to it for text in PDFKit. Let's move on now to
 images.
