@@ -10,8 +10,19 @@ describe('PDFObject', () => {
       expect(PDFObject.convert('αβγδ')).toEqual('/αβγδ');
     });
 
+    test('string literal with spaces should escape', () => {
+      expect(PDFObject.convert('PANTONE 295 C')).toEqual('/PANTONE#20295#20C');
+    });
+
     test('String object', () => {
       expect(PDFObject.convert(new String('test'))).toEqual('(test)');
+    });
+
+    test('String object with spaces should not escape', () => {
+      // Objects are not used to represent PDF object names directly, so they should not be escaped
+      expect(PDFObject.convert(new String('test with spaces'))).toEqual(
+        '(test with spaces)',
+      );
     });
 
     test('String object with unicode', () => {

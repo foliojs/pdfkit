@@ -56,4 +56,24 @@ describe('color', function () {
         '>>',
     ]);
   });
+
+  test('spot color escapes color name in Separation color space', function () {
+    const doc = new PDFDocument();
+    const data = logData(doc);
+    doc.addSpotColor('PANTONE 295 C', 100, 53, 0, 67);
+    doc.fillColor('PANTONE 295 C').text('This text uses spaced spot color!');
+    doc.end();
+
+    expect(data).toContainChunk([
+      `8 0 obj`,
+      '[/Separation /PANTONE#20295#20C /DeviceCMYK <<\n' +
+        '/Range [0 1 0 1 0 1 0 1]\n' +
+        '/C0 [0 0 0 0]\n' +
+        '/C1 [1 0.53 0 0.67]\n' +
+        '/FunctionType 2\n' +
+        '/Domain [0 1]\n' +
+        '/N 1\n' +
+        '>>]',
+    ]);
+  });
 });
