@@ -50,6 +50,7 @@
   "dependencies": {
     "@noble/ciphers": "^1.0.0",
     "@noble/hashes": "^1.6.0",
+    "bidi-js": "^1.0.3",
     "fontkit": "^2.0.4",
     "js-md5": "^0.8.3",
     "linebreak": "^1.1.0",
