@@ -11,6 +11,10 @@
 - Add bbox and placement options to PDFStructureElement for PDF/UA compliance
 - Extend `roundedRect` with `borderRadius` as number for all corners or per-corner array (CSS order)
 
+### [v0.18.1] - 2026-05-29
+
+- Fix accessibility: scope in TH element
+- 
 ### [v0.18.0] - 2026-03-14
 
 - Fix garbled text copying in Chrome/Edge for PDFs with >256 unique characters (#1659)

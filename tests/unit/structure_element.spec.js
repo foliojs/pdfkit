@@ -150,5 +150,33 @@ describe('PDFStructureElement', () => {
         `endobj`,
       ]);
     });
+    test('should contain scope on TH tag', () => {
+      const docData = logData(document);
+
+      const table = document.struct('Table');
+
+      const thead = document.struct('THead');
+
+      table.add(thead);
+
+      const trHead = document.struct('TR');
+
+      thead.add(trHead);
+
+      const th1 = document.struct('TH', { scope: 'Column' });
+
+      th1.add(document.struct('P', () => document.text('Test')));
+
+      trHead.add(th1);
+
+      document.addStructure(table);
+
+      document.end();
+
+      expect(docData).toContainChunk([
+        '<<\n/S /TH\n/A <<\n/O /Table\n/Scope /Column\n>>\n/P 10 0 R\n/K [12 0 R]\n>>',
+        `endobj`,
+      ]);
+    })
   });
 });
