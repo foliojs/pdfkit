@@ -10,6 +10,7 @@
 - Fix PDF/UA compliance issues in kitchen-sink-accessible example
 - Add bbox and placement options to PDFStructureElement for PDF/UA compliance
 - Extend `roundedRect` with `borderRadius` as number for all corners or per-corner array (CSS order)
+- Fix PDF Name escaping for spot colors with spaces ([#1644](https://github.com/foliojs/pdfkit/issues/1644))
 
 ### [v0.18.0] - 2026-03-14
 

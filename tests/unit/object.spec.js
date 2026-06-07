@@ -1,4 +1,4 @@
-import PDFObject from '../../lib/object';
+import PDFObject, { escapeName } from '../../lib/object';
 
 describe('PDFObject', () => {
   describe('convert', () => {
@@ -18,6 +18,16 @@ describe('PDFObject', () => {
       const result = PDFObject.convert(new String('αβγδ'));
       expect(result.length).toEqual(12);
       expect(result).toMatchInlineSnapshot(`"(þÿ±²³´)"`);
+    });
+  });
+
+  describe('escapeName', () => {
+    test('should escape unsafe characters', () => {
+      expect(escapeName('PANTONE 295 C')).toEqual('PANTONE#20295#20C');
+    });
+
+    test('should not escape safe characters', () => {
+      expect(escapeName('PANTONE-295_C')).toEqual('PANTONE-295_C');
     });
   });
 });

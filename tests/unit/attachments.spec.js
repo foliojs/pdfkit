@@ -120,6 +120,21 @@ describe('file', () => {
     ]);
   });
 
+  test('uses data URI MIME type as escaped subtype', () => {
+    const docData = logData(document);
+    document.file('data:text/plain;base64,ZXhhbXBsZSB0ZXh0', {
+      name: 'file.txt',
+      creationDate: date,
+      modifiedDate: date,
+    });
+    document.end();
+
+    const dataStr = docData.map((item) => item.toString()).join('\n');
+    expect(dataStr).toContain('/Subtype /text#2Fplain');
+    expect(dataStr).not.toContain('/Subtype /text/plain');
+    expect(dataStr).not.toContain('/Subtype /text#232Fplain'); // double escaped
+  });
+
   test('with hidden option', () => {
     const docData = logData(document);
 
