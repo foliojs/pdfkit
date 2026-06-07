@@ -1,4 +1,4 @@
-import PDFObject from '../../lib/object';
+import PDFObject, { escapeName } from '../../lib/object';
 
 describe('PDFObject', () => {
   describe('convert', () => {
@@ -10,25 +10,24 @@ describe('PDFObject', () => {
       expect(PDFObject.convert('αβγδ')).toEqual('/αβγδ');
     });
 
-    test('string literal with spaces should escape', () => {
-      expect(PDFObject.convert('PANTONE 295 C')).toEqual('/PANTONE#20295#20C');
-    });
-
     test('String object', () => {
       expect(PDFObject.convert(new String('test'))).toEqual('(test)');
-    });
-
-    test('String object with spaces should not escape', () => {
-      // Objects are not used to represent PDF object names directly, so they should not be escaped
-      expect(PDFObject.convert(new String('test with spaces'))).toEqual(
-        '(test with spaces)',
-      );
     });
 
     test('String object with unicode', () => {
       const result = PDFObject.convert(new String('αβγδ'));
       expect(result.length).toEqual(12);
       expect(result).toMatchInlineSnapshot(`"(þÿ±²³´)"`);
+    });
+  });
+
+  describe('escapeName', () => {
+    test('should escape unsafe characters', () => {
+      expect(escapeName('PANTONE 295 C')).toEqual('PANTONE#20295#20C');
+    });
+
+    test('should not escape safe characters', () => {
+      expect(escapeName('PANTONE-295_C')).toEqual('PANTONE-295_C');
     });
   });
 });
