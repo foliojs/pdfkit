@@ -177,6 +177,6 @@ describe('PDFStructureElement', () => {
         '<<\n/S /TH\n/A <<\n/O /Table\n/Scope /Column\n>>\n/P 10 0 R\n/K [12 0 R]\n>>',
         `endobj`,
       ]);
-    })
+    });
   });
 });
