@@ -29,6 +29,12 @@ describe('Image', function () {
     expect(jpeg.orientation).toBe(1);
   });
 
+  test('RGB JPEG is parsed with DeviceRGB color space (regression)', () => {
+    const data = fs.readFileSync('./tests/images/bee.jpg');
+    const jpeg = new JPEG(data, 'test');
+    expect(jpeg.colorSpace).toBe('DeviceRGB');
+  });
+
   describe('opacity', function () {
     test('adds an ExtGState with the correct ca value', () => {
       document.image('./tests/images/bee.png', 0, 0, { opacity: 0.5 });
