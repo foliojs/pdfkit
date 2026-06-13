@@ -186,6 +186,24 @@ describe('acroform', () => {
       expect(docData.length).toBe(3);
       expect(docData).toContainChunk(expected);
     });
+
+    test.each([
+      ['undefined', undefined],
+      ['null', null],
+    ])('nullish %s value uses an empty string', (_label, value) => {
+      const expectedDoc = new PDFDocument({
+        info: { CreationDate: new Date(Date.UTC(2018, 1, 1)) },
+      });
+      expectedDoc.initForm();
+      const expectedDocData = logData(expectedDoc);
+      expectedDoc.formText('empty', 20, 20, 50, 20, { value: '' });
+
+      doc.initForm();
+      const docData = logData(doc);
+      doc.formText('empty', 20, 20, 50, 20, { value });
+
+      expect(docData).toContainChunk(expectedDocData);
+    });
   });
 
   test('flags', () => {
