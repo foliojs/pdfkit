@@ -18,7 +18,7 @@ pdfkit is organized in the following folders:
 - `lib`: The actual source code.
 - `js`: The built / distributable code.
 - `docs`: Code and artifacts to generate documentation.
-- `demo`: Node and browser demos.
+- `examples`: Node and browser demos.
 - `tests/unit`: Tests behavior of specific classes / methods.
 - `tests/visual`: Compare the pdf output against a reference.
 
@@ -38,10 +38,10 @@ To install the project you need to have `node`
     cd pdfkit
     ```
 
-2.  `npm install` to install dependencies
-3.  `npm run build` to build the library
-4.  `npm run demo` to run the demo (check demo/out.pdf)
-5.  `npm run browser-demo` to run the browser demo (check demo/browser.html)
+2.  `yarn install` to install dependencies
+3.  `yarn build` to build the library
+4.  `yarn browserify-example` to build the browser demo (check examples/browserify/browser.html)
+5.  `cd examples` and run each of the examples using `node <example-name>.js`
     
 > Tip: Keep your `master` branch pointing at the original repository and make
 > pull requests from branches on your fork. To do this, run:
@@ -63,19 +63,24 @@ To install the project you need to have `node`
 
 Tests are run using [Vitest](https://vitest.dev/) and are categorized as unit and visual tests. 
 
-Visual tests check the pdf image screenshot against a reference stored as snapshots.
+Unit tests check behavior of specific classes / methods isolatedly. It is the preferred type of test.
 
-Unit tests check behavior of specific classes / methods isolatedly.
+Visual tests check the pdf image screenshot against a reference stored as snapshots. New visual tests should be added sparingly.
+
 
 Test commands
-* `npm run test`: Run all tests
-* `npm run test:unit`: Run unit tests
-* `npm run test:visual`: Run visual tests
-* `npm run lint`: Run linter
+* `yarn test`: Run all tests
+* `yarn test:unit`: Run unit tests
+* `yarn test:visual`: Run visual tests
 
 To write new tests, look for the *.spec.js files at `test/unit` and `test/visual` as examples
 
 > Visual tests should use an embedded font, instead of system fonts, to ensure uniform rendering between different environments
+
+Code style commands
+
+* `yarn lint`: Check code style using eslint
+* `yarn format`: Format code using prettier
 
 ## Documentation
 
@@ -88,6 +93,4 @@ Please go through existing issues and pull requests to check if somebody else is
 Also, make sure to run the tests and lint the code before you commit your changes.
 
 > Tests should be added to check the changed behavior even if is a bug fix.
-
-If the proposed change affects document structure a unit test should be added, if affects rendering, add a visual test
 
