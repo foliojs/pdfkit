@@ -204,6 +204,26 @@ describe('acroform', () => {
 
       expect(docData).toContainChunk(expectedDocData);
     });
+
+    test('options with an undefined value are omitted', () => {
+      // A field created with an extra option set to `undefined` must serialize
+      // identically to one created without that option at all - the key must
+      // not leak into the dictionary as the literal token `undefined`, which is
+      // an invalid PDF object that strict parsers reject (issue #1735).
+      const expectedDoc = new PDFDocument({
+        info: { CreationDate: new Date(Date.UTC(2018, 1, 1)) },
+      });
+      expectedDoc.initForm();
+      const expectedDocData = logData(expectedDoc);
+      expectedDoc.formText('demofield', 20, 20, 50, 20, {});
+
+      doc.initForm();
+      const docData = logData(doc);
+      doc.formText('demofield', 20, 20, 50, 20, { CustomKey: undefined });
+
+      expect(docData.join('')).not.toMatch(/undefined/);
+      expect(docData).toContainChunk(expectedDocData);
+    });
   });
 
   test('flags', () => {
