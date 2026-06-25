@@ -17,7 +17,7 @@ describe('table', () => {
   });
 
   describe('font', () => {
-    test('colum standard font', () => {
+    test('column standard font', () => {
       const document = new PDFDocument();
       const table = document.table({
         columnStyles: {
@@ -28,7 +28,7 @@ describe('table', () => {
       expect(table._columnWidths.length).toBe(1);
     });
 
-    test('colum embeded font with path', () => {
+    test('column embeded font with path', () => {
       const document = new PDFDocument();
       const table = document.table({
         columnStyles: {
@@ -39,7 +39,7 @@ describe('table', () => {
       expect(table._columnWidths.length).toBe(1);
     });
 
-    test('colum embeded font with Buffer', () => {
+    test('column embeded font with Buffer', () => {
       const document = new PDFDocument();
       const buffer = fs.readFileSync('tests/fonts/Roboto-Regular.ttf');
       console.log('buffer instanceof Buffer:', buffer instanceof Buffer);
