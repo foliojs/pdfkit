@@ -139,6 +139,21 @@ describe('acroform', () => {
     expect(docData[2]).toBe(expected[2]);
   });
 
+  test('type flags do not leak implementation markers', () => {
+    doc.initForm();
+    const docData = logData(doc);
+
+    doc.formRadioButton('radio1', 20, 20, 50, 20);
+    doc.formCombo('combo1', 20, 50, 50, 20);
+
+    expect(docData[1]).toContain('/Ff 32768');
+    expect(docData[1]).not.toContain('radioButton');
+    expect(docData[1]).not.toContain('RadioButton');
+    expect(docData[4]).toContain('/Ff 131072');
+    expect(docData[4]).not.toContain('/combo');
+    expect(docData[4]).not.toContain('/Combo');
+  });
+
   describe('text format', () => {
     test('number', () => {
       const expected = [
@@ -257,11 +272,44 @@ describe('acroform', () => {
     expect(docData).toContainChunk(expectedDocData);
   });
 
+  test('undefined flags should be ignored', () => {
+    const expectedDoc = new PDFDocument({
+      info: { CreationDate: new Date(Date.UTC(2018, 1, 1)) },
+    });
+    expectedDoc.initForm();
+    const expectedDocData = logData(expectedDoc);
+    let emptyOpts = {};
+    expectedDoc.formText('flags', 20, 20, 50, 20, emptyOpts);
+
+    doc.initForm();
+    const docData = logData(doc);
+    let opts = {
+      required: undefined,
+      noExport: undefined,
+      readOnly: undefined,
+      align: undefined,
+      multiline: undefined,
+      password: undefined,
+      noSpell: undefined,
+    };
+    doc.formText('flags', 20, 20, 50, 20, opts);
+
+    expect(docData).toContainChunk(expectedDocData);
+  });
+
+  test("align left doesn't write the default Q value", () => {
+    doc.initForm();
+    const docData = logData(doc);
+
+    doc.formText('left', 20, 20, 50, 20, { align: 'left' });
+
+    expect(docData[1]).not.toContain('/Q');
+  });
+
   test('font size', () => {
     const expected = [
       '11 0 obj',
       '<<\n' +
-        '/fontSize 16\n' +
         '/FT /Tx\n' +
         '/DR <<\n' +
         '/Font <<\n' +
@@ -276,7 +324,6 @@ describe('acroform', () => {
         '/Rect [20 752 70 772]\n' +
         '/Border [0 0 0]\n' +
         '/C [0 0 0]\n' +
-        '/FontSize 16\n' +
         '>>',
       'endobj',
     ];
@@ -291,24 +338,24 @@ describe('acroform', () => {
     expect(docData).toContainChunk(expected);
   });
 
-  test('field heirarchy', () => {
+  test('field hierarchy', () => {
     const expected = [
       '13 0 obj',
-      '<<\n/Parent 11 0 R\n/FT /Tx\n/T (leaf1)\n/Subtype /Widget\n/F 4\n/Type /Annot\n/Rect [10 742 210 782]\n/Border [0 0 0]\n/C [0 0 0]\n>>',
+      '<<\n/FT /Tx\n/T (leaf1)\n/Parent 11 0 R\n/Subtype /Widget\n/F 4\n/Type /Annot\n/Rect [10 742 210 782]\n/Border [0 0 0]\n/C [0 0 0]\n>>',
       'endobj',
       '14 0 obj',
-      '<<\n/Parent 11 0 R\n/FT /Tx\n/T (leaf2)\n/Subtype /Widget\n/F 4\n/Type /Annot\n/Rect [10 692 210 732]\n/Border [0 0 0]\n/C [0 0 0]\n>>',
+      '<<\n/FT /Tx\n/T (leaf2)\n/Parent 11 0 R\n/Subtype /Widget\n/F 4\n/Type /Annot\n/Rect [10 692 210 732]\n/Border [0 0 0]\n/C [0 0 0]\n>>',
       'endobj',
       '15 0 obj',
-      '<<\n/Parent 12 0 R\n/FT /Tx\n/T (leaf3)\n/Subtype /Widget\n/F 4\n/Type /Annot\n/Rect [10 642 210 682]\n/Border [0 0 0]\n/C [0 0 0]\n>>',
+      '<<\n/FT /Tx\n/T (leaf3)\n/Parent 12 0 R\n/Subtype /Widget\n/F 4\n/Type /Annot\n/Rect [10 642 210 682]\n/Border [0 0 0]\n/C [0 0 0]\n>>',
       'endobj',
     ];
     const expected2 = [
       '11 0 obj',
-      '<<\n/Parent 10 0 R\n/T (child1Field)\n/Kids [13 0 R 14 0 R]\n>>',
+      '<<\n/T (child1Field)\n/Parent 10 0 R\n/Kids [13 0 R 14 0 R]\n>>',
       'endobj',
       '12 0 obj',
-      '<<\n/Parent 10 0 R\n/T (child2Field)\n/Kids [15 0 R]\n>>',
+      '<<\n/T (child2Field)\n/Parent 10 0 R\n/Kids [15 0 R]\n>>',
       'endobj',
       '10 0 obj',
       '<<\n/T (rootField)\n/Kids [11 0 R 12 0 R]\n>>',
@@ -324,11 +371,11 @@ describe('acroform', () => {
     doc.initForm();
 
     let rootField = doc.formField('rootField');
-    let child1Field = doc.formField('child1Field', { Parent: rootField });
-    let child2Field = doc.formField('child2Field', { Parent: rootField });
-    doc.formText('leaf1', 10, 10, 200, 40, { Parent: child1Field });
-    doc.formText('leaf2', 10, 60, 200, 40, { Parent: child1Field });
-    doc.formText('leaf3', 10, 110, 200, 40, { Parent: child2Field });
+    let child1Field = doc.formField('child1Field', { parent: rootField });
+    let child2Field = doc.formField('child2Field', { parent: rootField });
+    doc.formText('leaf1', 10, 10, 200, 40, { parent: child1Field });
+    doc.formText('leaf2', 10, 60, 200, 40, { parent: child1Field });
+    doc.formText('leaf3', 10, 110, 200, 40, { parent: child2Field });
 
     expect(docData.length).toBe(expected.length);
     for (let idx = 0; idx < expected.length; ++idx) {
