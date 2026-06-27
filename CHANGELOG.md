@@ -2,6 +2,8 @@
 
 ### Unreleased
 
+- Fix Table style merging crashes when passing fonts as buffer (#1743)
+
 ### [v0.19.1] - 2026-06-10
 
 - Fix RGB JPEG embedded as DeviceGray (0.19.0 regression) (#1734)
