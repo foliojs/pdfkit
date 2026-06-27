@@ -3,6 +3,8 @@
 ### Unreleased
 
 - [BREAKING CHANGE] Restrict AcroForm options to documented mappings and explicit escape hatches.
+- [BREAKING CHANGE] Stop automatically uppercasing annotation option keys.
+- Do not mutate options passed to `doc.annotate()` and its convenience methods (link, note, strike, lineAnnotation, rectAnnotation, ellipseAnnotation, textAnnotation, fileAnnotation)
 
 ### [v0.19.1] - 2026-06-10
 
