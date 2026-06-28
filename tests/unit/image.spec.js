@@ -21,6 +21,23 @@ describe('Image', function () {
     expect(document.y).toBe(originalY + imageHeight);
   });
 
+  test('accepts a Uint8Array as image source (issue #1446)', () => {
+    const bytes = new Uint8Array(fs.readFileSync('./tests/images/bee.png'));
+    expect(bytes).toBeInstanceOf(Uint8Array);
+    expect(Buffer.isBuffer(bytes)).toBe(false);
+    expect(() => document.image(bytes, 0, 0, { width: 50 })).not.toThrow();
+  });
+
+  test('accepts a Uint8Array view with a byteOffset as image source (issue #1446)', () => {
+    const file = fs.readFileSync('./tests/images/bee.png');
+    // Place the PNG bytes inside a larger buffer so the view has a non-zero offset.
+    const backing = new Uint8Array(file.length + 8);
+    backing.set(file, 8);
+    const view = backing.subarray(8);
+    expect(view.byteOffset).toBe(8);
+    expect(() => document.image(view, 0, 0, { width: 50 })).not.toThrow();
+  });
+
   test('parse JPEG with null byte padding in EXIF (issue #1175)', () => {
     const data = fs.readFileSync('./tests/images/issue-1175.jpeg');
     const jpeg = new JPEG(data, 'test');
