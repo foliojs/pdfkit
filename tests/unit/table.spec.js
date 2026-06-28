@@ -106,9 +106,6 @@ describe('table', () => {
     });
 
     test('merge table font', () => {
-      const colFamily = 'family1';
-      const rowFamily = 'family2';
-      const cellFamily = 'family3';
       const fontSrcs = {
         colStandardFont: 'Courier',
         colFontPath: 'tests/fonts/Roboto-Regular.ttf',
@@ -151,59 +148,55 @@ describe('table', () => {
 
       const table = document.table({
         columnStyles: [
-          { font: { src: fontSrcs.colStandardFont, family: colFamily } },
-          { font: { src: fontSrcs.colFontPath, family: colFamily } },
-          { font: { src: fontSrcs.colFontBuffer, family: colFamily } },
+          { font: { src: fontSrcs.colStandardFont } },
+          { font: { src: fontSrcs.colFontPath } },
+          { font: { src: fontSrcs.colFontBuffer } },
         ],
         rowStyles: [
           {},
-          { font: { src: fontSrcs.rowStandardFont, family: rowFamily } },
-          { font: { src: fontSrcs.rowFontPath, family: rowFamily } },
-          { font: { src: fontSrcs.rowFontBuffer, family: rowFamily } },
-          { font: { src: fontSrcs.rowFontBuffer, family: rowFamily } },
+          { font: { src: fontSrcs.rowStandardFont } },
+          { font: { src: fontSrcs.rowFontPath } },
+          { font: { src: fontSrcs.rowFontBuffer } },
+          { font: { src: fontSrcs.rowFontBuffer } },
         ],
       });
       // fonts in column styles
       fontSpy.mockClear();
       table.row([{ text: 'A' }, { text: 'B' }, { text: 'C' }]);
       expectFonts(fontSpy, [
-        { src: fontSrcs.colStandardFont, family: colFamily },
-        { src: fontSrcs.colFontPath, family: colFamily },
-        { src: fontSrcs.colFontBuffer, family: colFamily },
+        { src: fontSrcs.colStandardFont },
+        { src: fontSrcs.colFontPath },
+        { src: fontSrcs.colFontBuffer },
       ]);
 
       // fonts in column + row styles
       fontSpy.mockClear();
       table.row([{ text: 'A' }, { text: 'B' }, { text: 'C' }]);
-      expectFonts(fontSpy, [
-        { src: fontSrcs.rowStandardFont, family: rowFamily },
-      ]);
+      expectFonts(fontSpy, [{ src: fontSrcs.rowStandardFont }]);
       fontSpy.mockClear();
       table.row([{ text: 'A' }, { text: 'B' }, { text: 'C' }]);
-      expectFonts(fontSpy, [{ src: fontSrcs.rowFontPath, family: rowFamily }]);
+      expectFonts(fontSpy, [{ src: fontSrcs.rowFontPath }]);
       fontSpy.mockClear();
       table.row([{ text: 'A' }, { text: 'B' }, { text: 'C' }]);
-      expectFonts(fontSpy, [
-        { src: fontSrcs.rowFontBuffer, family: rowFamily },
-      ]);
+      expectFonts(fontSpy, [{ src: fontSrcs.rowFontBuffer }]);
 
       // fonts in column + row + cell style
       fontSpy.mockClear();
       table.row([
         {
           text: 'A',
-          font: { src: fontSrcs.cellStandardFont, family: cellFamily },
+          font: { src: fontSrcs.cellStandardFont },
         },
-        { text: 'B', font: { src: fontSrcs.cellFontPath, family: cellFamily } },
+        { text: 'B', font: { src: fontSrcs.cellFontPath } },
         {
           text: 'C',
-          font: { src: fontSrcs.cellFontBuffer, family: cellFamily },
+          font: { src: fontSrcs.cellFontBuffer },
         },
       ]);
       expectFonts(fontSpy, [
-        { src: fontSrcs.cellStandardFont, family: cellFamily },
-        { src: fontSrcs.cellFontPath, family: cellFamily },
-        { src: fontSrcs.cellFontBuffer, family: cellFamily },
+        { src: fontSrcs.cellStandardFont },
+        { src: fontSrcs.cellFontPath },
+        { src: fontSrcs.cellFontBuffer },
       ]);
     });
   });
