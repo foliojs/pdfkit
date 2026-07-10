@@ -2,6 +2,7 @@
 
 ### Unreleased
 
+- Reset `continued` wrapping state when a `text` call is given an explicit x/y position, so the coordinate is treated as absolute instead of being offset by a previous continued run (#1641)
 - [BREAKING CHANGE] Restrict AcroForm options to documented mappings and explicit escape hatches.
 - [BREAKING CHANGE] Stop automatically uppercasing annotation option keys.
 - Do not mutate options passed to `doc.annotate()` and its convenience methods (link, note, strike, lineAnnotation, rectAnnotation, ellipseAnnotation, textAnnotation, fileAnnotation)
