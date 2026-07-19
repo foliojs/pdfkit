@@ -134,8 +134,8 @@ for (let file of Array.from(files)) {
 
   // turn github highlighted code blocks into normal markdown code blocks
   content = content.replace(
-    /^```javascript\n((:?.|\n)*?)\n```/gm,
-    (m, $1) => `    ${$1.split('\n').join('\n    ')}`,
+    /^```(?:javascript|js|bash)\r?\n([\s\S]*?)\r?\n```/gm,
+    (m, $1) => `    ${$1.split(/\r?\n/).join('\n    ')}`,
   );
 
   const tree = markdown.parse(content);
