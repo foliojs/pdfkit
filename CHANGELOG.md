@@ -5,6 +5,7 @@
 - [BREAKING CHANGE] Restrict AcroForm options to documented mappings and explicit escape hatches.
 - [BREAKING CHANGE] Stop automatically uppercasing annotation option keys.
 - Do not mutate options passed to `doc.annotate()` and its convenience methods (link, note, strike, lineAnnotation, rectAnnotation, ellipseAnnotation, textAnnotation, fileAnnotation)
+- Accept `Uint8Array` (and other `ArrayBuffer` views) as an image source in `doc.image()` ([#1446](https://github.com/foliojs/pdfkit/issues/1446))
 
 ### [v0.19.1] - 2026-06-10
 
