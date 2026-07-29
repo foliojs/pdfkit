@@ -54,6 +54,32 @@ describe('EmbeddedFont', () => {
 
       expect(dictionary.data.BaseFont).toBe('BAJJZZ+Roboto-Regular');
     });
+
+    // https://github.com/foliojs/pdfkit/issues/1687
+    // fontkit's readString() returns a raw Uint8Array instead of a string when the
+    // runtime's TextDecoder doesn't support the font's encoding - this happens on
+    // Hermes (React Native), which only supports utf-8/utf-16le.
+    test('does not crash when postscriptName is a Uint8Array', () => {
+      const document = new PDFDocument();
+      const font = PDFFontFactory.open(
+        document,
+        'tests/fonts/Roboto-Regular.ttf',
+        undefined,
+        'F1099',
+      );
+      const original = font.font.postscriptName;
+      Object.defineProperty(font.font, 'postscriptName', {
+        value: new Uint8Array(Array.from(original, (c) => c.charCodeAt(0))),
+      });
+
+      const dictionary = {
+        end: () => {},
+      };
+      font.dictionary = dictionary;
+
+      expect(() => font.embed()).not.toThrow();
+      expect(dictionary.data.BaseFont).toBe('BAJJZZ+Roboto-Regular');
+    });
   });
 
   describe('toUnicodeMap', () => {
