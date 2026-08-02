@@ -80,6 +80,9 @@
       },
       "default": "./js/pdfkit.browser.mjs"
     },
+    "./virtual-fs": {
+      "default": "./js/virtual-fs.js"
+    },
     "./standard-fonts/Courier": {
       "require": "./js/standard-fonts/Courier.cjs",
       "default": "./js/standard-fonts/Courier.mjs"
