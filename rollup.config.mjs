@@ -1,5 +1,5 @@
-import pkg from './package.json' with { type: 'json' };
 import { babel } from '@rollup/plugin-babel';
+import { nodeResolve } from '@rollup/plugin-node-resolve';
 import copy from 'rollup-plugin-copy';
 
 const external = [
@@ -31,12 +31,15 @@ export default [
     external,
     output: {
       name: 'pdfkit',
-      file: pkg.main,
+      file: 'js/pdfkit.js',
       format: 'cjs',
       sourcemap: true,
       interop: 'default',
     },
     plugins: [
+      nodeResolve({
+        exportConditions: ['node'],
+      }),
       babel({
         babelHelpers: 'bundled',
         babelrc: false,
@@ -69,11 +72,14 @@ export default [
     external,
     output: {
       name: 'pdfkit.es',
-      file: pkg.module,
+      file: 'js/pdfkit.browser.mjs',
       format: 'es',
       sourcemap: true,
     },
     plugins: [
+      nodeResolve({
+        exportConditions: ['default'],
+      }),
       babel({
         babelHelpers: 'bundled',
         babelrc: false,
