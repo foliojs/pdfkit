@@ -1,4 +1,4 @@
-var PDFDocument = require('../');
+var PDFDocument = require('pdfkit');
 var fs = require('fs');
 
 // Create a new PDFDocument

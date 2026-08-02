@@ -2,7 +2,7 @@ const fs = require('fs');
 const vm = require('vm');
 const { markdown } = require('markdown');
 const CodeMirror = require('codemirror/addon/runmode/runmode.node');
-const PDFDocument = require('../');
+const PDFDocument = require('pdfkit');
 
 process.chdir(__dirname);
 

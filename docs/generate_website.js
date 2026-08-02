@@ -3,7 +3,7 @@ const { markdown } = require('markdown');
 const fs = require('fs');
 const vm = require('vm');
 const { exec } = require('child_process');
-const PDFDocument = require('../');
+const PDFDocument = require('pdfkit');
 
 process.chdir(__dirname);
 

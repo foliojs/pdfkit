@@ -69,6 +69,7 @@
     "prettier": "prettier --check lib tests docs tools",
     "format": "prettier --write lib tests docs tools",
     "test": "vitest --testTimeout 8000 run --exclude \"tests/tools/**\"",
+    "test:package": "node tests/package-resolution.cjs",
     "test:tools": "vitest --testTimeout 8000 run tests/tools",
     "test:visual": "vitest --testTimeout 8000 run tests/visual",
     "test:unit": "vitest run tests/unit"
