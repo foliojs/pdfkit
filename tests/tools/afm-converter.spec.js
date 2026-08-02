@@ -16,10 +16,12 @@ const repositoryRoot = process.cwd();
 const require = createRequire(import.meta.url);
 const {
   convertFiles,
+  parseAFM,
   STANDARD_GLYPH_NAMES,
   STANDARD_GLYPH_NAMES_FILE,
 } = require('../../tools/afm-converter');
 const afmDirectory = path.join(repositoryRoot, 'lib/font/data');
+
 const afmFiles = readdirSync(afmDirectory)
   .filter((file) => file.endsWith('.afm'))
   .sort();
@@ -59,28 +61,6 @@ function enableESModules(outputDirectory) {
     path.join(outputDirectory, 'package.json'),
     JSON.stringify({ type: 'module' }),
   );
-}
-
-function decodeRuntimeData(data) {
-  const glyphNames = data.glyphNames ? data.glyphNames.split(' ') : [];
-  const glyphWidths = Object.fromEntries(
-    glyphNames.map((name, index) => [name, data.glyphWidths[index]]),
-  );
-  const kernPairs = {};
-
-  for (let index = 0; index < data.kernPairs.length; index += 2) {
-    const amount = data.kernPairs[index];
-    let pairId = 0;
-
-    for (const delta of data.kernPairs[index + 1]) {
-      pairId += delta;
-      const left = Math.floor(pairId / glyphNames.length);
-      const right = pairId % glyphNames.length;
-      kernPairs[`${glyphNames[left]}\0${glyphNames[right]}`] = amount;
-    }
-  }
-
-  return { glyphNames, glyphWidths, kernPairs };
 }
 
 beforeAll(() => {
@@ -201,14 +181,10 @@ describe('AFM JavaScript converters', () => {
     'preserves the complete parsed state for %s',
     async (file) => {
       const contents = readFileSync(path.join(afmDirectory, file), 'utf8');
-      const font = new AFMFont(contents);
+      const parsed = parseAFM(contents);
       const generated = await importOutput(parsedOutput, file);
 
-      expect(generated).toEqual({
-        attributes: font.attributes,
-        glyphWidths: font.glyphWidths,
-        kernPairs: font.kernPairs,
-      });
+      expect(generated).toEqual(parsed);
     },
   );
 
@@ -216,36 +192,38 @@ describe('AFM JavaScript converters', () => {
     'preserves reachable runtime data for %s',
     async (file) => {
       const contents = readFileSync(path.join(afmDirectory, file), 'utf8');
-      const font = new AFMFont(contents);
+      const parsed = parseAFM(contents);
       const generated = await importOutput(runtimeOutput, file);
-      const decoded = decodeRuntimeData(generated);
+      const font = new AFMFont(generated);
       const reachableGlyphs = new Set(
         Array.from({ length: 256 }, (_, index) => font.characterToGlyph(index)),
       );
       const expectedGlyphWidths = Object.fromEntries(
-        Object.entries(font.glyphWidths).filter(([name]) =>
+        Object.entries(parsed.glyphWidths).filter(([name]) =>
           reachableGlyphs.has(name),
         ),
       );
       const includedGlyphs = new Set(Object.keys(expectedGlyphWidths));
       const expectedKernPairs = Object.fromEntries(
-        Object.entries(font.kernPairs).filter(([pair]) =>
+        Object.entries(parsed.kernPairs).filter(([pair]) =>
           pair.split('\0').every((name) => includedGlyphs.has(name)),
         ),
       );
 
       expect(generated).toMatchObject({
-        name: font.attributes.FontName,
+        name: parsed.attributes.FontName,
         bbox: font.bbox,
         ascender: font.ascender,
         descender: font.descender,
         xHeight: font.xHeight,
         capHeight: font.capHeight,
       });
-      expect(decoded.glyphWidths).toEqual(expectedGlyphWidths);
-      expect(decoded.kernPairs).toEqual(expectedKernPairs);
+      expect(font.glyphWidths).toEqual(expectedGlyphWidths);
+      expect(font.kernPairs).toEqual(expectedKernPairs);
       expect(
-        decoded.glyphNames.every((name) => reachableGlyphs.has(name)),
+        Object.keys(font.glyphWidths).every((name) =>
+          reachableGlyphs.has(name),
+        ),
       ).toBe(true);
     },
   );

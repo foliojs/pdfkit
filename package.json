@@ -58,7 +58,7 @@
   },
   "scripts": {
     "prepublishOnly": "npm run build",
-    "build": "rollup -c && npm run build-standalone",
+    "build": "rollup -c",
     "build-standalone": "browserify --standalone PDFDocument --ignore crypto js/pdfkit.js > js/pdfkit.standalone.js",
     "browserify-example": "browserify examples/browserify/browser.js > examples/browserify/bundle.js",
     "pdf-guide": "node docs/generate.js",
@@ -79,6 +79,68 @@
         "require": "./js/pdfkit.js"
       },
       "default": "./js/pdfkit.browser.mjs"
+    },
+    "./standard-fonts/Courier": {
+      "require": "./js/standard-fonts/Courier.cjs",
+      "default": "./js/standard-fonts/Courier.mjs"
+    },
+    "./standard-fonts/CourierBold": {
+      "require": "./js/standard-fonts/CourierBold.cjs",
+      "default": "./js/standard-fonts/CourierBold.mjs"
+    },
+    "./standard-fonts/CourierBoldOblique": {
+      "require": "./js/standard-fonts/CourierBoldOblique.cjs",
+      "default": "./js/standard-fonts/CourierBoldOblique.mjs"
+    },
+    "./standard-fonts/CourierOblique": {
+      "require": "./js/standard-fonts/CourierOblique.cjs",
+      "default": "./js/standard-fonts/CourierOblique.mjs"
+    },
+    "./standard-fonts/Helvetica": {
+      "require": "./js/standard-fonts/Helvetica.cjs",
+      "default": "./js/standard-fonts/Helvetica.mjs"
+    },
+    "./standard-fonts/HelveticaBold": {
+      "require": "./js/standard-fonts/HelveticaBold.cjs",
+      "default": "./js/standard-fonts/HelveticaBold.mjs"
+    },
+    "./standard-fonts/HelveticaBoldOblique": {
+      "require": "./js/standard-fonts/HelveticaBoldOblique.cjs",
+      "default": "./js/standard-fonts/HelveticaBoldOblique.mjs"
+    },
+    "./standard-fonts/HelveticaOblique": {
+      "require": "./js/standard-fonts/HelveticaOblique.cjs",
+      "default": "./js/standard-fonts/HelveticaOblique.mjs"
+    },
+    "./standard-fonts/Symbol": {
+      "require": "./js/standard-fonts/Symbol.cjs",
+      "default": "./js/standard-fonts/Symbol.mjs"
+    },
+    "./standard-fonts/TimesBold": {
+      "require": "./js/standard-fonts/TimesBold.cjs",
+      "default": "./js/standard-fonts/TimesBold.mjs"
+    },
+    "./standard-fonts/TimesBoldItalic": {
+      "require": "./js/standard-fonts/TimesBoldItalic.cjs",
+      "default": "./js/standard-fonts/TimesBoldItalic.mjs"
+    },
+    "./standard-fonts/TimesItalic": {
+      "require": "./js/standard-fonts/TimesItalic.cjs",
+      "default": "./js/standard-fonts/TimesItalic.mjs"
+    },
+    "./standard-fonts/TimesRoman": {
+      "require": "./js/standard-fonts/TimesRoman.cjs",
+      "default": "./js/standard-fonts/TimesRoman.mjs"
+    },
+    "./standard-fonts/ZapfDingbats": {
+      "require": "./js/standard-fonts/ZapfDingbats.cjs",
+      "default": "./js/standard-fonts/ZapfDingbats.mjs"
+    }
+  },
+  "imports": {
+    "#standard-fonts/*": {
+      "require": "./js/standard-fonts/*.cjs",
+      "default": "./js/standard-fonts/*.mjs"
     }
   },
   "browserify": {

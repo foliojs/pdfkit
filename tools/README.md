@@ -2,12 +2,13 @@
 
 The AFM conversion tools generate one ECMAScript module per input font. Runtime
 conversion also generates a shared glyph-name module when Courier, Helvetica,
-or Times is present. These tools are groundwork for loading only the standard
-fonts an application uses; they do not currently change PDFKit's font loading
-path.
+or Times is present. PDFKit emits each generated runtime module as separate CJS
+and ESM artifacts. Node loads them on demand, while browser applications import
+and register only the standard fonts they use.
 
-Raw AFM files remain the source of truth. Generated modules should not be
-edited or committed.
+Raw AFM files remain the source of truth and are retained in distributions.
+The runtime modules in `lib/font/generated` are committed build inputs. Do not
+edit them directly; regenerate them from the AFM sources and format the result.
 
 ## Commands
 
@@ -17,7 +18,7 @@ Generate compact runtime data:
 node tools/convert-afm-runtime.js --output-dir /tmp/pdfkit-afm-runtime
 ```
 
-Generate the complete state produced by `AFMFont.parse`:
+Generate the complete parsed AFM state used for converter verification:
 
 ```sh
 node tools/convert-afm-parsed.js --output-dir /tmp/pdfkit-afm-parsed

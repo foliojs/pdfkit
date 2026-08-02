@@ -33,26 +33,19 @@ The `write` and `output` methods found in PDFKit before version 0.5 are now depr
 
 ## Using PDFKit in the browser
 
-PDFKit can be used in the browser as well as in Node! There are two ways to use PDFKit in the browser.
-The first is to create an app using an module bundler like [Browserify](http://browserify.org/) or [Webpack](https://webpack.js.org/).
-The second is to create a standalone pdfkit script as explained [here](https://github.com/foliojs/pdfkit/wiki/How-to-compile-standalone-PDFKit-for-use-in-the-browser).
+PDFKit provides an ES module build for browsers. Standard PDF font metrics are
+not included in the main browser module. Import and register the generated data
+for every standard font your application uses before selecting that font. The
+default document font is Helvetica, so it must be registered before constructing
+a document unless the document is created with `{ font: null }`.
 
-Using PDFKit in the browser is exactly the same as using it in Node, except you'll want to pipe the
-output to a destination supported in the browser, such as a
-[Blob](https://developer.mozilla.org/en-US/docs/Web/API/Blob). Blobs can be used
-to generate a URL to allow display of generated PDFs directly in the browser via an `iframe`, or they can
-be used to upload the PDF to a server, or trigger a download in the user's browser.
+    import PDFDocument, { registerStdFonts } from 'pdfkit';
+    import Helvetica from 'pdfkit/standard-fonts/Helvetica';
+    import blobStream from 'blob-stream';
 
-To get a Blob from a `PDFDocument`, you should pipe it to a [blob-stream](https://github.com/devongovett/blob-stream),
-which is a module that generates a Blob from any Node-style stream. The following example uses Browserify to load
-`PDFKit` and `blob-stream`, but if you're not using Browserify, you can load them in whatever way you'd like (e.g. script tags).
+    registerStdFonts(Helvetica);
 
-    // require dependencies
-    const PDFDocument = require('pdfkit');
-    const blobStream  = require('blob-stream');
-
-    // create a document the same way as above
-    const doc = new PDFDocument;
+    const doc = new PDFDocument();
 
     // pipe the document to a blob
     const stream = doc.pipe(blobStream());
@@ -71,11 +64,6 @@ which is a module that generates a Blob from any Node-style stream. The followin
     });
 
 You can see an interactive in-browser demo of PDFKit [here](http://pdfkit.org/demo/browser.html).
-
-Note that in order to Browserify a project using PDFKit, you need to install the `brfs` module with npm,
-which is used to load built-in font data into the package. It is listed as a `devDependencies` in
-PDFKit's `package.json`, so it isn't installed by default for Node users.
-If you forget to install it, Browserify will print an error message.
 
 ## Document options
 

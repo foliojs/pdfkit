@@ -196,7 +196,7 @@ Here is the output:
 
 ## Fonts
 
-The PDF format defines 14 standard fonts that can be used in PDF documents. PDFKit supports each of them out of the box.
+The PDF format defines 14 standard fonts that can be used in PDF documents. PDFKit supports each of them out of the box in Node.
 Besides Symbol and Zapf Dingbats this includes 4 styles (regular, bold, italic/oblique, bold+italic) of Helvetica,
 Courier, and Times. To switch between standard fonts, call the `font` method with the corresponding Label:
 
@@ -214,6 +214,17 @@ Courier, and Times. To switch between standard fonts, call the `font` method wit
 * `'Times-Italic'`
 * `'Times-BoldItalic'`
 * `'ZapfDingbats'`
+
+Browser applications import and register only the standard-font data they use:
+
+    import PDFDocument, { registerStdFonts } from 'pdfkit';
+    import Helvetica from 'pdfkit/standard-fonts/Helvetica';
+    import TimesRoman from 'pdfkit/standard-fonts/TimesRoman';
+
+    registerStdFonts(Helvetica, TimesRoman);
+
+    const doc = new PDFDocument();
+    doc.font('Times-Roman');
 
 The PDF format also allows fonts to be embedded right in the document. PDFKit supports
 embedding TrueType (`.ttf`), OpenType (`.otf`), WOFF, WOFF2, TrueType Collection (`.ttc`),
