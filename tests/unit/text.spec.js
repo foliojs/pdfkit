@@ -201,6 +201,46 @@ Q
 
       expect(docData).toContainText({ text: 'text with null x' });
     });
+
+    // Capture the absolute x each fragment is actually drawn at.
+    const spyFragmentX = () => {
+      const positions = [];
+      const original = document._fragment.bind(document);
+      document._fragment = (text, x, y, options) => {
+        if (text && String(text).trim()) {
+          positions.push({ text: String(text).trim(), x });
+        }
+        return original(text, x, y, options);
+      };
+      return positions;
+    };
+
+    test('explicit position resets a previous continued run (#1641)', () => {
+      const positions = spyFragmentX();
+
+      ['AAA ', 'BBB ', 'CCC '].forEach((t) =>
+        document.text(t, { continued: true }),
+      );
+      // A non-continued call with an explicit x should be absolute, not offset
+      // by the inline position left behind by the continued run above.
+      document.text('FRESH', 400);
+      document.end();
+
+      const fresh = positions.find((p) => p.text === 'FRESH');
+      expect(fresh.x).toBe(400);
+    });
+
+    test('continued run without coordinates still flows inline', () => {
+      const positions = spyFragmentX();
+
+      document.text('AAA', { continued: true });
+      document.text('BBB');
+      document.end();
+
+      const a = positions.find((p) => p.text === 'AAA');
+      const b = positions.find((p) => p.text === 'BBB');
+      expect(b.x).toBeGreaterThan(a.x);
+    });
   });
 
   describe('text with structure parent links', () => {
