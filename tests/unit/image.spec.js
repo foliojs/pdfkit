@@ -1,6 +1,8 @@
 import PDFDocument from '../../lib/document';
 import fs from 'fs';
 import JPEG from '../../lib/image/jpeg';
+import PDFImage from '../../lib/image';
+import dataURIs from '../images/bee';
 
 describe('Image', function () {
   /**
@@ -27,6 +29,12 @@ describe('Image', function () {
     expect(jpeg.width).toBe(375);
     expect(jpeg.height).toBe(500);
     expect(jpeg.orientation).toBe(1);
+  });
+
+  test.each(['png', 'jpeg'])('%s base64 data URI is decoded', (format) => {
+    const image = PDFImage.open(dataURIs[format], 'test');
+    expect(image.width).toBe(409);
+    expect(image.height).toBe(400);
   });
 
   test('RGB JPEG is parsed with DeviceRGB color space (regression)', () => {
