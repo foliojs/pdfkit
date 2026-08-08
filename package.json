@@ -41,7 +41,7 @@
     "jest-diff": "^30.4.1",
     "jest-image-snapshot": "^6.5.2",
     "markdown": "~0.5.0",
-    "pdfjs-dist": "^5.7.284",
+    "pdfjs-dist": "^6.2.108",
     "prettier": "3.4.2",
     "pug": "^3.0.4",
     "rollup": "^4.61.1",
