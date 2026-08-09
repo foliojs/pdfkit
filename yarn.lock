@@ -2797,7 +2797,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"browserify-zlib@npm:^0.2.0, browserify-zlib@npm:~0.2.0":
+"browserify-zlib@npm:~0.2.0":
   version: 0.2.0
   resolution: "browserify-zlib@npm:0.2.0"
   dependencies:
@@ -4026,6 +4026,13 @@ __metadata:
     picomatch:
       optional: true
   checksum: 10c0/e345083c4306b3aed6cb8ec551e26c36bab5c511e99ea4576a16750ddc8d3240e63826cc624f5ae17ad4dc82e68a253213b60d556c11bfad064b7607847ed07f
+  languageName: node
+  linkType: hard
+
+"fflate@npm:^0.8.2, fflate@npm:^0.8.3":
+  version: 0.8.3
+  resolution: "fflate@npm:0.8.3"
+  checksum: 10c0/eab181ca37f5348ae76d4b6f840e0026e30220e33153289ac942222d8b9638237d486507dbcc09878d724095bd354993a2ee48bbee99c8f2c6440d4448719aa7
   languageName: node
   linkType: hard
 
@@ -5867,6 +5874,7 @@ __metadata:
     canvas: "npm:^3.2.3"
     codemirror: "npm:~5.65.21"
     eslint: "npm:^10.4.1"
+    fflate: "npm:^0.8.3"
     fontkit: "npm:^2.0.4"
     gh-pages: "npm:^6.3.0"
     globals: "npm:^17.6.0"
@@ -5876,7 +5884,7 @@ __metadata:
     linebreak: "npm:^1.1.0"
     markdown: "npm:~0.5.0"
     pdfjs-dist: "npm:^5.7.284"
-    png-js: "npm:^1.1.0"
+    png-js: "npm:^2.0.0"
     prettier: "npm:3.4.2"
     pug: "npm:^3.0.4"
     rollup: "npm:^4.61.1"
@@ -5933,12 +5941,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"png-js@npm:^1.1.0":
-  version: 1.1.0
-  resolution: "png-js@npm:1.1.0"
+"png-js@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "png-js@npm:2.0.0"
   dependencies:
-    browserify-zlib: "npm:^0.2.0"
-  checksum: 10c0/61e275cb424b914fbc01c2a1b0096857f214c5fee45054c713dec1ad320760f4dd61f28bb0b3b0c139bd8c49def8891b02ca4018238e7b5f14bb671cd1ca7874
+    fflate: "npm:^0.8.2"
+  checksum: 10c0/69f44790c64b99ca7f44280ed13643e7700bc91406842a096471951227e7dfb52e21924dc3691bf65877c0411d8ced63bebaba1d2da17bf45fefed92a229f1a6
   languageName: node
   linkType: hard
 

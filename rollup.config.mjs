@@ -6,6 +6,7 @@ const external = [
   'stream',
   'fs',
   'zlib',
+  'fflate',
   'fontkit',
   'events',
   'linebreak',

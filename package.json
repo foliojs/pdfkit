@@ -51,10 +51,11 @@
   "dependencies": {
     "@noble/ciphers": "^1.0.0",
     "@noble/hashes": "^1.6.0",
+    "fflate": "^0.8.3",
     "fontkit": "^2.0.4",
     "js-md5": "^0.8.3",
     "linebreak": "^1.1.0",
-    "png-js": "^1.1.0"
+    "png-js": "^2.0.0"
   },
   "scripts": {
     "prepublishOnly": "npm run build",
@@ -142,6 +143,10 @@
     }
   },
   "imports": {
+    "#zlib": {
+      "node": "./lib/zlib/node.js",
+      "default": "./lib/zlib/browser.js"
+    },
     "#standard-fonts/*": {
       "require": "./js/standard-fonts/*.cjs",
       "default": "./js/standard-fonts/*.mjs"
