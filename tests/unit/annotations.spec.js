@@ -101,6 +101,30 @@ describe('Annotations', () => {
     });
   });
 
+  describe('note', () => {
+    test.each([
+      ['null', null],
+      ['undefined', undefined],
+    ])('uses the default icon when Name is %s', (_label, Name) => {
+      const docData = logData(document);
+
+      document.note(10, 30, 30, 30, 'Text of note', { Name });
+
+      const dataStr = docData.join('\n');
+      expect(dataStr).toContain('/Subtype /Text');
+      expect(dataStr).toContain('/Name /Comment');
+      expect(dataStr).not.toContain(`/Name ${Name}`);
+    });
+
+    test('does not mutate caller options', () => {
+      const options = {};
+
+      document.note(10, 30, 30, 30, 'Text of note', options);
+
+      expect(options).toEqual({});
+    });
+  });
+
   describe('fileAnnotation', () => {
     test('creating a fileAnnotation', () => {
       const docData = logData(document);

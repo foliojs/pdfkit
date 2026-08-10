@@ -16,12 +16,15 @@ doc.initForm();
 Form annotations are added using the following document methods.
 
 - `formText( name, x, y, width, height, options)`
-- `formPushButton( name, x, y, width, height, name, options)`
+- `formPushButton( name, x, y, width, height, options)`
 - `formCombo( name, x, y, width, height, options)`
 - `formList( name, x, y, width, height, options)`
+- `formRadioButton( name, x, y, width, height, options)`
+- `formCheckbox( name, x, y, width, height, options)`
 
 The above methods call the `formAnnotation` method with
-type set to one of `text`, `pushButton`, `radioButton`, `combo` or `list`.
+type set to one of `text`, `pushButton`, `radioButton`, `checkbox`, `combo`
+or `list`.
 
 - `formAnnotation( name, type, x, y, width, height, options)`
 
@@ -35,10 +38,11 @@ information on `name` in the **Field Names** section below.
 
 ### `options` Parameter
 
-#### Common Options
+#### Common Annotation Options
 
-Form Annotation `options` that are common across all form annotation types are:
+The following `options` are accepted by all form annotation methods:
 
+- `parent` [_PDFReference_] - Parent field returned by `formField`.
 - `required` [_boolean_] - The field must have a value by the time the form is submitted.
 - `noExport` [_boolean_] - The field will not be exported if a form is submitted.
 - `readOnly` [_boolean_] - The user may not change the value of the field, and
@@ -47,22 +51,24 @@ Form Annotation `options` that are common across all form annotation types are:
 - `value` [_number|string_] - The field's value.
 - `defaultValue` [_number|string_] - The default value to which the field
   reverts if a reset-form action is executed.
+- `backgroundColor` - Field background color.
+- `borderColor` - Field border color.
+- `fontSize` [_number_] - Sets the font size used in the field appearance string.
+  The default, `0`, means auto sizing.
 
-Some form annotations have `color` options. You can use an array of RGB values,
-a hex color, or a named CSS color value for that option.
-
-- `backgroundColor` - field background color
-- `borderColor` - field border color
+Color options accept an array of RGB values, a hex color, or a named CSS color.
+Method-specific options listed below are accepted in addition to these common
+options.
 
 #### Text Field Options
 
-- `align` [_string_] - Sets the alignment to `left`,
-  `center` or `right`.
+These options are accepted by `formText`:
+
+- `align` [_string_] - Sets the alignment to `left`, `center` or `right`.
 - `multiline` [_boolean_] - Allows the field to have multiple lines of text.
 - `password` [_boolean_] - The text will be masked (_e.g._ with asterisks).
-- `noSpell` [_boolean_] - If set, text entered in the field is not spell-checked
+- `noSpell` [_boolean_] - If set, text entered in the field is not spell-checked.
 - `format` [_object_] - See the section on **Text Field Formatting** below.
-- `fontSize` [_number_] - Sets the fontSize (default or 0 means auto sizing)
 
 ```js
 doc.formText('leaf2', 10, 60, 200, 40, {
@@ -75,13 +81,17 @@ doc.formText('leaf2', 10, 60, 200, 40, {
 });
 ```
 
-#### Combo and List Field Options
+#### Combo Field Options
 
+These options are accepted by `formCombo`:
+
+- `select` [_array_] - Array of choices to display in the combo field.
+- `align` [_string_] - Sets the alignment to `left`, `center` or `right`.
+- `edit` [_boolean_] - Allows the user to enter a value in the field.
 - `sort` [_boolean_] - The field options will be sorted alphabetically.
-- `edit` [_boolean_] - (combo only) Allow the user to enter a value in the field.
-- `multiSelect` [_boolean_] - Allow more than one choice to be selected.
-- `noSpell` [_boolean_] - (combo only) If set and `edit` is true, text entered in the field is not spell-checked.
-- `select` [_array_] - Array of choices to display in the combo or list form field.
+- `multiSelect` [_boolean_] - Allows more than one choice to be selected.
+- `noSpell` [_boolean_] - If set and `edit` is true, text entered in the field
+  is not spell-checked.
 
 ```js
 opts = {
@@ -93,7 +103,18 @@ opts = {
 doc.formCombo('ch1', 10, y, 100, 20, opts);
 ```
 
-#### Button Field Options
+#### List Field Options
+
+These options are accepted by `formList`:
+
+- `select` [_array_] - Array of choices to display in the list field.
+- `align` [_string_] - Sets the alignment to `left`, `center` or `right`.
+- `sort` [_boolean_] - The field options will be sorted alphabetically.
+- `multiSelect` [_boolean_] - Allows more than one choice to be selected.
+
+#### Push Button Field Options
+
+These options are accepted by `formPushButton`:
 
 - `label` [_string_] - Sets the label text. You can also set an icon, but for
   this you will need to 'expert-up' and dig deeper into the PDF Reference manual.
@@ -105,6 +126,33 @@ var opts = {
 };
 doc.formPushButton('btn1', 10, 200, 100, 30, opts);
 ```
+
+#### Radio Button Field Options
+
+These options are accepted by `formRadioButton`:
+
+- `toggleToOffButton` [_boolean_] - Allows a selected radio button to be toggled
+  off by clicking it again.
+
+#### Checkbox Field Options
+
+`formCheckbox` accepts the common annotation options.
+
+### Form Field Options
+
+`formField( name, options )` creates an invisible field node and accepts these
+options:
+
+- `parent` [_PDFReference_] - Parent field returned by `formField`.
+- `required` [_boolean_] - The field must have a value by the time the form is submitted.
+- `noExport` [_boolean_] - The field will not be exported if a form is submitted.
+- `readOnly` [_boolean_] - The user may not change the value of the field.
+- `value` [_number|string_] - The field's value.
+- `defaultValue` [_number|string_] - The default value to which the field
+  reverts if a reset-form action is executed.
+- `backgroundColor` - Field background color.
+- `borderColor` - Field border color.
+- `fontSize` [_number_] - Sets the font size used in the field appearance string.
 
 ### Text Field Formatting
 
@@ -254,11 +302,9 @@ The output of this example looks like this.
 
 ### Advanced Form Field Use
 
-Forms can be quite complicated and your needs will likely grow to sometimes need
-to directly specify the attributes that will go into the Form Annotation or
-Field dictionaries. Consult the **PDF Reference** and set these attributes in
-the `options` object. Any options that are not listed above will be added
-directly to the corresponding PDF Object.
+Older implementations used to pass all unknown options to the internal PDF object structure. A small set of direct PDF dictionary escape hatches is still recognized: `Ff`, `MK.CA`, and `AA` when a `format` option is used but its use is discouraged and likely will be removed in future versions.
+
+If an option is not supported, open an issue on Github and it will be considered for addition to the API.
 
 ## Font
 

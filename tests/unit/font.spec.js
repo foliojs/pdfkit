@@ -2,7 +2,25 @@ import { vi } from 'vitest';
 import { readFileSync } from 'fs';
 import PDFDocument from '../../lib/document';
 import PDFFontFactory from '../../lib/font_factory';
+import StandardFont from '../../lib/font/standard';
+import { STANDARD_FONT_NAMES } from '../../lib/font/standard_fonts';
 import { logData, collectPdf, missingObjects } from './helpers';
+
+describe('PDFFontFactory', () => {
+  test.each(STANDARD_FONT_NAMES)('opens generated metrics for %s', (name) => {
+    const font = PDFFontFactory.open({}, name, undefined, 'F1');
+
+    expect(font).toBeInstanceOf(StandardFont);
+    expect(font.name).toBe(name);
+    expect(font.id).toBe('F1');
+  });
+
+  test('rejects unsupported input', () => {
+    expect(() => PDFFontFactory.open({}, {})).toThrow(
+      'Not a supported font format or standard PDF font.',
+    );
+  });
+});
 
 describe('EmbeddedFont', () => {
   test('no fontLayoutCache option', () => {

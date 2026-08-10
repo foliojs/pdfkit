@@ -1,5 +1,5 @@
 var fs = require('fs');
-var PDFDocument = require('../');
+var PDFDocument = require('pdfkit');
 
 var doc = new PDFDocument({ bufferPages: true });
 doc.pipe(fs.createWriteStream('text-link.pdf'));

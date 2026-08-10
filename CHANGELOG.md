@@ -2,6 +2,17 @@
 
 ### Unreleased
 
+- [BREAKING CHANGE] Restrict AcroForm options to documented mappings and explicit escape hatches.
+- [BREAKING CHANGE] Stop automatically uppercasing annotation option keys.
+- Do not mutate options passed to `doc.annotate()` and its convenience methods (link, note, strike, lineAnnotation, rectAnnotation, ellipseAnnotation, textAnnotation, fileAnnotation)
+- Persist font options when adding a new page. Fixes #1739
+
+### [v0.19.1] - 2026-06-10
+
+- Fix RGB JPEG embedded as DeviceGray (0.19.0 regression) (#1734)
+
+### [v0.19.0] - 2026-06-07
+
 - Bump node version requirement to 20+
 - Bump minimum supported browsers to Firefox 115, iOS/Safari 16
 - Fix text with input x as null
@@ -10,6 +21,8 @@
 - Fix PDF/UA compliance issues in kitchen-sink-accessible example
 - Add bbox and placement options to PDFStructureElement for PDF/UA compliance
 - Extend `roundedRect` with `borderRadius` as number for all corners or per-corner array (CSS order)
+- Fix accessibility: scope in TH element
+- Fix PDF Name escaping for spot colors with spaces ([#1644](https://github.com/foliojs/pdfkit/issues/1644))
 
 ### [v0.18.0] - 2026-03-14
 

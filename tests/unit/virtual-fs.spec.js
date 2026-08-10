@@ -10,7 +10,7 @@ function checkMissingFiles(files) {
 
 describe('virtual-fs', function () {
   beforeEach(() => {
-    fs.fileData = {};
+    fs.files = {};
   });
 
   test('readFileSync', function () {

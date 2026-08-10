@@ -3,7 +3,7 @@ const { markdown } = require('markdown');
 const fs = require('fs');
 const vm = require('vm');
 const { exec } = require('child_process');
-const PDFDocument = require('../');
+const PDFDocument = require('pdfkit');
 
 process.chdir(__dirname);
 
@@ -134,8 +134,8 @@ for (let file of Array.from(files)) {
 
   // turn github highlighted code blocks into normal markdown code blocks
   content = content.replace(
-    /^```javascript\n((:?.|\n)*?)\n```/gm,
-    (m, $1) => `    ${$1.split('\n').join('\n    ')}`,
+    /^```(?:javascript|js|bash)\r?\n([\s\S]*?)\r?\n```/gm,
+    (m, $1) => `    ${$1.split(/\r?\n/).join('\n    ')}`,
   );
 
   const tree = markdown.parse(content);

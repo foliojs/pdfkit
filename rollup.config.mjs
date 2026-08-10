@@ -1,11 +1,12 @@
-import pkg from './package.json' with { type: 'json' };
 import { babel } from '@rollup/plugin-babel';
+import { nodeResolve } from '@rollup/plugin-node-resolve';
 import copy from 'rollup-plugin-copy';
 
 const external = [
   'stream',
   'fs',
   'zlib',
+  'fflate',
   'fontkit',
   'events',
   'linebreak',
@@ -24,19 +25,39 @@ const supportedBrowsers = [
   'Safari 16', // from 2022
 ];
 
+const standardFontInputs = {
+  Courier: 'lib/font/generated/Courier.js',
+  CourierBold: 'lib/font/generated/CourierBold.js',
+  CourierBoldOblique: 'lib/font/generated/CourierBoldOblique.js',
+  CourierOblique: 'lib/font/generated/CourierOblique.js',
+  Helvetica: 'lib/font/generated/Helvetica.js',
+  HelveticaBold: 'lib/font/generated/HelveticaBold.js',
+  HelveticaBoldOblique: 'lib/font/generated/HelveticaBoldOblique.js',
+  HelveticaOblique: 'lib/font/generated/HelveticaOblique.js',
+  Symbol: 'lib/font/generated/Symbol.js',
+  TimesBold: 'lib/font/generated/TimesBold.js',
+  TimesBoldItalic: 'lib/font/generated/TimesBoldItalic.js',
+  TimesItalic: 'lib/font/generated/TimesItalic.js',
+  TimesRoman: 'lib/font/generated/TimesRoman.js',
+  ZapfDingbats: 'lib/font/generated/ZapfDingbats.js',
+};
+
 export default [
   // CommonJS build for Node
   {
-    input: 'lib/document.js',
+    input: 'lib/document.node.js',
     external,
     output: {
       name: 'pdfkit',
-      file: pkg.main,
+      file: 'js/pdfkit.js',
       format: 'cjs',
       sourcemap: true,
       interop: 'default',
     },
     plugins: [
+      nodeResolve({
+        exportConditions: ['node'],
+      }),
       babel({
         babelHelpers: 'bundled',
         babelrc: false,
@@ -65,15 +86,18 @@ export default [
   },
   // ES for green browsers
   {
-    input: 'lib/document.js',
+    input: 'lib/document.browser.js',
     external,
     output: {
       name: 'pdfkit.es',
-      file: pkg.module,
+      file: 'js/pdfkit.browser.mjs',
       format: 'es',
       sourcemap: true,
     },
     plugins: [
+      nodeResolve({
+        exportConditions: ['default'],
+      }),
       babel({
         babelHelpers: 'bundled',
         babelrc: false,
@@ -89,6 +113,33 @@ export default [
             },
           ],
         ],
+        comments: false,
+      }),
+    ],
+  },
+  // Standard font data is kept outside the main bundles so it can be loaded
+  // individually on demand.
+  {
+    input: standardFontInputs,
+    output: [
+      {
+        dir: 'js/standard-fonts',
+        format: 'cjs',
+        entryFileNames: '[name].cjs',
+        chunkFileNames: 'chunks/[name]-[hash].cjs',
+        exports: 'default',
+      },
+      {
+        dir: 'js/standard-fonts',
+        format: 'es',
+        entryFileNames: '[name].mjs',
+        chunkFileNames: 'chunks/[name]-[hash].mjs',
+      },
+    ],
+    plugins: [
+      babel({
+        babelHelpers: 'bundled',
+        babelrc: false,
         comments: false,
       }),
     ],
