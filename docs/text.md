@@ -106,7 +106,7 @@ below.
 * `strike` - whether to strike out the text
 * `oblique` - whether to slant the text (angle in degrees or `true`)
 * `baseline` - the vertical alignment of the text with respect to its insertion point (values as [canvas textBaseline](https://www.w3schools.com/tags/canvas_textbaseline.asp))
-* `continued` - whether the text segment will be followed immediately by another segment. Useful for changing styling in the middle of a paragraph.
+* `continued` - whether the text segment will be followed immediately by another segment. Useful for changing styling in the middle of a paragraph. Note that this is a *forward-looking* flag set on the current segment to make the **next** `text` call continue from where this one left off — the continuing call itself does not need the flag. See [Rich Text](#rich-text) below.
 * `features` - an array of [OpenType feature tags](https://www.microsoft.com/typography/otspec/featuretags.htm) to apply. Can also be provided as an object with features as keys and boolean values. If not provided, a set of defaults is used. To deactivate default font features, you have to explicitly set them to false (`{ liga: false }`). When providing an empty array the default font features will still be used.
 
 Additionally, the fill and stroke color and opacity methods described in the
@@ -172,6 +172,12 @@ option from the first `text` call is retained by the second call.
 Here is the output:
 
 ![4]()
+
+Because `continued` is forward-looking, the wrapping state stays active until a `text` call
+*without* `continued: true` consumes it. To end a run explicitly — for example the last
+iteration of a loop — set `continued: false` on the final segment. Alternatively, giving the
+next `text` call an explicit `x` or `y` position starts it fresh: such a call ignores the
+leftover state and draws at the absolute coordinates you pass, rather than continuing inline.
 
 To cancel a link in rich text set the `link` option to `null`.
 
