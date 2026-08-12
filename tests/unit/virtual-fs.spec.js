@@ -35,15 +35,15 @@ describe('virtual-fs', function () {
     fs.writeFileSync('files/binary', new Uint8Array([4, 3, 1, 2]));
 
     const encodedData = fs.readFileSync('files/encoded');
-    expect(encodedData).toBeInstanceOf(Buffer);
-    expect(encodedData.toString('utf8')).toEqual('File content');
+    expect(encodedData).toBeInstanceOf(Uint8Array);
+    expect(new TextDecoder().decode(encodedData)).toEqual('File content');
 
     const rawData = fs.readFileSync('files/raw', 'utf8');
     expect(rawData).toEqual('File content');
 
     const binaryData = fs.readFileSync('files/binary');
-    expect(binaryData).toBeInstanceOf(Buffer);
-    expect(binaryData.toJSON()).toEqual({ data: [4, 3, 1, 2], type: 'Buffer' });
+    expect(binaryData).toBeInstanceOf(Uint8Array);
+    expect(Array.from(binaryData)).toEqual([4, 3, 1, 2]);
   });
 
   test('bindFileData', function () {
@@ -59,15 +59,15 @@ describe('virtual-fs', function () {
     });
 
     const encodedData = fs.readFileSync('files/encoded');
-    expect(encodedData).toBeInstanceOf(Buffer);
-    expect(encodedData.toString('utf8')).toEqual('File content');
+    expect(encodedData).toBeInstanceOf(Uint8Array);
+    expect(new TextDecoder().decode(encodedData)).toEqual('File content');
 
     let rawData = fs.readFileSync('files/raw', 'utf8');
     expect(rawData).toEqual('File content');
 
     let binaryData = fs.readFileSync('files/binary');
-    expect(binaryData).toBeInstanceOf(Buffer);
-    expect(binaryData.toJSON()).toEqual({ data: [4, 3, 1, 2], type: 'Buffer' });
+    expect(binaryData).toBeInstanceOf(Uint8Array);
+    expect(Array.from(binaryData)).toEqual([4, 3, 1, 2]);
 
     // reset option
     fs.bindFileData(
@@ -84,7 +84,7 @@ describe('virtual-fs', function () {
     expect(rawData).toEqual('New File content');
 
     binaryData = fs.readFileSync('files/binary2');
-    expect(binaryData).toBeInstanceOf(Buffer);
-    expect(binaryData.toJSON()).toEqual({ data: [4, 3, 1, 2], type: 'Buffer' });
+    expect(binaryData).toBeInstanceOf(Uint8Array);
+    expect(Array.from(binaryData)).toEqual([4, 3, 1, 2]);
   });
 });

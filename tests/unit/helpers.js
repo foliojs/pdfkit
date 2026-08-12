@@ -25,7 +25,7 @@ function logData(doc) {
   const loggedData = [];
   const originalMethod = doc._write;
   doc._write = function (data) {
-    loggedData.push(data);
+    loggedData.push(data instanceof Uint8Array ? Buffer.from(data) : data);
     originalMethod.call(this, data);
   };
   return loggedData;

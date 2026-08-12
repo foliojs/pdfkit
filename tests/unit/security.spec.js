@@ -17,13 +17,13 @@ function createMockDocument(id = null) {
 
 describe('PDFSecurity', () => {
   describe('generateFileID', () => {
-    test('returns 16-byte Buffer', () => {
+    test('returns 16 bytes', () => {
       const info = {
         CreationDate: new Date('2024-01-01T00:00:00Z'),
         Title: 'Test',
       };
       const result = PDFSecurity.generateFileID(info);
-      expect(Buffer.isBuffer(result)).toBe(true);
+      expect(result).toBeInstanceOf(Uint8Array);
       expect(result.length).toBe(16);
     });
 
@@ -112,8 +112,8 @@ describe('PDFSecurity', () => {
         pdfVersion: '1.3',
       });
 
-      expect(Buffer.isBuffer(security.dictionary.data.O)).toBe(true);
-      expect(Buffer.isBuffer(security.dictionary.data.U)).toBe(true);
+      expect(security.dictionary.data.O).toBeInstanceOf(Uint8Array);
+      expect(security.dictionary.data.U).toBeInstanceOf(Uint8Array);
       expect(security.dictionary.data.O.length).toBe(32);
       expect(security.dictionary.data.U.length).toBe(32);
     });
@@ -130,7 +130,7 @@ describe('PDFSecurity', () => {
 
       const plaintext = Buffer.from('Hello, World!');
       const encrypted = encryptFn(plaintext);
-      expect(Buffer.isBuffer(encrypted)).toBe(true);
+      expect(encrypted).toBeInstanceOf(Uint8Array);
       expect(encrypted.length).toBe(plaintext.length);
       expect(encrypted).not.toEqual(plaintext);
     });
@@ -173,7 +173,7 @@ describe('PDFSecurity', () => {
       const plaintext = Buffer.from('Test data');
       const encrypted = encryptFn(plaintext);
 
-      expect(Buffer.isBuffer(encrypted)).toBe(true);
+      expect(encrypted).toBeInstanceOf(Uint8Array);
       expect(encrypted).not.toEqual(plaintext);
     });
   });
@@ -216,7 +216,7 @@ describe('PDFSecurity', () => {
       const plaintext = Buffer.from('Test data for AES');
       const encrypted = encryptFn(plaintext);
 
-      expect(Buffer.isBuffer(encrypted)).toBe(true);
+      expect(encrypted).toBeInstanceOf(Uint8Array);
       // AES output includes 16-byte IV prefix
       expect(encrypted.length).toBeGreaterThan(plaintext.length);
       // First 16 bytes are IV
@@ -248,11 +248,11 @@ describe('PDFSecurity', () => {
         pdfVersion: '1.7ext3',
       });
 
-      expect(Buffer.isBuffer(security.dictionary.data.O)).toBe(true);
-      expect(Buffer.isBuffer(security.dictionary.data.U)).toBe(true);
-      expect(Buffer.isBuffer(security.dictionary.data.OE)).toBe(true);
-      expect(Buffer.isBuffer(security.dictionary.data.UE)).toBe(true);
-      expect(Buffer.isBuffer(security.dictionary.data.Perms)).toBe(true);
+      expect(security.dictionary.data.O).toBeInstanceOf(Uint8Array);
+      expect(security.dictionary.data.U).toBeInstanceOf(Uint8Array);
+      expect(security.dictionary.data.OE).toBeInstanceOf(Uint8Array);
+      expect(security.dictionary.data.UE).toBeInstanceOf(Uint8Array);
+      expect(security.dictionary.data.Perms).toBeInstanceOf(Uint8Array);
 
       expect(security.dictionary.data.O.length).toBe(48);
       expect(security.dictionary.data.U.length).toBe(48);
@@ -272,7 +272,7 @@ describe('PDFSecurity', () => {
       const plaintext = Buffer.from('Test data for AES-256');
       const encrypted = encryptFn(plaintext);
 
-      expect(Buffer.isBuffer(encrypted)).toBe(true);
+      expect(encrypted).toBeInstanceOf(Uint8Array);
       expect(encrypted.length).toBeGreaterThan(plaintext.length);
     });
   });
