@@ -175,10 +175,9 @@ stream.on('finish', function() {
 
 You can see an interactive in-browser demo of PDFKit [here](http://pdfkit.org/demo/browser.html).
 
-Note that in order to Browserify a project using PDFKit, you need to install the `brfs` module,
-which is used to load built-in font data into the package. It is listed as a `devDependency` in
-PDFKit's `package.json`, so it isn't installed by default for Node users.
-If you forget to install it, Browserify will print an error message.
+Note that the browser build has no access to the file system: passing a file path to
+`registerFont`, `image` or `file` throws. Pass a `Uint8Array`, an `ArrayBuffer` or a
+data URL instead.
 
 ## Documentation
 
