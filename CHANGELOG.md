@@ -2,11 +2,12 @@
 
 ### Unreleased
 
+- [BREAKING CHANGE] Remove the virtual file system (`pdfkit/virtual-fs`). Browser builds no longer depend on `fs`: pass a `Uint8Array`, `ArrayBuffer` or data URL to `registerFont`, `image` and `file` instead of a path
 - [BREAKING CHANGE] Restrict AcroForm options to documented mappings and explicit escape hatches.
 - [BREAKING CHANGE] Stop automatically uppercasing annotation option keys.
 - Do not mutate options passed to `doc.annotate()` and its convenience methods (link, note, strike, lineAnnotation, rectAnnotation, ellipseAnnotation, textAnnotation, fileAnnotation)
 - Persist font options when adding a new page. Fixes #1739
-- Use `Uint8Array` instead of Node's `Buffer` internally. `pdfkit/virtual-fs` now returns a `Uint8Array` from `readFileSync()`
+- Use `Uint8Array` instead of Node's `Buffer` internally
 
 ### [v0.19.1] - 2026-06-10
 

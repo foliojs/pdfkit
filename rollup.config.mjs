@@ -1,6 +1,6 @@
 import { babel } from '@rollup/plugin-babel';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
-import copy from 'rollup-plugin-copy';
+import binary from './tools/binary-plugin.mjs';
 
 const external = [
   'stream',
@@ -55,6 +55,7 @@ export default [
       interop: 'default',
     },
     plugins: [
+      binary('.icc'),
       nodeResolve({
         exportConditions: ['node'],
       }),
@@ -74,14 +75,6 @@ export default [
         ],
         comments: false,
       }),
-      copy({
-        targets: [
-          {
-            src: ['lib/font/data/*.afm', 'lib/mixins/data/*.icc'],
-            dest: 'js/data',
-          },
-        ],
-      }),
     ],
   },
   // ES for green browsers
@@ -95,6 +88,7 @@ export default [
       sourcemap: true,
     },
     plugins: [
+      binary('.icc'),
       nodeResolve({
         exportConditions: ['default'],
       }),
@@ -141,34 +135,6 @@ export default [
         babelHelpers: 'bundled',
         babelrc: false,
         comments: false,
-      }),
-    ],
-  },
-  {
-    input: 'lib/virtual-fs.js',
-    external,
-    output: {
-      name: 'virtual-fs',
-      file: 'js/virtual-fs.js',
-      format: 'es',
-      sourcemap: false,
-    },
-    plugins: [
-      babel({
-        babelHelpers: 'bundled',
-        babelrc: false,
-        presets: [
-          [
-            '@babel/preset-env',
-            {
-              loose: true,
-              modules: false,
-              targets: {
-                browsers: supportedBrowsers,
-              },
-            },
-          ],
-        ],
       }),
     ],
   },
