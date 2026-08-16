@@ -7,6 +7,7 @@
 - [BREAKING CHANGE] Stop automatically uppercasing annotation option keys.
 - Do not mutate options passed to `doc.annotate()` and its convenience methods (link, note, strike, lineAnnotation, rectAnnotation, ellipseAnnotation, textAnnotation, fileAnnotation)
 - Persist font options when adding a new page. Fixes #1739
+- Use `Uint8Array` instead of Node's `Buffer` internally
 
 ### [v0.19.1] - 2026-06-10
 
