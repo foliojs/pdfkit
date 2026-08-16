@@ -146,6 +146,10 @@
       "node": "./lib/zlib/node.js",
       "default": "./lib/zlib/browser.js"
     },
+    "#stream": {
+      "node": "./lib/stream/node.js",
+      "default": "./lib/stream/browser.js"
+    },
     "#standard-fonts/*": {
       "require": "./js/standard-fonts/*.cjs",
       "default": "./js/standard-fonts/*.mjs"

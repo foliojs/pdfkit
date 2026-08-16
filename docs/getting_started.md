@@ -63,6 +63,12 @@ a document unless the document is created with `{ font: null }`.
       iframe.src = url;
     });
 
+The browser build does not depend on Node's `stream` module. A document is still a
+readable stream, but only the parts a PDF document needs are implemented: `on`,
+`once`, `off`, `emit`, `pipe` and async iteration. `read`, `setEncoding`,
+`destroy`, `stream.pipeline` and the `readable`, `error` and `close` events are
+available in Node only.
+
 You can see an interactive in-browser demo of PDFKit [here](http://pdfkit.org/demo/browser.html).
 
 ## Document options
