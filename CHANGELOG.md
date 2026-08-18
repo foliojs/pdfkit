@@ -8,6 +8,7 @@
 - Do not mutate options passed to `doc.annotate()` and its convenience methods (link, note, strike, lineAnnotation, rectAnnotation, ellipseAnnotation, textAnnotation, fileAnnotation)
 - Persist font options when adding a new page. Fixes #1739
 - Use `Uint8Array` instead of Node's `Buffer` internally
+- Fix `date` text field formatting emitting invalid JavaScript, so the format was never applied. Fixes #1546
 
 ### [v0.19.1] - 2026-06-10
 

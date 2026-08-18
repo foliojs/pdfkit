@@ -183,8 +183,8 @@ describe('acroform', () => {
       const expected = [
         '10 0 obj',
         '<<\n/FT /Tx\n/V (1999-12-31)\n/AA <<\n/K <<\n/S /JavaScript\n' +
-          '/JS (AFDate_KeystrokeEx\\(yyyy-mm-dd\\);)\n>>\n' +
-          '/F <<\n/S /JavaScript\n/JS (AFDate_Format\\(yyyy-mm-dd\\);)\n>>\n>>\n' +
+          '/JS (AFDate_KeystrokeEx\\("yyyy-mm-dd"\\);)\n>>\n' +
+          '/F <<\n/S /JavaScript\n/JS (AFDate_FormatEx\\("yyyy-mm-dd"\\);)\n>>\n>>\n' +
           '/T (date)\n/Subtype /Widget\n/F 4\n/Type /Annot\n/Rect [20 752 70 772]\n/Border [0 0 0]\n/C [0 0 0]\n>>',
         'endobj',
       ];
@@ -195,6 +195,31 @@ describe('acroform', () => {
         format: {
           type: 'date',
           param: 'yyyy-mm-dd',
+        },
+      };
+      doc.formText('date', 20, 20, 50, 20, opts);
+      expect(docData.length).toBe(3);
+      expect(docData).toContainChunk(expected);
+    });
+
+    test('date format containing spaces and commas', () => {
+      // an unquoted format is not valid JavaScript, so the viewer
+      // cannot run the action and the field is left unformatted
+      const expected = [
+        '10 0 obj',
+        '<<\n/FT /Tx\n/V (1999-12-31)\n/AA <<\n/K <<\n/S /JavaScript\n' +
+          '/JS (AFDate_KeystrokeEx\\("mmmm d, yyyy"\\);)\n>>\n' +
+          '/F <<\n/S /JavaScript\n/JS (AFDate_FormatEx\\("mmmm d, yyyy"\\);)\n>>\n>>\n' +
+          '/T (date)\n/Subtype /Widget\n/F 4\n/Type /Annot\n/Rect [20 752 70 772]\n/Border [0 0 0]\n/C [0 0 0]\n>>',
+        'endobj',
+      ];
+      doc.initForm();
+      const docData = logData(doc);
+      let opts = {
+        value: '1999-12-31',
+        format: {
+          type: 'date',
+          param: 'mmmm d, yyyy',
         },
       };
       doc.formText('date', 20, 20, 50, 20, opts);
