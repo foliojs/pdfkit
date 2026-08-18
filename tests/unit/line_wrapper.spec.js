@@ -177,4 +177,102 @@ describe('LineWrapper', () => {
     wrapper.wrap('B', {});
     expect(pageBreaks).toBeGreaterThanOrEqual(1);
   });
+
+  test('indentAllLines indents every paragraph by the same amount', () => {
+    const options = { width: 300, indent: 50, indentAllLines: true };
+    const wrapper = new LineWrapper(document, options);
+
+    const geometry = [];
+    wrapper.on('line', () => {
+      geometry.push({ x: document.x, lineWidth: wrapper.lineWidth });
+      document.y += document.currentLineHeight(true);
+    });
+
+    wrapper.wrap('alpha\nbravo\ncharlie', options);
+
+    // the indent is only taken back off after the first line when
+    // indentAllLines is false, so each paragraph used to add another indent
+    // on top of the previous one
+    expect(geometry).toEqual([
+      { x: 50, lineWidth: 250 },
+      { x: 50, lineWidth: 250 },
+      { x: 50, lineWidth: 250 },
+    ]);
+  });
+
+  test('indentAllLines keeps the same line width across page breaks', () => {
+    const options = { width: 300, indent: 50, indentAllLines: true };
+    const wrapper = new LineWrapper(document, options);
+
+    const breaks = [];
+    wrapper.on('pageBreak', () => {
+      breaks.push({ x: document.x, lineWidth: wrapper.lineWidth });
+    });
+    wrapper.on('line', () => {
+      document.y += document.currentLineHeight(true);
+    });
+
+    wrapper.wrap('word '.repeat(1200), options);
+
+    // lineWidth carries over between pages, so subtracting the indent again
+    // on every page break narrowed the text column further and further
+    expect(breaks.length).toBeGreaterThan(1);
+    breaks.forEach((geometry) => {
+      expect(geometry).toEqual({ x: 50, lineWidth: 250 });
+    });
+  });
+
+  test('indentAllLines does not double the indent when a page break comes first', () => {
+    const options = { width: 300, indent: 50, indentAllLines: true };
+    // start near the bottom so the orphan check starts a new page before the
+    // first line is emitted, running the page break before firstLine
+    document.y = document.page.maxY() - 2;
+    const wrapper = new LineWrapper(document, options);
+
+    let firstLineGeometry = null;
+    wrapper.on('line', () => {
+      if (firstLineGeometry === null) {
+        firstLineGeometry = { x: document.x, lineWidth: wrapper.lineWidth };
+      }
+      document.y += document.currentLineHeight(true);
+    });
+
+    wrapper.wrap('word '.repeat(20), options);
+
+    expect(firstLineGeometry).toEqual({ x: 50, lineWidth: 250 });
+  });
+
+  test('indentAllLines keeps the indent when the text is continued', () => {
+    const geometry = [];
+    const line = document._line;
+    document._line = function (text, options, wrapper) {
+      geometry.push({ x: document.x, lineWidth: wrapper && wrapper.lineWidth });
+      return line.call(this, text, options, wrapper);
+    };
+
+    const sentence = 'lorem ipsum dolor sit amet consectetur adipiscing ';
+    const paragraph = sentence.repeat(4);
+    document.text(paragraph, {
+      width: 300,
+      indent: 15,
+      indentAllLines: true,
+      continued: true,
+    });
+    const continuedFrom = geometry.length;
+    document.text(paragraph, { width: 300 });
+
+    // continued options are inherited, so the second call is also
+    // indentAllLines: its first line carries on from where the previous
+    // segment ended, and every line after that keeps the paragraph indent
+    geometry.slice(0, continuedFrom).forEach((line) => {
+      expect(line).toEqual({ x: 15, lineWidth: 285 });
+    });
+
+    const continued = geometry.slice(continuedFrom);
+    expect(continued.length).toBeGreaterThan(1);
+    expect(continued[0].x).toBeGreaterThan(15);
+    continued.slice(1).forEach((line) => {
+      expect(line).toEqual({ x: 15, lineWidth: 285 });
+    });
+  });
 });
