@@ -19,6 +19,20 @@ describe('PDFObject', () => {
       expect(result.length).toEqual(12);
       expect(result).toMatchInlineSnapshot(`"(þÿ±²³´)"`);
     });
+
+    test('dictionary omits keys whose value is undefined', () => {
+      expect(PDFObject.convert({ a: 1, b: undefined, c: 2 })).toEqual(
+        '<<\n/a 1\n/c 2\n>>',
+      );
+    });
+
+    test('dictionary keeps an explicit null', () => {
+      expect(PDFObject.convert({ a: null })).toEqual('<<\n/a null\n>>');
+    });
+
+    test('array converts an undefined entry to null to keep positions', () => {
+      expect(PDFObject.convert([1, undefined, 2])).toEqual('[1 null 2]');
+    });
   });
 
   describe('escapeName', () => {
