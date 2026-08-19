@@ -1,3 +1,4 @@
+import fs from 'fs';
 import { vi } from 'vitest';
 import PDFDocument from '../../lib/document';
 import PDFTable from '../../lib/table';
@@ -36,6 +37,23 @@ describe('table', () => {
 
       expect(spy).toHaveBeenCalledWith(MEDIUM, undefined);
       expect(spy).not.toHaveBeenCalledWith(MEDIUM, 'Roboto');
+    });
+
+    test('a binary font src is passed through untouched', () => {
+      // deepMerge deep-cloned the src, turning a Buffer/Uint8Array into a plain
+      // object of numeric keys, so the font no longer looked like a font:
+      // "Not a supported font format or standard PDF font." It also made that
+      // merge walk every byte of the file.
+      const document = new PDFDocument({ font: REGULAR });
+      const spy = vi.spyOn(document, 'font');
+      const buffer = fs.readFileSync(REGULAR);
+
+      expect(() =>
+        document.table().row([{ text: 'x', font: { src: buffer } }]),
+      ).not.toThrow();
+
+      // the very same object, not a copy of it
+      expect(spy.mock.calls.some(([src]) => src === buffer)).toBe(true);
     });
 
     test('a cell overriding only family still refines the inherited src', () => {
