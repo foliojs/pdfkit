@@ -101,6 +101,48 @@ describe('Annotations', () => {
     });
   });
 
+  describe('undefined option values', () => {
+    // `doc.annotate()` passes arbitrary dictionary keys straight through by
+    // design, so unlike the acroform options there is no call site at which an
+    // absent value could be normalised first.
+    test('drops the key but keeps every other entry', () => {
+      const docData = logData(document);
+
+      document.annotate(10, 30, 30, 30, { Subtype: 'Text', CA: undefined });
+
+      const dataStr = docData.join('\n');
+      // the defect
+      expect(dataStr).not.toContain('/CA');
+      expect(dataStr).not.toContain('undefined');
+      // ...and the rest of the dictionary must survive, which a guard that
+      // dropped every key would also satisfy the negative assertions above
+      expect(dataStr).toContain('/Subtype /Text');
+      expect(dataStr).toContain('/Type /Annot');
+      expect(dataStr).toContain('/Rect [10 732 40 762]');
+      expect(dataStr).toContain('/Border [0 0 0]');
+    });
+
+    test('keeps array positions when an entry is absent', () => {
+      // A destination array is [page /XYZ left top zoom], and ISO 32000-1
+      // Table 151 explicitly allows null for left, top and zoom - it means
+      // "retain the current value". So this is a place where the stand-in is
+      // legal, and the point of the test is positional: skipping the hole
+      // instead would slide `3` from the zoom slot into the top slot.
+      const docData = logData(document);
+
+      document.annotate(10, 30, 30, 30, {
+        Subtype: 'Link',
+        // eslint-disable-next-line no-sparse-arrays
+        Dest: [document.page.dictionary, 'XYZ', 1, , 3],
+      });
+
+      const dataStr = docData.join('\n');
+      // asserted on the tail so the page object number stays incidental
+      expect(dataStr).toContain('/XYZ 1 null 3]');
+      expect(dataStr).not.toContain('/XYZ 1  3]');
+    });
+  });
+
   describe('note', () => {
     test.each([
       ['null', null],
