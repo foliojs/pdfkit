@@ -10,6 +10,7 @@
 - Use `Uint8Array` instead of Node's `Buffer` internally
 - Fix `date` text field formatting emitting invalid JavaScript, so the format was never applied. Fixes #1546
 - Fix `indentAllLines` applying the indent again on every paragraph and every page break, and keep it applied across continued text. Fixes #1606
+- Fix a hole in a sparse array being skipped entirely, which shifted every later entry down one
 
 ### [v0.19.1] - 2026-06-10
 
