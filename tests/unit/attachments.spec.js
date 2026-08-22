@@ -244,4 +244,42 @@ describe('file', () => {
 >>`,
     ]);
   });
+
+  test('throws when the ref is missing', () => {
+    expect(() =>
+      document.addNamedEmbeddedFile('phantom.txt', undefined),
+    ).toThrow('No ref specified for embedded file phantom.txt');
+
+    expect(() => document.addNamedEmbeddedFile('phantom.txt', null)).toThrow(
+      'No ref specified for embedded file phantom.txt',
+    );
+  });
+
+  test('registers a filespec created with the hidden option', () => {
+    const docData = logData(document);
+
+    const filespec = document.file(Buffer.from('example text'), {
+      name: 'file.txt',
+      creationDate: date,
+      modifiedDate: date,
+      hidden: true,
+    });
+    document.addNamedEmbeddedFile('file.txt', filespec);
+    document.end();
+
+    expect(docData).toContainChunk([
+      `2 0 obj`,
+      `<<
+/Dests <<
+  /Names [
+]
+>>
+/EmbeddedFiles <<
+  /Names [
+    (file.txt) 9 0 R
+]
+>>
+>>`,
+    ]);
+  });
 });
