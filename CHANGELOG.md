@@ -5,6 +5,7 @@
 - [BREAKING CHANGE] Remove the virtual file system (`pdfkit/virtual-fs`). Browser builds no longer depend on `fs`: pass a `Uint8Array`, `ArrayBuffer` or data URL to `registerFont`, `image` and `file` instead of a path
 - [BREAKING CHANGE] Restrict AcroForm options to documented mappings and explicit escape hatches.
 - [BREAKING CHANGE] Stop automatically uppercasing annotation option keys.
+- [BREAKING CHANGE] Throw from `addNamedEmbeddedFile` when no ref is given, instead of writing an unparseable `undefined` token into the `/EmbeddedFiles` name tree
 - Do not mutate options passed to `doc.annotate()` and its convenience methods (link, note, strike, lineAnnotation, rectAnnotation, ellipseAnnotation, textAnnotation, fileAnnotation)
 - Persist font options when adding a new page. Fixes #1739
 - Use `Uint8Array` instead of Node's `Buffer` internally
