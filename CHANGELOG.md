@@ -5,6 +5,7 @@
 - [BREAKING CHANGE] Remove the virtual file system (`pdfkit/virtual-fs`). Browser builds no longer depend on `fs`: use `registerFile` to register `Uint8Array` data under a path, pass a `Uint8Array` or `ArrayBuffer` directly to `registerFont`, `image` and `file`, or pass a data URL directly to `image` and `file`
 - Add `registerFile(path, data, options)` to globally register in-memory files in Node and browsers, with optional `birthtime` and `ctime` metadata. Passing `undefined` as data unregisters the path
 - Add experimental `toBlob(document)` and `toBytes(document)` output helpers under `pdfkit/output`
+- Accept already-parsed fontkit `Font` instances in `doc.font()` and `registerFont`
 - Load the PDF/A ICC profile from disk only when needed in Node, while continuing to bundle it in browser builds
 - [BREAKING CHANGE] Restrict AcroForm options to documented mappings and explicit escape hatches.
 - [BREAKING CHANGE] Stop automatically uppercasing annotation option keys.

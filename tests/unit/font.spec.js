@@ -1,5 +1,6 @@
 import { vi } from 'vitest';
 import { readFileSync } from 'fs';
+import { create } from 'fontkit';
 import PDFDocument from '../../lib/document';
 import PDFFontFactory from '../../lib/font_factory';
 import StandardFont from '../../lib/font/standard';
@@ -19,6 +20,60 @@ describe('PDFFontFactory', () => {
     expect(() => PDFFontFactory.open({}, {})).toThrow(
       'Not a supported font format or standard PDF font.',
     );
+  });
+});
+
+describe('fontkit font instance sources', () => {
+  const parseFont = (file = 'tests/fonts/Roboto-Regular.ttf') =>
+    create(readFileSync(file));
+
+  test('doc.font() embeds a parsed font instance and renders text', () => {
+    const doc = new PDFDocument({ compress: false });
+    doc.font(parseFont()).text('parsed roboto');
+
+    const pdf = collectPdf(doc);
+
+    expect(pdf).toContain('Roboto-Regular');
+    expect(pdf).toContain('startxref');
+    expect(missingObjects(pdf)).toHaveLength(0);
+  });
+
+  test('the same instance passed twice reuses the embedded font', () => {
+    const doc = new PDFDocument({ font: null });
+    const font = parseFont();
+
+    doc.font(font);
+    const first = doc._font;
+    const familyCount = Object.keys(doc._fontFamilies).length;
+
+    doc.font(font);
+
+    expect(doc._font).toBe(first);
+    expect(Object.keys(doc._fontFamilies)).toHaveLength(familyCount);
+  });
+
+  test('different instances do not collide', () => {
+    const doc = new PDFDocument({ font: null });
+
+    doc.font(parseFont('tests/fonts/Roboto-Regular.ttf'));
+    const regular = doc._font;
+    doc.font(parseFont('tests/fonts/Roboto-Italic.ttf'));
+    const italic = doc._font;
+
+    expect(italic).not.toBe(regular);
+    expect(doc._fontFamilies['Roboto-Regular']).toBe(regular);
+    expect(doc._fontFamilies['Roboto-Italic']).toBe(italic);
+  });
+
+  test('registerFont accepts a parsed font instance', () => {
+    const doc = new PDFDocument({ compress: false });
+    doc.registerFont('MyFont', parseFont());
+    doc.font('MyFont').text('registered parsed font');
+
+    expect(doc._fontFamilies['MyFont']).toBe(doc._font);
+
+    const pdf = collectPdf(doc);
+    expect(missingObjects(pdf)).toHaveLength(0);
   });
 });
 

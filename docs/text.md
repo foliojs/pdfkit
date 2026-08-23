@@ -232,7 +232,9 @@ and Datafork TrueType (`.dfont`) fonts.
 
 To change the font used to render text, just call the `font` method. If you
 are using a standard PDF font, just pass the name to the `font` method.
-Otherwise, pass the path to the font file, or a `Buffer` containing the font data.
+Otherwise, pass the path to the font file, a `Buffer` containing the font data,
+or an already-parsed [fontkit](https://github.com/foliojs/fontkit) `Font`
+instance.
 If the font is a collection font (`.ttc` and `.dfont` files), meaning that it
 contains multiple styles in the same file, you should pass the name of the style
 to be extracted from the collection.
