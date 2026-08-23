@@ -12,6 +12,9 @@ const emittedIccPath = path.resolve(
 );
 const nodeBundlePath = require.resolve('pdfkit');
 const browserBundlePath = path.resolve(__dirname, '../js/pdfkit.browser.js');
+const browserEsBundleUrl = require('node:url').pathToFileURL(
+  path.resolve(__dirname, '../js/pdfkit.browser.mjs'),
+);
 const outputHelpers = require('pdfkit/output');
 const sourceIcc = fs.readFileSync(sourceIccPath);
 
@@ -80,7 +83,13 @@ assert.equal(BrowserPDFDocument.registerFile, undefined);
   nodeDocument.end();
   assert.ok((await nodeOutput) instanceof Uint8Array);
 
-  const browserModule = await import('pdfkit');
+  const nodeEsModule = await import('pdfkit');
+  assert.equal(typeof nodeEsModule.default, 'function');
+  assert.equal(nodeEsModule.PDFDocument, nodeEsModule.default);
+  assert.equal(typeof nodeEsModule.LineWrapper, 'function');
+  assert.equal(typeof nodeEsModule.registerFile, 'function');
+
+  const browserModule = await import(browserEsBundleUrl);
   const browserOutputHelpers = await import('pdfkit/output');
 
   assert.equal(typeof browserModule.default, 'function');

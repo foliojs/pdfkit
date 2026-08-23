@@ -15,7 +15,15 @@ export and create an instance of the class.
     const { PDFDocument } = require('pdfkit');
     const doc = new PDFDocument();
 
-Both `const PDFDocument = require('pdfkit')` and
+Or, from an ES module:
+
+    import { PDFDocument } from 'pdfkit';
+    const doc = new PDFDocument();
+
+In Node, both `require('pdfkit')` and `import 'pdfkit'` resolve to a Node build
+with real file system access, native zlib compression and Node streams; browsers
+and bundlers targeting browsers get the browser build described below. Both
+`const PDFDocument = require('pdfkit')` and
 `import PDFDocument from 'pdfkit'` remain supported for backward compatibility.
 New code should prefer the named `PDFDocument` export, which will make a future
 migration to an ESM-only package more straightforward.
@@ -122,7 +130,7 @@ Registration is global to the loaded PDFKit module. Registering the same path
 again replaces its bytes. Passing `undefined` unregisters the path and does
 nothing if it was not registered. Unregistered paths throw in browsers.
 
-The same registry is available from the CommonJS entry point in Node. Registered
+The same registry is available from the Node entry points. Registered
 data takes precedence over a file at the same path; unregistering restores normal
 file system lookup.
 

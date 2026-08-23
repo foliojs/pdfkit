@@ -6,6 +6,7 @@ import binary from './tools/binary-plugin.mjs';
 const iccProfilePath = 'lib/mixins/data/sRGB_IEC61966_2_1.icc';
 
 const external = [
+  'module',
   'stream',
   'fs',
   'zlib',
@@ -72,20 +73,27 @@ const browserPlugins = () => [
 ];
 
 export default [
-  // CommonJS build for Node
+  // CommonJS and ES builds for Node
   {
     input: 'lib/document.node.js',
     external,
-    output: {
-      name: 'pdfkit',
-      file: 'js/pdfkit.js',
-      format: 'cjs',
-      sourcemap: true,
-      interop: 'default',
-      exports: 'named',
-      footer:
-        'module.exports = exports.default;\nmodule.exports.PDFDocument = exports.PDFDocument;\nmodule.exports.LineWrapper = exports.LineWrapper;\nmodule.exports.registerFile = exports.registerFile;',
-    },
+    output: [
+      {
+        name: 'pdfkit',
+        file: 'js/pdfkit.js',
+        format: 'cjs',
+        sourcemap: true,
+        interop: 'default',
+        exports: 'named',
+        footer:
+          'module.exports = exports.default;\nmodule.exports.PDFDocument = exports.PDFDocument;\nmodule.exports.LineWrapper = exports.LineWrapper;\nmodule.exports.registerFile = exports.registerFile;',
+      },
+      {
+        file: 'js/pdfkit.node.mjs',
+        format: 'es',
+        sourcemap: true,
+      },
+    ],
     plugins: [
       asset(iccProfilePath, 'data/sRGB_IEC61966_2_1.icc'),
       nodeResolve({

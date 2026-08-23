@@ -2,6 +2,7 @@
 
 ### Unreleased
 
+- Add a Node ESM build so `import 'pdfkit'` in Node resolves to the Node build (real file system, native zlib, Node streams, self-registering standard fonts) instead of the browser bundle
 - [BREAKING CHANGE] Remove the virtual file system (`pdfkit/virtual-fs`). Browser builds no longer depend on `fs`: use `registerFile` to register `Uint8Array` data under a path, pass a `Uint8Array` or `ArrayBuffer` directly to `registerFont`, `image` and `file`, or pass a data URL directly to `image` and `file`
 - Add `registerFile(path, data, options)` to globally register in-memory files in Node and browsers, with optional `birthtime` and `ctime` metadata. Passing `undefined` as data unregisters the path
 - [BREAKING CHANGE] Export `PDFDocument`, `LineWrapper` and `registerFile` as named exports from the main Node and browser entry points while preserving the default `PDFDocument` export
