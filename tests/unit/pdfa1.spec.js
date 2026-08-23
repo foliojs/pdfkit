@@ -144,7 +144,7 @@ describe('PDF/A-1', () => {
     const CIDSet = Buffer.alloc(Math.ceil((maxCID + 1) / 8), 0);
     for (let cid = 0; cid <= maxCID; cid++) {
       if (widths[cid] != null) {
-        CIDSet[Math.floor(cid / 8)] |= 0x80 >> cid % 8;
+        CIDSet[Math.floor(cid / 8)] |= 0x80 >> (cid % 8);
       }
     }
 
