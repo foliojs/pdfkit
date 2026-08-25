@@ -2,6 +2,8 @@
 
 ### Unreleased
 
+- Fix `doc.file()` throwing when the same in-memory attachment is embedded twice under one name, because the creation and modified dates the deduplication check compares are absent for sources that are not read from disk
+
 ### [v0.20.1] - 2026-08-23
 
 - Add a Node ESM build so `import 'pdfkit'` in Node resolves to the Node build (real file system, native zlib, Node streams, self-registering standard fonts) instead of the browser bundle

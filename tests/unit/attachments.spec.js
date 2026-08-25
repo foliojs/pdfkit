@@ -245,6 +245,90 @@ describe('file', () => {
     ]);
   });
 
+  test('attach the same file multiple times without dates', () => {
+    const docData = logData(document);
+
+    document.file(Buffer.from('example text'), { name: 'file1.txt' });
+    document.file(Buffer.from('example text'), { name: 'file1.txt' });
+    document.end();
+
+    const numFiles = docData.filter(
+      (str) =>
+        typeof str === 'string' && str.startsWith('<<\n/Type /EmbeddedFile\n'),
+    );
+
+    expect(numFiles.length).toEqual(1);
+
+    // both filespecs point at the single embedded file
+    expect(docData).toContainChunk([
+      `9 0 obj`,
+      `<<
+/Type /Filespec
+/AFRelationship /Unspecified
+/F (file1.txt)
+/EF <<
+/F 8 0 R
+>>
+/UF (file1.txt)
+>>`,
+    ]);
+
+    expect(docData).toContainChunk([
+      `10 0 obj`,
+      `<<
+/Type /Filespec
+/AFRelationship /Unspecified
+/F (file1.txt)
+/EF <<
+/F 8 0 R
+>>
+/UF (file1.txt)
+>>`,
+    ]);
+  });
+
+  test('attach the same file twice, only one with a creation date', () => {
+    const docData = logData(document);
+
+    document.file(Buffer.from('example text'), { name: 'file1.txt' });
+    document.file(Buffer.from('example text'), {
+      name: 'file1.txt',
+      creationDate: date,
+    });
+    document.end();
+
+    const numFiles = docData.filter(
+      (str) =>
+        typeof str === 'string' && str.startsWith('<<\n/Type /EmbeddedFile\n'),
+    );
+
+    // the metadata differs, so the reference is not reused
+    expect(numFiles.length).toEqual(2);
+  });
+
+  test('attach the same file twice, only one with a modified date', () => {
+    const docData = logData(document);
+
+    document.file(Buffer.from('example text'), {
+      name: 'file1.txt',
+      creationDate: date,
+    });
+    document.file(Buffer.from('example text'), {
+      name: 'file1.txt',
+      creationDate: date,
+      modifiedDate: date,
+    });
+    document.end();
+
+    const numFiles = docData.filter(
+      (str) =>
+        typeof str === 'string' && str.startsWith('<<\n/Type /EmbeddedFile\n'),
+    );
+
+    // the metadata differs, so the reference is not reused
+    expect(numFiles.length).toEqual(2);
+  });
+
   test('throws when the ref is missing', () => {
     expect(() =>
       document.addNamedEmbeddedFile('phantom.txt', undefined),
