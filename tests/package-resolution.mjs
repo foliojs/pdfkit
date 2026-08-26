@@ -5,6 +5,7 @@ import PDFDocument, { LineWrapper, registerFile } from 'pdfkit';
 import { toBytes } from 'pdfkit/output';
 
 const require = createRequire(import.meta.url);
+const packageJson = require('../package.json');
 
 assert.equal(
   import.meta.resolve('pdfkit'),
@@ -39,6 +40,29 @@ assert.equal(
   ),
   false,
 );
+
+// The node ESM build reaches the standard fonts through createRequire, so the
+// require condition is the only one ever taken at runtime. Bundlers and file
+// tracers walk this same file as ESM and resolve `#standard-fonts/*` under the
+// import condition instead: if the two point at different files, the tracer packs
+// the modules that are never loaded, omits the ones that are, and the bundle
+// throws `Cannot find module` on the first document. Keep every standard font
+// resolving to the one file the runtime uses, under both conditions.
+const standardFonts = Object.keys(packageJson.exports)
+  .filter((entry) => entry.startsWith('./standard-fonts/'))
+  .map((entry) => entry.slice('./standard-fonts/'.length));
+
+assert.equal(standardFonts.length, 14);
+
+for (const font of standardFonts) {
+  const expected = new URL(`../js/standard-fonts/${font}.cjs`, import.meta.url)
+    .href;
+  assert.equal(import.meta.resolve(`#standard-fonts/${font}`), expected);
+  assert.equal(
+    require.resolve(`#standard-fonts/${font}`),
+    fileURLToPath(expected),
+  );
+}
 
 const fileDocument = new PDFDocument();
 const fileOutput = toBytes(fileDocument);

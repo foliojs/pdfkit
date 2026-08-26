@@ -154,10 +154,7 @@
       "node": "./lib/stream/node.js",
       "default": "./lib/stream/browser.js"
     },
-    "#standard-fonts/*": {
-      "require": "./js/standard-fonts/*.cjs",
-      "default": "./js/standard-fonts/*.mjs"
-    }
+    "#standard-fonts/*": "./js/standard-fonts/*.cjs"
   },
   "engine": [
     "node >= v20.0.0"

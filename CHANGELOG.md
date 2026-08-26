@@ -2,6 +2,7 @@
 
 ### Unreleased
 
+- Fix bundlers and file tracers packing the ESM copies of the standard font metrics instead of the CommonJS ones the Node build actually loads, which left `Cannot find module` errors for every standard font at runtime, by resolving the internal `#standard-fonts/*` mapping to a single file under all conditions
 - Fix `doc.file()` throwing when the same in-memory attachment is embedded twice under one name, because the creation and modified dates the deduplication check compares are absent for sources that are not read from disk
 
 ### [v0.20.1] - 2026-08-23
