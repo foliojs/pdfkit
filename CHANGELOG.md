@@ -3,6 +3,7 @@
 ### Unreleased
 
 - Fix `doc.file()` throwing when the same in-memory attachment is embedded twice under one name, because the creation and modified dates the deduplication check compares are absent for sources that are not read from disk
+- Fix `doc.addNamedDestination()` writing a destination that carries more parameters than its type takes, and throwing `unsupported number: NaN` when the top of an `XYZ` destination was left off or passed as `undefined`. Parameters beyond the type's list are now dropped, and a short list is filled out with null for the types whose parameters may be null (`XYZ`, `FitH`, `FitV`, `FitBH` and `FitBV`)
 
 ### [v0.20.1] - 2026-08-23
 

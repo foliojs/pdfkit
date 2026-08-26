@@ -75,4 +75,91 @@ describe('Document trailer', () => {
 >>`,
     ]);
   });
+
+  test('writes null for XYZ parameters left off, rather than a NaN top', () => {
+    const docData = logData(document);
+    document.addNamedDestination('LINK1', 'XYZ', 36);
+    document.end();
+
+    expect(docData).toContainChunk([
+      '2 0 obj',
+      `<<
+/Dests <<
+  /Names [
+    (LINK1) [7 0 R /XYZ 36 null null]
+]
+>>
+>>`,
+    ]);
+  });
+
+  test('fills out a short parameter list for the types that allow null', () => {
+    const docData = logData(document);
+    document.addNamedDestination('LINK1', 'XYZ', 36, 36);
+    document.addNamedDestination('LINK2', 'FitH');
+    document.addNamedDestination('LINK3', 'FitV');
+    document.addNamedDestination('LINK4', 'FitBH');
+    document.addNamedDestination('LINK5', 'FitBV');
+    document.end();
+
+    expect(docData).toContainChunk([
+      '2 0 obj',
+      `<<
+/Dests <<
+  /Limits [(LINK1) (LINK5)]
+  /Names [
+    (LINK1) [7 0 R /XYZ 36 756 null]
+    (LINK2) [7 0 R /FitH null]
+    (LINK3) [7 0 R /FitV null]
+    (LINK4) [7 0 R /FitBH null]
+    (LINK5) [7 0 R /FitBV null]
+]
+>>
+>>`,
+    ]);
+  });
+
+  test('drops parameters beyond the list a destination type takes', () => {
+    const docData = logData(document);
+    document.addNamedDestination('LINK1', 'Fit', 99);
+    document.addNamedDestination('LINK2', 'FitB', 99);
+    document.addNamedDestination('LINK3', 'XYZ', 1, 2, 3, 4);
+    document.addNamedDestination('LINK4', 'FitR', 1, 2, 3, 4, 5);
+    document.end();
+
+    expect(docData).toContainChunk([
+      '2 0 obj',
+      `<<
+/Dests <<
+  /Limits [(LINK1) (LINK4)]
+  /Names [
+    (LINK1) [7 0 R /Fit]
+    (LINK2) [7 0 R /FitB]
+    (LINK3) [7 0 R /XYZ 1 790 3]
+    (LINK4) [7 0 R /FitR 1 2 3 4]
+]
+>>
+>>`,
+    ]);
+  });
+
+  // FitR is the one type whose parameters may not be null, so a short one is left as it
+  // was given rather than filled out. It is still not a valid destination; resizing it is
+  // out of scope here.
+  test('leaves a short FitR destination as it was given', () => {
+    const docData = logData(document);
+    document.addNamedDestination('LINK1', 'FitR', 1, 2, 3);
+    document.end();
+
+    expect(docData).toContainChunk([
+      '2 0 obj',
+      `<<
+/Dests <<
+  /Names [
+    (LINK1) [7 0 R /FitR 1 2 3]
+]
+>>
+>>`,
+    ]);
+  });
 });

@@ -13,6 +13,9 @@ Examples of creating anchor:
     // Insert anchor to display a portion of the current page, 1/2 inch in from the top and left and zoomed 50%
     doc.addNamedDestination('LINK', 'XYZ', 36, 36, 50);
 
+    // Insert anchor 1/2 inch in from the top and left, leaving the zoom as the reader has it
+    doc.addNamedDestination('LINK', 'XYZ', 36, 36);
+
     // Insert anchor for this text
     doc.text('End of paragraph', { destination: 'ENDP' });
 
