@@ -201,6 +201,23 @@ Q
 
       expect(docData).toContainText({ text: 'text with null x' });
     });
+
+    test.each([
+      ['underline', { underline: true }],
+      ['strike', { strike: true }],
+      ['link', { link: 'http://example.com/' }],
+      ['goTo', { goTo: 'anchor' }],
+    ])('with lineBreak false and %s', (_name, extraOptions) => {
+      const docData = logData(document);
+
+      document.text('no line break', 50, 50, {
+        lineBreak: false,
+        ...extraOptions,
+      });
+      document.end();
+
+      expect(docData).toContainText({ text: 'no line break' });
+    });
   });
 
   describe('text with structure parent links', () => {
