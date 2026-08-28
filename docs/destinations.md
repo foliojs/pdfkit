@@ -16,6 +16,29 @@ Examples of creating anchor:
     // Insert anchor for this text
     doc.text('End of paragraph', { destination: 'ENDP' });
 
+Each destination type takes a fixed, positional parameter list:
+
+| type | parameters |
+| --- | --- |
+| `XYZ` | `left`, `top`, `zoom` |
+| `Fit` | none |
+| `FitH` | `top` |
+| `FitV` | `left` |
+| `FitR` | `left`, `bottom`, `right`, `top` |
+| `FitB` | none |
+| `FitBH` | `top` |
+| `FitBV` | `left` |
+
+`XYZ` is the only type whose vertical coordinate is converted: give its `top` measured
+from the top of the page, as everywhere else in PDFKit. The others are written through
+unchanged, so `FitH` and `FitBH`'s `top`, and `FitR`'s `bottom` and `top`, are measured
+from the bottom of the page.
+
+A destination carrying more parameters than its type takes is not valid; `FitR` must
+carry all four, and `XYZ` at least `left` and `top`. For `XYZ`, `FitH`, `FitV`, `FitBH`
+and `FitBV` a parameter may be `null`, which tells the reader to keep that aspect of its
+current view. Called with no type at all, `addNamedDestination(name)` writes `XYZ` with
+all three parameters `null`.
 
 Examples of go to link to anchor:
 
