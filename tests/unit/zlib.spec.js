@@ -15,4 +15,20 @@ describe('zlib', () => {
     expect(compressed.length).toBeLessThan(data.length);
     expect(Buffer.from(zlib.inflateSync(compressed))).toEqual(data);
   });
+
+  test.each([
+    ['node', nodeZlib],
+    ['browser', browserZlib],
+  ])('%s inflateSync reverses deflateSync', (_, impl) => {
+    const compressed = impl.deflateSync(data);
+    expect(Buffer.from(impl.inflateSync(compressed))).toEqual(data);
+  });
+
+  test.each([
+    ['node', nodeZlib],
+    ['browser', browserZlib],
+  ])('%s inflateSync throws on data that was never validly compressed', (_, impl) => {
+    const garbage = Buffer.from([0xde, 0xad, 0xbe, 0xef]);
+    expect(() => impl.inflateSync(garbage)).toThrow();
+  });
 });
