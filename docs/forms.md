@@ -63,6 +63,43 @@ Color options accept an array of RGB values, a hex color, or a named CSS color.
 Method-specific options listed below are accepted in addition to these common
 options.
 
+#### Field Actions
+
+These options are accepted by all form annotation methods. Each takes the
+JavaScript to run when the event occurs, given as a string or as a function:
+
+- `onClick` - The mouse button is released inside the field.
+- `onMouseDown` - The mouse button is pressed inside the field.
+- `onMouseEnter` - The cursor enters the field.
+- `onMouseExit` - The cursor leaves the field.
+- `onFocus` - The field receives the input focus.
+- `onBlur` - The field loses the input focus.
+
+```js
+doc.formPushButton('btn1', 10, 200, 100, 30, {
+  label: 'Test Button',
+  onClick: 'app.alert("clicked");'
+});
+```
+
+A function is written into the document as its source text and runs in the
+viewer, not where the document was generated, so it cannot use variables or
+functions from the surrounding program. `this` is the document, and the
+viewer's own globals, such as `app`, are in scope:
+
+```js
+doc.formPushButton('btn1', 10, 200, 100, 30, {
+  label: 'Test Button',
+  onClick: function () {
+    app.alert('clicked');
+    this.getField('otherField').value = 'updated from btn1';
+  }
+});
+```
+
+Write the handler with `function` syntax; an arrow function cannot take the
+`this` binding.
+
 #### Text Field Options
 
 These options are accepted by `formText`:
@@ -121,6 +158,8 @@ These options are accepted by `formPushButton`:
 
 - `label` [_string_] - Sets the label text. You can also set an icon, but for
   this you will need to 'expert-up' and dig deeper into the PDF Reference manual.
+- `onClick` [_string | function_] - JavaScript to run when the button is
+  clicked. See [Field Actions](#field-actions).
 
 ```js
 var opts = {
