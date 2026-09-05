@@ -139,6 +139,21 @@ describe('acroform', () => {
     expect(docData[2]).toBe(expected[2]);
   });
 
+  test('a field built with hidden: true starts hidden', () => {
+    doc.initForm();
+    const docData = logData(doc);
+    doc.formPushButton('btn1', 20, 20, 100, 30, { hidden: true });
+    // 6 = Hidden + Print, overriding the usual default of 4 (print only)
+    expect(docData[1]).toContain('/F 6');
+  });
+
+  test('a field without hidden keeps the usual print-only default', () => {
+    doc.initForm();
+    const docData = logData(doc);
+    doc.formPushButton('btn1', 20, 20, 100, 30, {});
+    expect(docData[1]).toContain('/F 4');
+  });
+
   test('type flags do not leak implementation markers', () => {
     doc.initForm();
     const docData = logData(doc);

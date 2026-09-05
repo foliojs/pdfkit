@@ -2,6 +2,8 @@
 
 ### Unreleased
 
+- Add a `hidden` option to form annotation methods, for a field that should start hidden (e.g. one an interactive action reveals later) instead of the usual default of visible and printable
+
 ### [v0.20.2] - 2026-08-29
 
 - Fix bundlers and file tracers packing the ESM copies of the standard font metrics instead of the CommonJS ones the Node build actually loads, which left `Cannot find module` errors for every standard font at runtime, by resolving the internal `#standard-fonts/*` mapping to a single file under all conditions

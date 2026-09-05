@@ -55,6 +55,9 @@ The following `options` are accepted by all form annotation methods:
 - `borderColor` - Field border color.
 - `fontSize` [_number_] - Sets the font size used in the field appearance string.
   The default, `0`, means auto sizing.
+- `hidden` [_boolean_] - Builds the field starting hidden, instead of the
+  usual default of visible and printable, for a field an interactive action
+  (see `onClick` below) will reveal later.
 
 Color options accept an array of RGB values, a hex color, or a named CSS color.
 Method-specific options listed below are accepted in addition to these common
