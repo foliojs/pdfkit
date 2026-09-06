@@ -3,6 +3,7 @@
 ### Unreleased
 
 - Add a `hidden` option to form annotation methods, for a field that should start hidden (e.g. one an interactive action reveals later) instead of the usual default of visible and printable
+- Fix annotations placed under `doc.rotate()` marking the wrong area, because `_convertRect` derived each corner's y from the already transformed x and mapped only two of the four corners, so the rectangle a viewer makes interactive did not follow the rotated content. Fixes #1153
 
 ### [v0.20.2] - 2026-08-29
 

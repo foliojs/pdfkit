@@ -101,6 +101,28 @@ describe('Annotations', () => {
     });
   });
 
+  describe('rectangle under a transformation matrix', () => {
+    test('covers the whole rotated area', () => {
+      const docData = logData(document);
+
+      // Turning a 100x100 box a quarter turn about its own top left corner
+      // swings it from x 100..200 across to x 0..100 and leaves it spanning
+      // y 672..772 in default user space.
+      document.rotate(90, { origin: [100, 20] });
+      document.link(100, 20, 100, 100, 'http://www.example.com');
+
+      expect(docData.join('\n')).toContain('/Rect [0 672 100 772]');
+    });
+
+    test('leaves an untransformed rectangle alone', () => {
+      const docData = logData(document);
+
+      document.link(100, 20, 100, 100, 'http://www.example.com');
+
+      expect(docData.join('\n')).toContain('/Rect [100 672 200 772]');
+    });
+  });
+
   describe('undefined option values', () => {
     // `doc.annotate()` passes arbitrary dictionary keys straight through by
     // design, so unlike the acroform options there is no call site at which an
