@@ -154,6 +154,106 @@ describe('acroform', () => {
     expect(docData[1]).toContain('/F 4');
   });
 
+  test('push button with an onClick action', () => {
+    const expected = [
+      '10 0 obj',
+      '<<\n/FT /Btn\n/Ff 65536\n/AA <<\n/U <<\n/S /JavaScript\n/JS (app.alert\\(1\\);)\n>>\n>>\n' +
+        '/T (btn1)\n/Subtype /Widget\n/F 4\n/Type /Annot\n/Rect [20 742 120 772]\n/Border [0 0 0]\n/C [0 0 0]\n>>',
+      'endobj',
+    ];
+    doc.initForm();
+    const docData = logData(doc);
+    doc.formPushButton('btn1', 20, 20, 100, 30, { onClick: 'app.alert(1);' });
+    expect(docData.length).toBe(3);
+    expect(docData).toContainChunk(expected);
+  });
+
+  test.each([
+    ['onClick', 'U'],
+    ['onMouseDown', 'D'],
+    ['onMouseEnter', 'E'],
+    ['onMouseExit', 'X'],
+    ['onFocus', 'Fo'],
+    ['onBlur', 'Bl'],
+  ])('%s is written as the /%s action', (option, key) => {
+    doc.initForm();
+    const docData = logData(doc);
+    doc.formText('txt1', 20, 20, 100, 20, { [option]: 'app.alert(1);' });
+    expect(docData[1]).toContain(
+      `/AA <<\n/${key} <<\n/S /JavaScript\n/JS (app.alert\\(1\\);)\n>>\n>>`,
+    );
+  });
+
+  test('several actions are written into one AA dictionary', () => {
+    doc.initForm();
+    const docData = logData(doc);
+    doc.formText('txt1', 20, 20, 100, 20, {
+      onFocus: 'a();',
+      onBlur: 'b();',
+    });
+    expect(docData[1]).toContain('/Fo <<\n/S /JavaScript\n/JS (a\\(\\);)\n>>');
+    expect(docData[1]).toContain('/Bl <<\n/S /JavaScript\n/JS (b\\(\\);)\n>>');
+  });
+
+  test('an action given as a function is called with the document as this', () => {
+    doc.initForm();
+    const docData = logData(doc);
+    function onClick() {
+      this.getField('txt1').value = 'set';
+    }
+    doc.formPushButton('btn1', 20, 20, 100, 30, { onClick });
+
+    // The function is written into the action as its own source text. PDF
+    // string literals escape parens and newlines, so build the expectation the
+    // same way rather than hardcoding the exact whitespace
+    // `Function.prototype.toString()` happens to use (see lib/object.js's
+    // `escapable` map).
+    const expectedJs = `(${onClick}).call(this);`.replace(
+      /[\n\r\t\b\f()\\]/g,
+      (char) => ({ '\n': '\\n', '\r': '\\r', '(': '\\(', ')': '\\)' })[char],
+    );
+    expect(docData[1]).toContain('/S /JavaScript');
+    expect(docData[1]).toContain(expectedJs);
+  });
+
+  test('an action and text formatting combine into one AA dictionary', () => {
+    doc.initForm();
+    const docData = logData(doc);
+    let opts = {
+      value: 32.98,
+      onClick: 'app.alert(1);',
+      format: {
+        type: 'number',
+        nDec: 2,
+      },
+    };
+    doc.formText('dollars', 20, 20, 50, 20, opts);
+    // The onClick action survives...
+    expect(docData[1]).toContain(
+      '/U <<\n/S /JavaScript\n/JS (app.alert\\(1\\);)\n>>',
+    );
+    // ...alongside the format-validation actions mapFormat() adds.
+    expect(docData[1]).toContain('/K <<\n/S /JavaScript');
+    expect(docData[1]).toContain('/F <<\n/S /JavaScript');
+  });
+
+  test('an action is added to the AA escape hatch rather than replacing it', () => {
+    doc.initForm();
+    const docData = logData(doc);
+    doc.formText('dollars', 20, 20, 50, 20, {
+      value: 32.98,
+      onClick: 'app.alert(1);',
+      AA: { E: { S: 'JavaScript', JS: new String('enter();') } },
+      format: { type: 'number', nDec: 2 },
+    });
+    expect(docData[1]).toContain(
+      '/E <<\n/S /JavaScript\n/JS (enter\\(\\);)\n>>',
+    );
+    expect(docData[1]).toContain(
+      '/U <<\n/S /JavaScript\n/JS (app.alert\\(1\\);)\n>>',
+    );
+  });
+
   test('type flags do not leak implementation markers', () => {
     doc.initForm();
     const docData = logData(doc);
