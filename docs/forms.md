@@ -388,6 +388,23 @@ Some form documents may not need to generate appearances. This may be the case
 for text Form Annotations that initially have no value. This is not true for
 push button widget annotations. Please test
 
+With a custom font, a viewer building the appearance this way may show the
+field in a substitute font: the font PDFKit embeds for page content is
+subsetted and addressed by glyph id, which gives the viewer no way to resolve
+the field's text itself. Passing `embedFonts` to `initForm` embeds a
+complete, character-addressable copy of each font used in a field, which
+viewers can resolve any text against:
+
+```js
+doc.font('fonts/MyFont.ttf');
+doc.initForm({ embedFonts: true });
+```
+
+That copy holds the whole font rather than the glyphs used so far, so it adds
+roughly the size of the font file to the document, per font. It is off by
+default for that reason, and only affects custom fonts — the standard 14
+fonts are not embedded at all.
+
 ### Document JavaScript
 
 Many PDF Viewers, aside from Adobe Acrobat Reader, do not implement document
