@@ -1,7 +1,20 @@
+import zlib from 'zlib';
 import PDFDocument from '../../lib/document';
 import PDFSecurity from '../../lib/security';
 import { logData, joinTokens } from './helpers';
 import PDFFontFactory from '../../lib/font_factory';
+
+// Returns the body (as a single binary string, stream bytes included) of the
+// `n 0 obj ... endobj` entry logged by `logData`.
+function objectBody(docData, n) {
+  const start = docData.indexOf(`${n} 0 obj`);
+  if (start === -1) return null;
+  const end = docData.indexOf('endobj', start);
+  return docData
+    .slice(start + 1, end)
+    .map((item) => (item instanceof Buffer ? item.toString('binary') : item))
+    .join('\n');
+}
 
 // manual mock for PDFSecurity to ensure stored id will be the same accross different systems
 PDFSecurity.generateFileID = () => {
@@ -531,5 +544,172 @@ describe('acroform', () => {
         }
       }
     }
+  });
+
+  test('without embedFonts the form reuses the content-stream font', () => {
+    const docData = logData(doc);
+
+    doc.font('tests/fonts/Roboto-Regular.ttf');
+    doc.initForm();
+    doc.formText('field1', 10, 10, 200, 20, { value: 'Hello' });
+    doc.text('Hello', 10, 100);
+    doc.end();
+
+    const acroFormIdx = docData.findIndex(
+      (item) => typeof item === 'string' && item.includes('/NeedAppearances'),
+    );
+    const drFontRef = docData[acroFormIdx].match(
+      /\/DR\s*<<\s*\/Font\s*<<\s*\/\S+\s+(\d+)\s+0\s+R/,
+    );
+    expect(drFontRef).not.toBeNull();
+
+    // The same object the page content references, and no second copy of the
+    // font program: the default stays exactly as it was before the option.
+    const pageFontRefIdx = docData.findIndex(
+      (item) =>
+        typeof item === 'string' &&
+        item.includes('/ProcSet') &&
+        item.includes('/Font'),
+    );
+    const pageFontRef = docData[pageFontRefIdx].match(/\/F\d+ (\d+) 0 R/);
+    expect(drFontRef[1]).toBe(pageFontRef[1]);
+    expect(objectBody(docData, drFontRef[1])).toContain(
+      '/Encoding /Identity-H',
+    );
+  });
+
+  // Regression test for https://github.com/foliojs/pdfkit/issues/1096:
+  // a custom embedded font applied to a form field rendered with the wrong
+  // font in readers (e.g. Adobe Acrobat/Reader) that regenerate the field's
+  // appearance from its value, even though the same font renders correctly
+  // for ordinary page text.
+  test('embedFonts gives the form a font readers resolve field text against', () => {
+    const docData = logData(doc);
+
+    doc.font('tests/fonts/Roboto-Regular.ttf');
+    doc.initForm({ embedFonts: true });
+    doc.formText('field1', 10, 10, 200, 20, { value: 'Hello' });
+    // Also draw with the same font in the page content, so the test proves
+    // the two usages embed independently rather than sharing one font object.
+    doc.text('Hello', 10, 100);
+    doc.end();
+
+    // Locate the AcroForm dict, and the font object its /DR references.
+    const acroFormIdx = docData.findIndex(
+      (item) => typeof item === 'string' && item.includes('/NeedAppearances'),
+    );
+    expect(acroFormIdx).toBeGreaterThan(-1);
+    const drFontRef = docData[acroFormIdx].match(
+      /\/DR\s*<<\s*\/Font\s*<<\s*\/\S+\s+(\d+)\s+0\s+R/,
+    );
+    expect(drFontRef).not.toBeNull();
+    const acroFormFontBody = objectBody(docData, drFontRef[1]);
+
+    // The AcroForm font is a composite font, like the one pdfkit uses in
+    // content streams, but addressed through a custom CMap instead of
+    // `/Identity-H`: Identity-H has no character encoding a reader could
+    // resolve on its own, since it only works when the content stream
+    // author (pdfkit itself) already knows which glyph id corresponds to
+    // each character.
+    expect(acroFormFontBody).toContain('/Subtype /Type0');
+    expect(acroFormFontBody).not.toContain('/Encoding /Identity-H');
+
+    // The font actually used to draw page text is a different object,
+    // untouched: still the subsetted Type0/Identity-H composite font.
+    const pageFontRefIdx = docData.findIndex(
+      (item) =>
+        typeof item === 'string' &&
+        item.includes('/ProcSet') &&
+        item.includes('/Font'),
+    );
+    expect(pageFontRefIdx).toBeGreaterThan(-1);
+    const pageFontRef = docData[pageFontRefIdx].match(/\/F\d+ (\d+) 0 R/);
+    expect(pageFontRef[1]).not.toBe(drFontRef[1]);
+    const contentFontBody = objectBody(docData, pageFontRef[1]);
+    expect(contentFontBody).toContain('/Subtype /Type0');
+    expect(contentFontBody).toContain('/Encoding /Identity-H');
+
+    // The whole point: the AcroForm font's /Encoding must be a custom CMap a
+    // reader can use to resolve arbitrary WinAnsiEncoding field text to a
+    // glyph on its own -- built from `this.font`'s own character coverage,
+    // not from whatever `this.subset` (the font used for the page text
+    // above) happens to already include.
+    const encodingRef = acroFormFontBody.match(/\/Encoding (\d+) 0 R/);
+    expect(encodingRef).not.toBeNull();
+    const cmapObjectBody = objectBody(docData, encodingRef[1]);
+    expect(cmapObjectBody).toContain('/Type /CMap');
+    const cmapStreamMatch = cmapObjectBody.match(
+      /stream\r?\n([\s\S]*?)\r?\nendstream/,
+    );
+    const cmapBody = zlib
+      .inflateSync(Buffer.from(cmapStreamMatch[1], 'binary'))
+      .toString('latin1');
+    expect(cmapBody).toContain('begincidchar');
+    // 'H' (0x48) is in "Hello", drawn as page content above, but WinAnsi code
+    // 0x21 ('!') never appears anywhere in this test -- the CMap must cover
+    // it anyway, since it isn't built from the glyphs used so far.
+    expect(cmapBody).toMatch(/<48> \d+/);
+    expect(cmapBody).toMatch(/<21> \d+/);
+  });
+
+  // Same regression as above, but for a CFF-flavored font (OpenType/CFF
+  // rather than TrueType). fontkit's CFF subsetter always emits CID-keyed,
+  // nameless output, and a naive "subset then embed" approach still leaves
+  // the AcroForm font unreadable by a viewer -- the composite font with a
+  // custom WinAnsi CMap must work for this font format too, embedded as
+  // `/FontFile3 /Subtype /CIDFontType0C` rather than `/FontFile2`.
+  test('embedFonts resolves field text for a CFF-flavored font too', () => {
+    const docData = logData(doc);
+
+    doc.font('tests/fonts/Montserrat-Bold.otf');
+    doc.initForm({ embedFonts: true });
+    doc.formText('field1', 10, 10, 200, 20, { value: 'Hello' });
+    doc.text('Hello', 10, 100);
+    doc.end();
+
+    const acroFormIdx = docData.findIndex(
+      (item) => typeof item === 'string' && item.includes('/NeedAppearances'),
+    );
+    expect(acroFormIdx).toBeGreaterThan(-1);
+    const drFontRef = docData[acroFormIdx].match(
+      /\/DR\s*<<\s*\/Font\s*<<\s*\/\S+\s+(\d+)\s+0\s+R/,
+    );
+    expect(drFontRef).not.toBeNull();
+    const acroFormFontBody = objectBody(docData, drFontRef[1]);
+
+    expect(acroFormFontBody).toContain('/Subtype /Type0');
+    expect(acroFormFontBody).not.toContain('/Encoding /Identity-H');
+
+    // Descendant font must be CIDFontType0/CIDFontType0C, not the
+    // TrueType-only CIDFontType2/FontFile2 path.
+    const descendantRef = acroFormFontBody.match(
+      /\/DescendantFonts\s*\[\s*(\d+)\s+0\s+R/,
+    );
+    expect(descendantRef).not.toBeNull();
+    const descendantBody = objectBody(docData, descendantRef[1]);
+    expect(descendantBody).toContain('/Subtype /CIDFontType0');
+    expect(descendantBody).not.toContain('/CIDToGIDMap');
+
+    const descriptorRef = descendantBody.match(/\/FontDescriptor (\d+) 0 R/);
+    expect(descriptorRef).not.toBeNull();
+    const descriptorBody = objectBody(docData, descriptorRef[1]);
+    const fontFileRef = descriptorBody.match(/\/FontFile3 (\d+) 0 R/);
+    expect(fontFileRef).not.toBeNull();
+    const fontFileBody = objectBody(docData, fontFileRef[1]);
+    expect(fontFileBody).toContain('/Subtype /CIDFontType0C');
+
+    const encodingRef = acroFormFontBody.match(/\/Encoding (\d+) 0 R/);
+    expect(encodingRef).not.toBeNull();
+    const cmapObjectBody = objectBody(docData, encodingRef[1]);
+    expect(cmapObjectBody).toContain('/Type /CMap');
+    const cmapStreamMatch = cmapObjectBody.match(
+      /stream\r?\n([\s\S]*?)\r?\nendstream/,
+    );
+    const cmapBody = zlib
+      .inflateSync(Buffer.from(cmapStreamMatch[1], 'binary'))
+      .toString('latin1');
+    expect(cmapBody).toContain('begincidchar');
+    expect(cmapBody).toMatch(/<48> \d+/);
+    expect(cmapBody).toMatch(/<21> \d+/);
   });
 });
