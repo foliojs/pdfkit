@@ -69,6 +69,57 @@ describe('table', () => {
       expect(spy).toHaveBeenCalledWith(REGULAR, 'Condensed');
     });
   });
+
+  describe('text mask', () => {
+    // Returns the rect of each clip applied while rendering
+    function textMasks(document, render) {
+      const rect = vi.spyOn(document, 'rect');
+      const clip = vi.spyOn(document, 'clip');
+      render();
+      return clip.mock.invocationCallOrder.map((order) => {
+        const i = rect.mock.invocationCallOrder.findLastIndex((o) => o < order);
+        return rect.mock.calls[i];
+      });
+    }
+
+    test('leaves room for glyphs that rise above the ascender', () => {
+      // Accented capitals such as Ä and Õ rise above the Helvetica ascender
+      // (718), up to the top of its bbox (931). The first line starts at the
+      // ascender, so a mask at the top padding cut off their accents.
+      const document = new PDFDocument({ margin: 0 });
+      const [[, y, , height]] = textMasks(document, () =>
+        document.table().row(['ÕÜÖÄ'], true),
+      );
+      const padding = 3; // default 0.25em at 12pt
+      const overshoot = ((931 - 718) / 1000) * 12;
+      expect(y).toBeCloseTo(padding - overshoot);
+      // the bottom of the mask still stops at the padding
+      expect(y + height).toBeCloseTo(document.y - padding);
+    });
+
+    test('does not extend past the top of the cell', () => {
+      const document = new PDFDocument({ margin: 0 });
+      const [[, y, , height]] = textMasks(document, () =>
+        document.table({ defaultStyle: { padding: 1 } }).row(['ÕÜÖÄ'], true),
+      );
+      expect(y).toBeCloseTo(0);
+      expect(y + height).toBeCloseTo(document.y - 1);
+    });
+
+    test('uses the bbox of an embedded font', () => {
+      const document = new PDFDocument({
+        margin: 0,
+        font: 'tests/fonts/Roboto-Regular.ttf',
+      });
+      const [[, y]] = textMasks(document, () =>
+        document.table().row(['ÕÜÖÄ'], true),
+      );
+      const { font } = document._font;
+      const overshoot = ((font.bbox.maxY - font.ascent) / font.unitsPerEm) * 12;
+      expect(overshoot).toBeGreaterThan(0);
+      expect(y).toBeCloseTo(3 - overshoot);
+    });
+  });
 });
 
 describe('utils', () => {

@@ -5,6 +5,7 @@
 - Add a `hidden` option to form annotation methods, for a field that should start hidden (e.g. one an interactive action reveals later) instead of the usual default of visible and printable
 - Fix annotations placed under `doc.rotate()` marking the wrong area, because `_convertRect` derived each corner's y from the already transformed x and mapped only two of the four corners, so the rectangle a viewer makes interactive did not follow the rotated content. Fixes #1153
 - Add `onClick`, `onMouseDown`, `onMouseEnter`, `onMouseExit`, `onFocus` and `onBlur` options to form annotation methods, for the JavaScript a field runs on each of those events. Each accepts a string or a plain function, whose source text is written into the action
+- Fix the accents of capitals such as Ä and Õ being cut off in the first line of a table cell, because the text mask started exactly at the top padding while those glyphs rise above the font ascender where the first line begins. Fixes #1720
 
 ### [v0.20.2] - 2026-08-29
 
