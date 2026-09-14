@@ -351,6 +351,9 @@ is added to the document. This way, any calls to `text` or `table` will be place
 - `border` - The border for the cell (default `1pt`)
 - `borderColor` - The border colors for the cell (default `black`)
 - `font` - Font options for the cell
+  - `src` - The font to use: the name of a font registered with `doc.registerFont()`, a standard font name such as `Helvetica-Bold`, or a font file path or buffer. This is the same as the first argument of `doc.font()`
+  - `family` - The name of the font to use from a collection (`.ttc`, `.dfont`) or variable font given in `src`, like the second argument of `doc.font()`. It only applies when there is a `src` on the cell, its row or its column, so use `src` for a registered font name
+  - `size` - The font size
 - `backgroundColor` - Set the background color of the cell
 - `align` - The alignment of the cell text (default `{x: 'left', y: 'top'}`)
 - `textStroke` - The text stroke (default `0`)
@@ -359,6 +362,18 @@ is added to the document. This way, any calls to `text` or `table` will be place
 - `type` - Sets the cell type (for accessibility) (default `TD`)
 - `textOptions` - Sets any text options you wish to provide (such as rotation)
 - `debug` - Whether to show the debug lines for the cell (default `false`)
+
+A registered font can be used by its name:
+
+    doc.registerFont('Icons', 'fonts/fa-regular-400.ttf');
+
+    doc.table({
+      data: [
+        ['Label', { text: '\uf118', font: { src: 'Icons', size: 20 } }]
+      ]
+    })
+
+The `font` of a cell is combined with the `font` of its row and column. A more specific `src` also replaces the `family`, while a `family` or `size` on its own refines what is inherited.
 
 ## Column options
 
