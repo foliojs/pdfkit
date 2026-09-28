@@ -30,6 +30,142 @@ describe('acroform', () => {
     });
   });
 
+  test.each(['Request number', 'Référence №', ''])(
+    'alternateName writes a text string: %s',
+    (alternateName) => {
+      doc.initForm();
+      const options = Object.freeze({ alternateName });
+      const docData = logData(doc);
+      doc.formText('request', 10, 20, 100, 24, options);
+      const widget = doc.page.annotations.at(-1);
+      expect(widget.data.TU).toBeInstanceOf(String);
+      expect(String(widget.data.TU)).toBe(alternateName);
+      expect(objectBody(docData, widget.id)).toContain('/TU (');
+      expect(objectBody(docData, widget.id)).not.toContain('/alternateName');
+      doc.end();
+    },
+  );
+
+  test('omitted alternateName does not invent a tooltip', () => {
+    doc.initForm();
+    doc.formText('request', 10, 20, 100, 24);
+    expect(doc.page.annotations.at(-1).data).not.toHaveProperty('TU');
+    doc.end();
+  });
+
+  test.each([0, 9])(
+    'explicit fontSize %s applies to the default form font',
+    (fontSize) => {
+      doc.font('Helvetica').initForm();
+      const docData = logData(doc);
+      doc.formText('request', 10, 20, 100, 24, Object.freeze({ fontSize }));
+      const widget = doc.page.annotations.at(-1);
+      expect(objectBody(docData, widget.id)).toContain(
+        `/DA (/F1 ${fontSize} Tf 0 g)`,
+      );
+      expect(widget.data).not.toHaveProperty('DR');
+      doc.end();
+    },
+  );
+
+  test('omitted size inherits the default appearance', () => {
+    doc.font('Helvetica').initForm();
+    doc.formText('request', 10, 20, 100, 24);
+    expect(doc.page.annotations.at(-1).data).not.toHaveProperty('DA');
+    doc.end();
+  });
+
+  test.each([undefined, 0, 9])(
+    'non-default font retains resources and size %s',
+    (fontSize) => {
+      doc.font('Helvetica').initForm();
+      doc.font('Courier');
+      doc.formText('request', 10, 20, 100, 24, { fontSize });
+      const widget = doc.page.annotations.at(-1);
+      expect(String(widget.data.DA)).toBe(`/F2 ${fontSize ?? 0} Tf 0 g`);
+      doc.end();
+      expect(widget.data.DR.Font.F2).toBe(
+        doc._root.data.AcroForm.data.DR.Font.F2,
+      );
+    },
+  );
+
+  test('form widgets are attached to their own structure elements and parent tree', () => {
+    doc = new PDFDocument({ tagged: true, compress: false });
+    doc.initForm();
+    const docData = logData(doc);
+    const page = doc.page.dictionary;
+    const forms = [];
+    const widgets = [];
+    for (const name of ['request', 'department']) {
+      const form = doc.struct('Form');
+      doc.addStructure(form);
+      doc.formText(
+        name,
+        10,
+        20 + forms.length * 30,
+        100,
+        24,
+        Object.freeze({ structParent: form }),
+      );
+      forms.push(form);
+      widgets.push(doc.page.annotations.at(-1));
+    }
+    expect(widgets[0].data.StructParent).not.toBe(widgets[1].data.StructParent);
+    for (let i = 0; i < widgets.length; i++) {
+      expect(doc.getStructParentTree().get(widgets[i].data.StructParent)).toBe(
+        forms[i].dictionary,
+      );
+      expect(doc._root.data.AcroForm.data.Fields).toContain(widgets[i]);
+    }
+    doc.end();
+    for (let i = 0; i < widgets.length; i++) {
+      const formBody = objectBody(docData, forms[i].dictionary.id);
+      expect(formBody).toContain('/S /Form');
+      expect(formBody).toContain('/Type /OBJR');
+      expect(formBody).toContain(`/Obj ${widgets[i].id} 0 R`);
+      expect(formBody).toContain(`/Pg ${page.id} 0 R`);
+      const widgetBody = objectBody(docData, widgets[i].id);
+      expect(widgetBody).toContain(
+        `/StructParent ${widgets[i].data.StructParent}`,
+      );
+      expect(widgetBody).not.toContain('/structParent');
+    }
+  });
+
+  test('delayed form structure finalization retains each widget page and field parent', () => {
+    doc = new PDFDocument({ tagged: true, compress: false });
+    doc.initForm();
+    const docData = logData(doc);
+    const fieldParent = doc.formField('request');
+    const entries = [];
+    for (const name of ['number', 'department']) {
+      const form = doc.struct('Form');
+      doc.addStructure(form);
+      const page = doc.page.dictionary;
+      doc.formText(name, 10, 20, 100, 24, {
+        parent: fieldParent,
+        structParent: form,
+      });
+      entries.push({ form, page, widget: doc.page.annotations.at(-1) });
+      doc.addPage();
+    }
+    doc.end();
+    for (const { form, page, widget } of entries) {
+      expect(objectBody(docData, form.dictionary.id)).toContain(
+        `/Pg ${page.id} 0 R`,
+      );
+      expect(objectBody(docData, form.dictionary.id)).toContain(
+        `/Obj ${widget.id} 0 R`,
+      );
+      expect(widget.data.Parent).toBe(fieldParent);
+      expect(fieldParent.data.Kids).toContain(widget);
+      expect(doc.getStructParentTree().get(widget.data.StructParent)).toBe(
+        form.dictionary,
+      );
+    }
+  });
+
   test('named JavaScript', () => {
     const expected = [
       '2 0 obj',

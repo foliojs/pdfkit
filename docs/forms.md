@@ -43,6 +43,9 @@ information on `name` in the **Field Names** section below.
 The following `options` are accepted by all form annotation methods:
 
 - `parent` [_PDFReference_] - Parent field returned by `formField`.
+- `structParent` [_PDFStructureElement_] - Structure element returned by `doc.struct()`.
+  Use a separate `Form` element for each widget in a tagged PDF. This is distinct
+  from `parent`, which controls the form field hierarchy.
 - `required` [_boolean_] - The field must have a value by the time the form is submitted.
 - `noExport` [_boolean_] - The field will not be exported if a form is submitted.
 - `readOnly` [_boolean_] - The user may not change the value of the field, and
@@ -51,10 +54,14 @@ The following `options` are accepted by all form annotation methods:
 - `value` [_number|string_] - The field's value.
 - `defaultValue` [_number|string_] - The default value to which the field
   reverts if a reset-form action is executed.
+- `alternateName` [_string_] - Alternate field name (`TU`), used as the field's
+  accessible name or tooltip. Use a meaningful description, not just the
+  internal field name.
 - `backgroundColor` - Field background color.
 - `borderColor` - Field border color.
 - `fontSize` [_number_] - Sets the font size used in the field appearance string.
-  The default, `0`, means auto sizing.
+  The default, `0`, means auto sizing. An explicit size applies even when the
+  field uses the default form font.
 - `hidden` [_boolean_] - Builds the field starting hidden, instead of the
   usual default of visible and printable, for a field an interactive action
   (see `onClick` below) will reveal later.
