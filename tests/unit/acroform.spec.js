@@ -133,6 +133,39 @@ describe('acroform', () => {
     }
   });
 
+  test('delayed form structure finalization retains each widget page and field parent', () => {
+    doc = new PDFDocument({ tagged: true, compress: false });
+    doc.initForm();
+    const docData = logData(doc);
+    const fieldParent = doc.formField('request');
+    const entries = [];
+    for (const name of ['number', 'department']) {
+      const form = doc.struct('Form');
+      doc.addStructure(form);
+      const page = doc.page.dictionary;
+      doc.formText(name, 10, 20, 100, 24, {
+        parent: fieldParent,
+        structParent: form,
+      });
+      entries.push({ form, page, widget: doc.page.annotations.at(-1) });
+      doc.addPage();
+    }
+    doc.end();
+    for (const { form, page, widget } of entries) {
+      expect(objectBody(docData, form.dictionary.id)).toContain(
+        `/Pg ${page.id} 0 R`,
+      );
+      expect(objectBody(docData, form.dictionary.id)).toContain(
+        `/Obj ${widget.id} 0 R`,
+      );
+      expect(widget.data.Parent).toBe(fieldParent);
+      expect(fieldParent.data.Kids).toContain(widget);
+      expect(doc.getStructParentTree().get(widget.data.StructParent)).toBe(
+        form.dictionary,
+      );
+    }
+  });
+
   test('named JavaScript', () => {
     const expected = [
       '2 0 obj',
