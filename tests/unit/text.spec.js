@@ -218,6 +218,30 @@ Q
 
       expect(docData).toContainText({ text: 'no line break' });
     });
+
+    test.each([
+      ['characterSpacing', { characterSpacing: 4 }, '184.74'],
+      ['wordSpacing', { wordSpacing: 5 }, '138.74'],
+    ])('underline of wrapped text with %s', (_name, spacing, end) => {
+      const docData = logData(document);
+      const options = { width: 400, underline: true, ...spacing };
+      const bounds = document.boundsOfString(
+        'Hello big world',
+        50,
+        50,
+        options,
+      );
+
+      document.text('Hello big world', 50, 50, options);
+      document.end();
+
+      // the same width as with lineBreak false, with each spacing counted once
+      expect(bounds.width.toFixed(2)).toBe((end - 50).toFixed(2));
+      expect(docData).toContainChunk([
+        'stream',
+        new RegExp(`50 [\\d.]+ m\n${end.replace('.', '\\.')}\\d* [\\d.]+ l`),
+      ]);
+    });
   });
 
   describe('text with structure parent links', () => {
