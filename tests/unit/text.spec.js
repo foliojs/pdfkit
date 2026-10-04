@@ -242,6 +242,27 @@ Q
         new RegExp(`50 [\\d.]+ m\n${end.replace('.', '\\.')}\\d* [\\d.]+ l`),
       ]);
     });
+
+    test('bounds of text with lineBreak false and wordSpacing', () => {
+      const docData = logData(document);
+      const options = { lineBreak: false, underline: true, wordSpacing: 5 };
+      const bounds = document.boundsOfString(
+        'Hello big world',
+        50,
+        50,
+        options,
+      );
+
+      document.text('Hello big world', 50, 50, options);
+      document.end();
+
+      // as wide as the underline, which includes the word spacing
+      expect(bounds.width.toFixed(2)).toBe('88.74');
+      expect(docData).toContainChunk([
+        'stream',
+        /50 [\d.]+ m\n138\.74\d* [\d.]+ l/,
+      ]);
+    });
   });
 
   describe('text with structure parent links', () => {
