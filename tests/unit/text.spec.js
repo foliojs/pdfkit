@@ -268,6 +268,9 @@ Q
       ['center', { characterSpacing: 4 }, '182.628', '317.372'],
       ['center', { wordSpacing: 5 }, '205.628', '294.372'],
       ['right', { wordSpacing: 5 }, '361.256', '450'],
+      ['right', { horizontalScaling: 80 }, '387.00', '450'],
+      ['center', { horizontalScaling: 120 }, '202.75', '297.24'],
+      ['right', { horizontalScaling: 120, wordSpacing: 5 }, '343.50', '450'],
     ])('%s aligned text with %o', (align, spacing, start, end) => {
       const docData = logData(document);
 
@@ -287,6 +290,60 @@ Q
         new RegExp(
           `${escape(start)}\\d* [\\d.]+ m\n${escape(end)}\\d* [\\d.]+ l`,
         ),
+      ]);
+    });
+    test.each([
+      ['wrapped', { width: 400 }],
+      ['lineBreak false', { lineBreak: false }],
+    ])(
+      'bounds of %s text with horizontalScaling and wordSpacing',
+      (_name, options) => {
+        const bounds = document.boundsOfString('Hello big world', 50, 50, {
+          ...options,
+          horizontalScaling: 80,
+          wordSpacing: 6,
+        });
+
+        // the glyphs and both word gaps are scaled to 80%
+        expect(bounds.width.toFixed(2)).toBe('72.60');
+      },
+    );
+
+    test.each([50, 150])(
+      'wraps text with horizontalScaling %i at the given width',
+      (horizontalScaling) => {
+        const bounds = document.boundsOfString(
+          'The quick brown fox jumps over the lazy dog while the five boxing wizards jump quickly',
+          50,
+          50,
+          { width: 200, horizontalScaling },
+        );
+
+        expect(bounds.width).toBeLessThanOrEqual(200);
+        expect(bounds.width).toBeGreaterThan(180);
+      },
+    );
+
+    test('justified text with horizontalScaling fills the line', () => {
+      const docData = logData(document);
+      const text =
+        'The quick brown fox jumps over the lazy dog while the five boxing wizards jump quickly';
+      const options = {
+        width: 200,
+        align: 'justify',
+        underline: true,
+        horizontalScaling: 120,
+      };
+      const bounds = document.boundsOfString(text, 50, 50, options);
+
+      document.text(text, 50, 50, options);
+      document.end();
+
+      // the first line reaches the right edge, plus its trailing space
+      expect(bounds.width.toFixed(2)).toBe('204.00');
+      expect(docData).toContainChunk([
+        'stream',
+        /50 [\d.]+ m\n254\.00\d* [\d.]+ l/,
       ]);
     });
   });

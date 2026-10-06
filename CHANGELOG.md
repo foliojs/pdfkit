@@ -2,6 +2,7 @@
 
 ### Unreleased
 
+- Fix text with `horizontalScaling` being wrapped, indented, aligned and laid out in columns as if the `width`, `indent` and `columnGap` were scaled too, so scaled text no longer runs past the right edge or stops short of it, and fix `align: 'justify'`, the decorations and `boundsOfString()` counting the word spacing of scaled text at 100%
 - Fix wrapped text with `align: 'center'` sitting left of the middle of the line when `characterSpacing` or `wordSpacing` is set, and with `align: 'right'` running past the right edge by the `wordSpacing` of each gap between words
 - Fix `boundsOfString()` with `lineBreak: false` leaving out `wordSpacing`, so its width now matches the rendered text and its underline
 - Fix the underline, strike, link and goTo of wrapped text, and `boundsOfString()` with a `width`, counting `characterSpacing` and `wordSpacing` twice, so they no longer run past the text and match the same text drawn with `lineBreak: false`
