@@ -2,6 +2,7 @@
 
 ### Unreleased
 
+- Fix wrapped text with `align: 'center'` sitting left of the middle of the line when `characterSpacing` or `wordSpacing` is set, and with `align: 'right'` running past the right edge by the `wordSpacing` of each gap between words
 - Fix `boundsOfString()` with `lineBreak: false` leaving out `wordSpacing`, so its width now matches the rendered text and its underline
 - Fix the underline, strike, link and goTo of wrapped text, and `boundsOfString()` with a `width`, counting `characterSpacing` and `wordSpacing` twice, so they no longer run past the text and match the same text drawn with `lineBreak: false`
 - Fix the Node build throwing once a bundler inlines it into an application bundle, `Cannot find module '#standard-fonts/Helvetica'` on the first document from an ESM bundle and `Invalid URL` while importing a CommonJS one, because the standard font metrics and the PDF/A ICC profile were resolved relative to pdfkit's own package directory at import time. Both are now resolved on first use, a standard font that cannot be loaded names itself and the fix in its error, and `registerStdFonts` is exported from the Node build as it already was from the browser build, so a bundle can register the fonts it uses from `pdfkit/standard-fonts/<Name>`. The Node build now requires the standard fonts by a path relative to the built file, which replaces the `#standard-fonts/*` import mapping and lets an ESM bundle load them from a copy of `js/standard-fonts` next to it. Fixes #1801
