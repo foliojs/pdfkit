@@ -170,6 +170,17 @@ The `pageLayout` option specifies how pages should be displayed in a PDF viewer:
 
     const doc = new PDFDocument({ pageLayout: 'twoColumnLeft' });
 
+### Object streams
+
+The `objectStreams` option packs the objects that are not streams (pages, annotations, the
+structure elements of a tagged document, etc.) into compressed object streams, and writes a
+cross-reference stream instead of the xref table. Documents with many such objects, like tagged
+ones, get much smaller, while their content stays the same.
+
+    const doc = new PDFDocument({ pdfVersion: '1.5', objectStreams: true });
+
+It requires a `pdfVersion` of `1.5` or higher, and cannot be used with encryption or PDF/A-1.
+
 ## Adding pages
 
 The first page of a PDFKit document is added for you automatically when you

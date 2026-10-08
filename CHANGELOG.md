@@ -2,6 +2,7 @@
 
 ### Unreleased
 
+- Add an `objectStreams` option, which packs the objects that are not streams into compressed object streams and writes a cross-reference stream instead of the xref table, making documents with many such objects, e.g. tagged ones, much smaller. It requires a `pdfVersion` of `1.5` or higher, and cannot be used with encryption or PDF/A-1. Fixes #1810
 - Fix wrapped text with `align: 'center'` sitting left of the middle of the line when `characterSpacing` or `wordSpacing` is set, and with `align: 'right'` running past the right edge by the `wordSpacing` of each gap between words
 - Fix `boundsOfString()` with `lineBreak: false` leaving out `wordSpacing`, so its width now matches the rendered text and its underline
 - Fix the underline, strike, link and goTo of wrapped text, and `boundsOfString()` with a `width`, counting `characterSpacing` and `wordSpacing` twice, so they no longer run past the text and match the same text drawn with `lineBreak: false`
