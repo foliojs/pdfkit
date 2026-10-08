@@ -242,6 +242,53 @@ Q
         new RegExp(`50 [\\d.]+ m\n${end.replace('.', '\\.')}\\d* [\\d.]+ l`),
       ]);
     });
+
+    test('bounds of text with lineBreak false and wordSpacing', () => {
+      const docData = logData(document);
+      const options = { lineBreak: false, underline: true, wordSpacing: 5 };
+      const bounds = document.boundsOfString(
+        'Hello big world',
+        50,
+        50,
+        options,
+      );
+
+      document.text('Hello big world', 50, 50, options);
+      document.end();
+
+      // as wide as the underline, which includes the word spacing
+      expect(bounds.width.toFixed(2)).toBe('88.74');
+      expect(docData).toContainChunk([
+        'stream',
+        /50 [\d.]+ m\n138\.74\d* [\d.]+ l/,
+      ]);
+    });
+
+    test.each([
+      ['center', { characterSpacing: 4 }, '182.628', '317.372'],
+      ['center', { wordSpacing: 5 }, '205.628', '294.372'],
+      ['right', { wordSpacing: 5 }, '361.256', '450'],
+    ])('%s aligned text with %o', (align, spacing, start, end) => {
+      const docData = logData(document);
+
+      document.text('Hello big world', 50, 50, {
+        width: 400,
+        align,
+        underline: true,
+        ...spacing,
+      });
+      document.end();
+
+      // the underline spans the drawn text, so it sits in the middle of the
+      // line or ends at its right edge
+      const escape = (n) => n.replace('.', '\\.');
+      expect(docData).toContainChunk([
+        'stream',
+        new RegExp(
+          `${escape(start)}\\d* [\\d.]+ m\n${escape(end)}\\d* [\\d.]+ l`,
+        ),
+      ]);
+    });
   });
 
   describe('text with structure parent links', () => {
