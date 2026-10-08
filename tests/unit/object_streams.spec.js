@@ -8,7 +8,9 @@ const options = {
   objectStreams: true,
 };
 
-// Returns the bytes of a document; `after` can end references once it ended
+// Returns the bytes of a document; `after` can end references once it ended.
+// Spies on push rather than using logData, which starts after the header is
+// written, as the cross-reference offsets count from the start of the file
 function build(docOptions, fn = (doc) => doc.addPage(), after) {
   const chunks = [];
   const push = PDFDocument.prototype.push;
