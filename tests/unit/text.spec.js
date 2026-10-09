@@ -291,6 +291,42 @@ Q
     });
   });
 
+  describe('text with decomposed characters (NFD)', () => {
+    const textStream = (text) => {
+      const doc = new PDFDocument({
+        info: { CreationDate: new Date(Date.UTC(2018, 1, 1)) },
+        compress: false,
+      });
+      const docData = logData(doc);
+      doc.text(text, 100, 80);
+      doc.end();
+      return docData
+        .filter((item) => Buffer.isBuffer(item))
+        .map((item) => item.toString('binary'))
+        .find((item) => item.includes(' TJ'));
+    };
+
+    test('renders the same as the composed text with a standard font', () => {
+      const composed = 'Text f\u00fcr \u00c9t\u00e9 na\u00efve';
+      const decomposed = composed.normalize('NFD');
+      expect(decomposed).not.toBe(composed);
+
+      expect(textStream(decomposed)).toBe(textStream(composed));
+      // "ü", "É", "é" and "ï" as single WinAnsi bytes (fc, c9, e9, ef)
+      expect(textStream(decomposed)).toContain(
+        '[<54> 120 <65> 30 <78742066fc7220c974e9206e61ef76> 25 <65> 0] TJ',
+      );
+    });
+
+    test('measures the same width as the composed text with a standard font', () => {
+      // Helvetica "i" is narrower than "\u00ef", unlike most accented letters
+      const composed = 'na\u00efve';
+      expect(document.widthOfString(composed.normalize('NFD'))).toBe(
+        document.widthOfString(composed),
+      );
+    });
+  });
+
   describe('text with structure parent links', () => {
     beforeEach(() => {
       document = new PDFDocument({
