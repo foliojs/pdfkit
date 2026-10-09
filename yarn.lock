@@ -5036,8 +5036,8 @@ __metadata:
   linkType: hard
 
 "markdown-it@npm:^15.0.0":
-  version: 15.0.0
-  resolution: "markdown-it@npm:15.0.0"
+  version: 15.0.2
+  resolution: "markdown-it@npm:15.0.2"
   dependencies:
     argparse: "npm:^3.0.0"
     entities: "npm:^8.0.0"
@@ -5047,7 +5047,7 @@ __metadata:
     uc.micro: "npm:^3.0.0"
   bin:
     markdown-it: bin/markdown-it.mjs
-  checksum: 10c0/4eda1fa60757d0a4a5db06c04a670b6885cac70aa937bc53f54403c5c32b68341a5e1858e30812f3c9b7b1734178a0621cdeeef7446b84d8c9b2716beafb022c
+  checksum: 10c0/a06c47578157bcb01fc161951254158d41386f5f7dc09d335453568c9a95bc58f7099fad235d5be92d8b29fe8672b25c9b809313b64df0eacebdda804c68ca09
   languageName: node
   linkType: hard
 
