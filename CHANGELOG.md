@@ -2,6 +2,7 @@
 
 ### Unreleased
 
+- Add `lineBreak: 'whitespace'` to `doc.text()`, which breaks a line only at whitespace, a soft hyphen or a zero-width space. The Unicode line breaking rules the wrapper follows also allow a break after a hyphen or a slash, so `design-system` or `https://github.com/foliojs/pdfkit` could be cut at a line end, and a text extractor that joins the lines, such as a résumé parser, reads two words
 - Add an `objectStreams` option, which packs the objects that are not streams into compressed object streams and writes a cross-reference stream instead of the xref table, making documents with many such objects, e.g. tagged ones, much smaller. It requires a `pdfVersion` of `1.5` or higher, and cannot be used with encryption or PDF/A-1. Fixes #1810
 - Fix wrapped text with `align: 'center'` sitting left of the middle of the line when `characterSpacing` or `wordSpacing` is set, and with `align: 'right'` running past the right edge by the `wordSpacing` of each gap between words
 - Fix `boundsOfString()` with `lineBreak: false` leaving out `wordSpacing`, so its width now matches the rendered text and its underline

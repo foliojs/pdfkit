@@ -275,4 +275,94 @@ describe('LineWrapper', () => {
       expect(line).toEqual({ x: 15, lineWidth: 285 });
     });
   });
+
+  describe('lineBreak whitespace', () => {
+    // each line arrives with its trailing space or newline, which these
+    // tests are not about
+    const wrapLines = (text, options) => {
+      const wrapper = new LineWrapper(document, options);
+      const lines = [];
+      wrapper.on('line', (buffer) => {
+        lines.push(buffer.trimEnd());
+        document.y += document.currentLineHeight(true);
+      });
+      wrapper.wrap(text, options);
+      return lines;
+    };
+    // one point too narrow for the text to fit on one line
+    const widthJustUnder = (text) => document.widthOfString(text) - 1;
+
+    test('by default the Unicode rules break after a hyphen and after a slash', () => {
+      expect(
+        wrapLines('a design-system', {
+          width: widthJustUnder('a design-system'),
+        }),
+      ).toEqual(['a design-', 'system']);
+      expect(
+        wrapLines('see https://github.com/foliojs/pdfkit', {
+          width: widthJustUnder('see https://github.com/foliojs/pdfkit'),
+        }),
+      ).toEqual(['see https://github.com/foliojs/', 'pdfkit']);
+    });
+
+    test('moves a hyphenated word to the next line whole', () => {
+      expect(
+        wrapLines('a design-system', {
+          width: widthJustUnder('a design-system'),
+          lineBreak: 'whitespace',
+        }),
+      ).toEqual(['a', 'design-system']);
+    });
+
+    test('moves a URL to the next line whole', () => {
+      expect(
+        wrapLines('see https://github.com/foliojs/pdfkit', {
+          width: widthJustUnder('see https://github.com/foliojs/pdfkit'),
+          lineBreak: 'whitespace',
+        }),
+      ).toEqual(['see', 'https://github.com/foliojs/pdfkit']);
+    });
+
+    test('still breaks at a soft hyphen and shows the hyphen', () => {
+      expect(
+        wrapLines('a computer\u00ADscreen', {
+          width: widthJustUnder('a computerscreen'),
+          lineBreak: 'whitespace',
+        }),
+      ).toEqual(['a computer-', 'screen']);
+    });
+
+    test('still breaks at a zero-width space', () => {
+      expect(
+        wrapLines('a computer\u200Bscreen', {
+          width: widthJustUnder('a computerscreen'),
+          lineBreak: 'whitespace',
+        }),
+        // the zero-width space stays at the end of the line, as a space does
+      ).toEqual(['a computer\u200B', 'screen']);
+    });
+
+    test('still breaks a paragraph at a newline', () => {
+      expect(
+        wrapLines('design-system\nnext', {
+          width: 300,
+          lineBreak: 'whitespace',
+        }),
+      ).toEqual(['design-system', 'next']);
+    });
+
+    test('still splits a word wider than the line where the line ends', () => {
+      const url = `https://example.com/${'x'.repeat(40)}`;
+      const lines = wrapLines(`see ${url}`, {
+        width: 120,
+        lineBreak: 'whitespace',
+      });
+
+      expect(lines.length).toBeGreaterThan(2);
+      expect(lines.join('')).toBe(`see ${url}`);
+      lines.forEach((line) => {
+        expect(document.widthOfString(line)).toBeLessThanOrEqual(120);
+      });
+    });
+  });
 });

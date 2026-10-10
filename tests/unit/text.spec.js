@@ -289,6 +289,36 @@ Q
         ),
       ]);
     });
+    test('with lineBreak whitespace a hyphenated word moves to the next line whole', () => {
+      const lines = [];
+      const line = document._line;
+      document._line = function (text, options, wrapper) {
+        lines.push(text);
+        return line.call(this, text, options, wrapper);
+      };
+      const width = document.widthOfString('a design-system') - 1;
+
+      document.text('a design-system', { width, lineBreak: 'whitespace' });
+
+      expect(lines).toEqual(['a ', 'design-system']);
+    });
+
+    test('a continued segment can switch to lineBreak whitespace', () => {
+      const lines = [];
+      const line = document._line;
+      document._line = function (text, options, wrapper) {
+        lines.push(text);
+        return line.call(this, text, options, wrapper);
+      };
+      const width = document.widthOfString('a design-system') - 1;
+
+      document.text('a ', { width, continued: true });
+      document.text('design-system', { lineBreak: 'whitespace' });
+
+      // a continued segment whose first word does not fit emits an empty
+      // line to move down before the word
+      expect(lines.filter(Boolean)).toEqual(['a ', 'design-system']);
+    });
   });
 
   describe('text with structure parent links', () => {

@@ -29,6 +29,10 @@ doing that for long pieces of text. PDFKit can also automatically wrap text
 into multiple columns.
 
 The text will automatically wrap unless you set the `lineBreak` option to `false`.
+A line may break wherever the Unicode line breaking rules allow one, which
+includes after a hyphen or a slash inside a word. Set `lineBreak` to
+`'whitespace'` to break only at whitespace, a soft hyphen or a zero-width space,
+so that a word such as `design-system` or a URL moves to the next line whole.
 By default it will wrap to the page margin, but the `width` option allows
 you to set a different width the text should be wrapped to.
 If you set the `height` option, the text will be clipped to the number of
@@ -83,7 +87,7 @@ PDFKit has many options for controlling the look of text added to PDF
 documents, which can be passed to the `text` method. They are enumerated
 below.
 
-* `lineBreak` - set to `false` to disable line wrapping all together
+* `lineBreak` - set to `false` to disable line wrapping all together, or to `'whitespace'` to break lines only at whitespace, a soft hyphen or a zero-width space, never after a hyphen or a slash inside a word
 * `width` - the width that text should be wrapped to (by default, the page width minus the left and right margin)
 * `height` - the maximum height that text should be clipped to
 * `rotation` - the rotation of the text in degrees (by default 0)
