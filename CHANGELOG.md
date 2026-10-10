@@ -2,6 +2,7 @@
 
 ### Unreleased
 
+- Fix `doc.table()` parsing a font passed as binary data (e.g. registered with `registerFont(name, uint8Array)`) again for every cell, when it restores the font after measuring and drawing the cell, which made tables with such fonts slower. A font loaded from the same `Uint8Array` is now reused without parsing it again
 - Add an `objectStreams` option, which packs the objects that are not streams into compressed object streams and writes a cross-reference stream instead of the xref table, making documents with many such objects, e.g. tagged ones, much smaller. It requires a `pdfVersion` of `1.5` or higher, and cannot be used with encryption or PDF/A-1. Fixes #1810
 - Fix wrapped text with `align: 'center'` sitting left of the middle of the line when `characterSpacing` or `wordSpacing` is set, and with `align: 'right'` running past the right edge by the `wordSpacing` of each gap between words
 - Fix `boundsOfString()` with `lineBreak: false` leaving out `wordSpacing`, so its width now matches the rendered text and its underline

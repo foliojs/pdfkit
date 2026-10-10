@@ -395,3 +395,62 @@ describe('font name collision', () => {
     });
   });
 });
+
+describe('binary font sources', () => {
+  const data = () =>
+    new Uint8Array(readFileSync('tests/fonts/Roboto-Regular.ttf'));
+
+  test('the same data passed twice is parsed once', () => {
+    const doc = new PDFDocument({ font: null });
+    const open = vi.spyOn(PDFFontFactory, 'open');
+    const buf = data();
+
+    doc.font(buf);
+    const first = doc._font;
+    doc.font(buf);
+
+    expect(doc._font.id).toBe(first.id);
+    expect(open).toHaveBeenCalledTimes(1);
+    open.mockRestore();
+  });
+
+  test('a registered binary font is parsed once when tables restore it', () => {
+    const doc = new PDFDocument({ font: null });
+    doc.registerFont('Body', data());
+    doc.font('Body');
+    const open = vi.spyOn(PDFFontFactory, 'open');
+
+    doc.table({
+      data: [
+        ['a', 'b', 'c'],
+        ['d', 'e', 'f'],
+      ],
+    });
+
+    expect(open).not.toHaveBeenCalled();
+    expect(doc._font.name).toBe('Roboto-Regular');
+    open.mockRestore();
+  });
+
+  test('different data of the same font still embeds one font', () => {
+    const doc = new PDFDocument({ font: null });
+
+    doc.font(data());
+    const first = doc._font;
+    doc.font(data());
+
+    expect(doc._font.id).toBe(first.id);
+  });
+
+  test('a duplicate buffer passed again reuses the embedded font', () => {
+    const doc = new PDFDocument({ font: null });
+    const buf = data();
+
+    doc.font(data());
+    const first = doc._font;
+    doc.font(buf);
+    doc.font(buf);
+
+    expect(doc._font.id).toBe(first.id);
+  });
+});
