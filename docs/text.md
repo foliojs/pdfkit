@@ -166,6 +166,9 @@ The options given to the first `text` call are also retained for subsequent call
 `continued` one, but of course you can override them.  In the following example, the `width`
 option from the first `text` call is retained by the second call.
 
+With `align: 'center'` or `align: 'right'`, a line made of several `continued` segments is
+aligned as a whole, like the same text given in a single call.
+
     doc.fillColor('green')
        .text(lorem.slice(0, 500), {
          width: 465,

@@ -1,3 +1,4 @@
+import { getDocument } from 'pdfjs-dist/legacy/build/pdf.mjs';
 import PDFDocument from '../../lib/document';
 import { logData } from './helpers';
 
@@ -318,6 +319,174 @@ Q
       // a continued segment whose first word does not fit emits an empty
       // line to move down before the word
       expect(lines.filter(Boolean)).toEqual(['a ', 'design-system']);
+    });
+  });
+
+  describe('continued text with center or right alignment', () => {
+    // where a PDF reader puts each line of text and each link, page by page
+    async function layout(doc) {
+      const chunks = [];
+      doc.on('data', (chunk) => chunks.push(chunk));
+      const ended = new Promise((resolve) => doc.on('end', resolve));
+      doc.end();
+      await ended;
+
+      const round = (n) => Math.round(n * 1000) / 1000;
+      const pdf = await getDocument({
+        data: new Uint8Array(Buffer.concat(chunks)),
+        verbosity: 0,
+      }).promise;
+      const pages = [];
+      for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i);
+        const { items } = await page.getTextContent();
+        const annotations = await page.getAnnotations();
+
+        // the reader may split a line into runs in different ways, so
+        // compare whole lines
+        const lines = new Map();
+        for (const item of items.filter((item) => item.str.trim())) {
+          const y = round(item.transform[5]);
+          lines.set(y, [...(lines.get(y) || []), item]);
+        }
+        pages.push({
+          lines: [...lines].map(([y, runs]) => {
+            runs.sort((a, b) => a.transform[4] - b.transform[4]);
+            const last = runs[runs.length - 1];
+            return {
+              text: runs
+                .map((run) => run.str)
+                .join(' ')
+                .replace(/\s+/g, ' ')
+                .trim(),
+              y,
+              x: round(runs[0].transform[4]),
+              end: round(last.transform[4] + last.width),
+            };
+          }),
+          links: annotations.map((annotation) => annotation.rect.map(round)),
+        });
+      }
+      return pages;
+    }
+
+    // Courier has no kerning, so continued text ends up exactly where the
+    // same text written at once does
+    const courier = () => new PDFDocument().font('Courier');
+
+    test.each(['center', 'right'])(
+      'aligns the line as a whole (%s)',
+      async (align) => {
+        const single = courier().text('Hello big world', 50, 50, {
+          width: 400,
+          align,
+        });
+        const continued = courier()
+          .text('Hello ', 50, 50, { width: 400, align, continued: true })
+          .text('big ', { continued: true })
+          .text('world');
+
+        expect(await layout(continued)).toEqual(await layout(single));
+      },
+    );
+
+    test.each(['center', 'right'])(
+      'aligns the line that wrapped text completes (%s)',
+      async (align) => {
+        const text = 'and then text that wraps onto a second and a third line';
+        const single = courier().text(`Lead in, ${text}`, 50, 50, {
+          width: 200,
+          align,
+        });
+        const continued = courier()
+          .text('Lead in, ', 50, 50, { width: 200, align, continued: true })
+          .text(text);
+
+        expect(await layout(continued)).toEqual(await layout(single));
+      },
+    );
+
+    test('keeps a line on its page when the text goes on to the next page', async () => {
+      const text =
+        'and the rest of the text does not fit, so it goes on to the next page';
+      const single = courier().text(`Near the bottom, ${text}`, 50, 700, {
+        width: 200,
+        align: 'center',
+      });
+      const continued = courier()
+        .text('Near the bottom, ', 50, 700, {
+          width: 200,
+          align: 'center',
+          continued: true,
+        })
+        .text(text);
+
+      const pages = await layout(continued);
+      expect(pages).toHaveLength(2);
+      expect(pages).toEqual(await layout(single));
+    });
+
+    test('writes a line that is still continued when the document ends', async () => {
+      const single = courier().text('Hello world', 50, 50, {
+        width: 400,
+        align: 'right',
+      });
+      const continued = courier()
+        .text('Hello ', 50, 50, { width: 400, align: 'right', continued: true })
+        .text('world', { continued: true });
+
+      expect(await layout(continued)).toEqual(await layout(single));
+    });
+
+    test('moves links with the text', async () => {
+      const link = 'http://www.example.com';
+      const single = courier().text('Hello world', 50, 50, {
+        width: 400,
+        align: 'center',
+        link,
+      });
+      const continued = courier()
+        .text('Hello ', 50, 50, {
+          width: 400,
+          align: 'center',
+          continued: true,
+          link,
+        })
+        .text('world');
+
+      const [
+        {
+          links: [whole],
+        },
+      ] = await layout(single);
+      const [{ links }] = await layout(continued);
+
+      // a link per fragment, together covering the same span
+      expect(links).toHaveLength(2);
+      expect(links[0][0]).toBe(whole[0]);
+      expect(links[0][2]).toBe(links[1][0]);
+      expect(links[1][2]).toBe(whole[2]);
+    });
+
+    test('centers a line of fragments in different sizes', async () => {
+      const continued = courier()
+        .fontSize(10)
+        .text('Name: ', 50, 50, {
+          width: 400,
+          align: 'center',
+          continued: true,
+        })
+        .fontSize(16)
+        .text('Jane Doe', { continued: true })
+        .fontSize(10)
+        .text(' (editor)');
+
+      // fragments in different sizes sit on different baselines
+      const [{ lines }] = await layout(continued);
+      const start = Math.min(...lines.map((line) => line.x));
+      const end = Math.max(...lines.map((line) => line.end));
+
+      expect(start - 50).toBeCloseTo(450 - end);
     });
   });
 
