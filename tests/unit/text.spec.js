@@ -218,6 +218,107 @@ Q
 
       expect(docData).toContainText({ text: 'no line break' });
     });
+
+    test.each([
+      ['characterSpacing', { characterSpacing: 4 }, '184.74'],
+      ['wordSpacing', { wordSpacing: 5 }, '138.74'],
+    ])('underline of wrapped text with %s', (_name, spacing, end) => {
+      const docData = logData(document);
+      const options = { width: 400, underline: true, ...spacing };
+      const bounds = document.boundsOfString(
+        'Hello big world',
+        50,
+        50,
+        options,
+      );
+
+      document.text('Hello big world', 50, 50, options);
+      document.end();
+
+      // the same width as with lineBreak false, with each spacing counted once
+      expect(bounds.width.toFixed(2)).toBe((end - 50).toFixed(2));
+      expect(docData).toContainChunk([
+        'stream',
+        new RegExp(`50 [\\d.]+ m\n${end.replace('.', '\\.')}\\d* [\\d.]+ l`),
+      ]);
+    });
+
+    test('bounds of text with lineBreak false and wordSpacing', () => {
+      const docData = logData(document);
+      const options = { lineBreak: false, underline: true, wordSpacing: 5 };
+      const bounds = document.boundsOfString(
+        'Hello big world',
+        50,
+        50,
+        options,
+      );
+
+      document.text('Hello big world', 50, 50, options);
+      document.end();
+
+      // as wide as the underline, which includes the word spacing
+      expect(bounds.width.toFixed(2)).toBe('88.74');
+      expect(docData).toContainChunk([
+        'stream',
+        /50 [\d.]+ m\n138\.74\d* [\d.]+ l/,
+      ]);
+    });
+
+    test.each([
+      ['center', { characterSpacing: 4 }, '182.628', '317.372'],
+      ['center', { wordSpacing: 5 }, '205.628', '294.372'],
+      ['right', { wordSpacing: 5 }, '361.256', '450'],
+    ])('%s aligned text with %o', (align, spacing, start, end) => {
+      const docData = logData(document);
+
+      document.text('Hello big world', 50, 50, {
+        width: 400,
+        align,
+        underline: true,
+        ...spacing,
+      });
+      document.end();
+
+      // the underline spans the drawn text, so it sits in the middle of the
+      // line or ends at its right edge
+      const escape = (n) => n.replace('.', '\\.');
+      expect(docData).toContainChunk([
+        'stream',
+        new RegExp(
+          `${escape(start)}\\d* [\\d.]+ m\n${escape(end)}\\d* [\\d.]+ l`,
+        ),
+      ]);
+    });
+    test('with lineBreak whitespace a hyphenated word moves to the next line whole', () => {
+      const lines = [];
+      const line = document._line;
+      document._line = function (text, options, wrapper) {
+        lines.push(text);
+        return line.call(this, text, options, wrapper);
+      };
+      const width = document.widthOfString('a design-system') - 1;
+
+      document.text('a design-system', { width, lineBreak: 'whitespace' });
+
+      expect(lines).toEqual(['a ', 'design-system']);
+    });
+
+    test('a continued segment can switch to lineBreak whitespace', () => {
+      const lines = [];
+      const line = document._line;
+      document._line = function (text, options, wrapper) {
+        lines.push(text);
+        return line.call(this, text, options, wrapper);
+      };
+      const width = document.widthOfString('a design-system') - 1;
+
+      document.text('a ', { width, continued: true });
+      document.text('design-system', { lineBreak: 'whitespace' });
+
+      // a continued segment whose first word does not fit emits an empty
+      // line to move down before the word
+      expect(lines.filter(Boolean)).toEqual(['a ', 'design-system']);
+    });
   });
 
   describe('text with structure parent links', () => {
