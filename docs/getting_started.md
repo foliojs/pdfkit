@@ -297,6 +297,10 @@ title, or author of the document. You can add that information by adding it to
 the `doc.info` object, or by passing an info object into the document at
 creation time.
 
+Pass metadata as plain text; PDFKit escapes it when writing XML (XMP) metadata.
+Characters that XML 1.0 cannot represent are omitted from XMP. The original
+values in `doc.info` and the PDF Info dictionary are not changed.
+
 Here is a list of all of the properties you can add to the document metadata.
 According to the PDF spec, each property must have its first letter
 capitalized.
