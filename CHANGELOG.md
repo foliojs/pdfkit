@@ -2,6 +2,7 @@
 
 ### Unreleased
 
+- Add `alternateName` and `structParent` options to form annotations so tagged form widgets can have an accessible name and belong to a `Form` structure element. Retain the annotation's page when its structure is finalized after a page change. Honor an explicit `fontSize` when the field uses the default form font. Fixes #1803
 - Fix `doc.table()` parsing a font passed as binary data (e.g. registered with `registerFont(name, uint8Array)`) again for every cell, when it restores the font after measuring and drawing the cell, which made tables with such fonts slower. A font loaded from the same `Uint8Array` is now reused without parsing it again
 - Add `lineBreak: 'whitespace'` to `doc.text()`, which breaks a line only at whitespace, a soft hyphen or a zero-width space. The Unicode line breaking rules the wrapper follows also allow a break after a hyphen or a slash, so `design-system` or `https://github.com/foliojs/pdfkit` could be cut at a line end, and a text extractor that joins the lines, such as a résumé parser, reads two words
 - Add an `objectStreams` option, which packs the objects that are not streams into compressed object streams and writes a cross-reference stream instead of the xref table, making documents with many such objects, e.g. tagged ones, much smaller. It requires a `pdfVersion` of `1.5` or higher, and cannot be used with encryption or PDF/A-1. Fixes #1810
