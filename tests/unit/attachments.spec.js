@@ -39,7 +39,7 @@ describe('file', () => {
 /Params <<
 /CreationDate (D:20180201000000Z)
 /ModDate (D:20180201000000Z)
-/CheckSum (${md5})
+/CheckSum <${md5}>
 /Size 12
 >>
 /Subtype /text#2Fplain
@@ -97,7 +97,7 @@ describe('file', () => {
 /Params <<
 /CreationDate (D:20180201000000Z)
 /ModDate (D:20180201000000Z)
-/CheckSum (${md5})
+/CheckSum <${md5}>
 /Size 12
 >>
 /Length 20
@@ -155,7 +155,7 @@ describe('file', () => {
 /Params <<
 /CreationDate (D:20180201000000Z)
 /ModDate (D:20180201000000Z)
-/CheckSum (${md5})
+/CheckSum <${md5}>
 /Size 12
 >>
 /Length 20
