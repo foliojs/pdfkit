@@ -2,6 +2,7 @@
 
 ### Unreleased
 
+- Reuse the glyph width and kerning tables of a standard font across documents instead of building them again for every document that uses it, which made a short document using two standard fonts more than twice as slow to create
 - Fix `doc.table()` parsing a font passed as binary data (e.g. registered with `registerFont(name, uint8Array)`) again for every cell, when it restores the font after measuring and drawing the cell, which made tables with such fonts slower. A font loaded from the same `Uint8Array` is now reused without parsing it again
 - Add `lineBreak: 'whitespace'` to `doc.text()`, which breaks a line only at whitespace, a soft hyphen or a zero-width space. The Unicode line breaking rules the wrapper follows also allow a break after a hyphen or a slash, so `design-system` or `https://github.com/foliojs/pdfkit` could be cut at a line end, and a text extractor that joins the lines, such as a résumé parser, reads two words
 - Add an `objectStreams` option, which packs the objects that are not streams into compressed object streams and writes a cross-reference stream instead of the xref table, making documents with many such objects, e.g. tagged ones, much smaller. It requires a `pdfVersion` of `1.5` or higher, and cannot be used with encryption or PDF/A-1. Fixes #1810
