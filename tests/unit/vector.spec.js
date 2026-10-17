@@ -78,6 +78,28 @@ describe('Vector Graphics', () => {
       ]);
     });
 
+    test('with zero length and space option', () => {
+      const docData = logData(document);
+      const vectorStream = Buffer.from(
+        '1 0 0 -1 0 792 cm\n50 20 m\n[0 2] 0 d\nS\n',
+        'binary',
+      );
+
+      document.moveTo(50, 20).dash(0, { space: 2 }).stroke();
+      document.end();
+
+      expect(docData).toContainChunk([
+        `5 0 obj`,
+        `<<
+/Length 38
+>>`,
+        `stream`,
+        vectorStream,
+        `\nendstream`,
+        `endobj`,
+      ]);
+    });
+
     test('with phase option', () => {
       const docData = logData(document);
       const vectorStream = Buffer.from(
@@ -117,7 +139,7 @@ describe('Vector Graphics', () => {
         const doc = new PDFDocument();
 
         expect(() => doc.dash(0)).toThrow(
-          'dash(0, {}) invalid, lengths must be numeric and greater than zero',
+          'dash(0, {}) invalid, lengths must be numeric and non-negative, and not all zero',
         );
       });
 
@@ -125,7 +147,7 @@ describe('Vector Graphics', () => {
         const doc = new PDFDocument();
 
         expect(() => doc.dash(-1)).toThrow(
-          'dash(-1, {}) invalid, lengths must be numeric and greater than zero',
+          'dash(-1, {}) invalid, lengths must be numeric and non-negative, and not all zero',
         );
       });
 
@@ -133,7 +155,7 @@ describe('Vector Graphics', () => {
         const doc = new PDFDocument();
 
         expect(() => doc.dash(null)).toThrow(
-          'dash(null, {}) invalid, lengths must be numeric and greater than zero',
+          'dash(null, {}) invalid, lengths must be numeric and non-negative, and not all zero',
         );
       });
 
@@ -143,11 +165,17 @@ describe('Vector Graphics', () => {
         expect(() => doc.dash([2, 3])).not.toThrow();
       });
 
-      test('length array containing zeros throws', () => {
+      test('length array containing zeros', () => {
         const doc = new PDFDocument();
 
-        expect(() => doc.dash([2, 0, 3])).toThrow(
-          'dash([2,0,3], {}) invalid, lengths must be numeric and greater than zero',
+        expect(() => doc.dash([2, 0, 3])).not.toThrow();
+      });
+
+      test('length array of only zeros throws', () => {
+        const doc = new PDFDocument();
+
+        expect(() => doc.dash([0, 0])).toThrow(
+          'dash([0,0], {}) invalid, lengths must be numeric and non-negative, and not all zero',
         );
       });
     });
