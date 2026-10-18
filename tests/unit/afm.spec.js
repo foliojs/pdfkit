@@ -230,6 +230,18 @@ describe('AFMFont', () => {
     expect(font.getKernPair('A', '.notdef')).toBe(0);
   });
 
+  test('encodes character codes below 0x10 as two hex digits', () => {
+    const font = new AFMFont(Helvetica);
+
+    expect(font.encodeText('a\tb\r\x01')).toEqual([
+      '61',
+      '09',
+      '62',
+      '0d',
+      '01',
+    ]);
+  });
+
   test('does not mutate generated data while decoding it', () => {
     const originalData = JSON.stringify(Helvetica);
     const font = new AFMFont(Helvetica);
