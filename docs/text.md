@@ -198,6 +198,9 @@ Here is the output:
 
 ![5]()
 
+Note that the `center` and `right` alignments are not applied to `continued` text as a whole:
+each segment is aligned on its own, so the segments of a line can overlap.
+
 ## Fonts
 
 The PDF format defines 14 standard fonts that can be used in PDF documents. PDFKit supports each of them out of the box in Node.
