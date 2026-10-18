@@ -454,3 +454,13 @@ describe('binary font sources', () => {
     expect(doc._font.id).toBe(first.id);
   });
 });
+
+describe('standard font metrics', () => {
+  test('are shared across documents', () => {
+    const first = new PDFDocument().font('Helvetica-Bold')._font;
+    const second = new PDFDocument().font('Helvetica-Bold')._font;
+
+    expect(second).not.toBe(first);
+    expect(second.font).toBe(first.font);
+  });
+});
