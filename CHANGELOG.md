@@ -3,7 +3,8 @@
 ### Unreleased
 
 - Escape document information in XMP metadata and omit characters XML 1.0 cannot represent, without changing the PDF Info dictionary. Fixes #1817
-
+- Fix text in a standard font garbling or dropping the characters after a tab, a carriage return or any other character code below `0x10`, which was written into the hex string of the text as a single digit, so the following digits paired up wrongly: a `\r` before a line break showed as `Ð`, and `Tab\there` was read back as `Tab–†W&P`. Fixes #1425, #606
+- Reuse the glyph width and kerning tables of a standard font across documents instead of building them again for every document that uses it, which made a short document using two standard fonts more than twice as slow to create
 - Fix `doc.table()` parsing a font passed as binary data (e.g. registered with `registerFont(name, uint8Array)`) again for every cell, when it restores the font after measuring and drawing the cell, which made tables with such fonts slower. A font loaded from the same `Uint8Array` is now reused without parsing it again
 - Add `lineBreak: 'whitespace'` to `doc.text()`, which breaks a line only at whitespace, a soft hyphen or a zero-width space. The Unicode line breaking rules the wrapper follows also allow a break after a hyphen or a slash, so `design-system` or `https://github.com/foliojs/pdfkit` could be cut at a line end, and a text extractor that joins the lines, such as a résumé parser, reads two words
 - Add an `objectStreams` option, which packs the objects that are not streams into compressed object streams and writes a cross-reference stream instead of the xref table, making documents with many such objects, e.g. tagged ones, much smaller. It requires a `pdfVersion` of `1.5` or higher, and cannot be used with encryption or PDF/A-1. Fixes #1810
@@ -16,6 +17,7 @@
 - Fix annotations placed under `doc.rotate()` marking the wrong area, because `_convertRect` derived each corner's y from the already transformed x and mapped only two of the four corners, so the rectangle a viewer makes interactive did not follow the rotated content. Fixes #1153
 - Add `onClick`, `onMouseDown`, `onMouseEnter`, `onMouseExit`, `onFocus` and `onBlur` options to form annotation methods, for the JavaScript a field runs on each of those events. Each accepts a string or a plain function, whose source text is written into the action
 - Add an `embedFonts` option to `initForm`, embedding a complete, character-addressable copy of each custom font used in a form field. Viewers that regenerate a field's appearance from its value, such as Adobe Acrobat/Reader, need one to resolve field text; without it they fall back to a substitute font. It adds roughly the size of the font file per font, so it is off by default. Fixes #1096
+- Add `alternateName` and `structParent` options to form annotations so tagged form widgets can have an accessible name and belong to a `Form` structure element. Retain the annotation's page when its structure is finalized after a page change. Honor an explicit `fontSize` when the field uses the default form font. Fixes #1803
 
 ### [v0.20.2] - 2026-08-29
 

@@ -21,6 +21,15 @@ describe('Text', () => {
       expect(docData).toContainText({ text: 'simple text' });
     });
 
+    test('with a tab or carriage return keeps the following characters', () => {
+      const docData = logData(document);
+
+      document.text('a\tb\rc', { lineBreak: false });
+      document.end();
+
+      expect(docData).toContainText({ text: 'a\tb\rc' });
+    });
+
     test('with destination', () => {
       // just check that there is no exception
       document.text('simple text', { destination: 'anchor' });
