@@ -2,6 +2,7 @@
 
 ### Unreleased
 
+- Fix links to a named destination going nowhere in readers that look the name up in sorted order, such as Chrome (PDFium) and qpdf, because name tree keys were sorted by locale with `localeCompare` instead of by their bytes: with destinations named `appendix` and `Chapter1`, `Chapter1` was written second and could not be found. The keys of the `EmbeddedFiles` and `JavaScript` name trees are sorted the same way
 - Escape document information in XMP metadata and omit characters XML 1.0 cannot represent, without changing the PDF Info dictionary. Fixes #1817
 - Fix text in a standard font garbling or dropping the characters after a tab, a carriage return or any other character code below `0x10`, which was written into the hex string of the text as a single digit, so the following digits paired up wrongly: a `\r` before a line break showed as `Ð`, and `Tab\there` was read back as `Tab–†W&P`. Fixes #1425, #606
 - Reuse the glyph width and kerning tables of a standard font across documents instead of building them again for every document that uses it, which made a short document using two standard fonts more than twice as slow to create
