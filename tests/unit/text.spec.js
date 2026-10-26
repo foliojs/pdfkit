@@ -1,4 +1,5 @@
 import PDFDocument from '../../lib/document';
+import { vi } from 'vitest';
 import { logData } from './helpers';
 
 describe('Text', () => {
@@ -227,6 +228,30 @@ Q
 
       expect(docData).toContainText({ text: 'no line break' });
     });
+
+    test.each(['underline', 'strike'])(
+      '%s follows the baseline option',
+      (decoration) => {
+        // y is the top of the text with the default baseline and the baseline
+        // itself with 'alphabetic', so the line has to move up by the ascent
+        const lineY = (doc, baseline) => {
+          const moveTo = vi.spyOn(doc, 'moveTo');
+          doc.text('baseline', 50, 50, {
+            lineBreak: false,
+            [decoration]: true,
+            baseline,
+          });
+          return moveTo.mock.calls.at(-1)[1];
+        };
+        const other = new PDFDocument({ compress: false });
+        const ascent = (document._font.ascender / 1000) * document._fontSize;
+
+        expect(lineY(other, 'alphabetic')).toBeCloseTo(
+          lineY(document, 'top') - ascent,
+          5,
+        );
+      },
+    );
 
     test.each([
       ['characterSpacing', { characterSpacing: 4 }, '184.74'],
