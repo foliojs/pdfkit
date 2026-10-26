@@ -2,6 +2,7 @@
 
 ### Unreleased
 
+- Fix wrapped right-to-left text shaped as one run, e.g. Arabic with `features`, drawing the space at the end of each line on its left, which pushed every line but the last one space past the right margin with `align: 'right'`. Fixes #1422
 - Fix gradients whose last stop comes before 1 stretching the stops over the whole gradient. The last color now stays solid from that stop to the end
 - Add a `headerRows` table option, which repeats the first rows at the top of each new page. Fixes #1657
 - Add a `scaleDown` option to `doc.image()`, which works like `fit` but keeps an image smaller than the rectangle at its own size instead of enlarging it. Fixes #1347
