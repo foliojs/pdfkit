@@ -337,6 +337,29 @@ Q
       expect(lines).toEqual(['a ', 'design-system']);
     });
 
+    test('right-to-left wrapped lines do not draw their trailing space - issue #1422', () => {
+      document.font('tests/fonts/NotoKufiArabic-Subset.ttf', 12);
+      const features = ['rtla'];
+      const [[space]] = document._font.encode(' ', features);
+      const glyphs = [];
+      const addContent = document.addContent;
+      document.addContent = function (data) {
+        if (data.endsWith('TJ')) {
+          glyphs.push(data.match(/<([0-9a-f]+)>/)[1].match(/.{4}/g));
+        }
+        return addContent.call(this, data);
+      };
+
+      document.text('هذا نص عربي', { width: 60, align: 'right', features });
+
+      // The trailing space of the first line comes first once the line is
+      // reversed, and would push the line one space past the right margin.
+      expect(glyphs).toHaveLength(2);
+      expect(glyphs[0]).toHaveLength(6);
+      expect(glyphs[0][0]).not.toBe(space);
+      expect(glyphs[0]).toContain(space);
+    });
+
     test('a continued segment can switch to lineBreak whitespace', () => {
       const lines = [];
       const line = document._line;

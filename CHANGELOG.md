@@ -2,6 +2,7 @@
 
 ### Unreleased
 
+- Fix wrapped right-to-left text shaped as one run, e.g. Arabic with `features`, drawing the space at the end of each line on its left, which pushed every line but the last one space past the right margin with `align: 'right'`. Fixes #1422
 - Fix `heightOfString` drawing the measured text into the page when it is called after a `text` call with `continued: true`, because it measured with the line wrapper that call had left behind, which draws its lines. A measurement that passes `continued: true` itself still uses that wrapper and draws as before. Fixes #1284
 - Render SVG quadratic curves with equivalent cubic control points, so reversing a path preserves its shape. Fixes #550
 - Fix the visual test renderer rejecting its standard-font directory on Windows because its path ends in a backslash.
