@@ -244,6 +244,15 @@ describe('AFMFont', () => {
     },
   );
 
+  test('gives the euro sign and U+0080 the same glyph in ZapfDingbats', () => {
+    const font = new AFMFont(ZapfDingbats);
+
+    expect(font.encodeText('\u20ac\u0080')).toEqual(['80', '80']);
+    expect(font.glyphsForString('\u20ac')).toEqual(
+      font.glyphsForString('\u0080'),
+    );
+  });
+
   test('encodes character codes below 0x10 as two hex digits', () => {
     const font = new AFMFont(Helvetica);
 
