@@ -2,6 +2,7 @@
 
 ### Unreleased
 
+- Fix `heightOfString` drawing the measured text into the page when it is called after a `text` call with `continued: true`, because it measured with the line wrapper that call had left behind, which draws its lines. A measurement that passes `continued: true` itself still uses that wrapper and draws as before. Fixes #1284
 - Render SVG quadratic curves with equivalent cubic control points, so reversing a path preserves its shape. Fixes #550
 - Fix the visual test renderer rejecting its standard-font directory on Windows because its path ends in a backslash.
 - Fix the underline, strike-through, link and `goTo` rectangle of text drawn with a `baseline` other than the default sitting an ascent too low, because they were placed from the top of the line while the glyphs had moved up with the baseline. Fixes #994, #1245
