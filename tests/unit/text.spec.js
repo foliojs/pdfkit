@@ -1,6 +1,6 @@
 import PDFDocument from '../../lib/document';
 import { vi } from 'vitest';
-import { logData } from './helpers';
+import { logData, parseTextStreams } from './helpers';
 
 describe('Text', () => {
   let document;
@@ -352,6 +352,69 @@ Q
       // a continued segment whose first word does not fit emits an empty
       // line to move down before the word
       expect(lines.filter(Boolean)).toEqual(['a ', 'design-system']);
+    });
+  });
+
+  describe('heightOfString', () => {
+    // Every string drawn by a TJ operator in the captured output, decoded with
+    // the shared test helper, so a measured string merged into another line is
+    // caught.
+    const drawnTexts = (data) =>
+      data
+        .filter((item) => Buffer.isBuffer(item))
+        .flatMap((item) => parseTextStreams(item.toString('utf8')))
+        .map((stream) => stream.text);
+
+    test('after a continued text call does not draw the measured string - issue #1284', () => {
+      const docData = logData(document);
+
+      document.text('abc', 0, 0, { continued: true });
+      document.heightOfString('X');
+      document.end();
+
+      expect(docData).toContainText({ text: 'abc' });
+      expect(docData).not.toContainText({ text: 'X' });
+      expect(drawnTexts(docData).join('')).not.toContain('X');
+    });
+
+    test('after a finished text call does not draw the measured string', () => {
+      const docData = logData(document);
+
+      document.text('abc', 0, 0);
+      document.heightOfString('X');
+      document.end();
+
+      expect(docData).toContainText({ text: 'abc' });
+      expect(docData).not.toContainText({ text: 'X' });
+      expect(drawnTexts(docData).join('')).not.toContain('X');
+    });
+
+    test('with the continued option still draws the next text call', () => {
+      const docData = logData(document);
+
+      // a measurement with continued: true must not leave a wrapper behind
+      // that stops the next text call from being drawn
+      document.text('abc', 0, 0, { continued: true });
+      document.heightOfString('X', { continued: true });
+      document.text('def');
+      document.end();
+
+      expect(docData).toContainText({ text: 'abc' });
+      expect(docData).toContainText({ text: 'def' });
+    });
+
+    test('without line wrapping preserves the next text position', () => {
+      const docData = logData(document);
+      const nextX = document.widthOfString('abc');
+
+      document.text('abc', 0, 0, { continued: true });
+      document.heightOfString('X', { lineBreak: false, width: null });
+      document.text('def');
+      document.end();
+
+      expect(docData).toContainText({ text: 'abc', x: 0 });
+      expect(docData).toContainText({ text: 'def', x: nextX });
+      expect(drawnTexts(docData).join('')).not.toContain('X');
     });
   });
 
