@@ -3,6 +3,7 @@
 ### Unreleased
 
 - Render SVG quadratic curves with equivalent cubic control points, so reversing a path preserves its shape. Fixes #550
+- Fix the visual test renderer rejecting its standard-font directory on Windows because its path ends in a backslash.
 - Fix the underline, strike-through, link and `goTo` rectangle of text drawn with a `baseline` other than the default sitting an ascent too low, because they were placed from the top of the line while the glyphs had moved up with the baseline. Fixes #994, #1245
 - Fix links to a named destination going nowhere in readers that look the name up in sorted order, such as Chrome (PDFium) and qpdf, because name tree keys were sorted by locale with `localeCompare` instead of by their bytes: with destinations named `appendix` and `Chapter1`, `Chapter1` was written second and could not be found. The keys of the `EmbeddedFiles` and `JavaScript` name trees are sorted the same way
 - Escape document information in XMP metadata and omit characters XML 1.0 cannot represent, without changing the PDF Info dictionary. Fixes #1817
