@@ -42,6 +42,7 @@ const ADOBE_DISTRIBUTION_NOTICE =
 function parseAFM(contents) {
   const attributes = {};
   const glyphWidths = {};
+  const glyphCodes = {};
   const kernPairs = {};
   let section = '';
 
@@ -89,6 +90,10 @@ function parseAFM(contents) {
         }
 
         glyphWidths[nameMatch[1]] = +widthMatch[1];
+        const codeMatch = line.match(/^C\s+(-?\d+)\s*;/);
+        if (codeMatch) {
+          glyphCodes[nameMatch[1]] = +codeMatch[1];
+        }
         break;
       }
 
@@ -106,7 +111,7 @@ function parseAFM(contents) {
     throw new Error('AFM data is missing FontName or FontBBox.');
   }
 
-  return { attributes, glyphWidths, kernPairs };
+  return { attributes, glyphWidths, glyphCodes, kernPairs };
 }
 
 function createParsedData(parsed) {
@@ -114,10 +119,15 @@ function createParsedData(parsed) {
 }
 
 function createRuntimeData(parsed) {
-  const { attributes, glyphWidths, kernPairs } = parsed;
-  const glyphNames = RUNTIME_GLYPH_NAMES.filter((name) =>
-    Object.hasOwn(glyphWidths, name),
-  );
+  const { attributes, glyphWidths, glyphCodes, kernPairs } = parsed;
+  // Symbol and ZapfDingbats declare `EncodingScheme FontSpecific`, so their
+  // glyphs are the ones with a character code, in code order (lib/font/data/Symbol.afm:18).
+  const fontSpecific = attributes.EncodingScheme === 'FontSpecific';
+  const glyphNames = fontSpecific
+    ? Object.keys(glyphWidths)
+        .filter((name) => glyphCodes[name] >= 0 && glyphCodes[name] < 256)
+        .sort((a, b) => glyphCodes[a] - glyphCodes[b])
+    : RUNTIME_GLYPH_NAMES.filter((name) => Object.hasOwn(glyphWidths, name));
   const glyphIndexes = Object.fromEntries(
     glyphNames.map((name, index) => [name, index]),
   );
@@ -148,7 +158,7 @@ function createRuntimeData(parsed) {
     compactKernPairs.push(amount, deltas);
   }
 
-  return {
+  const data = {
     name: attributes.FontName,
     bbox: attributes.FontBBox.trim().split(/\s+/).map(Number),
     ascender: +(attributes.Ascender || 0),
@@ -159,6 +169,11 @@ function createRuntimeData(parsed) {
     glyphWidths: glyphNames.map((name) => glyphWidths[name]),
     kernPairs: compactKernPairs,
   };
+  if (fontSpecific) {
+    data.glyphCodes = glyphNames.map((name) => glyphCodes[name]);
+  }
+
+  return data;
 }
 
 function asArray(value) {
