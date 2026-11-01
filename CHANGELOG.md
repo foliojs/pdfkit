@@ -2,6 +2,7 @@
 
 ### Unreleased
 
+- Measure aligned lines and their decorations from the text that is drawn, which fixes `align: 'center'` counting the space at the end of a wrapped line, and with `wordSpacing` the gaps being miscounted at a hyphen, so underlines ran past the text. Also fix a continued segment with several words starting too far right with `wordSpacing`. Fixes #1174
 - Add `doc.addPageLabel()`, which sets the page labels viewers show, such as roman numerals for a preface or numbering that starts at 49. Fixes #1269
 - Add a `start` option to `doc.list()`, so a `numbered` or `lettered` list can carry on counting after other content. Fixes #1350
 - Export the predefined page sizes as `PAGE_SIZES`. Fixes #1236
