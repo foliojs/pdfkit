@@ -2,6 +2,7 @@
 
 ### Unreleased
 
+- Fix `wordSpacing` removing consecutive line breaks: `text()` and `boundsOfString()` collapsed every run of whitespace to one space, so `Test\n\nText` was drawn as the single line `Test Text`. Only runs of whitespace within a line are collapsed now. Fixes #1034
 - Fix `heightOfString` drawing the measured text into the page when it is called after a `text` call with `continued: true`, because it measured with the line wrapper that call had left behind, which draws its lines. A measurement that passes `continued: true` itself still uses that wrapper and draws as before. Fixes #1284
 - Render SVG quadratic curves with equivalent cubic control points, so reversing a path preserves its shape. Fixes #550
 - Fix the visual test renderer rejecting its standard-font directory on Windows because its path ends in a backslash.
