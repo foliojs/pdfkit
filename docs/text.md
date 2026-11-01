@@ -107,7 +107,9 @@ below.
 * `goTo` - go to anchor (shortcut to create an annotation)
 * `destination` - create anchor to this text
 * `underline` - whether to underline the text
+* `underlineOffset` - how far to move the underline down from its default position, in PDF points. A negative value moves it up.
 * `strike` - whether to strike out the text
+* `decorationThickness` - the thickness of the underline and the strikethrough in PDF points (by default it follows the font size)
 * `oblique` - whether to slant the text (angle in degrees or `true`)
 * `baseline` - the vertical alignment of the text with respect to its insertion point (values as [canvas textBaseline](https://www.w3schools.com/tags/canvas_textbaseline.asp))
 * `continued` - whether the text segment will be followed immediately by another segment. Useful for changing styling in the middle of a paragraph.

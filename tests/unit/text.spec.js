@@ -538,3 +538,61 @@ Q
     });
   });
 });
+
+describe('decoration options - #993', () => {
+  const underline = (options) => {
+    const doc = new PDFDocument({ compress: false });
+    const calls = [];
+    const addContent = doc.addContent;
+    doc.addContent = function (data) {
+      calls.push(data);
+      return addContent.call(this, data);
+    };
+    doc.text('hello', 72, 72, { underline: true, ...options });
+    const width = calls.find((data) => / w$/.test(data));
+    const move = calls.find((data) => / m$/.test(data));
+    return {
+      thickness: Number(width.split(' ')[0]),
+      y: Number(move.split(' ')[1]),
+    };
+  };
+
+  test('keeps the defaults', () => {
+    expect(underline({}).thickness).toBe(1);
+  });
+
+  test('decorationThickness sets the line width and stays inside the line', () => {
+    const base = underline({});
+    const thick = underline({ decorationThickness: 3 });
+    expect(thick.thickness).toBe(3);
+    expect(thick.y).toBeCloseTo(base.y - 2, 5);
+  });
+
+  test('underlineOffset moves the line down or up', () => {
+    const base = underline({});
+    expect(underline({ underlineOffset: 2 }).y).toBeCloseTo(base.y + 2, 5);
+    expect(underline({ underlineOffset: -2 }).y).toBeCloseTo(base.y - 2, 5);
+  });
+
+  test('decorationThickness also sets the strikethrough, underlineOffset does not move it', () => {
+    const doc = new PDFDocument({ compress: false });
+    const widths = [];
+    const moves = [];
+    const addContent = doc.addContent;
+    doc.addContent = function (data) {
+      if (/ w$/.test(data)) widths.push(data);
+      if (/ m$/.test(data)) moves.push(Number(data.split(' ')[1]));
+      return addContent.call(this, data);
+    };
+    doc.text('hello', 72, 72, {
+      underline: true,
+      strike: true,
+      decorationThickness: 3,
+      underlineOffset: 2,
+    });
+    expect(widths).toEqual(['3 w', '3 w']);
+    const lineTop = 72;
+    const strikeY = moves[1];
+    expect(strikeY).toBeCloseTo(lineTop + doc.currentLineHeight() / 2, 5);
+  });
+});
