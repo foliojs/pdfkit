@@ -538,3 +538,148 @@ Q
     });
   });
 });
+
+describe('width of drawn lines - #1174', () => {
+  const X = 72;
+
+  const draw = (doc, text, options, next) => {
+    const lines = [];
+    const fragment = doc._fragment;
+    doc._fragment = function (line, x, y, opts) {
+      lines.push({ text: line });
+      return fragment.call(this, line, x, y, opts);
+    };
+    const addContent = doc.addContent;
+    doc.addContent = function (data) {
+      const line = lines[lines.length - 1];
+      const start = /^1 0 0 1 ([\d.-]+) [\d.-]+ Tm$/.exec(data);
+      if (start) line.x = Number(start[1]);
+      const from = /^([\d.-]+) [\d.-]+ m$/.exec(data);
+      if (from) line.underlineFrom = Number(from[1]);
+      const to = /^([\d.-]+) [\d.-]+ l$/.exec(data);
+      if (to) line.underlineTo = Number(to[1]);
+      return addContent.call(this, data);
+    };
+    doc.text(text, X, 72, options);
+    if (next) doc.text(next, options.next);
+    return lines;
+  };
+  const newDoc = () => new PDFDocument({ compress: false });
+  const wrapped = 'hello world this is a long line of text that wraps here';
+
+  test('center ignores the space at the end of a wrapped line', () => {
+    const doc = newDoc();
+    const [first, second] = draw(doc, wrapped, { width: 150, align: 'center' });
+    const center = (text) => X + (150 - doc.widthOfString(text)) / 2;
+    expect(first.text.endsWith(' ')).toBe(true);
+    expect(first.x).toBeCloseTo(center(first.text.trimEnd()), 2);
+    expect(second.x).toBeCloseTo(center(second.text), 2);
+  });
+
+  test('center ignores it with characterSpacing', () => {
+    const doc = newDoc();
+    const options = { width: 200, align: 'center', characterSpacing: 4 };
+    const [first] = draw(doc, wrapped, options);
+    const width = doc.widthOfString(first.text.trimEnd(), options);
+    expect(first.x).toBeCloseTo(X + (200 - width) / 2, 2);
+  });
+
+  test.each([
+    ['center', (width) => X + (300 - width) / 2],
+    ['right', (width) => X + 300 - width],
+  ])('%s counts one gap for a hyphenated word', (align, expected) => {
+    const doc = newDoc();
+    const [line] = draw(doc, 'a well-known fact', {
+      width: 300,
+      align,
+      wordSpacing: 5,
+      underline: true,
+    });
+    const width = doc.widthOfString('a well-known fact') + 2 * 5;
+    expect(line.x).toBeCloseTo(expected(width), 2);
+    expect(line.underlineFrom).toBeCloseTo(line.x, 2);
+    expect(line.underlineTo).toBeCloseTo(line.x + width, 2);
+  });
+
+  test('center counts the hyphen that replaces a soft hyphen', () => {
+    const doc = newDoc().font('tests/fonts/Roboto-Regular.ttf');
+    const part = 'a'.repeat(30);
+    const [line] = draw(doc, `${part}­${part}`, {
+      width: 200,
+      align: 'center',
+    });
+    expect(line.text.endsWith('-')).toBe(true);
+    expect(line.x).toBeCloseTo(X + (200 - doc.widthOfString(line.text)) / 2, 2);
+  });
+
+  test('a justified underline stays inside the line', () => {
+    const doc = newDoc();
+    const [line] = draw(
+      doc,
+      'a well-known and well-known fact about well-known things',
+      { width: 200, align: 'justify', underline: true },
+    );
+    expect(line.underlineTo).toBeCloseTo(X + 200, 0);
+  });
+
+  test.each([[0], [5]])(
+    'an underline stops at the last glyph with wordSpacing %d',
+    (wordSpacing) => {
+      const doc = newDoc();
+      const [line] = draw(doc, wrapped, {
+        width: 150,
+        underline: true,
+        wordSpacing,
+      });
+      const visible = line.text.trim();
+      const gaps = visible.split(/\s+/).length - 1;
+      expect(line.underlineTo).toBeCloseTo(
+        X + doc.widthOfString(visible) + gaps * wordSpacing,
+        2,
+      );
+    },
+  );
+
+  test('an underline runs on into a continued segment', () => {
+    const doc = newDoc();
+    const [first, second] = draw(
+      doc,
+      'hello ',
+      {
+        width: 300,
+        underline: true,
+        continued: true,
+        next: { underline: true },
+      },
+      'world',
+    );
+    expect(first.underlineTo).toBeCloseTo(second.underlineFrom, 2);
+  });
+
+  test('an underline keeps the trailing space with lineBreak false', () => {
+    const doc = newDoc();
+    const [line] = draw(doc, 'hello ', { lineBreak: false, underline: true });
+    expect(line.underlineTo).toBeCloseTo(X + doc.widthOfString('hello '), 2);
+  });
+
+  test('a continued segment counts each gap once with wordSpacing', () => {
+    const doc = newDoc();
+    const options = {
+      width: 300,
+      wordSpacing: 5,
+      continued: true,
+      next: { wordSpacing: 5 },
+    };
+    const [first, second] = draw(doc, 'a b ', options, 'c');
+    expect(second.x - first.x).toBeCloseTo(
+      doc.widthOfString('a b ') + 2 * 5,
+      2,
+    );
+  });
+
+  test('a line of only whitespace has no width', () => {
+    const doc = newDoc();
+    expect(doc._drawnWidth('   ', 0, {})).toBe(0);
+    expect(doc._drawnWidth('   ', 5, {})).toBe(0);
+  });
+});
