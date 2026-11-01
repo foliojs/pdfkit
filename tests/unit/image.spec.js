@@ -143,3 +143,38 @@ describe('Image', function () {
     });
   });
 });
+
+describe('images from buffers - #1361', function () {
+  const bee = () => fs.readFileSync('./tests/images/bee.jpg');
+  const countImages = (...sources) => {
+    const doc = new PDFDocument();
+    sources.forEach((src) => doc.image(src, 0, 0, { width: 10 }));
+    return Object.keys(doc.page.xobjects.data ?? doc.page.xobjects).length;
+  };
+
+  test('embeds the same Buffer once', function () {
+    const buffer = bee();
+    expect(countImages(buffer, buffer, buffer)).toBe(1);
+  });
+
+  test('embeds separate buffers with the same bytes once', function () {
+    expect(countImages(bee(), bee())).toBe(1);
+  });
+
+  test('treats an ArrayBuffer and a Uint8Array like a Buffer', function () {
+    const buffer = bee();
+    const bytes = Uint8Array.from(buffer);
+    expect(countImages(buffer, bytes, bytes.buffer)).toBe(1);
+  });
+
+  test('embeds a buffer again when its bytes changed', function () {
+    const first = fs.readFileSync('./tests/images/bee.png');
+    const second = fs.readFileSync('./tests/images/bee.jpg');
+    expect(countImages(first, second)).toBe(2);
+  });
+
+  test('openImage returns the same image for the same bytes', function () {
+    const doc = new PDFDocument();
+    expect(doc.openImage(bee())).toBe(doc.openImage(bee()));
+  });
+});
