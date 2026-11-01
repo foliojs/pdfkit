@@ -87,6 +87,12 @@ In order to use the predefined sizes, the name of the size (as named in the list
     // Passing size to the addPage function
     doc.addPage({size: 'A7'});
 
+The predefined sizes are exported as `PAGE_SIZES`, which maps each name in upper case to its `[width, height]` in points.
+
+    import { PAGE_SIZES } from 'pdfkit';
+
+    const [width, height] = PAGE_SIZES.A4;
+
 ### User Unit (PDF 1.6+)
 
 The `userUnit` option allows you to scale the physical size of a page without changing the coordinate system. This is useful for creating large format documents like posters or banners that exceed the standard PDF coordinate limit (200 inches or 14400 points).

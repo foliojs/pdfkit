@@ -86,7 +86,7 @@ export default [
         interop: 'default',
         exports: 'named',
         footer:
-          'module.exports = exports.default;\nmodule.exports.PDFDocument = exports.PDFDocument;\nmodule.exports.LineWrapper = exports.LineWrapper;\nmodule.exports.registerStdFonts = exports.registerStdFonts;\nmodule.exports.registerFile = exports.registerFile;',
+          'module.exports = exports.default;\nmodule.exports.PDFDocument = exports.PDFDocument;\nmodule.exports.LineWrapper = exports.LineWrapper;\nmodule.exports.PAGE_SIZES = exports.PAGE_SIZES;\nmodule.exports.registerStdFonts = exports.registerStdFonts;\nmodule.exports.registerFile = exports.registerFile;',
       },
       {
         file: 'js/pdfkit.node.mjs',
