@@ -1,6 +1,12 @@
 import PDFDocument from '../../lib/document';
+import { PAGE_SIZES } from '../../lib/page';
 
 describe('page', function () {
+  test('PAGE_SIZES holds the dimensions a named size resolves to', function () {
+    const doc = new PDFDocument({ size: 'a4' });
+    expect([doc.page.width, doc.page.height]).toEqual(PAGE_SIZES.A4);
+  });
+
   describe('userUnit', function () {
     test('defaults to 1.0', function () {
       const doc = new PDFDocument();
