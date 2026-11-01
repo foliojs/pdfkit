@@ -302,6 +302,14 @@ The following options are available:
 * `start` - the number of the first page of the range, a positive integer. Defaults to `1`.
 
 Page labels only change what viewers show, and do not draw anything on the page.
+## Getting the current page number
+
+`doc.pageNumber` is the number of the current page. Like `switchToPage`, it starts at 0,
+so add 1 if you are printing it. It works with or without `bufferPages`, and is `null`
+while the document has no page yet.
+
+    doc.addPage();
+    doc.text(`Page ${doc.pageNumber + 1}`);
 
 ## Setting default font
 
