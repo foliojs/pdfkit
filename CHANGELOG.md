@@ -2,6 +2,7 @@
 
 ### Unreleased
 
+- Add a `headerRows` table option, which repeats the first rows at the top of each new page. Fixes #1657
 - Add a `scaleDown` option to `doc.image()`, which works like `fit` but keeps an image smaller than the rectangle at its own size instead of enlarging it. Fixes #1347
 - Fix standard fonts drawing a narrow no-break space as ` /` and a non-breaking hyphen as a double space. They now use the no-break space and the hyphen. Fixes #1071, fixes #1040
 - Add `decorationThickness` and `underlineOffset` text options. Fixes #993
