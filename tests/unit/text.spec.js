@@ -538,3 +538,42 @@ Q
     });
   });
 });
+
+describe('carriage returns - #336', () => {
+  const drawn = (...args) => {
+    const doc = new PDFDocument({ compress: false });
+    const lines = [];
+    const fragment = doc._fragment;
+    doc._fragment = function (text, x, y, options) {
+      lines.push(text);
+      return fragment.call(this, text, x, y, options);
+    };
+    doc.text(...args);
+    return lines;
+  };
+
+  test.each([
+    ['\\r\\n', 'alpha\r\nbeta'],
+    ['\\r', 'alpha\rbeta'],
+    ['\\n', 'alpha\nbeta'],
+  ])('%s breaks the line without drawing a carriage return', (_, text) => {
+    const lines = drawn(text);
+    expect(lines.map((line) => line.trim())).toEqual(['alpha', 'beta']);
+    expect(lines.join('')).not.toContain('\r');
+  });
+
+  test('also without line wrapping', () => {
+    const lines = drawn('alpha\r\nbeta', { lineBreak: false });
+    expect(lines).toEqual(['alpha', 'beta']);
+  });
+
+  test('measures like \\n', () => {
+    const doc = new PDFDocument();
+    expect(doc.heightOfString('alpha\r\nbeta')).toBe(
+      doc.heightOfString('alpha\nbeta'),
+    );
+    expect(doc.boundsOfString('alpha\r\nbeta').height).toBe(
+      doc.boundsOfString('alpha\nbeta').height,
+    );
+  });
+});
