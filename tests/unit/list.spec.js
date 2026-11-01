@@ -69,6 +69,41 @@ describe('List', () => {
       expect(docData).toContainText({ text: 'beta', x: 90 });
     });
 
+    test('numbered list counts from start - #1350', () => {
+      const docData = logData(document);
+
+      document.list(['alpha', 'beta'], { listType: 'numbered', start: 5 });
+      document.end();
+
+      expect(docData).toContainText({ text: '5.' });
+      expect(docData).toContainText({ text: '6.' });
+      expect(docData).not.toContainText({ text: '1.' });
+    });
+
+    test('lettered list counts from start', () => {
+      const docData = logData(document);
+
+      document.list(['alpha', 'beta'], { listType: 'lettered', start: 3 });
+      document.end();
+
+      expect(docData).toContainText({ text: 'C.' });
+      expect(docData).toContainText({ text: 'D.' });
+    });
+
+    test('start applies to the top level only', () => {
+      const docData = logData(document);
+
+      document.list(['alpha', ['nested'], 'beta'], {
+        listType: 'numbered',
+        start: 7,
+      });
+      document.end();
+
+      expect(docData).toContainText({ text: '7.' });
+      expect(docData).toContainText({ text: '1.' });
+      expect(docData).toContainText({ text: '8.' });
+    });
+
     test('numbered list with align justify underlines only the label', () => {
       const docData = logData(document);
 
