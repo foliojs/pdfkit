@@ -11,6 +11,42 @@ describe('LineWrapper', () => {
     });
   });
 
+  describe('negative line width', () => {
+    // without a guard the failure is a loop that never returns to the test runner
+    const countPages = (options) => {
+      let pages = 1;
+      document.on('pageAdded', () => {
+        if (++pages > 20) throw new Error('text keeps adding pages');
+      });
+      document.text('hello world', options);
+      return pages;
+    };
+
+    test.each([
+      ['columns', { columns: 50 }],
+      ['columnGap', { columns: 3, columnGap: 400 }],
+      ['indentAllLines', { width: 100, indent: 500, indentAllLines: true }],
+      ['characterSpacing', { columns: 50, characterSpacing: 2 }],
+    ])('with %s draws the text and returns', (_, options) => {
+      expect(countPages(options)).toBeLessThanOrEqual(20);
+    });
+
+    test('draws every character', () => {
+      const lines = [];
+      document.on('pageAdded', () => {});
+      const wrapper = new LineWrapper(document, {
+        width: 100,
+        columns: 50,
+      });
+      wrapper.on('line', (line) => {
+        lines.push(line);
+        document.y += 10;
+      });
+      wrapper.wrap('abc', { width: 100, columns: 50 });
+      expect(lines.join('')).toBe('abc');
+    });
+  });
+
   test('ellipsis is present only on last line of multiline text', () => {
     // There is a weird edge case where ellipsis occurs on lines
     // in the middle of text due to number rounding errors
