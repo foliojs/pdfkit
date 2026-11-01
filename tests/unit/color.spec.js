@@ -85,3 +85,50 @@ describe('color', function () {
     ]);
   });
 });
+
+describe('save and restore - #1199', () => {
+  const colorsOnNewPages = (draw) => {
+    const doc = new PDFDocument({ compress: false });
+    draw(doc);
+    const colors = [];
+    const addContent = doc.addContent;
+    doc.addContent = function (data) {
+      if (/ scn$/.test(data)) colors.push(data);
+      return addContent.call(this, data);
+    };
+    doc.text('lorem '.repeat(3000), { width: 300 });
+    return colors;
+  };
+
+  test('a color set between them does not reach text on a new page', () => {
+    const colors = colorsOnNewPages((doc) => {
+      doc.save().rect(0, 0, 10, 10).fill('#f00').restore();
+    });
+    expect(colors).toEqual([]);
+  });
+
+  test('the color from before save is used on new pages', () => {
+    const colors = colorsOnNewPages((doc) => {
+      doc.fillColor('#00f');
+      doc.save().rect(0, 0, 10, 10).fill('#f00').restore();
+    });
+    expect(colors.length).toBeGreaterThan(0);
+    expect(new Set(colors)).toEqual(new Set(['0 0 1 scn']));
+  });
+
+  test('a color set without save stays', () => {
+    const colors = colorsOnNewPages((doc) => doc.fillColor('#f00'));
+    expect(new Set(colors)).toEqual(new Set(['1 0 0 scn']));
+  });
+
+  test('nested and unmatched calls keep working', () => {
+    const doc = new PDFDocument();
+    doc.fillColor('#00f').save().fillColor('#0f0').save().fillColor('#f00');
+    doc.restore();
+    expect(doc._fillColor[0]).toBe('#0f0');
+    doc.restore();
+    expect(doc._fillColor[0]).toBe('#00f');
+    doc.restore();
+    expect(doc._fillColor[0]).toBe('#00f');
+  });
+});

@@ -2,6 +2,7 @@
 
 ### Unreleased
 
+- Fix `restore()` not restoring the remembered fill color, so text flowing onto a new page was drawn in a color set between `save()` and `restore()`. Fixes #1199
 - Add `doc.addPageLabel()`, which sets the page labels viewers show, such as roman numerals for a preface or numbering that starts at 49. Fixes #1269
 - Add a `start` option to `doc.list()`, so a `numbered` or `lettered` list can carry on counting after other content. Fixes #1350
 - Export the predefined page sizes as `PAGE_SIZES`. Fixes #1236
