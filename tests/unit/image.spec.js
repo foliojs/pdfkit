@@ -89,6 +89,52 @@ describe('Image', function () {
     });
   });
 
+  describe('scaleDown - #1347', function () {
+    const drawnSize = (options) => {
+      const transform = vi.spyOn(document, 'transform');
+      document.image('./tests/images/bee.png', 10, 20, options);
+      const [w, , , h, x, y] = transform.mock.calls[0];
+      return { w, h: -h, x, y: y + h };
+    };
+
+    test('fit enlarges the same smaller image', function () {
+      const { w, h } = drawnSize({ fit: [818, 800] });
+      expect(w).toBeCloseTo(818);
+      expect(h).toBeCloseTo(800);
+    });
+
+    test('keeps a smaller image at its own size', function () {
+      expect(drawnSize({ scaleDown: [818, 800] })).toEqual({
+        w: 409,
+        h: 400,
+        x: 10,
+        y: 20,
+      });
+    });
+
+    test('still scales down an image larger than the rectangle', function () {
+      const { w, h } = drawnSize({ scaleDown: [100, 1000] });
+      expect(w).toBeCloseTo(100);
+      expect(h).toBeCloseTo((100 * 400) / 409);
+    });
+
+    test('aligns the unscaled image within the rectangle', function () {
+      const { x, y } = drawnSize({
+        scaleDown: [809, 800],
+        align: 'center',
+        valign: 'bottom',
+      });
+      expect(x).toBeCloseTo(10 + (809 - 409) / 2);
+      expect(y).toBeCloseTo(20 + 800 - 400);
+    });
+
+    test('fit wins when both are passed', function () {
+      const { w, h } = drawnSize({ fit: [818, 800], scaleDown: [818, 800] });
+      expect(w).toBeCloseTo(818);
+      expect(h).toBeCloseTo(800);
+    });
+  });
+
   describe('opacity', function () {
     test('adds an ExtGState with the correct ca value', () => {
       document.image('./tests/images/bee.png', 0, 0, { opacity: 0.5 });

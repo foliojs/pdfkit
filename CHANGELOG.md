@@ -3,6 +3,9 @@
 ### Unreleased
 
 - Add a `headerRows` table option, which repeats the first rows at the top of each new page. Fixes #1657
+- Add a `scaleDown` option to `doc.image()`, which works like `fit` but keeps an image smaller than the rectangle at its own size instead of enlarging it. Fixes #1347
+- Fix standard fonts drawing a narrow no-break space as ` /` and a non-breaking hyphen as a double space. They now use the no-break space and the hyphen. Fixes #1071, fixes #1040
+- Add `decorationThickness` and `underlineOffset` text options. Fixes #993
 - Add `doc.addPageLabel()`, which sets the page labels viewers show, such as roman numerals for a preface or numbering that starts at 49. Fixes #1269
 - Add a `start` option to `doc.list()`, so a `numbered` or `lettered` list can carry on counting after other content. Fixes #1350
 - Export the predefined page sizes as `PAGE_SIZES`. Fixes #1236
