@@ -22,6 +22,32 @@ describe('Text', () => {
       expect(docData).toContainText({ text: 'simple text' });
     });
 
+    test('with wordSpacing keeps consecutive line breaks - #1034', () => {
+      const lineYs = (options) => {
+        const doc = new PDFDocument({ compress: false });
+        const docData = logData(doc);
+        doc.text('Test\n\nText', 100, 300, options);
+        doc.end();
+        return [...docData.join('\n').matchAll(/1 0 0 1 100 (\S+) Tm/g)].map(
+          (match) => match[1],
+        );
+      };
+
+      expect(lineYs({ wordSpacing: 5 })).toEqual(lineYs({}));
+      expect(lineYs({ wordSpacing: 5 })).toHaveLength(2);
+    });
+
+    test('with wordSpacing still collapses spaces within a line', () => {
+      const docData = logData(document);
+
+      document.text('one   two', { wordSpacing: 5 });
+      document.end();
+
+      expect(docData.join('\n')).toContain(
+        '[<6f6e65> -694.666667 <7477> 10 <6f> -694.666667] TJ',
+      );
+    });
+
     test('with a tab or carriage return keeps the following characters', () => {
       const docData = logData(document);
 
@@ -275,6 +301,14 @@ Q
         'stream',
         new RegExp(`50 [\\d.]+ m\n${end.replace('.', '\\.')}\\d* [\\d.]+ l`),
       ]);
+    });
+
+    test('bounds of text with wordSpacing keep consecutive line breaks - #1034', () => {
+      const text = 'Test\n\nText';
+
+      expect(document.boundsOfString(text, { wordSpacing: 5 }).height).toBe(
+        document.boundsOfString(text).height,
+      );
     });
 
     test('bounds of text with lineBreak false and wordSpacing', () => {
