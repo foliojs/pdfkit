@@ -154,6 +154,7 @@ Lists use the following additional options:
 * `bulletRadius`
 * `textIndent`
 * `bulletIndent`
+* `start` - the number the top level of a `numbered` or `lettered` list starts counting from, e.g. to carry on after an image. A `lettered` list counts `1` as `A`, so `3` starts at `C`. Nested lists still start from the beginning. Defaults to `1`.
 
 ## Rich Text
 
