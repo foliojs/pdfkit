@@ -340,6 +340,7 @@ is added to the document. This way, any calls to `text` or `table` will be place
 - `rowStyles` - Row definitions of the table. (default `*`)
 - `defaultStyle` - Defaults to apply to every cell
 - `data` - The data to render (not required, you can call `.row()`). This can be an iterable (async or sync)
+- `headerRows` - How many rows at the start of the table to repeat at the top of each new page, skipped on a page where the next row would not fit below them (default `0`)
 - `debug` - Whether to show the debug lines for all the cells (default `false`)
 
 ## Cell options
