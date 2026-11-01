@@ -2,6 +2,7 @@
 
 ### Unreleased
 
+- Add `doc.addPageLabel()`, which sets the page labels viewers show, such as roman numerals for a preface or numbering that starts at 49. Fixes #1269
 - Export the predefined page sizes as `PAGE_SIZES`. Fixes #1236
 - Fix `doc.text()` adding pages until it runs out of memory when the line width is negative, which happens when `indent` with `indentAllLines` is larger than `width`, or the gaps take up more than the width shared by the `columns`. Such text is now drawn one character per line, as it already was for a line too narrow to hold a character
 - Add `flipH` and `flipV` options to `doc.image()`, which mirror an image without embedding it a second time. Fixes #1309
