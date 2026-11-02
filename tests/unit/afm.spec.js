@@ -265,6 +265,35 @@ describe('AFMFont', () => {
     ]);
   });
 
+  test('treats UTF-16 surrogate pairs as a single code point', () => {
+    const font = new AFMFont(Helvetica);
+    const mathItalicX = '\u{1D465}';
+    const trademarkGlyphs = '\u{1F16A}\u{1F16B}';
+
+    expect(font.encodeText(mathItalicX)).toHaveLength(1);
+    expect(font.encodeText(mathItalicX)).not.toEqual(['d835', 'dc65']);
+    expect(font.glyphsForString(mathItalicX)).toEqual(['.notdef']);
+
+    expect(font.encodeText(trademarkGlyphs)).toHaveLength(2);
+    expect(font.encodeText(trademarkGlyphs)).not.toEqual([
+      'd83c',
+      'dd6a',
+      'd83c',
+      'dd6b',
+    ]);
+    expect(font.glyphsForString(trademarkGlyphs)).toEqual([
+      '.notdef',
+      '.notdef',
+    ]);
+
+    expect(font.encodeText(`f(${mathItalicX})`)).toHaveLength(4);
+    expect(font.glyphsForString(`A${mathItalicX}B`)).toEqual([
+      'A',
+      '.notdef',
+      'B',
+    ]);
+  });
+
   test('does not mutate generated data while decoding it', () => {
     const originalData = JSON.stringify(Helvetica);
     const font = new AFMFont(Helvetica);
