@@ -283,8 +283,8 @@ This is equivalent to:
 
     const section = doc.struct('Sect');
     doc.addStructure(section);
-    section.add(doc.struct('P', () => { doc.text("Foo. "); });
-    section.add(doc.struct('P', () => { doc.text("Bar. "); });
+    section.add(doc.struct('P', () => { doc.text("Foo. "); }));
+    section.add(doc.struct('P', () => { doc.text("Bar. "); }));
 
 The `list()` method also accepts a `structParent` option. By default, it add list items
 (type `LI`) to the parent, each of which contains a label (type `Lbl`, which holds the bullet,
