@@ -48,6 +48,23 @@ describe('Text', () => {
       );
     });
 
+    test('justified with negative wordSpacing squeezes a line into the width - #1458', () => {
+      const docData = logData(document);
+
+      // three words only fit on the first line because of the negative spacing
+      document.text('aaaa aaaa aaaa aaaa', 50, 50, {
+        width: 85,
+        align: 'justify',
+        wordSpacing: -2,
+      });
+      document.end();
+
+      // gaps of (85 - 80.064) / 2 = 2.468, which is about 205.67 units at 12pt
+      expect(docData.join('\n')).toContain(
+        '[<61616161> -205.666667 <61616161> -205.666667 <61616161> -205.666667] TJ',
+      );
+    });
+
     test('with a tab or carriage return keeps the following characters', () => {
       const docData = logData(document);
 
