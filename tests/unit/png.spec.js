@@ -3,6 +3,29 @@ import PDFDocument from '../../lib/document';
 import PDFReference from '../../lib/reference';
 import PNGImage from '../../lib/image/png';
 import fs from 'fs';
+import zlib from 'zlib';
+
+// Builds a one-row PNG with a tRNS chunk. The CRCs are left as zero, png-js
+// doesn't check them.
+const pngWithColorKey = (bitDepth, colorType, row, trns) => {
+  const chunk = (type, data) => {
+    const length = Buffer.alloc(4);
+    length.writeUInt32BE(data.length);
+    return Buffer.concat([length, Buffer.from(type), data, Buffer.alloc(4)]);
+  };
+  const header = Buffer.alloc(13);
+  header.writeUInt32BE(row.length, 0);
+  header.writeUInt32BE(1, 4);
+  header[8] = bitDepth;
+  header[9] = colorType;
+  return Buffer.concat([
+    Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]),
+    chunk('IHDR', header),
+    chunk('tRNS', Buffer.from(trns)),
+    chunk('IDAT', zlib.deflateSync(Buffer.from([0, ...row.flat()]))),
+    chunk('IEND', Buffer.alloc(0)),
+  ]);
+};
 
 describe('PNGImage', () => {
   let document;
@@ -92,7 +115,7 @@ describe('PNGImage', () => {
       Subtype: 'Image',
       Type: 'XObject',
       Width: 32,
-      Mask: [255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255],
+      Mask: [65535, 65535, 65535, 65535, 65535, 65535],
       DecodeParms: expect.any(PDFReference),
     });
 
@@ -359,7 +382,7 @@ describe('PNGImage', () => {
       Subtype: 'Image',
       Type: 'XObject',
       Width: 32,
-      Mask: [0, 0],
+      Mask: [15, 15],
       DecodeParms: expect.any(PDFReference),
     });
 
@@ -395,7 +418,7 @@ describe('PNGImage', () => {
       Subtype: 'Image',
       Type: 'XObject',
       Width: 32,
-      Mask: [255, 255],
+      Mask: [65535, 65535],
       DecodeParms: expect.any(PDFReference),
     });
 
@@ -405,6 +428,31 @@ describe('PNGImage', () => {
       Columns: 32,
       Predictor: 15,
     });
+  });
+
+  test('Grayscale (8bit) grey transparent', () => {
+    const img = new PNGImage(pngWithColorKey(8, 0, [128, 0], [0, 128]), 'I1');
+    img.embed(document);
+
+    expect(img.obj.data.Mask).toEqual([128, 128]);
+  });
+
+  test('RGB (8bit) red transparent', () => {
+    const img = new PNGImage(
+      pngWithColorKey(
+        8,
+        2,
+        [
+          [255, 0, 0],
+          [0, 0, 255],
+        ],
+        [0, 255, 0, 0, 0, 0],
+      ),
+      'I1',
+    );
+    img.embed(document);
+
+    expect(img.obj.data.Mask).toEqual([255, 255, 0, 0, 0, 0]);
   });
 
   test('Grayscale with Alpha', () => {
