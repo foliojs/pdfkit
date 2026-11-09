@@ -2,6 +2,7 @@
 
 ### Unreleased
 
+- Leave the whitespace where a line wraps out of the line, so it is no longer drawn, aligned or measured. This fixes wrapped right-to-left text shaped as one run, e.g. Arabic with `features`, sitting one space past the right margin with `align: 'right'`, centered lines sitting half a space left of center, and underlines running past the last word. Fixes #1422
 - Fix gradients whose last stop comes before 1 stretching the stops over the whole gradient. The last color now stays solid from that stop to the end
 - Add a `headerRows` table option, which repeats the first rows at the top of each new page. Fixes #1657
 - Add a `scaleDown` option to `doc.image()`, which works like `fit` but keeps an image smaller than the rectangle at its own size instead of enlarging it. Fixes #1347
