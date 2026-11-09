@@ -368,7 +368,7 @@ Q
 
       document.text('a design-system', { width, lineBreak: 'whitespace' });
 
-      expect(lines).toEqual(['a ', 'design-system']);
+      expect(lines).toEqual(['a', 'design-system']);
     });
 
     test('right-to-left wrapped lines do not draw their trailing space - issue #1422', () => {
@@ -417,6 +417,26 @@ Q
       // The wrapped first line still drops its trailing space, but the space
       // between "text" and "continued" is part of the text.
       expect(drawn).toEqual(['Here is some longer', 'text ', 'continued']);
+    });
+
+    test('centered wrapped lines are centered without their trailing space', () => {
+      const xs = [];
+      const addContent = document.addContent;
+      document.addContent = function (data) {
+        if (data.endsWith(' Tm')) xs.push(Number(data.split(' ')[4]));
+        return addContent.call(this, data);
+      };
+      const width = 30;
+
+      document.text('aaa bbb', { width, align: 'center' });
+
+      const left = document.page.margins.left;
+      expect(xs[0]).toBeCloseTo(
+        left + (width - document.widthOfString('aaa')) / 2,
+      );
+      expect(xs[1]).toBeCloseTo(
+        left + (width - document.widthOfString('bbb')) / 2,
+      );
     });
 
     test('a continued segment can switch to lineBreak whitespace', () => {
