@@ -394,6 +394,31 @@ Q
       expect(glyphs[0]).toContain(space);
     });
 
+    test('a continued call keeps the trailing space before the next call', () => {
+      const drawn = [];
+      const addContent = document.addContent;
+      document.addContent = function (data) {
+        if (data.endsWith('TJ')) {
+          drawn.push(
+            [...data.matchAll(/<([0-9a-f]+)>/g)]
+              .map(([, hex]) => Buffer.from(hex, 'hex').toString('latin1'))
+              .join(''),
+          );
+        }
+        return addContent.call(this, data);
+      };
+
+      document.text('Here is some longer text ', {
+        width: 120,
+        continued: true,
+      });
+      document.text('continued');
+
+      // The wrapped first line still drops its trailing space, but the space
+      // between "text" and "continued" is part of the text.
+      expect(drawn).toEqual(['Here is some longer', 'text ', 'continued']);
+    });
+
     test('a continued segment can switch to lineBreak whitespace', () => {
       const lines = [];
       const line = document._line;
