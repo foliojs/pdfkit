@@ -16,6 +16,15 @@ describe('PDFFontFactory', () => {
     expect(font.id).toBe('F1');
   });
 
+  test.each(['Symbol', 'ZapfDingbats'])(
+    'measures text in %s with its built-in encoding',
+    (name) => {
+      const document = new PDFDocument();
+
+      expect(document.font(name).widthOfString('ABG')).toBeGreaterThan(0);
+    },
+  );
+
   test('rejects unsupported input', () => {
     expect(() => PDFFontFactory.open({}, {})).toThrow(
       'Not a supported font format or standard PDF font.',
@@ -452,5 +461,15 @@ describe('binary font sources', () => {
     doc.font(buf);
 
     expect(doc._font.id).toBe(first.id);
+  });
+});
+
+describe('standard font metrics', () => {
+  test('are shared across documents', () => {
+    const first = new PDFDocument().font('Helvetica-Bold')._font;
+    const second = new PDFDocument().font('Helvetica-Bold')._font;
+
+    expect(second).not.toBe(first);
+    expect(second.font).toBe(first.font);
   });
 });

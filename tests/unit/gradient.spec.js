@@ -70,4 +70,43 @@ describe('Gradient', function () {
 >>`,
     ]);
   });
+
+  test('Last stop before the end', () => {
+    const docData = logData(document);
+    const gradient = document.linearGradient(0, 0, 300, 0);
+    gradient.stop(0, 'green').stop(0.5, 'red');
+    document.rect(0, 0, 300, 300).fill(gradient);
+    document.end();
+
+    expect(docData).toContainChunk([
+      '8 0 obj',
+      `<<
+/FunctionType 2
+/Domain [0 1]
+/C0 [0 0.501961 0]
+/C1 [1 0 0]
+/N 1
+>>`,
+    ]);
+    expect(docData).toContainChunk([
+      '9 0 obj',
+      `<<
+/FunctionType 2
+/Domain [0 1]
+/C0 [1 0 0]
+/C1 [1 0 0]
+/N 1
+>>`,
+    ]);
+    expect(docData).toContainChunk([
+      '10 0 obj',
+      `<<
+/FunctionType 3
+/Domain [0 1]
+/Functions [8 0 R 9 0 R]
+/Bounds [0.5]
+/Encode [0 1 0 1]
+>>`,
+    ]);
+  });
 });

@@ -8,10 +8,13 @@ async function pdf2png(data) {
   const loadingTask = getDocument({
     data: new Uint8Array(data),
     useSystemFonts: false,
-    standardFontDataUrl: path.join(
-      path.dirname(fileURLToPath(import.meta.url)),
-      '../../node_modules/pdfjs-dist/standard_fonts/',
-    ),
+    standardFontDataUrl: path
+      .join(
+        path.dirname(fileURLToPath(import.meta.url)),
+        '../../node_modules/pdfjs-dist/standard_fonts/',
+      )
+      .split(path.sep)
+      .join('/'),
   });
 
   const pdfDocument = await loadingTask.promise;

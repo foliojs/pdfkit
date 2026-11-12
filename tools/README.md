@@ -36,13 +36,14 @@ default export.
 
 ## Parsed-data schema
 
-The parsed-data module exports the parser's three data structures without
+The parsed-data module exports the parser's four data structures without
 normalizing their values:
 
 ```js
 export default {
   attributes: { FontName: 'Helvetica' },
   glyphWidths: { space: 278 },
+  glyphCodes: { space: 32 },
   kernPairs: { 'A\0V': -70 },
 };
 ```
@@ -77,6 +78,10 @@ export default {
 used by all Courier, Helvetica, and Times variants. Bundlers include this
 dependency once when one or more of those fonts are used. Symbol, ZapfDingbats,
 and nonmatching AFMs keep their glyph-name strings inline.
+
+Symbol and ZapfDingbats use their own built-in encoding instead. Their
+`glyphNames` are the glyphs with a character code from 0 to 255, in code order,
+and an extra `glyphCodes` array holds the code of each glyph.
 
 `glyphWidths` uses indexes matching `glyphNames`. `kernPairs` alternates a
 kerning amount and an array of delta-encoded pair IDs. A pair ID is

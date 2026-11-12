@@ -127,7 +127,7 @@ const expectedFonts = [
     xHeight: 0,
     capHeight: 0,
     lineGap: 1303,
-    glyphCount: 43,
+    glyphCount: 189,
     spaceWidth: 250,
     kernPairCount: 0,
     avKern: 0,
@@ -192,7 +192,7 @@ const expectedFonts = [
     xHeight: 0,
     capHeight: 0,
     lineGap: 963,
-    glyphCount: 1,
+    glyphCount: 202,
     spaceWidth: 278,
     kernPairCount: 0,
     avKern: 0,
@@ -228,6 +228,70 @@ describe('AFMFont', () => {
     expect(font.characterToGlyph('☃'.charCodeAt(0))).toBe('.notdef');
     expect(font.widthOfGlyph('.notdef')).toBe(0);
     expect(font.getKernPair('A', '.notdef')).toBe(0);
+  });
+
+  test.each([
+    [Symbol, 'ABG', ['Alpha', 'Beta', 'Gamma'], [722, 667, 603]],
+    [ZapfDingbats, '!"', ['a1', 'a2'], [974, 961]],
+  ])(
+    'maps text through the built-in encoding %#',
+    (data, text, glyphs, widths) => {
+      const font = new AFMFont(data);
+
+      expect(font.glyphsForString(text)).toEqual(glyphs);
+      expect(font.advancesForGlyphs(glyphs)).toEqual(widths);
+      expect(font.characterToGlyph('☃'.charCodeAt(0))).toBe('.notdef');
+    },
+  );
+
+  test('gives the euro sign and U+0080 the same glyph in ZapfDingbats', () => {
+    const font = new AFMFont(ZapfDingbats);
+
+    expect(font.encodeText('\u20ac\u0080')).toEqual(['80', '80']);
+    expect(font.glyphsForString('\u20ac')).toEqual(
+      font.glyphsForString('\u0080'),
+    );
+  });
+
+  test('encodes character codes below 0x10 as two hex digits', () => {
+    const font = new AFMFont(Helvetica);
+
+    expect(font.encodeText('a\tb\r\x01')).toEqual([
+      '61',
+      '09',
+      '62',
+      '0d',
+      '01',
+    ]);
+  });
+
+  test('treats UTF-16 surrogate pairs as a single code point', () => {
+    const font = new AFMFont(Helvetica);
+    const mathItalicX = '\u{1D465}';
+    const trademarkGlyphs = '\u{1F16A}\u{1F16B}';
+
+    expect(font.encodeText(mathItalicX)).toHaveLength(1);
+    expect(font.encodeText(mathItalicX)).not.toEqual(['d835', 'dc65']);
+    expect(font.glyphsForString(mathItalicX)).toEqual(['.notdef']);
+
+    expect(font.encodeText(trademarkGlyphs)).toHaveLength(2);
+    expect(font.encodeText(trademarkGlyphs)).not.toEqual([
+      'd83c',
+      'dd6a',
+      'd83c',
+      'dd6b',
+    ]);
+    expect(font.glyphsForString(trademarkGlyphs)).toEqual([
+      '.notdef',
+      '.notdef',
+    ]);
+
+    expect(font.encodeText(`f(${mathItalicX})`)).toHaveLength(4);
+    expect(font.glyphsForString(`A${mathItalicX}B`)).toEqual([
+      'A',
+      '.notdef',
+      'B',
+    ]);
   });
 
   test('does not mutate generated data while decoding it', () => {

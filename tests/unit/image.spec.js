@@ -1,4 +1,5 @@
 import PDFDocument from '../../lib/document';
+import { vi } from 'vitest';
 import fs from 'fs';
 import JPEG from '../../lib/image/jpeg';
 import PDFImage from '../../lib/image';
@@ -41,6 +42,97 @@ describe('Image', function () {
     const data = fs.readFileSync('./tests/images/bee.jpg');
     const jpeg = new JPEG(data, 'test');
     expect(jpeg.colorSpace).toBe('DeviceRGB');
+  });
+
+  describe('flipH and flipV - #1309', function () {
+    const transforms = (options) => {
+      const transform = vi.spyOn(document, 'transform');
+      document.image('./tests/images/bee.png', 10, 20, {
+        width: 409,
+        height: 400,
+        ...options,
+      });
+      return transform.mock.calls;
+    };
+    const place = [409, 0, 0, -400, 10, 420];
+
+    test('places the image without a flip by default', function () {
+      expect(transforms({})).toEqual([place]);
+    });
+
+    test('flipH mirrors around the middle of the image', function () {
+      expect(transforms({ flipH: true })).toEqual([
+        [-1, 0, 0, 1, 2 * 10 + 409, 0],
+        place,
+      ]);
+    });
+
+    test('flipV mirrors around the middle of the image', function () {
+      expect(transforms({ flipV: true })).toEqual([
+        [1, 0, 0, -1, 0, 2 * 20 + 400],
+        place,
+      ]);
+    });
+
+    test('flipH and flipV can be combined', function () {
+      expect(transforms({ flipH: true, flipV: true })).toEqual([
+        [-1, 0, 0, 1, 2 * 10 + 409, 0],
+        [1, 0, 0, -1, 0, 2 * 20 + 400],
+        place,
+      ]);
+    });
+
+    test('does not move the document flow', function () {
+      const originalY = document.y;
+      document.image('./tests/images/bee.png', { flipV: true });
+      expect(document.y).toBe(originalY + 400);
+    });
+  });
+
+  describe('scaleDown - #1347', function () {
+    const drawnSize = (options) => {
+      const transform = vi.spyOn(document, 'transform');
+      document.image('./tests/images/bee.png', 10, 20, options);
+      const [w, , , h, x, y] = transform.mock.calls[0];
+      return { w, h: -h, x, y: y + h };
+    };
+
+    test('fit enlarges the same smaller image', function () {
+      const { w, h } = drawnSize({ fit: [818, 800] });
+      expect(w).toBeCloseTo(818);
+      expect(h).toBeCloseTo(800);
+    });
+
+    test('keeps a smaller image at its own size', function () {
+      expect(drawnSize({ scaleDown: [818, 800] })).toEqual({
+        w: 409,
+        h: 400,
+        x: 10,
+        y: 20,
+      });
+    });
+
+    test('still scales down an image larger than the rectangle', function () {
+      const { w, h } = drawnSize({ scaleDown: [100, 1000] });
+      expect(w).toBeCloseTo(100);
+      expect(h).toBeCloseTo((100 * 400) / 409);
+    });
+
+    test('aligns the unscaled image within the rectangle', function () {
+      const { x, y } = drawnSize({
+        scaleDown: [809, 800],
+        align: 'center',
+        valign: 'bottom',
+      });
+      expect(x).toBeCloseTo(10 + (809 - 409) / 2);
+      expect(y).toBeCloseTo(20 + 800 - 400);
+    });
+
+    test('fit wins when both are passed', function () {
+      const { w, h } = drawnSize({ fit: [818, 800], scaleDown: [818, 800] });
+      expect(w).toBeCloseTo(818);
+      expect(h).toBeCloseTo(800);
+    });
   });
 
   describe('opacity', function () {

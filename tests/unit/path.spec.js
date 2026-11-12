@@ -11,6 +11,25 @@ describe('SVG Path', () => {
     });
   });
 
+  describe('quadratic curves', () => {
+    test.each([
+      ['M60 540 Q60 60 540 60', '60 220 220 60 540 60 c'],
+      ['M540 60 Q60 60 60 540', '220 60 60 220 60 540 c'],
+      ['M60 540 q0 -480 480 -480', '60 220 220 60 540 60 c'],
+      ['M0 0 Q30 60 60 0 T120 0 T180 0', '140 40 160 40 180 0 c'],
+      ['M0 0 q30 60 60 0 t60 0 t60 0', '140 40 160 40 180 0 c'],
+      ['M0 0 T60 60', '0 0 20 20 60 60 c'],
+      ['M0 0 t60 60', '0 0 20 20 60 60 c'],
+    ])('converts %s to an equivalent cubic', (path, curve) => {
+      const docData = logData(document);
+
+      document.path(path).stroke();
+      document.end();
+
+      expect(docData.join('')).toContain(curve);
+    });
+  });
+
   describe('arc command flag parsing', () => {
     // Arc command flags (large-arc-flag and sweep-flag) can be chained without separator
     // This is valid per SVG spec and commonly produced by SVGO (SVG optimizer)

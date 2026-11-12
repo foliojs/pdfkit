@@ -3,6 +3,26 @@
 ### Unreleased
 
 - Fix the `/CheckSum` of an embedded file being written as a 32-character literal string of hex digits, instead of the 16 raw bytes of the MD5 digest the PDF specification requires, which validators such as veraPDF and pdfcpu reject. It is now written as a hex string of those bytes. Fixes #1531
+- Fix gradients whose last stop comes before 1 stretching the stops over the whole gradient. The last color now stays solid from that stop to the end
+- Add a `headerRows` table option, which repeats the first rows at the top of each new page. Fixes #1657
+- Add a `scaleDown` option to `doc.image()`, which works like `fit` but keeps an image smaller than the rectangle at its own size instead of enlarging it. Fixes #1347
+- Fix standard fonts drawing a narrow no-break space as ` /` and a non-breaking hyphen as a double space. They now use the no-break space and the hyphen. Fixes #1071, fixes #1040
+- Add `decorationThickness` and `underlineOffset` text options. Fixes #993
+- Add `doc.addPageLabel()`, which sets the page labels viewers show, such as roman numerals for a preface or numbering that starts at 49. Fixes #1269
+- Add a `start` option to `doc.list()`, so a `numbered` or `lettered` list can carry on counting after other content. Fixes #1350
+- Export the predefined page sizes as `PAGE_SIZES`. Fixes #1236
+- Fix `doc.text()` adding pages until it runs out of memory when the line width is negative, which happens when `indent` with `indentAllLines` is larger than `width`, or the gaps take up more than the width shared by the `columns`. Such text is now drawn one character per line, as it already was for a line too narrow to hold a character
+- Add `flipH` and `flipV` options to `doc.image()`, which mirror an image without embedding it a second time. Fixes #1309
+- Fix `wordSpacing` removing consecutive line breaks: `text()` and `boundsOfString()` collapsed every run of whitespace to one space, so `Test\n\nText` was drawn as the single line `Test Text`. Only runs of whitespace within a line are collapsed now. Fixes #1034
+- Fix `heightOfString` drawing the measured text into the page when it is called after a `text` call with `continued: true`, because it measured with the line wrapper that call had left behind, which draws its lines. A measurement that passes `continued: true` itself still uses that wrapper and draws as before. Fixes #1284
+- Render SVG quadratic curves with equivalent cubic control points, so reversing a path preserves its shape. Fixes #550
+- Fix the visual test renderer rejecting its standard-font directory on Windows because its path ends in a backslash.
+- Fix the underline, strike-through, link and `goTo` rectangle of text drawn with a `baseline` other than the default sitting an ascent too low, because they were placed from the top of the line while the glyphs had moved up with the baseline. Fixes #994, #1245
+- Fix links to a named destination going nowhere in readers that look the name up in sorted order, such as Chrome (PDFium) and qpdf, because name tree keys were sorted by locale with `localeCompare` instead of by their bytes: with destinations named `appendix` and `Chapter1`, `Chapter1` was written second and could not be found. The keys of the `EmbeddedFiles` and `JavaScript` name trees are sorted the same way
+- Escape document information in XMP metadata and omit characters XML 1.0 cannot represent, without changing the PDF Info dictionary. Fixes #1817
+- Fix `widthOfString()`, line wrapping and text positioning with the `Symbol` and `ZapfDingbats` standard fonts, which measured many characters as 0 wide (for example the `ZapfDingbats` euro sign, the `Symbol` letters and most of the `ZapfDingbats` ornaments) because the text was looked up in the Roman character table instead of the font's own built-in encoding, and the metrics of nearly all of their glyphs were not included. Fixes #580
+- Fix text in a standard font garbling or dropping the characters after a tab, a carriage return or any other character code below `0x10`, which was written into the hex string of the text as a single digit, so the following digits paired up wrongly: a `\r` before a line break showed as `Ð`, and `Tab\there` was read back as `Tab–†W&P`. Fixes #1425, #606
+- Reuse the glyph width and kerning tables of a standard font across documents instead of building them again for every document that uses it, which made a short document using two standard fonts more than twice as slow to create
 - Fix `doc.table()` parsing a font passed as binary data (e.g. registered with `registerFont(name, uint8Array)`) again for every cell, when it restores the font after measuring and drawing the cell, which made tables with such fonts slower. A font loaded from the same `Uint8Array` is now reused without parsing it again
 - Add `lineBreak: 'whitespace'` to `doc.text()`, which breaks a line only at whitespace, a soft hyphen or a zero-width space. The Unicode line breaking rules the wrapper follows also allow a break after a hyphen or a slash, so `design-system` or `https://github.com/foliojs/pdfkit` could be cut at a line end, and a text extractor that joins the lines, such as a résumé parser, reads two words
 - Add an `objectStreams` option, which packs the objects that are not streams into compressed object streams and writes a cross-reference stream instead of the xref table, making documents with many such objects, e.g. tagged ones, much smaller. It requires a `pdfVersion` of `1.5` or higher, and cannot be used with encryption or PDF/A-1. Fixes #1810
@@ -15,6 +35,7 @@
 - Fix annotations placed under `doc.rotate()` marking the wrong area, because `_convertRect` derived each corner's y from the already transformed x and mapped only two of the four corners, so the rectangle a viewer makes interactive did not follow the rotated content. Fixes #1153
 - Add `onClick`, `onMouseDown`, `onMouseEnter`, `onMouseExit`, `onFocus` and `onBlur` options to form annotation methods, for the JavaScript a field runs on each of those events. Each accepts a string or a plain function, whose source text is written into the action
 - Add an `embedFonts` option to `initForm`, embedding a complete, character-addressable copy of each custom font used in a form field. Viewers that regenerate a field's appearance from its value, such as Adobe Acrobat/Reader, need one to resolve field text; without it they fall back to a substitute font. It adds roughly the size of the font file per font, so it is off by default. Fixes #1096
+- Add `alternateName` and `structParent` options to form annotations so tagged form widgets can have an accessible name and belong to a `Form` structure element. Retain the annotation's page when its structure is finalized after a page change. Honor an explicit `fontSize` when the field uses the default form font. Fixes #1803
 
 ### [v0.20.2] - 2026-08-29
 

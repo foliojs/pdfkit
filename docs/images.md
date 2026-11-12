@@ -14,13 +14,16 @@ be scaled according to the following options.
 - `scale` factor provided - image is scaled proportionally by the provided scale factor
 - `fit` array provided - image is scaled proportionally to fit within the passed width and height
 - `cover` array provided - image is scaled proportionally to completely cover the rectangle defined by the passed width and height
+- `scaleDown` array provided - same as `fit`, except that an image already smaller than the passed width and height keeps its own size instead of being enlarged
 - `link` - a URL to link this image to (shortcut to create an annotation)
 - `goTo` - go to anchor (shortcut to create an annotation)
 - `destination` - create anchor to this image
 - `ignoreOrientation` - (true/false) ignore JPEG EXIF orientation. By default, images with JPEG EXIF orientation are properly rotated and/or flipped. Defaults to `false`, unless `ignoreOrientation` option set to `true` when creating the `PDFDocument` object (e.g. `new PDFDocument({ignoreOrientation: true})`)
+- `flipH` - (true/false) mirror the image horizontally within the rectangle it is placed in
+- `flipV` - (true/false) mirror the image vertically within the rectangle it is placed in
 - `opacity` - a value between `0` (fully transparent) and `1` (fully opaque). For PNGs that already have an alpha channel, this compounds with the existing transparency
 
-When a `fit` or `cover` array is provided, PDFKit accepts these additional options:
+When a `fit`, `scaleDown` or `cover` array is provided, PDFKit accepts these additional options:
 
 - `align` - horizontally align the image, the possible values are `'left'`, `'center'` and `'right'`
 - `valign` - vertically align the image, the possible values are `'top'`, `'center'` and `'bottom'`

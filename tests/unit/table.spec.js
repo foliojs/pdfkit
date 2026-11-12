@@ -90,3 +90,104 @@ describe('utils', () => {
     });
   });
 });
+
+describe('headerRows - #1657', () => {
+  const rows = (count) =>
+    Array.from({ length: count }, (_, i) => [`row ${i}`, `value ${i}`]);
+
+  const draw = (table, options) => {
+    const doc = new PDFDocument({ bufferPages: true, ...options });
+    const drawn = [];
+    const text = doc.text;
+    doc.text = function (value, x, y, opts) {
+      drawn.push({ value, y, page: this.page });
+      return text.call(this, value, x, y, opts);
+    };
+    doc.table(table);
+    return { doc, drawn, pages: doc.bufferedPageRange().count };
+  };
+
+  test('repeats one row at the top of each new page', () => {
+    const { doc, drawn, pages } = draw({
+      headerRows: 1,
+      data: [['Name', 'Value'], ...rows(120)],
+    });
+    expect(pages).toBeGreaterThan(1);
+
+    const headers = drawn.filter(({ value }) => value === 'Name');
+    expect(headers).toHaveLength(pages);
+    expect(new Set(headers.map(({ page }) => page)).size).toBe(pages);
+    headers.forEach(({ y }) =>
+      expect(y).toBeLessThan(doc.page.margins.top + 20),
+    );
+  });
+
+  test('places the next row below the repeated row', () => {
+    const { drawn, pages } = draw({
+      headerRows: 1,
+      data: [['Name', 'Value'], ...rows(120)],
+    });
+    expect(pages).toBeGreaterThan(1);
+
+    const secondPage = drawn.find(
+      ({ value, page }) => value === 'Name' && page !== drawn[0].page,
+    ).page;
+    const onPage = drawn.filter(({ page }) => page === secondPage);
+    expect(onPage[0].value).toBe('Name');
+    expect(onPage[1].value).toBe('Value');
+    expect(onPage[2].y).toBeGreaterThan(onPage[0].y);
+  });
+
+  test('repeats several rows in order', () => {
+    const { drawn, pages } = draw({
+      headerRows: 2,
+      data: [['A', 'B'], ['C', 'D'], ...rows(120)],
+    });
+    expect(pages).toBeGreaterThan(1);
+
+    const firstNew = drawn.findIndex(({ page }) => page !== drawn[0].page);
+    expect(
+      drawn.slice(firstNew, firstNew + 4).map(({ value }) => value),
+    ).toEqual(['A', 'B', 'C', 'D']);
+    expect(drawn[firstNew + 2].y).toBeGreaterThan(drawn[firstNew].y);
+  });
+
+  test('repeats nothing by default', () => {
+    const { drawn, pages } = draw({ data: [['Name', 'Value'], ...rows(120)] });
+    expect(pages).toBeGreaterThan(1);
+    expect(drawn.filter(({ value }) => value === 'Name')).toHaveLength(1);
+  });
+
+  test('skips the header when the next row would not fit below it', () => {
+    const { doc, drawn, pages } = draw({
+      headerRows: 1,
+      rowStyles: (i) => (i === 2 ? { height: 640 } : {}),
+      data: [
+        ['Name', 'Value'],
+        ['first', '1'],
+        ['tall', '2'],
+      ],
+    });
+    expect(pages).toBe(2);
+    expect(doc.page.contentHeight).toBeLessThan(660);
+    expect(drawn.filter(({ value }) => value === 'Name')).toHaveLength(1);
+  });
+
+  test('keeps a structured table to one row per data row', () => {
+    const doc = new PDFDocument({ tagged: true, pdfVersion: '1.7' });
+    const markContent = vi.spyOn(doc, 'markContent');
+    const struct = vi.spyOn(doc, 'struct');
+    doc.table({
+      structParent: doc,
+      headerRows: 1,
+      data: [['Name', 'Value'], ...rows(120)],
+    });
+    expect(struct.mock.calls.filter(([type]) => type === 'TR')).toHaveLength(
+      121,
+    );
+    expect(
+      markContent.mock.calls.filter(([type]) => type === 'Artifact').length,
+    ).toBeGreaterThan(0);
+    doc.end();
+  });
+});

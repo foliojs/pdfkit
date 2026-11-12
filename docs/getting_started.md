@@ -283,6 +283,26 @@ numbers to a document.
     // doc.end() will call it for you automatically.
     doc.end();
 
+## Page labels
+
+PDF viewers number pages from 1 unless the document says otherwise. To have them
+show other page labels, such as roman numerals for a preface, call `addPageLabel`
+with the zero-based index of the first page of each range. A range lasts until the
+next one starts, and pages before the first range keep plain numbers.
+
+    // Pages i, ii, then 1, 2, ... and an appendix numbered A-1, A-2, ...
+    doc.addPageLabel(0, { style: 'lowerRoman' });
+    doc.addPageLabel(2, { style: 'decimal' });
+    doc.addPageLabel(10, { style: 'decimal', prefix: 'A-' });
+
+The following options are available:
+
+* `style` - `decimal`, `upperRoman`, `lowerRoman`, `upperAlpha` or `lowerAlpha`. Without a style, the label is only the `prefix`.
+* `prefix` - text in front of the number
+* `start` - the number of the first page of the range, a positive integer. Defaults to `1`.
+
+Page labels only change what viewers show, and do not draw anything on the page.
+
 ## Setting default font
 
 The default font is 'Helvetica'. It can be configured by passing `font` option

@@ -73,6 +73,24 @@ describe.each([
   });
 });
 
+describe('PDFNameTree key order', () => {
+  test('sorts the keys by their bytes rather than by locale', () => {
+    const tree = new PDFNameTree();
+    tree.add('appendix', new String('one'));
+    tree.add('Chapter1', new String('two'));
+
+    // readers look keys up in byte order, in which `Chapter1` (0x43) comes
+    // before `appendix` (0x61); in locale order they could not find it
+    expect(PDFObject.convert(tree)).toEqual(`<<
+  /Limits [(Chapter1) (appendix)]
+  /Names [
+    (Chapter1) (two)
+    (appendix) (one)
+]
+>>`);
+  });
+});
+
 describe('name trees in a document', () => {
   const names = ['(heading)', '(data.txt)', 'app.alert'];
 

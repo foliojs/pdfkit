@@ -107,7 +107,9 @@ below.
 * `goTo` - go to anchor (shortcut to create an annotation)
 * `destination` - create anchor to this text
 * `underline` - whether to underline the text
+* `underlineOffset` - how far to move the underline down from its default position, in PDF points. A negative value moves it up.
 * `strike` - whether to strike out the text
+* `decorationThickness` - the thickness of the underline and the strikethrough in PDF points (by default it follows the font size)
 * `oblique` - whether to slant the text (angle in degrees or `true`)
 * `baseline` - the vertical alignment of the text with respect to its insertion point (values as [canvas textBaseline](https://www.w3schools.com/tags/canvas_textbaseline.asp))
 * `continued` - whether the text segment will be followed immediately by another segment. Useful for changing styling in the middle of a paragraph.
@@ -154,6 +156,7 @@ Lists use the following additional options:
 * `bulletRadius`
 * `textIndent`
 * `bulletIndent`
+* `start` - the number the top level of a `numbered` or `lettered` list starts counting from, e.g. to carry on after an image. A `lettered` list counts `1` as `A`, so `3` starts at `C`. Nested lists still start from the beginning. Defaults to `1`.
 
 ## Rich Text
 
@@ -197,6 +200,9 @@ To cancel a link in rich text set the `link` option to `null`.
 Here is the output:
 
 ![5]()
+
+Note that the `center` and `right` alignments are not applied to `continued` text as a whole:
+each segment is aligned on its own, so the segments of a line can overlap.
 
 ## Fonts
 

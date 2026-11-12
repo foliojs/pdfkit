@@ -246,8 +246,8 @@ describe('AFM JavaScript converters', () => {
       descender: 0,
       xHeight: 0,
       capHeight: 0,
-      glyphNames: 'space',
-      glyphWidths: [278],
+      glyphNames: expect.stringMatching(/^space a1 a2 /),
+      glyphWidths: expect.arrayContaining([278, 974, 961]),
       kernPairs: [],
     });
   });

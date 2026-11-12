@@ -1,5 +1,6 @@
 import PDFDocument from '../../lib/document';
-import { logData } from './helpers';
+import { vi } from 'vitest';
+import { logData, parseTextStreams } from './helpers';
 
 describe('Text', () => {
   let document;
@@ -19,6 +20,41 @@ describe('Text', () => {
       document.end();
 
       expect(docData).toContainText({ text: 'simple text' });
+    });
+
+    test('with wordSpacing keeps consecutive line breaks - #1034', () => {
+      const lineYs = (options) => {
+        const doc = new PDFDocument({ compress: false });
+        const docData = logData(doc);
+        doc.text('Test\n\nText', 100, 300, options);
+        doc.end();
+        return [...docData.join('\n').matchAll(/1 0 0 1 100 (\S+) Tm/g)].map(
+          (match) => match[1],
+        );
+      };
+
+      expect(lineYs({ wordSpacing: 5 })).toEqual(lineYs({}));
+      expect(lineYs({ wordSpacing: 5 })).toHaveLength(2);
+    });
+
+    test('with wordSpacing still collapses spaces within a line', () => {
+      const docData = logData(document);
+
+      document.text('one   two', { wordSpacing: 5 });
+      document.end();
+
+      expect(docData.join('\n')).toContain(
+        '[<6f6e65> -694.666667 <7477> 10 <6f> -694.666667] TJ',
+      );
+    });
+
+    test('with a tab or carriage return keeps the following characters', () => {
+      const docData = logData(document);
+
+      document.text('a\tb\rc', { lineBreak: false });
+      document.end();
+
+      expect(docData).toContainText({ text: 'a\tb\rc' });
     });
 
     test('with destination', () => {
@@ -219,6 +255,30 @@ Q
       expect(docData).toContainText({ text: 'no line break' });
     });
 
+    test.each(['underline', 'strike'])(
+      '%s follows the baseline option',
+      (decoration) => {
+        // y is the top of the text with the default baseline and the baseline
+        // itself with 'alphabetic', so the line has to move up by the ascent
+        const lineY = (doc, baseline) => {
+          const moveTo = vi.spyOn(doc, 'moveTo');
+          doc.text('baseline', 50, 50, {
+            lineBreak: false,
+            [decoration]: true,
+            baseline,
+          });
+          return moveTo.mock.calls.at(-1)[1];
+        };
+        const other = new PDFDocument({ compress: false });
+        const ascent = (document._font.ascender / 1000) * document._fontSize;
+
+        expect(lineY(other, 'alphabetic')).toBeCloseTo(
+          lineY(document, 'top') - ascent,
+          5,
+        );
+      },
+    );
+
     test.each([
       ['characterSpacing', { characterSpacing: 4 }, '184.74'],
       ['wordSpacing', { wordSpacing: 5 }, '138.74'],
@@ -241,6 +301,14 @@ Q
         'stream',
         new RegExp(`50 [\\d.]+ m\n${end.replace('.', '\\.')}\\d* [\\d.]+ l`),
       ]);
+    });
+
+    test('bounds of text with wordSpacing keep consecutive line breaks - #1034', () => {
+      const text = 'Test\n\nText';
+
+      expect(document.boundsOfString(text, { wordSpacing: 5 }).height).toBe(
+        document.boundsOfString(text).height,
+      );
     });
 
     test('bounds of text with lineBreak false and wordSpacing', () => {
@@ -318,6 +386,69 @@ Q
       // a continued segment whose first word does not fit emits an empty
       // line to move down before the word
       expect(lines.filter(Boolean)).toEqual(['a ', 'design-system']);
+    });
+  });
+
+  describe('heightOfString', () => {
+    // Every string drawn by a TJ operator in the captured output, decoded with
+    // the shared test helper, so a measured string merged into another line is
+    // caught.
+    const drawnTexts = (data) =>
+      data
+        .filter((item) => Buffer.isBuffer(item))
+        .flatMap((item) => parseTextStreams(item.toString('utf8')))
+        .map((stream) => stream.text);
+
+    test('after a continued text call does not draw the measured string - issue #1284', () => {
+      const docData = logData(document);
+
+      document.text('abc', 0, 0, { continued: true });
+      document.heightOfString('X');
+      document.end();
+
+      expect(docData).toContainText({ text: 'abc' });
+      expect(docData).not.toContainText({ text: 'X' });
+      expect(drawnTexts(docData).join('')).not.toContain('X');
+    });
+
+    test('after a finished text call does not draw the measured string', () => {
+      const docData = logData(document);
+
+      document.text('abc', 0, 0);
+      document.heightOfString('X');
+      document.end();
+
+      expect(docData).toContainText({ text: 'abc' });
+      expect(docData).not.toContainText({ text: 'X' });
+      expect(drawnTexts(docData).join('')).not.toContain('X');
+    });
+
+    test('with the continued option still draws the next text call', () => {
+      const docData = logData(document);
+
+      // a measurement with continued: true must not leave a wrapper behind
+      // that stops the next text call from being drawn
+      document.text('abc', 0, 0, { continued: true });
+      document.heightOfString('X', { continued: true });
+      document.text('def');
+      document.end();
+
+      expect(docData).toContainText({ text: 'abc' });
+      expect(docData).toContainText({ text: 'def' });
+    });
+
+    test('without line wrapping preserves the next text position', () => {
+      const docData = logData(document);
+      const nextX = document.widthOfString('abc');
+
+      document.text('abc', 0, 0, { continued: true });
+      document.heightOfString('X', { lineBreak: false, width: null });
+      document.text('def');
+      document.end();
+
+      expect(docData).toContainText({ text: 'abc', x: 0 });
+      expect(docData).toContainText({ text: 'def', x: nextX });
+      expect(drawnTexts(docData).join('')).not.toContain('X');
     });
   });
 
@@ -405,5 +536,63 @@ Q
       expect(dataStr).toContain('/S /Span');
       expect(dataStr).toContain('/S /Link');
     });
+  });
+});
+
+describe('decoration options - #993', () => {
+  const underline = (options) => {
+    const doc = new PDFDocument({ compress: false });
+    const calls = [];
+    const addContent = doc.addContent;
+    doc.addContent = function (data) {
+      calls.push(data);
+      return addContent.call(this, data);
+    };
+    doc.text('hello', 72, 72, { underline: true, ...options });
+    const width = calls.find((data) => / w$/.test(data));
+    const move = calls.find((data) => / m$/.test(data));
+    return {
+      thickness: Number(width.split(' ')[0]),
+      y: Number(move.split(' ')[1]),
+    };
+  };
+
+  test('keeps the defaults', () => {
+    expect(underline({}).thickness).toBe(1);
+  });
+
+  test('decorationThickness sets the line width and stays inside the line', () => {
+    const base = underline({});
+    const thick = underline({ decorationThickness: 3 });
+    expect(thick.thickness).toBe(3);
+    expect(thick.y).toBeCloseTo(base.y - 2, 5);
+  });
+
+  test('underlineOffset moves the line down or up', () => {
+    const base = underline({});
+    expect(underline({ underlineOffset: 2 }).y).toBeCloseTo(base.y + 2, 5);
+    expect(underline({ underlineOffset: -2 }).y).toBeCloseTo(base.y - 2, 5);
+  });
+
+  test('decorationThickness also sets the strikethrough, underlineOffset does not move it', () => {
+    const doc = new PDFDocument({ compress: false });
+    const widths = [];
+    const moves = [];
+    const addContent = doc.addContent;
+    doc.addContent = function (data) {
+      if (/ w$/.test(data)) widths.push(data);
+      if (/ m$/.test(data)) moves.push(Number(data.split(' ')[1]));
+      return addContent.call(this, data);
+    };
+    doc.text('hello', 72, 72, {
+      underline: true,
+      strike: true,
+      decorationThickness: 3,
+      underlineOffset: 2,
+    });
+    expect(widths).toEqual(['3 w', '3 w']);
+    const lineTop = 72;
+    const strikeY = moves[1];
+    expect(strikeY).toBeCloseTo(lineTop + doc.currentLineHeight() / 2, 5);
   });
 });
