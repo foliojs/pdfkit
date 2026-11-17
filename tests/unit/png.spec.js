@@ -13,18 +13,14 @@ describe('PNGImage', () => {
     img.loadIndexedAlphaChannel = () => {
       if (img.image.transparency.indexed) {
         img.alphaChannel = {};
-        img.finalize();
       }
     };
     img.splitAlphaChannel = () => {
       if (img.image.hasAlphaChannel) {
         img.alphaChannel = {};
-        img.finalize();
       }
     };
-    img.decodeData = () => {
-      img.finalize();
-    };
+    img.decodeData = () => {};
     const finalizeFn = img.finalize;
     vi.spyOn(img, 'finalize').mockImplementation(() => finalizeFn.call(img));
     img.embed(document);

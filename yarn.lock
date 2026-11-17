@@ -3896,7 +3896,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fflate@npm:^0.8.2, fflate@npm:^0.8.3":
+"fflate@npm:^0.8.3":
   version: 0.8.3
   resolution: "fflate@npm:0.8.3"
   checksum: 10c0/eab181ca37f5348ae76d4b6f840e0026e30220e33153289ac942222d8b9638237d486507dbcc09878d724095bd354993a2ee48bbee99c8f2c6440d4448719aa7
@@ -5654,7 +5654,7 @@ __metadata:
     linebreak: "npm:^1.1.0"
     markdown-it: "npm:^15.0.0"
     pdfjs-dist: "npm:^5.7.284"
-    png-js: "npm:^2.0.0"
+    png-js: "npm:^3.0.0"
     prettier: "npm:3.9.6"
     pug: "npm:^3.0.4"
     rollup: "npm:^4.62.4"
@@ -5711,12 +5711,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"png-js@npm:^2.0.0":
-  version: 2.0.0
-  resolution: "png-js@npm:2.0.0"
+"png-js@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "png-js@npm:3.0.0"
   dependencies:
-    fflate: "npm:^0.8.2"
-  checksum: 10c0/69f44790c64b99ca7f44280ed13643e7700bc91406842a096471951227e7dfb52e21924dc3691bf65877c0411d8ced63bebaba1d2da17bf45fefed92a229f1a6
+    fflate: "npm:^0.8.3"
+  checksum: 10c0/b524df90a94da2e0895f985131a48526ab79ca09acbb7c16b5f09d4e1c7671f9c745a9b971bcbc9a2b76d592387b5a3212008204493ca408a7952a673f7e64f9
   languageName: node
   linkType: hard
 
