@@ -2,6 +2,7 @@
 
 ### Unreleased
 
+- Fix justified text with a negative `wordSpacing` running past the width. A line the negative spacing made room for now has its gaps shrunk to fit. Fixes #1458
 - Fix gradients whose last stop comes before 1 stretching the stops over the whole gradient. The last color now stays solid from that stop to the end
 - Add a `headerRows` table option, which repeats the first rows at the top of each new page. Fixes #1657
 - Add a `scaleDown` option to `doc.image()`, which works like `fit` but keeps an image smaller than the rectangle at its own size instead of enlarging it. Fixes #1347
