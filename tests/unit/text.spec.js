@@ -368,7 +368,75 @@ Q
 
       document.text('a design-system', { width, lineBreak: 'whitespace' });
 
-      expect(lines).toEqual(['a ', 'design-system']);
+      expect(lines).toEqual(['a', 'design-system']);
+    });
+
+    test('right-to-left wrapped lines do not draw their trailing space - issue #1422', () => {
+      document.font('tests/fonts/NotoKufiArabic-Subset.ttf', 12);
+      const features = ['rtla'];
+      const [[space]] = document._font.encode(' ', features);
+      const glyphs = [];
+      const addContent = document.addContent;
+      document.addContent = function (data) {
+        if (data.endsWith('TJ')) {
+          glyphs.push(data.match(/<([0-9a-f]+)>/)[1].match(/.{4}/g));
+        }
+        return addContent.call(this, data);
+      };
+
+      document.text('هذا نص عربي', { width: 60, align: 'right', features });
+
+      // The trailing space of the first line comes first once the line is
+      // reversed, and would push the line one space past the right margin.
+      expect(glyphs).toHaveLength(2);
+      expect(glyphs[0]).toHaveLength(6);
+      expect(glyphs[0][0]).not.toBe(space);
+      expect(glyphs[0]).toContain(space);
+    });
+
+    test('a continued call keeps the trailing space before the next call', () => {
+      const drawn = [];
+      const addContent = document.addContent;
+      document.addContent = function (data) {
+        if (data.endsWith('TJ')) {
+          drawn.push(
+            [...data.matchAll(/<([0-9a-f]+)>/g)]
+              .map(([, hex]) => Buffer.from(hex, 'hex').toString('latin1'))
+              .join(''),
+          );
+        }
+        return addContent.call(this, data);
+      };
+
+      document.text('Here is some longer text ', {
+        width: 120,
+        continued: true,
+      });
+      document.text('continued');
+
+      // The wrapped first line still drops its trailing space, but the space
+      // between "text" and "continued" is part of the text.
+      expect(drawn).toEqual(['Here is some longer', 'text ', 'continued']);
+    });
+
+    test('centered wrapped lines are centered without their trailing space', () => {
+      const xs = [];
+      const addContent = document.addContent;
+      document.addContent = function (data) {
+        if (data.endsWith(' Tm')) xs.push(Number(data.split(' ')[4]));
+        return addContent.call(this, data);
+      };
+      const width = 30;
+
+      document.text('aaa bbb', { width, align: 'center' });
+
+      const left = document.page.margins.left;
+      expect(xs[0]).toBeCloseTo(
+        left + (width - document.widthOfString('aaa')) / 2,
+      );
+      expect(xs[1]).toBeCloseTo(
+        left + (width - document.widthOfString('bbb')) / 2,
+      );
     });
 
     test('a continued segment can switch to lineBreak whitespace', () => {
