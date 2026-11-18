@@ -464,6 +464,37 @@ describe('binary font sources', () => {
   });
 });
 
+describe('a document without a font', () => {
+  const message =
+    'No font is set. Select one with doc.font(), or pass the font option when creating the document.';
+
+  test.each([
+    ['moveDown', (doc) => doc.moveDown()],
+    ['moveUp', (doc) => doc.moveUp()],
+    ['currentLineHeight', (doc) => doc.currentLineHeight()],
+    ['widthOfString', (doc) => doc.widthOfString('text')],
+    ['heightOfString', (doc) => doc.heightOfString('text')],
+    ['boundsOfString', (doc) => doc.boundsOfString('text')],
+    ['text', (doc) => doc.text('text')],
+    ['text without wrapping', (doc) => doc.text('text', { lineBreak: false })],
+    ['list', (doc) => doc.list(['item'])],
+    ['table', (doc) => doc.table({ data: [['cell']] })],
+  ])('%s says that no font is set', (_, use) => {
+    expect(() => use(new PDFDocument({ font: null }))).toThrow(message);
+  });
+
+  test('an embedded font can be the default font instead', () => {
+    const doc = new PDFDocument({
+      font: new Uint8Array(readFileSync('tests/fonts/Roboto-Regular.ttf')),
+      compress: false,
+    });
+    doc.moveDown().text('embedded only');
+
+    expect(Object.keys(doc._fontFamilies)).toEqual(['Roboto-Regular']);
+    expect(missingObjects(collectPdf(doc))).toHaveLength(0);
+  });
+});
+
 describe('standard font metrics', () => {
   test('are shared across documents', () => {
     const first = new PDFDocument().font('Helvetica-Bold')._font;

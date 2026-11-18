@@ -49,7 +49,8 @@ PDFKit provides an ES module build for browsers. Standard PDF font metrics are
 not included in the main browser module. Import and register the generated data
 for every standard font your application uses before selecting that font. The
 default document font is Helvetica, so it must be registered before constructing
-a document unless the document is created with `{ font: null }`.
+a document unless the document is created with `{ font: null }` or with an
+embedded font as its default (see [Setting default font](#setting-default-font)).
 
 ### Experimental output helpers
 
@@ -309,6 +310,17 @@ The default font is 'Helvetica'. It can be configured by passing `font` option
 
     // use Courier font by default
     const doc = new PDFDocument({font: 'Courier'});
+
+A document that only uses embedded fonts can start with one of them, so it never
+loads a standard font. Pass the font data as a `Uint8Array` or an `ArrayBuffer`,
+or, in Node, the path to the font file:
+
+    const doc = new PDFDocument({font: robotoData});
+
+With `font: null` the document starts without a font. Select one with
+`doc.font()` before anything that needs font metrics, such as writing or
+measuring text, `moveDown()`, or a list or table. Until then those methods throw
+an error saying that no font is set.
 
 ## Setting document metadata
 
