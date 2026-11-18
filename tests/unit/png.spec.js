@@ -88,7 +88,7 @@ describe('PNGImage', () => {
       Subtype: 'Image',
       Type: 'XObject',
       Width: 32,
-      Mask: [255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255],
+      Mask: [65535, 65535, 65535, 65535, 65535, 65535],
       DecodeParms: expect.any(PDFReference),
     });
 
@@ -355,7 +355,7 @@ describe('PNGImage', () => {
       Subtype: 'Image',
       Type: 'XObject',
       Width: 32,
-      Mask: [0, 0],
+      Mask: [15, 15],
       DecodeParms: expect.any(PDFReference),
     });
 
@@ -391,7 +391,7 @@ describe('PNGImage', () => {
       Subtype: 'Image',
       Type: 'XObject',
       Width: 32,
-      Mask: [255, 255],
+      Mask: [65535, 65535],
       DecodeParms: expect.any(PDFReference),
     });
 

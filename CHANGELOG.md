@@ -2,6 +2,7 @@
 
 ### Unreleased
 
+- Fix the color key mask of greyscale and RGB PNGs with a `tRNS` chunk. The key is now read as one 2-byte sample per color component, so 8-bit greyscale keys other than 0 and 16-bit keys are made transparent and RGB masks have one pair per component. Fixes #1864
 - Fix gradients whose last stop comes before 1 stretching the stops over the whole gradient. The last color now stays solid from that stop to the end
 - Add a `headerRows` table option, which repeats the first rows at the top of each new page. Fixes #1657
 - Add a `scaleDown` option to `doc.image()`, which works like `fit` but keeps an image smaller than the rectangle at its own size instead of enlarging it. Fixes #1347
