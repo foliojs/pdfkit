@@ -6,7 +6,7 @@ import randomBytes from '../../lib/crypto/random';
 
 describe('crypto/md5', () => {
   test('md5Hash returns correct hash for string', () => {
-    const result = md5Hash('hello');
+    const result = md5Hash(new TextEncoder().encode('hello'));
     const hex = Array.from(result, (b) => b.toString(16).padStart(2, '0')).join(
       '',
     );
@@ -23,11 +23,13 @@ describe('crypto/md5', () => {
   });
 
   test('md5Hex returns hex string', () => {
-    expect(md5Hex('hello')).toBe('5d41402abc4b2a76b9719d911017c592');
+    expect(md5Hex(new TextEncoder().encode('hello'))).toBe(
+      '5d41402abc4b2a76b9719d911017c592',
+    );
   });
 
   test('md5Hash empty string', () => {
-    const hex = md5Hex('');
+    const hex = md5Hex(new TextEncoder().encode(''));
     expect(hex).toBe('d41d8cd98f00b204e9800998ecf8427e');
   });
 });
