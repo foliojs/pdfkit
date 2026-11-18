@@ -2,6 +2,7 @@
 
 ### Unreleased
 
+- Fix text, measuring, `moveDown()`, lists and tables in a document created with `font: null` failing with `Cannot read properties of null` before a font is selected. They now throw an error saying that no font is set, and the docs show how to start a document with an embedded font instead. Fixes #1647
 - Fix gradients whose last stop comes before 1 stretching the stops over the whole gradient. The last color now stays solid from that stop to the end
 - Add a `headerRows` table option, which repeats the first rows at the top of each new page. Fixes #1657
 - Add a `scaleDown` option to `doc.image()`, which works like `fit` but keeps an image smaller than the rectangle at its own size instead of enlarging it. Fixes #1347
