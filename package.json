@@ -50,7 +50,7 @@
     "@noble/ciphers": "^2.4.0",
     "@noble/hashes": "^2.4.0",
     "fflate": "^0.8.3",
-    "fontkit": "^2.0.4",
+    "fontkit": "^3.0.0",
     "linebreak": "^2.0.0",
     "png-js": "^3.0.0"
   },
