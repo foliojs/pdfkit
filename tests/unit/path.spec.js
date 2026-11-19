@@ -62,6 +62,17 @@ describe('SVG Path', () => {
         expect(docData.join('')).toContain('20 20 l');
       },
     );
+
+    test('omits arc with coincident start and end points', () => {
+      const docData = logData(document);
+
+      // A0 5 0 0 1 10 10 starts and ends at (10, 10) - must be omitted per SVG spec
+      document.path('M10 10 A0 5 0 0 1 10 10').stroke();
+      document.end();
+
+      // No lineTo should have been emitted for the degenerate arc
+      expect(docData.join('')).not.toContain('10 10 l');
+    });
   });
 
   describe('arc command flag parsing', () => {
