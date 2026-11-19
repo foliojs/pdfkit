@@ -1,4 +1,5 @@
 import { babel } from '@rollup/plugin-babel';
+import commonjs from '@rollup/plugin-commonjs';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 import asset from './tools/asset-plugin.mjs';
 import binary from './tools/binary-plugin.mjs';
@@ -46,11 +47,12 @@ const standardFontInputs = {
   ZapfDingbats: 'lib/font/generated/ZapfDingbats.js',
 };
 
-const browserPlugins = () => [
+const browserPlugins = (...dependencyPlugins) => [
   binary('.icc'),
   nodeResolve({
     exportConditions: ['default'],
   }),
+  ...dependencyPlugins,
   babel({
     babelHelpers: 'bundled',
     babelrc: false,
@@ -132,20 +134,16 @@ export default [
     },
     plugins: browserPlugins(),
   },
-  // CommonJS browser build consumed by Browserify for the standalone bundle.
+  // Standalone browser build with bundled dependencies.
   {
     input: 'lib/document.browser.standalone.js',
-    external,
     output: {
-      file: 'js/pdfkit.browser.js',
-      format: 'cjs',
-      sourcemap: true,
-      interop: 'default',
-      exports: 'named',
-      footer:
-        'module.exports = exports.default;\nmodule.exports.PDFDocument = exports.PDFDocument;',
+      file: 'js/pdfkit.standalone.js',
+      format: 'umd',
+      name: 'PDFDocument',
+      exports: 'default',
     },
-    plugins: browserPlugins(),
+    plugins: browserPlugins(commonjs()),
   },
   // Experimental helpers for collecting document output.
   {

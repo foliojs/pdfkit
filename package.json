@@ -28,6 +28,7 @@
     "@babel/preset-env": "^8.0.7",
     "@eslint/js": "^10.0.1",
     "@rollup/plugin-babel": "^7.1.0",
+    "@rollup/plugin-commonjs": "^29.0.3",
     "@rollup/plugin-node-resolve": "^16.0.3",
     "brace": "^0.11.1",
     "browserify": "^17.0.1",
@@ -58,7 +59,6 @@
   "scripts": {
     "prepublishOnly": "npm run build",
     "build": "rollup -c",
-    "build-standalone": "browserify --standalone PDFDocument --ignore crypto js/pdfkit.browser.js -o js/pdfkit.standalone.js",
     "browserify-example": "browserify examples/browserify/browser.js > examples/browserify/bundle.js",
     "pdf-guide": "node docs/generate.js",
     "website": "node docs/generate_website.js",

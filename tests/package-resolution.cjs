@@ -1,6 +1,7 @@
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
+const vm = require('node:vm');
 
 const sourceIccPath = path.resolve(
   __dirname,
@@ -12,6 +13,10 @@ const emittedIccPath = path.resolve(
 );
 const nodeBundlePath = require.resolve('pdfkit');
 const browserBundlePath = path.resolve(__dirname, '../js/pdfkit.browser.js');
+const standaloneBundlePath = path.resolve(
+  __dirname,
+  '../js/pdfkit.standalone.js',
+);
 const browserEsBundleUrl = require('node:url').pathToFileURL(
   path.resolve(__dirname, '../js/pdfkit.browser.mjs'),
 );
@@ -125,4 +130,31 @@ assert.equal(BrowserPDFDocument.registerFile, undefined);
   pdfaDocument.on('data', () => {});
   pdfaDocument.end();
   assert.equal(pdfaDocument._root.data.OutputIntents.length, 1);
+
+  const StandalonePDFDocument = require(standaloneBundlePath);
+  assert.equal(typeof StandalonePDFDocument, 'function');
+  assert.equal(StandalonePDFDocument.PDFDocument, StandalonePDFDocument);
+
+  const browser = {
+    document: { baseURI: 'https://example.test/' },
+    atob,
+    btoa,
+    queueMicrotask,
+    TextDecoder,
+    TextEncoder,
+    URL,
+  };
+  vm.runInNewContext(fs.readFileSync(standaloneBundlePath, 'utf8'), browser, {
+    filename: standaloneBundlePath,
+  });
+  assert.equal(typeof browser.PDFDocument, 'function');
+  assert.equal(browser.PDFDocument.PDFDocument, browser.PDFDocument);
+
+  const standaloneDocument = new browser.PDFDocument({ subset: 'PDF/A-1' });
+  const standaloneOutput = outputHelpers.toBytes(standaloneDocument);
+  standaloneDocument.text('Standalone PDFKit');
+  standaloneDocument.end();
+  const pdf = Buffer.from(await standaloneOutput).toString('latin1');
+  assert.match(pdf, /^%PDF-/);
+  assert.match(pdf, /\/OutputIntents\b/);
 })();
