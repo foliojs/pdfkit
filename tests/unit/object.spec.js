@@ -1,4 +1,4 @@
-import PDFObject from '../../lib/object';
+import PDFObject, { escapeName } from '../../lib/object';
 
 describe('PDFObject', () => {
   describe('convert', () => {
@@ -18,6 +18,37 @@ describe('PDFObject', () => {
       const result = PDFObject.convert(new String('αβγδ'));
       expect(result.length).toEqual(12);
       expect(result).toMatchInlineSnapshot(`"(þÿ±²³´)"`);
+    });
+
+    test('dictionary omits keys whose value is undefined', () => {
+      expect(PDFObject.convert({ a: 1, b: undefined, c: 2 })).toEqual(
+        '<<\n/a 1\n/c 2\n>>',
+      );
+    });
+
+    test('dictionary keeps an explicit null', () => {
+      expect(PDFObject.convert({ a: null })).toEqual('<<\n/a null\n>>');
+    });
+
+    test('array converts an undefined entry to null to keep positions', () => {
+      expect(PDFObject.convert([1, undefined, 2])).toEqual('[1 null 2]');
+    });
+
+    test('an array hole keeps its position', () => {
+      // `.map` skipped holes, so the entry vanished and every later index
+      // shifted down: `[1, , 2]` serialised as a two-element array.
+      // eslint-disable-next-line no-sparse-arrays
+      expect(PDFObject.convert([1, , 2])).toEqual('[1 null 2]');
+    });
+  });
+
+  describe('escapeName', () => {
+    test('should escape unsafe characters', () => {
+      expect(escapeName('PANTONE 295 C')).toEqual('PANTONE#20295#20C');
+    });
+
+    test('should not escape safe characters', () => {
+      expect(escapeName('PANTONE-295_C')).toEqual('PANTONE-295_C');
     });
   });
 });

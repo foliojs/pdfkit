@@ -18,9 +18,15 @@ You can also try out an interactive in-browser demo of PDFKit [here](http://pdfk
 
 ## Installation
 
-Installation uses the [npm](http://npmjs.org/) package manager. Just type the following command after installing npm.
+Use [npm](http://npmjs.org/) or [yarn](https://yarnpkg.com/) package manager. Just type the following command:
 
-    npm install pdfkit
+```bash
+# with npm
+npm install pdfkit
+
+# with yarn
+yarn add pdfkit
+```
 
 ## Features
 
@@ -40,6 +46,7 @@ Installation uses the [npm](http://npmjs.org/) package manager. Just type the fo
   - See [fontkit](http://github.com/foliojs/fontkit) for more details on advanced glyph layout support.
 - Image embedding
   - Supports JPEG and PNG files (including indexed PNGs, and PNGs with transparency)
+- Tables
 - Annotations
   - Links
   - Notes
@@ -56,14 +63,19 @@ Installation uses the [npm](http://npmjs.org/) package manager. Just type the fo
 ## Coming soon!
 
 - Patterns fills
-- Higher level APIs for creating tables and laying out content
+- Higher level APIs for laying out content
 - More performance optimizations
 - Even more awesomeness, perhaps written by you! Please fork this repository and send me pull requests.
 
 ## Example
 
+Both `const PDFDocument = require('pdfkit')` and
+`import PDFDocument from 'pdfkit'` remain supported for backward compatibility.
+New code should prefer the named `PDFDocument` export, which will make a future
+migration to an ESM-only package more straightforward.
+
 ```javascript
-const PDFDocument = require('pdfkit');
+const { PDFDocument } = require('pdfkit');
 const fs = require('fs');
 
 // Create a document
@@ -124,6 +136,41 @@ doc.end();
 complex documents with a very small amount of code. For more, see the `demo` folder and the
 [PDFKit programming guide](http://pdfkit.org/docs/getting_started.html).
 
+## Bundling for Node
+
+The Node build loads the metrics of the 14 standard fonts on first use from
+`standard-fonts/` next to the built file, and PDF/A output reads the sRGB ICC
+profile from `data/` next to it. Both are resolved relative to the built file
+inside pdfkit's package directory, which a bundle that inlines pdfkit (esbuild,
+rollup, webpack, the AWS CDK's `NodejsFunction`, ...) does not sit in. Pick one
+of:
+
+- Mark `pdfkit` as external in the bundler and ship `node_modules/pdfkit` next
+  to the bundle. File tracers such as `@vercel/nft` pick up every file pdfkit
+  needs.
+- Copy pdfkit's `js/standard-fonts` directory next to an ESM bundle, which then
+  loads the fonts from there. A CommonJS bundle has no `import.meta.url` to
+  resolve against, so this route is not open to it.
+- Register the standard fonts the document uses before creating it, the same
+  way as in the browser:
+
+  ```javascript
+  import { PDFDocument, registerStdFonts } from 'pdfkit';
+  import Helvetica from 'pdfkit/standard-fonts/Helvetica';
+
+  registerStdFonts(Helvetica);
+  const doc = new PDFDocument();
+  ```
+
+  Using a standard font that is neither registered nor loadable throws an
+  error naming the font. Fonts read from the file system or passed as data are
+  not affected.
+
+PDF/A output additionally reads `data/sRGB_IEC61966_2_1.icc` relative to the
+bundle's `import.meta.url`: copy pdfkit's `js/data` directory next to an ESM
+bundle, or register the profile under that URL with `registerFile`. A CommonJS
+bundle has no `import.meta.url` and says so when PDF/A output is requested.
+
 ## Browser Usage
 
 There are three ways to use PDFKit in the browser:
@@ -132,46 +179,113 @@ There are three ways to use PDFKit in the browser:
 - Use [webpack](https://webpack.js.org/). See [complete example](https://github.com/foliojs/pdfkit/blob/master/examples/webpack).
 - Use prebuilt version. Distributed as `pdfkit.standalone.js` file in the [releases](https://github.com/foliojs/pdfkit/releases) or in the package `js` folder.
 
-In addition to PDFKit, you'll need somewhere to stream the output to. HTML5 has a
-[Blob](https://developer.mozilla.org/en-US/docs/Web/API/Blob) object which can be used to store binary data, and
-get URLs to this data in order to display PDF output inside an iframe, or upload to a server, etc. In order to
-get a Blob from the output of PDFKit, you can use the [blob-stream](https://github.com/devongovett/blob-stream)
-module.
+In addition to PDFKit, you'll need to collect its output. Browsers provide a
+[Blob](https://developer.mozilla.org/en-US/docs/Web/API/Blob) object for storing
+binary data and creating URLs that can be displayed in an iframe, downloaded or
+uploaded.
 
-The following example uses Browserify or webpack to load `PDFKit` and `blob-stream`. See [here](https://codepen.io/blikblum/pen/gJNWMg?editors=1010) and [here](https://codepen.io/blikblum/pen/YboVNq?editors=1010) for examples
-of prebuilt version usage.
+### Experimental output helpers
+
+PDFKit provides experimental `toBlob` and `toBytes` helpers from
+`pdfkit/output`. These functions may change before they are stabilized. Call the
+selected helper before ending the document so it receives the complete output.
+
+Use `toBlob` when displaying, downloading or uploading the PDF in a browser:
 
 ```javascript
-// require dependencies
-const PDFDocument = require('pdfkit');
-const blobStream = require('blob-stream');
+import { PDFDocument, registerStdFonts } from 'pdfkit';
+import Helvetica from 'pdfkit/standard-fonts/Helvetica';
+import HelveticaBold from 'pdfkit/standard-fonts/HelveticaBold';
+import { toBlob } from 'pdfkit/output';
 
-// create a document the same way as above
+registerStdFonts(Helvetica, HelveticaBold);
 const doc = new PDFDocument();
+const output = toBlob(doc);
 
-// pipe the document to a blob
-const stream = doc.pipe(blobStream());
+// Add your content to the document here, as usual.
 
-// add your content to the document here, as usual
-
-// get a blob when you are done
 doc.end();
-stream.on('finish', function() {
-  // get a blob you can do whatever you like with
-  const blob = stream.toBlob('application/pdf');
+const blob = await output;
+const url = URL.createObjectURL(blob);
+iframe.src = url;
 
-  // or get a blob URL for display in the browser
-  const url = stream.toBlobURL('application/pdf');
+// Revoke the URL when the iframe no longer needs the PDF.
+// URL.revokeObjectURL(url);
+```
+
+Use `toBytes` instead when a binary API, worker or parser needs one contiguous
+`Uint8Array`:
+
+```javascript
+import { toBytes } from 'pdfkit/output';
+
+const output = toBytes(doc);
+doc.end();
+const bytes = await output;
+```
+
+The stable, dependency-free alternative is to collect the document's
+`Uint8Array` chunks using its events and construct the Blob directly:
+
+```javascript
+const chunks = [];
+
+doc.on('data', chunk => chunks.push(chunk));
+doc.on('end', () => {
+  const blob = new Blob(chunks, { type: 'application/pdf' });
+  const url = URL.createObjectURL(blob);
   iframe.src = url;
 });
+
+// Add your content to the document here, as usual.
+doc.end();
 ```
 
 You can see an interactive in-browser demo of PDFKit [here](http://pdfkit.org/demo/browser.html).
 
-Note that in order to Browserify a project using PDFKit, you need to install the `brfs` module with npm,
-which is used to load built-in font data into the package. It is listed as a `devDependency` in
-PDFKit's `package.json`, so it isn't installed by default for Node users.
-If you forget to install it, Browserify will print an error message.
+The browser build has no access to the file system. You can register a
+`Uint8Array` under a path before passing that exact path to `registerFont`,
+`image` or `file`:
+
+```javascript
+import { PDFDocument, registerFile } from 'pdfkit';
+
+const response = await fetch('/fonts/Roboto-Regular.ttf');
+const fontData = new Uint8Array(await response.arrayBuffer());
+
+registerFile('fonts/Roboto-Regular.ttf', fontData);
+
+const doc = new PDFDocument();
+
+// register an alias for the font path
+doc.registerFont('Roboto', 'fonts/Roboto-Regular.ttf');
+// or use the path directly
+doc.font('fonts/Roboto-Regular.ttf');
+
+// Optionally unregister the path when it is no longer needed.
+registerFile('fonts/Roboto-Regular.ttf', undefined);
+```
+
+Registration is global to the loaded PDFKit module. Registering the same path
+again replaces its data. In Node, registered data takes precedence over a file at
+the same path; unregistering it restores normal file system lookup. Both APIs
+are available as named exports from the CommonJS entry point:
+
+```javascript
+const { PDFDocument, registerFile } = require('pdfkit');
+
+registerFile('files/example.txt', new Uint8Array([1, 2, 3]), {
+  birthtime: new Date('2020-01-02T03:04:05Z'),
+  ctime: new Date('2021-02-03T04:05:06Z'),
+});
+registerFile('files/example.txt', undefined);
+```
+
+`registerFile` accepts only a `Uint8Array` or `undefined`. You can still pass a
+`Uint8Array` or `ArrayBuffer` directly to `registerFont`, `image` and `file`, and
+you can pass a data URL directly to `image` and `file`. An unregistered file path
+throws in the browser. The optional `birthtime` and `ctime` values must be valid
+`Date` objects; either omitted value defaults to the time of registration.
 
 ## Documentation
 

@@ -1,15 +1,17 @@
 const fs = require('fs');
 const vm = require('vm');
-const { markdown } = require('markdown');
-const CodeMirror = require('codemirror/addon/runmode/runmode.node');
-const PDFDocument = require('../');
+const MarkdownIt = require('markdown-it');
+const { highlightCode, classHighlighter } = require('@lezer/highlight');
+const { parser } = require('@lezer/javascript');
+
+const { PDFDocument } = require('pdfkit');
+
+const markdown = new MarkdownIt();
+
+const tableCellPadding = 5;
+const tableFontSize = 9;
 
 process.chdir(__dirname);
-
-// setup code mirror javascript mode
-const filename = require.resolve('codemirror/mode/javascript/javascript');
-const jsMode = fs.readFileSync(filename, 'utf8');
-vm.runInNewContext(jsMode, { CodeMirror });
 
 // style definitions for markdown
 const styles = {
@@ -32,6 +34,10 @@ const styles = {
     font: 'fonts/Merriweather-Regular.ttf',
     fontSize: 10,
     padding: 10,
+  },
+  em: {
+    font: 'Times-Italic',
+    fontSize: 10,
   },
   code: {
     font: 'fonts/SourceCodePro-Regular.ttf',
@@ -92,9 +98,100 @@ const colors = {
   default: '#002b36',
 };
 
+const highlightColors = {
+  'tok-atom': colors.atom,
+  'tok-bool': colors.atom,
+  'tok-className': colors.def,
+  'tok-comment': colors.comment,
+  'tok-keyword': colors.keyword,
+  'tok-literal': colors.atom,
+  'tok-meta': colors.meta,
+  'tok-number': colors.number,
+  'tok-operator': colors.operator,
+  'tok-propertyName': colors.property,
+  'tok-punctuation': colors.bracket,
+  'tok-string': colors.string,
+  'tok-string2': colors['string-2'],
+  'tok-typeName': colors.def,
+  'tok-variableName': colors.variable,
+  'tok-variableName2': colors['variable-2'],
+};
+
+const getHighlightColor = (classes) =>
+  classes
+    .split(' ')
+    .map((className) => highlightColors[className])
+    .find(Boolean) || colors.default;
+
 // shared lorem ipsum text so we don't need to copy it into every example
 const lorem =
   'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam in suscipit purus. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Vivamus nec hendrerit felis. Morbi aliquam facilisis risus eu lacinia. Sed eu leo in turpis fringilla hendrerit. Ut nec accumsan nisl. Suspendisse rhoncus nisl posuere tortor tempus et dapibus elit porta. Cras leo neque, elementum a rhoncus ut, vestibulum non nibh. Phasellus pretium justo turpis. Etiam vulputate, odio vitae tincidunt ultricies, eros odio dapibus nisi, ut tincidunt lacus arcu eu elit. Aenean velit erat, vehicula eget lacinia ut, dignissim non tellus. Aliquam nec lacus mi, sed vestibulum nunc. Suspendisse potenti. Curabitur vitae sem turpis. Vestibulum sed neque eget dolor dapibus porttitor at sit amet sem. Fusce a turpis lorem. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae;';
+
+const nodeTypes = {
+  bullet_list: 'bulletlist',
+  code_inline: 'inlinecode',
+  heading: 'header',
+  list_item: 'listitem',
+  ordered_list: 'numberlist',
+};
+
+const getAttrs = (token) => Object.fromEntries(token.attrs || []);
+
+const tokensToTree = function (tokens, index = 0, closingType = null) {
+  const nodes = [];
+
+  while (index < tokens.length) {
+    const token = tokens[index];
+    if (token.type === closingType) {
+      return [nodes, index + 1];
+    }
+
+    if (token.type === 'inline') {
+      const [children] = tokensToTree(token.children);
+      nodes.push(...children);
+      index += 1;
+      continue;
+    }
+
+    if (token.type === 'text' || token.type === 'html_block') {
+      nodes.push(token.content);
+    } else if (token.type === 'softbreak' || token.type === 'hardbreak') {
+      nodes.push('\n');
+    } else if (token.type === 'code_inline') {
+      nodes.push(['inlinecode', token.content]);
+    } else if (token.type === 'image') {
+      nodes.push(['img', { ...getAttrs(token), alt: token.content }]);
+    } else if (token.type === 'fence' || token.type === 'code_block') {
+      nodes.push(['code_block', token.content]);
+    } else if (token.type === 'hr') {
+      nodes.push(['hr']);
+    } else if (token.nesting === 1) {
+      const type = token.type.replace(/_open$/, '');
+      const attrs = getAttrs(token);
+      if (type === 'heading') {
+        attrs.level = Number(token.tag.slice(1));
+      }
+
+      const [children, nextIndex] = tokensToTree(
+        tokens,
+        index + 1,
+        `${type}_close`,
+      );
+      const node = [nodeTypes[type] || type];
+      if (Object.keys(attrs).length) {
+        node.push(attrs);
+      }
+      node.push(...children);
+      nodes.push(node);
+      index = nextIndex;
+      continue;
+    }
+
+    index += 1;
+  }
+
+  return [nodes, index];
+};
 
 let codeBlocks = [];
 let lastType = null;
@@ -127,25 +224,32 @@ class Node {
         this.type = `h${this.attrs.level}`;
         break;
 
-      case 'code_block':
-        // use code mirror to syntax highlight the code block
+      case 'code_block': {
         var code = this.content[0].text;
         this.content = [];
-        CodeMirror.runMode(code, 'javascript', (text, style) => {
-          const color = colors[style] || colors.default;
+
+        const addCodeFragment = (text, classes = '') => {
           const opts = {
-            color,
+            color: getHighlightColor(classes),
             continued: text !== '\n',
           };
+          this.content.push(new Node(['code', opts, text]));
+        };
 
-          return this.content.push(new Node(['code', opts, text]));
-        });
+        highlightCode(
+          code,
+          parser.parse(code),
+          classHighlighter,
+          addCodeFragment,
+          () => addCodeFragment('\n'),
+        );
 
         if (this.content.length) {
           this.content[this.content.length - 1].attrs.continued = false;
         }
         codeBlocks.push(code);
         break;
+      }
 
       case 'img':
         // images are used to generate inline example output
@@ -186,6 +290,109 @@ class Node {
       options.continued = this.attrs.continued;
     }
     return options;
+  }
+
+  getText() {
+    if (this.type === 'text') {
+      return this.text;
+    }
+    return this.content.map((node) => node.getText()).join('');
+  }
+
+  getTableRows() {
+    const rows = [];
+    for (const section of this.content) {
+      if (section.type === 'tr') {
+        rows.push({ isHeader: false, node: section });
+      } else {
+        for (const row of section.content) {
+          if (row.type === 'tr') {
+            rows.push({ isHeader: section.type === 'thead', node: row });
+          }
+        }
+      }
+    }
+    return rows;
+  }
+
+  getTableRowHeight(doc, row, cellWidth, isHeader) {
+    const font = isHeader ? styles.h3.font : styles.para.font;
+    const fontSize = isHeader ? styles.para.fontSize : tableFontSize;
+    doc.font(font).fontSize(fontSize);
+
+    return (
+      Math.max(
+        ...row.content.map((cell) =>
+          doc.heightOfString(cell.getText(), {
+            width: cellWidth - tableCellPadding * 2,
+          }),
+        ),
+        doc.currentLineHeight(),
+      ) +
+      tableCellPadding * 2
+    );
+  }
+
+  renderTableRow(doc, row, cellWidth, rowHeight, isHeader) {
+    const x = doc.page.margins.left;
+    const y = doc.y;
+    const font = isHeader ? styles.h3.font : styles.para.font;
+    const fontSize = isHeader ? styles.para.fontSize : tableFontSize;
+
+    for (let index = 0; index < row.content.length; index++) {
+      const cell = row.content[index];
+      const alignment = cell.attrs.style?.match(/text-align:(\w+)/)?.[1];
+      const cellX = x + index * cellWidth;
+
+      doc
+        .font(font)
+        .fontSize(fontSize)
+        .fillColor('black')
+        .text(cell.getText(), cellX + tableCellPadding, y + tableCellPadding, {
+          align: alignment,
+          width: cellWidth - tableCellPadding * 2,
+        });
+      doc.rect(cellX, y, cellWidth, rowHeight).stroke();
+    }
+
+    doc.x = x;
+    doc.y = y + rowHeight;
+  }
+
+  renderTable(doc) {
+    const rows = this.getTableRows();
+    const header = rows.find((row) => row.isHeader);
+    const columnCount = Math.max(...rows.map((row) => row.node.content.length));
+    const width =
+      doc.page.width - doc.page.margins.left - doc.page.margins.right;
+    const cellWidth = width / columnCount;
+
+    const renderRow = (row) => {
+      const rowHeight = this.getTableRowHeight(
+        doc,
+        row.node,
+        cellWidth,
+        row.isHeader,
+      );
+      const pageBottom = doc.page.height - doc.page.margins.bottom;
+      if (doc.y + rowHeight > pageBottom) {
+        doc.addPage();
+        if (!row.isHeader && header) {
+          const headerHeight = this.getTableRowHeight(
+            doc,
+            header.node,
+            cellWidth,
+            true,
+          );
+          this.renderTableRow(doc, header.node, cellWidth, headerHeight, true);
+        }
+      }
+      this.renderTableRow(doc, row.node, cellWidth, rowHeight, row.isHeader);
+    };
+
+    for (const row of rows) {
+      renderRow(row);
+    }
   }
 
   // renders this node and its subnodes to the document
@@ -231,6 +438,9 @@ class Node {
         break;
       case 'hr':
         doc.addPage();
+        break;
+      case 'table':
+        this.renderTable(doc);
         break;
       default:
         // loop through subnodes and render them
@@ -290,8 +500,9 @@ class Node {
 // reads and renders a markdown/literate javascript file to the document
 const render = (doc, filename) => {
   codeBlocks = [];
-  const tree = markdown.parse(fs.readFileSync(filename, 'utf8'));
-  tree.shift();
+  const [tree] = tokensToTree(
+    markdown.parse(fs.readFileSync(filename, 'utf8'), {}),
+  );
 
   const result = [];
   while (tree.length) {

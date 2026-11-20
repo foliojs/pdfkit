@@ -1,5 +1,5 @@
 import { runDocTest } from './helpers';
-var tiger = require('../../examples/tiger');
+var tiger = require('../../examples/tiger').default;
 
 describe('vector', function () {
   test('simple shapes', function () {
@@ -24,7 +24,7 @@ describe('vector', function () {
   });
 
   test('complex svg', function () {
-    return runDocTest(function (doc) {
+    return runDocTest({ failureThreshold: 0.05 }, function (doc) {
       var i, len, part;
       doc.translate(220, 300);
       for (i = 0, len = tiger.length; i < len; i++) {

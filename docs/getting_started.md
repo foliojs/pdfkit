@@ -9,12 +9,24 @@ following command after installing npm.
 
 ### Creating a document
 
-Creating a PDFKit document is quite simple. Just require the `pdfkit` module
-in your JavaScript source file and create an instance of the
-`PDFDocument` class.
+Creating a PDFKit document is quite simple. Require the named `PDFDocument`
+export and create an instance of the class.
 
-    const PDFDocument = require('pdfkit');
+    const { PDFDocument } = require('pdfkit');
     const doc = new PDFDocument();
+
+Or, from an ES module:
+
+    import { PDFDocument } from 'pdfkit';
+    const doc = new PDFDocument();
+
+In Node, both `require('pdfkit')` and `import 'pdfkit'` resolve to a Node build
+with real file system access, native zlib compression and Node streams; browsers
+and bundlers targeting browsers get the browser build described below. Both
+`const PDFDocument = require('pdfkit')` and
+`import PDFDocument from 'pdfkit'` remain supported for backward compatibility.
+New code should prefer the named `PDFDocument` export, which will make a future
+migration to an ESM-only package more straightforward.
 
 `PDFDocument` instances are readable Node streams. They don't get saved anywhere automatically,
 but you can call the `pipe` method to send the output of the PDF document to another
@@ -33,49 +45,141 @@ The `write` and `output` methods found in PDFKit before version 0.5 are now depr
 
 ## Using PDFKit in the browser
 
-PDFKit can be used in the browser as well as in Node! There are two ways to use PDFKit in the browser.
-The first is to create an app using an module bundler like [Browserify](http://browserify.org/) or [Webpack](https://webpack.js.org/).
-The second is to create a standalone pdfkit script as explained [here](https://github.com/foliojs/pdfkit/wiki/How-to-compile-standalone-PDFKit-for-use-in-the-browser).
+PDFKit provides an ES module build for browsers. Standard PDF font metrics are
+not included in the main browser module. Import and register the generated data
+for every standard font your application uses before selecting that font. The
+default document font is Helvetica, so it must be registered before constructing
+a document unless the document is created with `{ font: null }`.
 
-Using PDFKit in the browser is exactly the same as using it in Node, except you'll want to pipe the
-output to a destination supported in the browser, such as a
-[Blob](https://developer.mozilla.org/en-US/docs/Web/API/Blob). Blobs can be used
-to generate a URL to allow display of generated PDFs directly in the browser via an `iframe`, or they can
-be used to upload the PDF to a server, or trigger a download in the user's browser.
+### Experimental output helpers
 
-To get a Blob from a `PDFDocument`, you should pipe it to a [blob-stream](https://github.com/devongovett/blob-stream),
-which is a module that generates a Blob from any Node-style stream. The following example uses Browserify to load
-`PDFKit` and `blob-stream`, but if you're not using Browserify, you can load them in whatever way you'd like (e.g. script tags).
+PDFKit provides experimental `toBlob` and `toBytes` helpers from
+`pdfkit/output`. These functions may change before they are stabilized. Call the
+selected helper before ending the document so it receives the complete output.
 
-    // require dependencies
-    const PDFDocument = require('pdfkit');
-    const blobStream  = require('blob-stream');
+Use `toBlob` when displaying, downloading or uploading the PDF in a browser:
 
-    // create a document the same way as above
-    const doc = new PDFDocument;
+    import { PDFDocument, registerStdFonts } from 'pdfkit';
+    import Helvetica from 'pdfkit/standard-fonts/Helvetica';
+    import { toBlob } from 'pdfkit/output';
 
-    // pipe the document to a blob
-    const stream = doc.pipe(blobStream());
+    registerStdFonts(Helvetica);
+
+    const doc = new PDFDocument();
+    const output = toBlob(doc);
 
     // add your content to the document here, as usual
 
-    // get a blob when you're done
     doc.end();
-    stream.on('finish', function() {
-      // get a blob you can do whatever you like with
-      const blob = stream.toBlob('application/pdf');
+    const blob = await output;
+    const url = URL.createObjectURL(blob);
+    iframe.src = url;
 
-      // or get a blob URL for display in the browser
-      const url = stream.toBlobURL('application/pdf');
+    // Revoke the URL when the iframe no longer needs the PDF.
+    // URL.revokeObjectURL(url);
+
+Use `toBytes` instead when a binary API, worker or parser needs one contiguous
+`Uint8Array`:
+
+    import { toBytes } from 'pdfkit/output';
+
+    const output = toBytes(doc);
+    doc.end();
+    const bytes = await output;
+
+The stable, dependency-free alternative is to collect the document's
+`Uint8Array` chunks using its events and construct the Blob directly:
+
+    const chunks = [];
+
+    doc.on('data', chunk => chunks.push(chunk));
+    doc.on('end', () => {
+      const blob = new Blob(chunks, { type: 'application/pdf' });
+      const url = URL.createObjectURL(blob);
       iframe.src = url;
     });
 
+    // add your content to the document here, as usual
+    doc.end();
+
+The browser build does not depend on Node's `stream` module. A document is still a
+readable stream, but only the parts a PDF document needs are implemented: `on`,
+`once`, `off`, `emit`, `pipe` and async iteration. `read`, `setEncoding`,
+`destroy`, `stream.pipeline` and the `readable`, `error` and `close` events are
+available in Node only.
+
+The browser build cannot read from the file system. To keep using paths with
+`registerFont`, `image` or `file`, register a `Uint8Array` under the exact path
+first:
+
+    import { PDFDocument, registerFile } from 'pdfkit';
+
+    const response = await fetch('/fonts/Roboto-Regular.ttf');
+    const fontData = new Uint8Array(await response.arrayBuffer());
+
+    registerFile('fonts/Roboto-Regular.ttf', fontData);
+
+    const doc = new PDFDocument();
+    doc.registerFont('Roboto', 'fonts/Roboto-Regular.ttf');
+    doc.font('Roboto').text('This font was loaded from memory.');
+
+    // Unregister the path when it is no longer needed.
+    registerFile('fonts/Roboto-Regular.ttf', undefined);
+
+Registration is global to the loaded PDFKit module. Registering the same path
+again replaces its bytes. Passing `undefined` unregisters the path and does
+nothing if it was not registered. Unregistered paths throw in browsers.
+
+The same registry is available from the Node entry points. Registered
+data takes precedence over a file at the same path; unregistering restores normal
+file system lookup.
+
+    const { PDFDocument, registerFile } = require('pdfkit');
+
+    registerFile('files/example.txt', new Uint8Array([1, 2, 3]), {
+      birthtime: new Date('2020-01-02T03:04:05Z'),
+      ctime: new Date('2021-02-03T04:05:06Z'),
+    });
+    registerFile('files/example.txt', undefined);
+
+`registerFile` accepts only a `Uint8Array` or `undefined`. A `Uint8Array` or
+`ArrayBuffer` can still be passed directly to `registerFont`, `image` and `file`,
+and a data URL can be passed directly to `image` and `file`, but these other
+representations cannot be stored with `registerFile`. The optional `birthtime`
+and `ctime` values must be valid `Date` objects. Any omitted timestamp defaults
+to the time of registration.
+
 You can see an interactive in-browser demo of PDFKit [here](http://pdfkit.org/demo/browser.html).
 
-Note that in order to Browserify a project using PDFKit, you need to install the `brfs` module with npm,
-which is used to load built-in font data into the package. It is listed as a `devDependencies` in
-PDFKit's `package.json`, so it isn't installed by default for Node users.
-If you forget to install it, Browserify will print an error message.
+## Document options
+
+When creating a PDFDocument, you can pass various options to control the document behavior.
+
+### Page Layout
+
+The `pageLayout` option specifies how pages should be displayed in a PDF viewer:
+
+| Value | Description |
+|-------|-------------|
+| `singlePage` | Display one page at a time |
+| `oneColumn` | Display pages in one column |
+| `twoColumnLeft` | Display pages in two columns, odd pages on left |
+| `twoColumnRight` | Display pages in two columns, odd pages on right |
+| `twoPageLeft` | Display two pages at a time, odd pages on left |
+| `twoPageRight` | Display two pages at a time, odd pages on right |
+
+    const doc = new PDFDocument({ pageLayout: 'twoColumnLeft' });
+
+### Object streams
+
+The `objectStreams` option packs the objects that are not streams (pages, annotations, the
+structure elements of a tagged document, etc.) into compressed object streams, and writes a
+cross-reference stream instead of the xref table. Documents with many such objects, like tagged
+ones, get much smaller, while their content stays the same.
+
+    const doc = new PDFDocument({ pdfVersion: '1.5', objectStreams: true });
+
+It requires a `pdfVersion` of `1.5` or higher, and cannot be used with encryption or PDF/A-1.
 
 ## Adding pages
 
@@ -178,6 +282,26 @@ numbers to a document.
     // or, if you are at the end of the document anyway,
     // doc.end() will call it for you automatically.
     doc.end();
+
+## Page labels
+
+PDF viewers number pages from 1 unless the document says otherwise. To have them
+show other page labels, such as roman numerals for a preface, call `addPageLabel`
+with the zero-based index of the first page of each range. A range lasts until the
+next one starts, and pages before the first range keep plain numbers.
+
+    // Pages i, ii, then 1, 2, ... and an appendix numbered A-1, A-2, ...
+    doc.addPageLabel(0, { style: 'lowerRoman' });
+    doc.addPageLabel(2, { style: 'decimal' });
+    doc.addPageLabel(10, { style: 'decimal', prefix: 'A-' });
+
+The following options are available:
+
+* `style` - `decimal`, `upperRoman`, `lowerRoman`, `upperAlpha` or `lowerAlpha`. Without a style, the label is only the `prefix`.
+* `prefix` - text in front of the number
+* `start` - the number of the first page of the range, a positive integer. Defaults to `1`.
+
+Page labels only change what viewers show, and do not draw anything on the page.
 
 ## Setting default font
 

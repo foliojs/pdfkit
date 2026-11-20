@@ -1,6 +1,6 @@
 {
   "name": "pdfkit",
-  "description": "A PDF generation library for Node.js",
+  "description": "A JavaScript PDF generation library",
   "keywords": [
     "pdf",
     "pdf writer",
@@ -9,7 +9,7 @@
     "document",
     "vector"
   ],
-  "version": "0.17.1",
+  "version": "0.21.0",
   "homepage": "http://pdfkit.org/",
   "author": {
     "name": "Devon Govett",
@@ -23,71 +23,147 @@
   },
   "bugs": "https://github.com/foliojs/pdfkit/issues",
   "devDependencies": {
-    "@babel/core": "^7.26.0",
-    "@babel/plugin-external-helpers": "^7.25.9",
-    "@babel/preset-env": "^7.26.0",
-    "@eslint/js": "^9.17.0",
-    "@rollup/plugin-babel": "^6.0.4",
-    "babel-jest": "^29.7.0",
-    "blob-stream": "^0.1.3",
-    "brace": "^0.11.1",
-    "brfs": "~2.0.2",
-    "browserify": "^17.0.1",
-    "canvas": "^3.1.0",
-    "codemirror": "~5.65.18",
-    "eslint": "^9.17.0",
-    "gh-pages": "^6.2.0",
-    "globals": "^15.14.0",
-    "jest": "^29.7.0",
-    "jest-environment-jsdom": "^29.7.0",
-    "jest-image-snapshot": "^6.4.0",
-    "markdown": "~0.5.0",
-    "pdfjs-dist": "^2.14.305",
-    "prettier": "3.4.2",
-    "pug": "^3.0.3",
-    "rollup": "^2.79.2",
-    "rollup-plugin-copy": "^3.5.0"
+    "@babel/core": "^8.1.2",
+    "@babel/plugin-external-helpers": "^8.0.1",
+    "@babel/preset-env": "^8.0.7",
+    "@codemirror/lang-javascript": "^6.2.5",
+    "@codemirror/theme-one-dark": "^6.1.3",
+    "@eslint/js": "^10.0.1",
+    "@lezer/highlight": "^1.2.5",
+    "@lezer/javascript": "^1.5.6",
+    "@rollup/plugin-babel": "^7.1.0",
+    "@rollup/plugin-commonjs": "^29.0.3",
+    "@rollup/plugin-node-resolve": "^16.0.3",
+    "codemirror": "~6.0.2",
+    "eslint": "^10.14.0",
+    "gh-pages": "^6.3.0",
+    "globals": "^17.14.0",
+    "jest-diff": "^30.5.2",
+    "jest-image-snapshot": "^6.5.2",
+    "markdown-it": "^15.0.3",
+    "pdfjs-dist": "^5.7.284",
+    "prettier": "3.10.0",
+    "pug": "^3.0.4",
+    "rollup": "^4.68.2",
+    "sharp": "^0.35.5",
+    "vite": "^8.3.8",
+    "vitest": "^5.1.0"
   },
   "dependencies": {
-    "crypto-js": "^4.2.0",
-    "fontkit": "^2.0.4",
-    "jpeg-exif": "^1.1.4",
-    "linebreak": "^1.1.0",
-    "png-js": "^1.0.0"
+    "@noble/ciphers": "^2.4.0",
+    "@noble/hashes": "^2.4.0",
+    "fflate": "^0.8.3",
+    "fontkit": "^3.0.0",
+    "linebreak": "^2.0.0",
+    "png-js": "^3.0.0"
   },
   "scripts": {
     "prepublishOnly": "npm run build",
-    "build": "rollup -c && npm run build-standalone",
-    "build-standalone": "browserify --standalone PDFDocument --ignore crypto js/pdfkit.js > js/pdfkit.standalone.js",
-    "browserify-example": "browserify examples/browserify/browser.js > examples/browserify/bundle.js",
+    "build": "rollup -c",
+    "playground:dev": "yarn build && vite examples/playground",
+    "playground:build": "yarn build && vite build examples/playground",
+    "playground:preview": "vite preview examples/playground",
     "pdf-guide": "node docs/generate.js",
     "website": "node docs/generate_website.js",
-    "publish-website": "node docs/publish_website.js",
-    "docs": "npm run pdf-guide && npm run website && npm run browserify-example",
-    "lint": "eslint {lib,tests}/**/*.js",
-    "prettier": "prettier lib tests docs",
-    "test": "jest -i --env=node",
-    "test:visual": "jest visual/ -i --env=node",
-    "test:unit": "jest unit/ --env=node"
+    "publish-website": "npm run docs && node docs/publish_website.js",
+    "docs": "npm run pdf-guide && npm run website && node examples/kitchen-sink.js && npm run playground:build",
+    "lint": "eslint {lib,tests,tools}/**/*.js",
+    "prettier": "prettier --check lib tests docs tools",
+    "format": "prettier --write lib tests docs tools",
+    "test": "vitest --testTimeout 8000 run --exclude \"tests/tools/**\"",
+    "test:package": "node tests/package-resolution.cjs && node tests/package-resolution.mjs",
+    "test:tools": "vitest --testTimeout 8000 run tests/tools",
+    "test:visual": "vitest --testTimeout 8000 run tests/visual",
+    "test:unit": "vitest run tests/unit"
   },
-  "main": "js/pdfkit.js",
-  "module": "js/pdfkit.es.js",
-  "browserify": {
-    "transform": [
-      "brfs"
-    ]
+  "exports": {
+    ".": {
+      "node": {
+        "import": "./js/pdfkit.node.mjs",
+        "require": "./js/pdfkit.js"
+      },
+      "default": "./js/pdfkit.browser.mjs"
+    },
+    "./output": {
+      "require": "./js/output.cjs",
+      "default": "./js/output.mjs"
+    },
+    "./standard-fonts/Courier": {
+      "require": "./js/standard-fonts/Courier.cjs",
+      "default": "./js/standard-fonts/Courier.mjs"
+    },
+    "./standard-fonts/CourierBold": {
+      "require": "./js/standard-fonts/CourierBold.cjs",
+      "default": "./js/standard-fonts/CourierBold.mjs"
+    },
+    "./standard-fonts/CourierBoldOblique": {
+      "require": "./js/standard-fonts/CourierBoldOblique.cjs",
+      "default": "./js/standard-fonts/CourierBoldOblique.mjs"
+    },
+    "./standard-fonts/CourierOblique": {
+      "require": "./js/standard-fonts/CourierOblique.cjs",
+      "default": "./js/standard-fonts/CourierOblique.mjs"
+    },
+    "./standard-fonts/Helvetica": {
+      "require": "./js/standard-fonts/Helvetica.cjs",
+      "default": "./js/standard-fonts/Helvetica.mjs"
+    },
+    "./standard-fonts/HelveticaBold": {
+      "require": "./js/standard-fonts/HelveticaBold.cjs",
+      "default": "./js/standard-fonts/HelveticaBold.mjs"
+    },
+    "./standard-fonts/HelveticaBoldOblique": {
+      "require": "./js/standard-fonts/HelveticaBoldOblique.cjs",
+      "default": "./js/standard-fonts/HelveticaBoldOblique.mjs"
+    },
+    "./standard-fonts/HelveticaOblique": {
+      "require": "./js/standard-fonts/HelveticaOblique.cjs",
+      "default": "./js/standard-fonts/HelveticaOblique.mjs"
+    },
+    "./standard-fonts/Symbol": {
+      "require": "./js/standard-fonts/Symbol.cjs",
+      "default": "./js/standard-fonts/Symbol.mjs"
+    },
+    "./standard-fonts/TimesBold": {
+      "require": "./js/standard-fonts/TimesBold.cjs",
+      "default": "./js/standard-fonts/TimesBold.mjs"
+    },
+    "./standard-fonts/TimesBoldItalic": {
+      "require": "./js/standard-fonts/TimesBoldItalic.cjs",
+      "default": "./js/standard-fonts/TimesBoldItalic.mjs"
+    },
+    "./standard-fonts/TimesItalic": {
+      "require": "./js/standard-fonts/TimesItalic.cjs",
+      "default": "./js/standard-fonts/TimesItalic.mjs"
+    },
+    "./standard-fonts/TimesRoman": {
+      "require": "./js/standard-fonts/TimesRoman.cjs",
+      "default": "./js/standard-fonts/TimesRoman.mjs"
+    },
+    "./standard-fonts/ZapfDingbats": {
+      "require": "./js/standard-fonts/ZapfDingbats.cjs",
+      "default": "./js/standard-fonts/ZapfDingbats.mjs"
+    }
+  },
+  "imports": {
+    "#fs": {
+      "node": "./lib/fs/node.js",
+      "default": "./lib/fs/browser.js"
+    },
+    "#zlib": {
+      "node": "./lib/zlib/node.js",
+      "default": "./lib/zlib/browser.js"
+    },
+    "#stream": {
+      "node": "./lib/stream/node.js",
+      "default": "./lib/stream/browser.js"
+    }
   },
   "engine": [
-    "node >= v18.0.0"
+    "node >= v20.0.0"
   ],
-  "jest": {
-    "testEnvironment": "jest-environment-jsdom",
-    "testPathIgnorePatterns": [
-      "/node_modules/",
-      "<rootDir>/examples/"
-    ],
-    "setupFilesAfterEnv": [
-      "<rootDir>/tests/unit/setupTests.js"
-    ]
-  }
+  "packageManager": "yarn@4.18.1",
+  "files": [
+    "js"
+  ]
 }

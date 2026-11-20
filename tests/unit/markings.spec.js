@@ -525,6 +525,23 @@ EMC
         document.struct('Foo', [1]);
       }).toThrow();
     });
+
+    test('_currentStructureElement tracking with closures', () => {
+      const section = document.struct('Sect');
+      document.addStructure(section);
+
+      let capturedStructElement = null;
+
+      const paragraph = document.struct('P', () => {
+        capturedStructElement = document._currentStructureElement;
+      });
+
+      section.add(paragraph);
+      section.end();
+      document.end();
+
+      expect(capturedStructElement).toBe(paragraph);
+    });
   });
 
   describe('accessible document', () => {

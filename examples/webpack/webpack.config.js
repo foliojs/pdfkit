@@ -14,10 +14,6 @@ module.exports = {
   ],
   resolve: {
     symlinks: false,
-    alias: {
-      // maps fs to a virtual one allowing to register file content dynamically
-      fs: __dirname + '/../../js/virtual-fs.js'
-    },
     fallback: {
       // crypto module is not necessary at browser
       crypto: false,
@@ -31,8 +27,6 @@ module.exports = {
   },
   module: {
     rules: [
-      // bundle and load afm files verbatim
-      { test: /\.afm$/, type: 'asset/source' },
       // bundle and load binary files inside static-assets folder as base64
       {
         test: /src[/\\]static-assets/,

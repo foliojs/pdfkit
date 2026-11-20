@@ -1,11 +1,23 @@
-var PDFDocument = require('../');
-var tiger = require('./tiger');
-var fs = require('fs');
+import fs from 'node:fs';
+import { PDFDocument } from 'pdfkit';
+import tiger from './tiger.js';
+
+const outputFilePath = new URL('./kitchen-sink.pdf', import.meta.url);
+
+// for image paths, we can use the URL object directly without resolving to pathname
+const pngTestImagePath = new URL('./images/test.png', import.meta.url);
+const jpegTestImagePath = new URL('./images/test.jpeg', import.meta.url);
+
+// font paths need to be resolved to their pathname
+const palatinoFontPath = new URL('./fonts/PalatinoBold.ttf', import.meta.url)
+  .pathname;
+const chalkboardFontPath = new URL('./fonts/Chalkboard.ttc', import.meta.url)
+  .pathname;
 
 // Create a new PDFDocument
 var doc = new PDFDocument();
 
-doc.pipe(fs.createWriteStream('kitchen-sink.pdf'));
+doc.pipe(fs.createWriteStream(outputFilePath));
 
 // Set some meta data
 doc.info['Title'] = 'Test Document';
@@ -13,7 +25,7 @@ doc.info['Title'] = 'Test Document';
 doc.info['Author'] = 'Devon Govett';
 
 // Register a font name for use later
-doc.registerFont('Palatino', 'fonts/PalatinoBold.ttf');
+doc.registerFont('Palatino', palatinoFontPath);
 
 // Set the font, draw some text, and embed an image
 doc
@@ -22,26 +34,18 @@ doc
   .text('Some text with an embedded font!', 100, 100)
   .fontSize(18)
   .text('PNG and JPEG images:')
-  .image('images/test.png', 100, 160, {
-    width: 412
+  .image(pngTestImagePath, 100, 160, {
+    width: 412,
   })
-  .image('images/test.jpeg', 190, 400, {
-    height: 300
+  .image(jpegTestImagePath, 190, 400, {
+    height: 300,
   });
 
 // Add another page
-doc
-  .addPage()
-  .fontSize(25)
-  .text('Here is some vector graphics...', 100, 100);
+doc.addPage().fontSize(25).text('Here is some vector graphics...', 100, 100);
 
 // Draw a triangle and a circle
-doc
-  .save()
-  .moveTo(100, 150)
-  .lineTo(100, 250)
-  .lineTo(200, 250)
-  .fill('#FF3300');
+doc.save().moveTo(100, 150).lineTo(100, 250).lineTo(200, 250).fill('#FF3300');
 
 doc.circle(280, 200, 50).fill('#6600FF');
 
@@ -65,7 +69,7 @@ doc
     width: 412,
     align: 'justify',
     indent: 30,
-    paragraphGap: 5
+    paragraphGap: 5,
   });
 
 // Add another page, and set the font back
@@ -98,56 +102,45 @@ for (i = 0, len = tiger.length; i < len; i++) {
 }
 
 // Add some text with annotations
-doc
-  .addPage()
-  .fillColor('blue')
-  .text('Here is a link!', 100, 100, {
-    link: 'http://google.com/',
-    underline: true
-  });
+doc.addPage().fillColor('blue').text('Here is a link!', 100, 100, {
+  link: 'http://google.com/',
+  underline: true,
+});
 
 // Add a list with a font loaded from a TrueType collection file
 doc
   .fillColor('#000')
-  .font('fonts/Chalkboard.ttc', 'Chalkboard', 16)
+  .font(chalkboardFontPath, 'Chalkboard', 16)
   .list(['One', 'Two', 'Three'], 100, 150);
 
 // Create text with a spot color
-doc.addSpotColor('PANTONE185C', 0, 100, 78, 9)
-doc.moveDown()
-    .fillColor('PANTONE185C')
-    .text('This text uses spot color!');
+doc.addSpotColor('PANTONE185C', 0, 100, 78, 9);
+doc.moveDown().fillColor('PANTONE185C').text('This text uses spot color!');
 
 doc.moveDown();
 
-doc
-  .font('Helvetica')
-  .fillColor('#000')
-  .text('Horizontal scaling support:');
+doc.font('Helvetica').fillColor('#000').text('Horizontal scaling support:');
 
 doc.moveDown();
 
-doc
-  .text(loremIpsum, {
-    height: 100,
-    width: 300,
-    align: 'justify',
-  });
+doc.text(loremIpsum, {
+  height: 100,
+  width: 300,
+  align: 'justify',
+});
 
-doc
-  .text(loremIpsum, {
-    height: 100,
-    width: 300,
-    align: 'justify',
-    horizontalScaling: 75
-  });
+doc.text(loremIpsum, {
+  height: 100,
+  width: 300,
+  align: 'justify',
+  horizontalScaling: 75,
+});
 
-doc
-  .text(loremIpsum, {
-    height: 100,
-    width: 300,
-    align: 'justify',
-    horizontalScaling: 130
-  });
+doc.text(loremIpsum, {
+  height: 100,
+  width: 300,
+  align: 'justify',
+  horizontalScaling: 130,
+});
 
 doc.end();

@@ -27,6 +27,14 @@ describe('color', function () {
     ]);
   });
 
+  test('normalize named color case-insensitively', function () {
+    const doc = new PDFDocument();
+
+    expect(doc._normalizeColor('red')).toEqual([1, 0, 0]);
+    expect(doc._normalizeColor('Red')).toEqual([1, 0, 0]);
+    expect(doc._normalizeColor('RED')).toEqual([1, 0, 0]);
+  });
+
   test('normalize with spot color', function () {
     const doc = new PDFDocument();
     doc.addSpotColor('PANTONE 123 C', 0.1, 0.2, 0.3, 0.4);
@@ -54,6 +62,26 @@ describe('color', function () {
         '/F1 9 0 R\n' +
         '>>\n' +
         '>>',
+    ]);
+  });
+
+  test('spot color escapes color name in Separation color space', function () {
+    const doc = new PDFDocument();
+    const data = logData(doc);
+    doc.addSpotColor('PANTONE 295 C', 100, 53, 0, 67);
+    doc.fillColor('PANTONE 295 C').text('This text uses spaced spot color!');
+    doc.end();
+
+    expect(data).toContainChunk([
+      `8 0 obj`,
+      '[/Separation /PANTONE#20295#20C /DeviceCMYK <<\n' +
+        '/Range [0 1 0 1 0 1 0 1]\n' +
+        '/C0 [0 0 0 0]\n' +
+        '/C1 [1 0.53 0 0.67]\n' +
+        '/FunctionType 2\n' +
+        '/Domain [0 1]\n' +
+        '/N 1\n' +
+        '>>]',
     ]);
   });
 });

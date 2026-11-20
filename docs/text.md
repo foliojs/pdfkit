@@ -29,6 +29,10 @@ doing that for long pieces of text. PDFKit can also automatically wrap text
 into multiple columns.
 
 The text will automatically wrap unless you set the `lineBreak` option to `false`.
+A line may break wherever the Unicode line breaking rules allow one, which
+includes after a hyphen or a slash inside a word. Set `lineBreak` to
+`'whitespace'` to break only at whitespace, a soft hyphen or a zero-width space,
+so that a word such as `design-system` or a URL moves to the next line whole.
 By default it will wrap to the page margin, but the `width` option allows
 you to set a different width the text should be wrapped to.
 If you set the `height` option, the text will be clipped to the number of
@@ -83,7 +87,7 @@ PDFKit has many options for controlling the look of text added to PDF
 documents, which can be passed to the `text` method. They are enumerated
 below.
 
-* `lineBreak` - set to `false` to disable line wrapping all together
+* `lineBreak` - set to `false` to disable line wrapping all together, or to `'whitespace'` to break lines only at whitespace, a soft hyphen or a zero-width space, never after a hyphen or a slash inside a word
 * `width` - the width that text should be wrapped to (by default, the page width minus the left and right margin)
 * `height` - the maximum height that text should be clipped to
 * `rotation` - the rotation of the text in degrees (by default 0)
@@ -103,7 +107,9 @@ below.
 * `goTo` - go to anchor (shortcut to create an annotation)
 * `destination` - create anchor to this text
 * `underline` - whether to underline the text
+* `underlineOffset` - how far to move the underline down from its default position, in PDF points. A negative value moves it up.
 * `strike` - whether to strike out the text
+* `decorationThickness` - the thickness of the underline and the strikethrough in PDF points (by default it follows the font size)
 * `oblique` - whether to slant the text (angle in degrees or `true`)
 * `baseline` - the vertical alignment of the text with respect to its insertion point (values as [canvas textBaseline](https://www.w3schools.com/tags/canvas_textbaseline.asp))
 * `continued` - whether the text segment will be followed immediately by another segment. Useful for changing styling in the middle of a paragraph.
@@ -151,6 +157,7 @@ Lists use the following additional options:
 * `textIndent`
 * `bulletIndent`
 * `listType` - `bullet`, `numbered`, `roman`, `roman-lower`, `lettered` (`bullet` by default)
+* `start` - the number the top level of a `numbered` or `lettered` list starts counting from, e.g. to carry on after an image. A `lettered` list counts `1` as `A`, so `3` starts at `C`. Nested lists still start from the beginning. Defaults to `1`.
 
 ## Rich Text
 
@@ -195,9 +202,12 @@ Here is the output:
 
 ![5]()
 
+Note that the `center` and `right` alignments are not applied to `continued` text as a whole:
+each segment is aligned on its own, so the segments of a line can overlap.
+
 ## Fonts
 
-The PDF format defines 14 standard fonts that can be used in PDF documents. PDFKit supports each of them out of the box.
+The PDF format defines 14 standard fonts that can be used in PDF documents. PDFKit supports each of them out of the box in Node.
 Besides Symbol and Zapf Dingbats this includes 4 styles (regular, bold, italic/oblique, bold+italic) of Helvetica,
 Courier, and Times. To switch between standard fonts, call the `font` method with the corresponding Label:
 
@@ -216,13 +226,26 @@ Courier, and Times. To switch between standard fonts, call the `font` method wit
 * `'Times-BoldItalic'`
 * `'ZapfDingbats'`
 
+Browser applications import and register only the standard-font data they use:
+
+    import { PDFDocument, registerStdFonts } from 'pdfkit';
+    import Helvetica from 'pdfkit/standard-fonts/Helvetica';
+    import TimesRoman from 'pdfkit/standard-fonts/TimesRoman';
+
+    registerStdFonts(Helvetica, TimesRoman);
+
+    const doc = new PDFDocument();
+    doc.font('Times-Roman');
+
 The PDF format also allows fonts to be embedded right in the document. PDFKit supports
 embedding TrueType (`.ttf`), OpenType (`.otf`), WOFF, WOFF2, TrueType Collection (`.ttc`),
 and Datafork TrueType (`.dfont`) fonts.
 
 To change the font used to render text, just call the `font` method. If you
 are using a standard PDF font, just pass the name to the `font` method.
-Otherwise, pass the path to the font file, or a `Buffer` containing the font data.
+Otherwise, pass the path to the font file, a `Buffer` containing the font data,
+or an already-parsed [fontkit](https://github.com/foliojs/fontkit) `Font`
+instance.
 If the font is a collection font (`.ttc` and `.dfont` files), meaning that it
 contains multiple styles in the same file, you should pass the name of the style
 to be extracted from the collection.
@@ -248,7 +271,7 @@ Here is an example showing how to set the font in each case.
 
 The output of this example looks like this:
 
-![6](images/fonts.png)
+![7](images/fonts.png)
 
 Another nice feature of the PDFKit font support, is the ability to register a
 font file under a name for use later rather than entering the path to the font

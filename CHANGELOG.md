@@ -2,12 +2,118 @@
 
 ### Unreleased
 
+- Fix smooth curves (`S`, `T`) in SVG paths reflecting the control point of an arc or of a curve of the other kind. As the SVG spec says, they now start from the current point there. An arc with a zero radius is now drawn as a straight line instead of nothing
+
+### [v0.21.0] - 2026-11-19
+
+- Fix gradients whose last stop comes before 1 stretching the stops over the whole gradient. The last color now stays solid from that stop to the end
+- Add a `headerRows` table option, which repeats the first rows at the top of each new page. Fixes #1657
+- Add a `scaleDown` option to `doc.image()`, which works like `fit` but keeps an image smaller than the rectangle at its own size instead of enlarging it. Fixes #1347
+- Fix standard fonts drawing a narrow no-break space as ` /` and a non-breaking hyphen as a double space. They now use the no-break space and the hyphen. Fixes #1071, fixes #1040
+- Add `decorationThickness` and `underlineOffset` text options. Fixes #993
+- Add `doc.addPageLabel()`, which sets the page labels viewers show, such as roman numerals for a preface or numbering that starts at 49. Fixes #1269
+- Add a `start` option to `doc.list()`, so a `numbered` or `lettered` list can carry on counting after other content. Fixes #1350
+- Export the predefined page sizes as `PAGE_SIZES`. Fixes #1236
+- Fix `doc.text()` adding pages until it runs out of memory when the line width is negative, which happens when `indent` with `indentAllLines` is larger than `width`, or the gaps take up more than the width shared by the `columns`. Such text is now drawn one character per line, as it already was for a line too narrow to hold a character
+- Add `flipH` and `flipV` options to `doc.image()`, which mirror an image without embedding it a second time. Fixes #1309
+- Fix `wordSpacing` removing consecutive line breaks: `text()` and `boundsOfString()` collapsed every run of whitespace to one space, so `Test\n\nText` was drawn as the single line `Test Text`. Only runs of whitespace within a line are collapsed now. Fixes #1034
+- Fix `heightOfString` drawing the measured text into the page when it is called after a `text` call with `continued: true`, because it measured with the line wrapper that call had left behind, which draws its lines. A measurement that passes `continued: true` itself still uses that wrapper and draws as before. Fixes #1284
+- Render SVG quadratic curves with equivalent cubic control points, so reversing a path preserves its shape. Fixes #550
+- Fix the visual test renderer rejecting its standard-font directory on Windows because its path ends in a backslash.
+- Fix the underline, strike-through, link and `goTo` rectangle of text drawn with a `baseline` other than the default sitting an ascent too low, because they were placed from the top of the line while the glyphs had moved up with the baseline. Fixes #994, #1245
+- Fix links to a named destination going nowhere in readers that look the name up in sorted order, such as Chrome (PDFium) and qpdf, because name tree keys were sorted by locale with `localeCompare` instead of by their bytes: with destinations named `appendix` and `Chapter1`, `Chapter1` was written second and could not be found. The keys of the `EmbeddedFiles` and `JavaScript` name trees are sorted the same way
+- Escape document information in XMP metadata and omit characters XML 1.0 cannot represent, without changing the PDF Info dictionary. Fixes #1817
+- Fix `widthOfString()`, line wrapping and text positioning with the `Symbol` and `ZapfDingbats` standard fonts, which measured many characters as 0 wide (for example the `ZapfDingbats` euro sign, the `Symbol` letters and most of the `ZapfDingbats` ornaments) because the text was looked up in the Roman character table instead of the font's own built-in encoding, and the metrics of nearly all of their glyphs were not included. Fixes #580
+- Fix text in a standard font garbling or dropping the characters after a tab, a carriage return or any other character code below `0x10`, which was written into the hex string of the text as a single digit, so the following digits paired up wrongly: a `\r` before a line break showed as `Ð`, and `Tab\there` was read back as `Tab–†W&P`. Fixes #1425, #606
+- Reuse the glyph width and kerning tables of a standard font across documents instead of building them again for every document that uses it, which made a short document using two standard fonts more than twice as slow to create
+- Fix `doc.table()` parsing a font passed as binary data (e.g. registered with `registerFont(name, uint8Array)`) again for every cell, when it restores the font after measuring and drawing the cell, which made tables with such fonts slower. A font loaded from the same `Uint8Array` is now reused without parsing it again
+- Add `lineBreak: 'whitespace'` to `doc.text()`, which breaks a line only at whitespace, a soft hyphen or a zero-width space. The Unicode line breaking rules the wrapper follows also allow a break after a hyphen or a slash, so `design-system` or `https://github.com/foliojs/pdfkit` could be cut at a line end, and a text extractor that joins the lines, such as a résumé parser, reads two words
+- Add an `objectStreams` option, which packs the objects that are not streams into compressed object streams and writes a cross-reference stream instead of the xref table, making documents with many such objects, e.g. tagged ones, much smaller. It requires a `pdfVersion` of `1.5` or higher, and cannot be used with encryption or PDF/A-1. Fixes #1810
+- Fix wrapped text with `align: 'center'` sitting left of the middle of the line when `characterSpacing` or `wordSpacing` is set, and with `align: 'right'` running past the right edge by the `wordSpacing` of each gap between words
+- Fix `boundsOfString()` with `lineBreak: false` leaving out `wordSpacing`, so its width now matches the rendered text and its underline
+- Fix the underline, strike, link and goTo of wrapped text, and `boundsOfString()` with a `width`, counting `characterSpacing` and `wordSpacing` twice, so they no longer run past the text and match the same text drawn with `lineBreak: false`
+- Fix the Node build throwing once a bundler inlines it into an application bundle, `Cannot find module '#standard-fonts/Helvetica'` on the first document from an ESM bundle and `Invalid URL` while importing a CommonJS one, because the standard font metrics and the PDF/A ICC profile were resolved relative to pdfkit's own package directory at import time. Both are now resolved on first use, a standard font that cannot be loaded names itself and the fix in its error, and `registerStdFonts` is exported from the Node build as it already was from the browser build, so a bundle can register the fonts it uses from `pdfkit/standard-fonts/<Name>`. The Node build now requires the standard fonts by a path relative to the built file, which replaces the `#standard-fonts/*` import mapping and lets an ESM bundle load them from a copy of `js/standard-fonts` next to it. Fixes #1801
+- Fix `doc.list()` drawing the label of a `numbered` or `lettered` item with the line wrapper's own options object, which threw `unsupported number: NaN` for `align` `center` and `right`, applied a word spacing derived from the previous line to the label for `align` `justify`, and sized the underline, strike, link and goTo of every label after the first from the previous item's text
+- Add a `hidden` option to form annotation methods, for a field that should start hidden (e.g. one an interactive action reveals later) instead of the usual default of visible and printable
+- Fix annotations placed under `doc.rotate()` marking the wrong area, because `_convertRect` derived each corner's y from the already transformed x and mapped only two of the four corners, so the rectangle a viewer makes interactive did not follow the rotated content. Fixes #1153
+- Add `onClick`, `onMouseDown`, `onMouseEnter`, `onMouseExit`, `onFocus` and `onBlur` options to form annotation methods, for the JavaScript a field runs on each of those events. Each accepts a string or a plain function, whose source text is written into the action
+- Add an `embedFonts` option to `initForm`, embedding a complete, character-addressable copy of each custom font used in a form field. Viewers that regenerate a field's appearance from its value, such as Adobe Acrobat/Reader, need one to resolve field text; without it they fall back to a substitute font. It adds roughly the size of the font file per font, so it is off by default. Fixes #1096
+- Add `alternateName` and `structParent` options to form annotations so tagged form widgets can have an accessible name and belong to a `Form` structure element. Retain the annotation's page when its structure is finalized after a page change. Honor an explicit `fontSize` when the field uses the default form font. Fixes #1803
+
+### [v0.20.2] - 2026-08-29
+
+- Fix bundlers and file tracers packing the ESM copies of the standard font metrics instead of the CommonJS ones the Node build actually loads, which left `Cannot find module` errors for every standard font at runtime, by resolving the internal `#standard-fonts/*` mapping to a single file under all conditions
+- Fix `doc.file()` throwing when the same in-memory attachment is embedded twice under one name, because the creation and modified dates the deduplication check compares are absent for sources that are not read from disk
+- Fix `doc.text()` throwing `unsupported number: NaN` when `lineBreak: false` is combined with `underline`, `strike`, `link` or `goTo`, because the rendered width was computed from the line wrapper's measurements, which are never produced when wrapping is disabled
+
+### [v0.20.1] - 2026-08-23
+
+- Add a Node ESM build so `import 'pdfkit'` in Node resolves to the Node build (real file system, native zlib, Node streams, self-registering standard fonts) instead of the browser bundle
+
+### [v0.20.0] - 2026-08-23
+
+- [BREAKING CHANGE] Remove the virtual file system (`pdfkit/virtual-fs`). Browser builds no longer depend on `fs`: use `registerFile` to register `Uint8Array` data under a path, pass a `Uint8Array` or `ArrayBuffer` directly to `registerFont`, `image` and `file`, or pass a data URL directly to `image` and `file`
+- Add `registerFile(path, data, options)` to globally register in-memory files in Node and browsers, with optional `birthtime` and `ctime` metadata. Passing `undefined` as data unregisters the path
+- [BREAKING CHANGE] Export `PDFDocument`, `LineWrapper` and `registerFile` as named exports from the main Node and browser entry points while preserving the default `PDFDocument` export
+- Add experimental `toBlob(document)` and `toBytes(document)` output helpers under `pdfkit/output`
+- Accept already-parsed fontkit `Font` instances in `doc.font()` and `registerFont`
+- Load the PDF/A ICC profile from disk only when needed in Node, while continuing to bundle it in browser builds
+- Add tools to convert raw AFM standard-font definitions into parsed or compact runtime JavaScript modules
+- [BREAKING CHANGE] Use generated standard-font data instead of parsing raw AFM definitions at runtime. Node loads font metrics lazily; browser applications must import each font they use from `pdfkit/standard-fonts/*` and register it with `registerStdFonts()`
+- [BREAKING CHANGE] Restrict AcroForm options to documented mappings and explicit escape hatches.
+- [BREAKING CHANGE] Stop automatically uppercasing annotation option keys.
+- [BREAKING CHANGE] Throw from `addNamedEmbeddedFile` when no ref is given, instead of writing an unparseable `undefined` token into the `/EmbeddedFiles` name tree
+- Do not mutate options passed to `doc.annotate()` and its convenience methods (link, note, strike, lineAnnotation, rectAnnotation, ellipseAnnotation, textAnnotation, fileAnnotation)
+- Persist font options when adding a new page. Fixes #1739
+- Use `Uint8Array` instead of Node's `Buffer` internally
+- Fix `date` text field formatting emitting invalid JavaScript, so the format was never applied. Fixes #1546
+- Fix `indentAllLines` applying the indent again on every paragraph and every page break, and keep it applied across continued text. Fixes #1606
+- Fix a hole in a sparse array being skipped entirely, which shifted every later entry down one
+- Encrypt strings inside name trees. Fixes #1513
+
+### [v0.19.1] - 2026-06-10
+
+- Fix RGB JPEG embedded as DeviceGray (0.19.0 regression) (#1734)
+
+### [v0.19.0] - 2026-06-07
+
+- Bump node version requirement to 20+
+- Bump minimum supported browsers to Firefox 115, iOS/Safari 16
+- Fix text with input x as null
+- Add opacity option to `doc.image()` to control image transparency
+- Fix corrupted PDF when mixing standard and embedded fonts that share postscript name
+- Fix PDF/UA compliance issues in kitchen-sink-accessible example
+- Add bbox and placement options to PDFStructureElement for PDF/UA compliance
+- Extend `roundedRect` with `borderRadius` as number for all corners or per-corner array (CSS order)
+- Fix accessibility: scope in TH element
+- Fix PDF Name escaping for spot colors with spaces ([#1644](https://github.com/foliojs/pdfkit/issues/1644))
+
+### [v0.18.0] - 2026-03-14
+
+- Fix garbled text copying in Chrome/Edge for PDFs with >256 unique characters (#1659)
+- Fix Link accessibility issues
+- Fix Table Accessibility Issue: Operator CS/cs not allowed in this current state
+- Fix Interlaced PNG with indexed transparency rendered incorrectly
+- Fix SVG path parser incorrectly handle arc flags without separators
+- Add pageLayout option to control how pages are displayed in PDF viewers
+- Preserve existing PageMode instead of overwriting when adding outlines
+- Add userUnit option for custom page units (PDF 1.6)
+- Support outlines that jump to specific page positions with custom zoom level
+- Add robust handling of null byte padding in JPEG images
+- Replace outdated jpeg-exif with minimal implementation
+- Replace outdated crypto-js with maintained small alternatives
+- Fix issue with indentation with `indentAllLines: true` when a new page is created
+
+### [v0.17.2] - 2025-08-30
+
+- Fix rendering lists that spans across pages
+
 ### [v0.17.1] - 2025-05-02
 
 - Fix null values in table cells rendering as `[object Object]`
 - Fix further LineWrapper precision issues
 - Optmize standard font handling. Less code, less memory usage
- 
+
 ### [v0.17.0] - 2025-04-12
 
 - Fix precision rounding issues in LineWrapper

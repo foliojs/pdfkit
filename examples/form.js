@@ -1,10 +1,12 @@
-var PDFDocument = require('../');
-var fs = require('fs');
+import fs from 'node:fs';
+import { PDFDocument } from 'pdfkit';
+
+const outputFilePath = new URL('./form.pdf', import.meta.url);
 
 // Create a new PDFDocument
 var doc = new PDFDocument();
 
-doc.pipe(fs.createWriteStream('form.pdf'));
+doc.pipe(fs.createWriteStream(outputFilePath));
 
 // Set some meta data
 doc.info['Title'] = 'Test Form Document';
@@ -25,9 +27,9 @@ doc.formText('leaf1', 10, y, 200, 20, {
   value: '1999-12-31',
   format: {
     type: 'date',
-    param: 'yyyy-mm-dd'
+    param: 'yyyy-mm-dd',
   },
-  align: 'center'
+  align: 'center',
 });
 
 y += 30;
@@ -38,9 +40,9 @@ opts = {
     type: 'number',
     nDec: 2,
     currency: '$',
-    currencyPrepend: true
+    currencyPrepend: true,
   },
-  align: 'right'
+  align: 'right',
 };
 doc.formText('dollar', 10, y, 200, 20, opts);
 
@@ -48,18 +50,18 @@ y += 30;
 doc.formText('leaf2', 10, y, 200, 40, {
   parent: child1Field,
   multiline: true,
-  align: 'right'
+  align: 'right',
 });
 y += 50;
 doc.formText('leaf3', 10, y, 200, 80, {
   parent: child2Field,
-  multiline: true
+  multiline: true,
 });
 
 y += 90;
 var opts = {
   backgroundColor: 'yellow',
-  label: 'Test Button'
+  label: 'Test Button',
 };
 doc.formPushButton('btn1', 10, y, 100, 30, opts);
 
@@ -70,7 +72,7 @@ opts = {
   value: 'Select Option',
   defaultValue: 'Select Option',
   align: 'center',
-  edit: true
+  edit: true,
 };
 doc.formCombo('ch1', 10, y, 100, 20, opts);
 
@@ -78,7 +80,7 @@ y += 30;
 opts = {
   borderColor: '#808080',
   select: ['github', 'bitbucket', 'gitlab', 'sourcesafe', 'perforce'],
-  sort: true
+  sort: true,
 };
 doc.formList('ch2', 10, y, 100, 45, opts);
 

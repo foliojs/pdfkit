@@ -1,6 +1,90 @@
+import { vi } from 'vitest';
+import { readFileSync } from 'fs';
+import { create } from 'fontkit';
 import PDFDocument from '../../lib/document';
 import PDFFontFactory from '../../lib/font_factory';
-import { logData } from './helpers';
+import StandardFont from '../../lib/font/standard';
+import { STANDARD_FONT_NAMES } from '../../lib/font/standard_fonts';
+import { logData, collectPdf, missingObjects } from './helpers';
+
+describe('PDFFontFactory', () => {
+  test.each(STANDARD_FONT_NAMES)('opens generated metrics for %s', (name) => {
+    const font = PDFFontFactory.open({}, name, undefined, 'F1');
+
+    expect(font).toBeInstanceOf(StandardFont);
+    expect(font.name).toBe(name);
+    expect(font.id).toBe('F1');
+  });
+
+  test.each(['Symbol', 'ZapfDingbats'])(
+    'measures text in %s with its built-in encoding',
+    (name) => {
+      const document = new PDFDocument();
+
+      expect(document.font(name).widthOfString('ABG')).toBeGreaterThan(0);
+    },
+  );
+
+  test('rejects unsupported input', () => {
+    expect(() => PDFFontFactory.open({}, {})).toThrow(
+      'Not a supported font format or standard PDF font.',
+    );
+  });
+});
+
+describe('fontkit font instance sources', () => {
+  const parseFont = (file = 'tests/fonts/Roboto-Regular.ttf') =>
+    create(readFileSync(file));
+
+  test('doc.font() embeds a parsed font instance and renders text', () => {
+    const doc = new PDFDocument({ compress: false });
+    doc.font(parseFont()).text('parsed roboto');
+
+    const pdf = collectPdf(doc);
+
+    expect(pdf).toContain('Roboto-Regular');
+    expect(pdf).toContain('startxref');
+    expect(missingObjects(pdf)).toHaveLength(0);
+  });
+
+  test('the same instance passed twice reuses the embedded font', () => {
+    const doc = new PDFDocument({ font: null });
+    const font = parseFont();
+
+    doc.font(font);
+    const first = doc._font;
+    const familyCount = Object.keys(doc._fontFamilies).length;
+
+    doc.font(font);
+
+    expect(doc._font).toBe(first);
+    expect(Object.keys(doc._fontFamilies)).toHaveLength(familyCount);
+  });
+
+  test('different instances do not collide', () => {
+    const doc = new PDFDocument({ font: null });
+
+    doc.font(parseFont('tests/fonts/Roboto-Regular.ttf'));
+    const regular = doc._font;
+    doc.font(parseFont('tests/fonts/Roboto-Italic.ttf'));
+    const italic = doc._font;
+
+    expect(italic).not.toBe(regular);
+    expect(doc._fontFamilies['Roboto-Regular']).toBe(regular);
+    expect(doc._fontFamilies['Roboto-Italic']).toBe(italic);
+  });
+
+  test('registerFont accepts a parsed font instance', () => {
+    const doc = new PDFDocument({ compress: false });
+    doc.registerFont('MyFont', parseFont());
+    doc.font('MyFont').text('registered parsed font');
+
+    expect(doc._fontFamilies['MyFont']).toBe(doc._font);
+
+    const pdf = collectPdf(doc);
+    expect(missingObjects(pdf)).toHaveLength(0);
+  });
+});
 
 describe('EmbeddedFont', () => {
   test('no fontLayoutCache option', () => {
@@ -9,7 +93,7 @@ describe('EmbeddedFont', () => {
       document,
       'tests/fonts/Roboto-Regular.ttf',
     );
-    const runSpy = jest.spyOn(font, 'layoutRun');
+    const runSpy = vi.spyOn(font, 'layoutRun');
 
     font.layout('test');
     font.layout('test');
@@ -25,7 +109,7 @@ describe('EmbeddedFont', () => {
       document,
       'tests/fonts/Roboto-Regular.ttf',
     );
-    const runSpy = jest.spyOn(font, 'layoutRun');
+    const runSpy = vi.spyOn(font, 'layoutRun');
 
     font.layout('test');
     font.layout('test');
@@ -98,6 +182,108 @@ describe('EmbeddedFont', () => {
 
       expect(glyphs).toBe(398 + 1);
     });
+
+    test('beginbfrange count should match actual number of ranges', () => {
+      const doc = new PDFDocument({ compress: false });
+      const font = PDFFontFactory.open(
+        doc,
+        'tests/fonts/Roboto-Regular.ttf',
+        undefined,
+        'F1099',
+      );
+
+      // Generate more than 256 unique characters to trigger multiple bfrange entries
+      // Each chunk is 256 characters, so we need >256 to get multiple ranges
+      const chars = [];
+
+      // Add ASCII characters (0-127)
+      for (let i = 32; i < 127; i++) {
+        chars.push(String.fromCharCode(i));
+      }
+
+      // Add extended Latin characters (128-255)
+      for (let i = 160; i < 256; i++) {
+        chars.push(String.fromCharCode(i));
+      }
+
+      // Add additional Unicode characters to exceed 256
+      const additionalChars =
+        'ÁÀÂÄÅÃÆÇÐÉÈÊËÍÌÎÏÑÓÒÔÖÕØŒÞÚÙÛÜÝŸáàâäãåæçðéèêëíìîïıñóòôöõøœßþúùûüýÿĀĂĄĆČĎĐĒĖĘĚĞĢĪĮİĶŁĹĻĽŃŅŇŌŐŔŖŘŠŚŞȘŢȚŤŪŮŰŲŽŹŻāăąćčďđēėęěğģīįķłĺļľńņňōőŕŗřšśşșţțťūůűųžźż';
+
+      const allChars = chars.join('') + additionalChars;
+      font.encode(allChars);
+
+      const docData = logData(doc);
+      font.toUnicodeCmap();
+      const text = docData.map((d) => d.toString('utf8')).join('');
+
+      // Extract the count declaration from "N beginbfrange"
+      const beginbfrangeMatch = text.match(/(\d+)\s+beginbfrange/);
+      expect(beginbfrangeMatch).not.toBeNull();
+      const declaredCount = parseInt(beginbfrangeMatch[1], 10);
+
+      // Count actual bfrange entries
+      let actualRangeCount = 0;
+      const bfrangeBlockMatch = text.match(
+        /beginbfrange\n((?:.|\n)*?)\nendbfrange/,
+      );
+      if (bfrangeBlockMatch) {
+        const bfrangeContent = bfrangeBlockMatch[1];
+        // Match each bfrange line: <start> <end> [entries]
+        const rangeMatches = bfrangeContent.matchAll(
+          /^<([0-9a-f]+)>\s+<([0-9a-f]+)>\s+\[/gm,
+        );
+        actualRangeCount = [...rangeMatches].length;
+      }
+
+      // The declared count must match the actual number of ranges
+      expect(declaredCount).toBe(actualRangeCount);
+      expect(actualRangeCount).toBeGreaterThan(1); // Should have multiple ranges when >256 chars
+    });
+
+    test('beginbfrange count should be 1 for fonts with <=256 characters', () => {
+      const doc = new PDFDocument({ compress: false });
+      const font = PDFFontFactory.open(
+        doc,
+        'tests/fonts/Roboto-Regular.ttf',
+        undefined,
+        'F1099',
+      );
+
+      // Generate exactly 256 characters
+      const chars = [];
+      for (let i = 0; i < 256; i++) {
+        chars.push(String.fromCharCode(i + 32)); // Start from space (32) to avoid control chars
+      }
+      font.encode(chars.join(''));
+
+      const docData = logData(doc);
+      font.toUnicodeCmap();
+      const text = docData.map((d) => d.toString('utf8')).join('');
+
+      // Extract the count declaration
+      const beginbfrangeMatch = text.match(/(\d+)\s+beginbfrange/);
+      expect(beginbfrangeMatch).not.toBeNull();
+      const declaredCount = parseInt(beginbfrangeMatch[1], 10);
+
+      // Count actual bfrange entries
+      let actualRangeCount = 0;
+      const bfrangeBlockMatch = text.match(
+        /beginbfrange\n((?:.|\n)*?)\nendbfrange/,
+      );
+      if (bfrangeBlockMatch) {
+        const bfrangeContent = bfrangeBlockMatch[1];
+        const rangeMatches = bfrangeContent.matchAll(
+          /^<([0-9a-f]+)>\s+<([0-9a-f]+)>\s+\[/gm,
+        );
+        actualRangeCount = [...rangeMatches].length;
+      }
+
+      // For <=256 characters, should have exactly 1 range
+      expect(declaredCount).toBe(1);
+      expect(actualRangeCount).toBe(1);
+      expect(declaredCount).toBe(actualRangeCount);
+    });
   });
 });
 
@@ -139,5 +325,151 @@ describe('sizeToPoint', () => {
     doc.fontSize(15);
     expect(doc.sizeToPoint('1em')).toEqual(15);
     expect(doc.sizeToPoint('1rem')).toEqual(12);
+  });
+});
+
+describe('font name collision', () => {
+  // fake font with a bogus checksum so isEqualFont always returns false
+  const makeCachedFont = (name, id) => ({
+    name,
+    id,
+    font: { _tables: { head: { checkSumAdjustment: -1 } } },
+    ref: vi.fn(),
+    finalize: vi.fn(),
+    embedded: false,
+  });
+
+  afterEach(() => vi.restoreAllMocks());
+
+  describe('name-alias slot is not overwritten when already occupied', () => {
+    test('does not overwrite existing font on postscript name collision', () => {
+      const doc = new PDFDocument({ font: null, compress: false });
+      const existingFont = makeCachedFont('Roboto-Regular', 'F0');
+      doc._fontFamilies['Roboto-Regular'] = existingFont;
+
+      doc.registerFont('Roboto', 'tests/fonts/Roboto-Regular.ttf');
+      doc.font('Roboto');
+
+      expect(doc._fontFamilies['Roboto-Regular']).toBe(existingFont);
+      expect(doc._fontFamilies['Roboto']).toBeDefined();
+      expect(doc._fontFamilies['Roboto']).not.toBe(existingFont);
+    });
+  });
+
+  describe('buffer-loaded font with name collision is registered under its id', () => {
+    test('registers under id when postscript name slot is taken', () => {
+      const doc = new PDFDocument({ font: null, compress: false });
+      const existingFont = makeCachedFont('Roboto-Regular', 'F0');
+      doc._fontFamilies['Roboto-Regular'] = existingFont;
+
+      const buf = readFileSync('tests/fonts/Roboto-Regular.ttf');
+      doc.font(buf);
+
+      const loaded = doc._font;
+      expect(doc._fontFamilies[loaded.id]).toBe(loaded);
+      expect(doc._fontFamilies['Roboto-Regular']).toBe(existingFont);
+    });
+  });
+
+  describe('document completes without dangling references', () => {
+    test('standard + registered embedded font', () => {
+      const doc = new PDFDocument({ compress: false });
+
+      doc.text('standard helvetica');
+      doc.registerFont('Roboto', 'tests/fonts/Roboto-Regular.ttf');
+      doc.font('Roboto').text('embedded roboto');
+
+      const pdf = collectPdf(doc);
+
+      expect(pdf).toContain('startxref');
+      expect(pdf).toContain('%%EOF');
+      expect(missingObjects(pdf)).toHaveLength(0);
+    });
+
+    test('buffer font with name collision', () => {
+      const doc = new PDFDocument({ compress: false });
+      doc._fontFamilies['Roboto-Regular'] = makeCachedFont(
+        'Roboto-Regular',
+        'F0',
+      );
+
+      const buf = readFileSync('tests/fonts/Roboto-Regular.ttf');
+      doc.font(buf).text('buffer roboto');
+
+      const pdf = collectPdf(doc);
+
+      expect(pdf).toContain('startxref');
+      expect(pdf).toContain('%%EOF');
+      expect(missingObjects(pdf)).toHaveLength(0);
+    });
+  });
+});
+
+describe('binary font sources', () => {
+  const data = () =>
+    new Uint8Array(readFileSync('tests/fonts/Roboto-Regular.ttf'));
+
+  test('the same data passed twice is parsed once', () => {
+    const doc = new PDFDocument({ font: null });
+    const open = vi.spyOn(PDFFontFactory, 'open');
+    const buf = data();
+
+    doc.font(buf);
+    const first = doc._font;
+    doc.font(buf);
+
+    expect(doc._font.id).toBe(first.id);
+    expect(open).toHaveBeenCalledTimes(1);
+    open.mockRestore();
+  });
+
+  test('a registered binary font is parsed once when tables restore it', () => {
+    const doc = new PDFDocument({ font: null });
+    doc.registerFont('Body', data());
+    doc.font('Body');
+    const open = vi.spyOn(PDFFontFactory, 'open');
+
+    doc.table({
+      data: [
+        ['a', 'b', 'c'],
+        ['d', 'e', 'f'],
+      ],
+    });
+
+    expect(open).not.toHaveBeenCalled();
+    expect(doc._font.name).toBe('Roboto-Regular');
+    open.mockRestore();
+  });
+
+  test('different data of the same font still embeds one font', () => {
+    const doc = new PDFDocument({ font: null });
+
+    doc.font(data());
+    const first = doc._font;
+    doc.font(data());
+
+    expect(doc._font.id).toBe(first.id);
+  });
+
+  test('a duplicate buffer passed again reuses the embedded font', () => {
+    const doc = new PDFDocument({ font: null });
+    const buf = data();
+
+    doc.font(data());
+    const first = doc._font;
+    doc.font(buf);
+    doc.font(buf);
+
+    expect(doc._font.id).toBe(first.id);
+  });
+});
+
+describe('standard font metrics', () => {
+  test('are shared across documents', () => {
+    const first = new PDFDocument().font('Helvetica-Bold')._font;
+    const second = new PDFDocument().font('Helvetica-Bold')._font;
+
+    expect(second).not.toBe(first);
+    expect(second.font).toBe(first.font);
   });
 });

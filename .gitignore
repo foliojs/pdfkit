@@ -5,8 +5,15 @@ node-zlib/
 playground/
 build/
 js/
+!docs/js/
+!docs/js/scroll.js
 .vscode
+.idea
 coverage
 package-lock.json
 /examples/browserify/bundle.js
 index.html
+/.yarn/install-state.gz
+!/examples/playground/
+!/examples/playground/**
+/examples/playground/dist/

@@ -1,4 +1,3 @@
 *.html
-css/
 img/
-js/
+/guide.pdf

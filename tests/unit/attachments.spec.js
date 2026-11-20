@@ -120,6 +120,21 @@ describe('file', () => {
     ]);
   });
 
+  test('uses data URI MIME type as escaped subtype', () => {
+    const docData = logData(document);
+    document.file('data:text/plain;base64,ZXhhbXBsZSB0ZXh0', {
+      name: 'file.txt',
+      creationDate: date,
+      modifiedDate: date,
+    });
+    document.end();
+
+    const dataStr = docData.map((item) => item.toString()).join('\n');
+    expect(dataStr).toContain('/Subtype /text#2Fplain');
+    expect(dataStr).not.toContain('/Subtype /text/plain');
+    expect(dataStr).not.toContain('/Subtype /text#232Fplain'); // double escaped
+  });
+
   test('with hidden option', () => {
     const docData = logData(document);
 
@@ -224,6 +239,128 @@ describe('file', () => {
 /EmbeddedFiles <<
   /Names [
     (file1.txt) 10 0 R
+]
+>>
+>>`,
+    ]);
+  });
+
+  test('attach the same file multiple times without dates', () => {
+    const docData = logData(document);
+
+    document.file(Buffer.from('example text'), { name: 'file1.txt' });
+    document.file(Buffer.from('example text'), { name: 'file1.txt' });
+    document.end();
+
+    const numFiles = docData.filter(
+      (str) =>
+        typeof str === 'string' && str.startsWith('<<\n/Type /EmbeddedFile\n'),
+    );
+
+    expect(numFiles.length).toEqual(1);
+
+    // both filespecs point at the single embedded file
+    expect(docData).toContainChunk([
+      `9 0 obj`,
+      `<<
+/Type /Filespec
+/AFRelationship /Unspecified
+/F (file1.txt)
+/EF <<
+/F 8 0 R
+>>
+/UF (file1.txt)
+>>`,
+    ]);
+
+    expect(docData).toContainChunk([
+      `10 0 obj`,
+      `<<
+/Type /Filespec
+/AFRelationship /Unspecified
+/F (file1.txt)
+/EF <<
+/F 8 0 R
+>>
+/UF (file1.txt)
+>>`,
+    ]);
+  });
+
+  test('attach the same file twice, only one with a creation date', () => {
+    const docData = logData(document);
+
+    document.file(Buffer.from('example text'), { name: 'file1.txt' });
+    document.file(Buffer.from('example text'), {
+      name: 'file1.txt',
+      creationDate: date,
+    });
+    document.end();
+
+    const numFiles = docData.filter(
+      (str) =>
+        typeof str === 'string' && str.startsWith('<<\n/Type /EmbeddedFile\n'),
+    );
+
+    // the metadata differs, so the reference is not reused
+    expect(numFiles.length).toEqual(2);
+  });
+
+  test('attach the same file twice, only one with a modified date', () => {
+    const docData = logData(document);
+
+    document.file(Buffer.from('example text'), {
+      name: 'file1.txt',
+      creationDate: date,
+    });
+    document.file(Buffer.from('example text'), {
+      name: 'file1.txt',
+      creationDate: date,
+      modifiedDate: date,
+    });
+    document.end();
+
+    const numFiles = docData.filter(
+      (str) =>
+        typeof str === 'string' && str.startsWith('<<\n/Type /EmbeddedFile\n'),
+    );
+
+    // the metadata differs, so the reference is not reused
+    expect(numFiles.length).toEqual(2);
+  });
+
+  test('throws when the ref is missing', () => {
+    expect(() =>
+      document.addNamedEmbeddedFile('phantom.txt', undefined),
+    ).toThrow('No ref specified for embedded file phantom.txt');
+
+    expect(() => document.addNamedEmbeddedFile('phantom.txt', null)).toThrow(
+      'No ref specified for embedded file phantom.txt',
+    );
+  });
+
+  test('registers a filespec created with the hidden option', () => {
+    const docData = logData(document);
+
+    const filespec = document.file(Buffer.from('example text'), {
+      name: 'file.txt',
+      creationDate: date,
+      modifiedDate: date,
+      hidden: true,
+    });
+    document.addNamedEmbeddedFile('file.txt', filespec);
+    document.end();
+
+    expect(docData).toContainChunk([
+      `2 0 obj`,
+      `<<
+/Dests <<
+  /Names [
+]
+>>
+/EmbeddedFiles <<
+  /Names [
+    (file.txt) 9 0 R
 ]
 >>
 >>`,

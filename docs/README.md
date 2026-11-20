@@ -5,8 +5,6 @@ You can also read the guide in PDF form, in this directory or [online](http://pd
 
 Both the website and the PDF guide are generated from the Markdown files
 in this directory. Just run `npm run docs` to generate them.
-You will need to have ImageMagick 7 installed so the `magick` command is
-on your `$PATH`.
 
 The examples are actually run when generating the PDF in order to show the results inline.
 The `generate.js` file in this directory is actually quite short.  It parses the markdown files into a 

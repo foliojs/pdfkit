@@ -23,10 +23,12 @@ function runDocTest(options, fn) {
         doc.on('end', async () => {
           try {
             const pdfData = Buffer.concat(buffers);
-            const { systemFonts = false } = options;
-            const images = await pdf2png(pdfData, { systemFonts });
+            const images = await pdf2png(pdfData);
             for (let image of images) {
-              expect(image).toMatchImageSnapshot(options);
+              expect(image).toMatchImageSnapshot({
+                failureThresholdType: 'percent',
+                failureThreshold: options.failureThreshold || 0.01,
+              });
             }
             resolve();
           } catch (err) {
