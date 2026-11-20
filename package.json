@@ -34,7 +34,6 @@
     "@rollup/plugin-babel": "^7.1.0",
     "@rollup/plugin-commonjs": "^29.0.3",
     "@rollup/plugin-node-resolve": "^16.0.3",
-    "canvas": "^3.2.3",
     "codemirror": "~6.0.2",
     "eslint": "^10.14.0",
     "gh-pages": "^6.3.0",
