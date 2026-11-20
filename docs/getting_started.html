@@ -1,4 +1,4 @@
-<!DOCTYPE html><html><head><meta charset="utf-8"><title>Getting Started with PDFKit</title><link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Source+Code+Pro:400,700|Alegreya:700|Merriweather"><link rel="stylesheet" href="/docs/css/index.css"><link rel="stylesheet" href="/docs/css/github.css"></head><body><nav class="sidebar"><ul><li><a href="/">Home</a></li><li><a href="/docs/../index.html">Documentation</a><ul><li><a class="selected" href="/docs/getting_started.html">Getting Started </a><ul><li><a href="#installation">Installation</a></li><li><a href="#creating_a_document">Creating a document</a></li><li><a href="#using_pdfkit_in_the_browser">Using PDFKit in the browser</a></li><li><a href="#experimental_output_helpers">Experimental output helpers</a></li><li><a href="#document_options">Document options</a></li><li><a href="#page_layout">Page Layout</a></li><li><a href="#adding_pages">Adding pages</a></li><li><a href="#switching_to_previous_pages">Switching to previous pages</a></li><li><a href="#setting_default_font">Setting default font</a></li><li><a href="#setting_document_metadata">Setting document metadata</a></li><li><a href="#encryption_and_access_privileges">Encryption and Access Privileges</a></li><li><a href="#pdf/a">PDF/A</a></li><li><a href="#adding_content">Adding content</a></li></ul></li><li><a href="/docs/paper_sizes.html">Paper Sizes</a></li><li><a href="/docs/vector.html">Vector Graphics </a></li><li><a href="/docs/text.html">Text </a></li><li><a href="/docs/images.html">Images </a></li><li><a href="/docs/outline.html">Outlines </a></li><li><a href="/docs/annotations.html">Annotations </a></li><li><a href="/docs/forms.html">Forms </a></li><li><a href="/docs/destinations.html">Destinations</a></li><li><a href="/docs/attachments.html">Attachments </a></li><li><a href="/docs/accessibility.html">Accessibility</a></li><li><a href="/docs/table.html">Tables </a></li><li><a href="/docs/you_made_it.html">You made it!</a></li></ul></li><li><a href="/docs/guide.pdf">PDF Guide</a></li><li><a href="/examples/kitchen-sink.pdf">Example PDF</a></li><li><a href="/examples/browserify/browser.html">Interactive Browser Demo</a></li><li><a href="http://github.com/foliojs/pdfkit">Source Code</a></li></ul></nav><div class="main"><h1 id="getting_started_with_pdfkit">Getting Started with PDFKit</h1>
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>Getting Started with PDFKit</title><link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Source+Code+Pro:400,700|Alegreya:700|Merriweather"><link rel="stylesheet" href="/docs/css/index.css"><link rel="stylesheet" href="/docs/css/github.css"></head><body><nav class="sidebar"><ul><li><a href="/">Home</a></li><li><a href="/docs/../index.html">Documentation</a><ul><li><a class="selected" href="/docs/getting_started.html">Getting Started </a><ul><li><a href="#installation">Installation</a></li><li><a href="#creating_a_document">Creating a document</a></li><li><a href="#using_pdfkit_in_the_browser">Using PDFKit in the browser</a></li><li><a href="#experimental_output_helpers">Experimental output helpers</a></li><li><a href="#document_options">Document options</a></li><li><a href="#page_layout">Page Layout</a></li><li><a href="#object_streams">Object streams</a></li><li><a href="#adding_pages">Adding pages</a></li><li><a href="#switching_to_previous_pages">Switching to previous pages</a></li><li><a href="#page_labels">Page labels</a></li><li><a href="#setting_default_font">Setting default font</a></li><li><a href="#setting_document_metadata">Setting document metadata</a></li><li><a href="#encryption_and_access_privileges">Encryption and Access Privileges</a></li><li><a href="#pdf/a">PDF/A</a></li><li><a href="#adding_content">Adding content</a></li></ul></li><li><a href="/docs/paper_sizes.html">Paper Sizes</a></li><li><a href="/docs/vector.html">Vector Graphics </a></li><li><a href="/docs/text.html">Text </a></li><li><a href="/docs/images.html">Images </a></li><li><a href="/docs/outline.html">Outlines </a></li><li><a href="/docs/annotations.html">Annotations </a></li><li><a href="/docs/forms.html">Forms </a></li><li><a href="/docs/destinations.html">Destinations</a></li><li><a href="/docs/attachments.html">Attachments </a></li><li><a href="/docs/accessibility.html">Accessibility</a></li><li><a href="/docs/table.html">Tables </a></li><li><a href="/docs/you_made_it.html">You made it!</a></li></ul></li><li><a href="/docs/guide.pdf">PDF Guide</a></li><li><a href="/examples/kitchen-sink.pdf">Example PDF</a></li><li><a href="/examples/playground/dist/index.html">Interactive Browser Demo</a></li><li><a href="http://github.com/foliojs/pdfkit">Source Code</a></li></ul></nav><div class="main"><h1 id="getting_started_with_pdfkit">Getting Started with PDFKit</h1>
 <h2 id="installation">Installation</h2>
 <p>Installation uses the <a href="http://npmjs.org/">npm</a> package manager. Just type the
 following command after installing npm.</p>
@@ -169,6 +169,14 @@ to the time of registration.</p>
 </table>
 <pre><code>const doc = new PDFDocument({ pageLayout: 'twoColumnLeft' });
 </code></pre>
+<h2 id="object_streams">Object streams</h2>
+<p>The <code>objectStreams</code> option packs the objects that are not streams (pages, annotations, the
+structure elements of a tagged document, etc.) into compressed object streams, and writes a
+cross-reference stream instead of the xref table. Documents with many such objects, like tagged
+ones, get much smaller, while their content stays the same.</p>
+<pre><code>const doc = new PDFDocument({ pdfVersion: '1.5', objectStreams: true });
+</code></pre>
+<p>It requires a <code>pdfVersion</code> of <code>1.5</code> or higher, and cannot be used with encryption or PDF/A-1.</p>
 <h2 id="adding_pages">Adding pages</h2>
 <p>The first page of a PDFKit document is added for you automatically when you
 create the document unless you provide <code>autoFirstPage: false</code>. Subsequent pages must be added by you. Luckily, it is
@@ -259,6 +267,23 @@ doc.flushPages();
 // doc.end() will call it for you automatically.
 doc.end();
 </code></pre>
+<h2 id="page_labels">Page labels</h2>
+<p>PDF viewers number pages from 1 unless the document says otherwise. To have them
+show other page labels, such as roman numerals for a preface, call <code>addPageLabel</code>
+with the zero-based index of the first page of each range. A range lasts until the
+next one starts, and pages before the first range keep plain numbers.</p>
+<pre><code>// Pages i, ii, then 1, 2, ... and an appendix numbered A-1, A-2, ...
+doc.addPageLabel(0, { style: 'lowerRoman' });
+doc.addPageLabel(2, { style: 'decimal' });
+doc.addPageLabel(10, { style: 'decimal', prefix: 'A-' });
+</code></pre>
+<p>The following options are available:</p>
+<ul>
+<li><code>style</code> - <code>decimal</code>, <code>upperRoman</code>, <code>lowerRoman</code>, <code>upperAlpha</code> or <code>lowerAlpha</code>. Without a style, the label is only the <code>prefix</code>.</li>
+<li><code>prefix</code> - text in front of the number</li>
+<li><code>start</code> - the number of the first page of the range, a positive integer. Defaults to <code>1</code>.</li>
+</ul>
+<p>Page labels only change what viewers show, and do not draw anything on the page.</p>
 <h2 id="setting_default_font">Setting default font</h2>
 <p>The default font is 'Helvetica'. It can be configured by passing <code>font</code> option</p>
 <pre><code>// use Courier font by default

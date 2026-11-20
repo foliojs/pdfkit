@@ -1,4 +1,4 @@
-<!DOCTYPE html><html><head><meta charset="utf-8"><title>Forms in PDFKit</title><link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Source+Code+Pro:400,700|Alegreya:700|Merriweather"><link rel="stylesheet" href="/docs/css/index.css"><link rel="stylesheet" href="/docs/css/github.css"></head><body><nav class="sidebar"><ul><li><a href="/">Home</a></li><li><a href="/docs/../index.html">Documentation</a><ul><li><a href="/docs/getting_started.html">Getting Started </a></li><li><a href="/docs/paper_sizes.html">Paper Sizes</a></li><li><a href="/docs/vector.html">Vector Graphics </a></li><li><a href="/docs/text.html">Text </a></li><li><a href="/docs/images.html">Images </a></li><li><a href="/docs/outline.html">Outlines </a></li><li><a href="/docs/annotations.html">Annotations </a></li><li><a class="selected" href="/docs/forms.html">Forms </a><ul><li><a href="#form_annotation_methods">Form Annotation Methods</a></li><li><a href="#name_parameter">name Parameter</a></li><li><a href="#options_parameter">options Parameter</a></li><li><a href="#common_annotation_options">Common Annotation Options</a></li><li><a href="#text_field_options">Text Field Options</a></li><li><a href="#combo_field_options">Combo Field Options</a></li><li><a href="#list_field_options">List Field Options</a></li><li><a href="#push_button_field_options">Push Button Field Options</a></li><li><a href="#radio_button_field_options">Radio Button Field Options</a></li><li><a href="#checkbox_field_options">Checkbox Field Options</a></li><li><a href="#form_field_options">Form Field Options</a></li><li><a href="#text_field_formatting">Text Field Formatting</a></li><li><a href="#date_format">Date format</a></li><li><a href="#time_format">Time format</a></li><li><a href="#number_and_percent_format">Number and percent format</a></li><li><a href="#field_names">Field Names</a></li><li><a href="#advanced_form_field_use">Advanced Form Field Use</a></li><li><a href="#font">Font</a></li><li><a href="#named_javascript">Named JavaScript</a></li><li><a href="#limitations">Limitations</a></li><li><a href="#form_field_appearances">Form Field Appearances</a></li><li><a href="#document_javascript">Document JavaScript</a></li><li><a href="#radio_and_checkboxes">Radio and Checkboxes</a></li></ul></li><li><a href="/docs/destinations.html">Destinations</a></li><li><a href="/docs/attachments.html">Attachments </a></li><li><a href="/docs/accessibility.html">Accessibility</a></li><li><a href="/docs/table.html">Tables </a></li><li><a href="/docs/you_made_it.html">You made it!</a></li></ul></li><li><a href="/docs/guide.pdf">PDF Guide</a></li><li><a href="/examples/kitchen-sink.pdf">Example PDF</a></li><li><a href="/examples/browserify/browser.html">Interactive Browser Demo</a></li><li><a href="http://github.com/foliojs/pdfkit">Source Code</a></li></ul></nav><div class="main"><h1 id="forms_in_pdfkit">Forms in PDFKit</h1>
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>Forms in PDFKit</title><link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Source+Code+Pro:400,700|Alegreya:700|Merriweather"><link rel="stylesheet" href="/docs/css/index.css"><link rel="stylesheet" href="/docs/css/github.css"></head><body><nav class="sidebar"><ul><li><a href="/">Home</a></li><li><a href="/docs/../index.html">Documentation</a><ul><li><a href="/docs/getting_started.html">Getting Started </a></li><li><a href="/docs/paper_sizes.html">Paper Sizes</a></li><li><a href="/docs/vector.html">Vector Graphics </a></li><li><a href="/docs/text.html">Text </a></li><li><a href="/docs/images.html">Images </a></li><li><a href="/docs/outline.html">Outlines </a></li><li><a href="/docs/annotations.html">Annotations </a></li><li><a class="selected" href="/docs/forms.html">Forms </a><ul><li><a href="#form_annotation_methods">Form Annotation Methods</a></li><li><a href="#name_parameter">name Parameter</a></li><li><a href="#options_parameter">options Parameter</a></li><li><a href="#common_annotation_options">Common Annotation Options</a></li><li><a href="#field_actions">Field Actions</a></li><li><a href="#text_field_options">Text Field Options</a></li><li><a href="#combo_field_options">Combo Field Options</a></li><li><a href="#list_field_options">List Field Options</a></li><li><a href="#push_button_field_options">Push Button Field Options</a></li><li><a href="#radio_button_field_options">Radio Button Field Options</a></li><li><a href="#checkbox_field_options">Checkbox Field Options</a></li><li><a href="#form_field_options">Form Field Options</a></li><li><a href="#text_field_formatting">Text Field Formatting</a></li><li><a href="#date_format">Date format</a></li><li><a href="#time_format">Time format</a></li><li><a href="#number_and_percent_format">Number and percent format</a></li><li><a href="#field_names">Field Names</a></li><li><a href="#advanced_form_field_use">Advanced Form Field Use</a></li><li><a href="#font">Font</a></li><li><a href="#named_javascript">Named JavaScript</a></li><li><a href="#limitations">Limitations</a></li><li><a href="#form_field_appearances">Form Field Appearances</a></li><li><a href="#document_javascript">Document JavaScript</a></li><li><a href="#radio_and_checkboxes">Radio and Checkboxes</a></li></ul></li><li><a href="/docs/destinations.html">Destinations</a></li><li><a href="/docs/attachments.html">Attachments </a></li><li><a href="/docs/accessibility.html">Accessibility</a></li><li><a href="/docs/table.html">Tables </a></li><li><a href="/docs/you_made_it.html">You made it!</a></li></ul></li><li><a href="/docs/guide.pdf">PDF Guide</a></li><li><a href="/examples/kitchen-sink.pdf">Example PDF</a></li><li><a href="/examples/playground/dist/index.html">Interactive Browser Demo</a></li><li><a href="http://github.com/foliojs/pdfkit">Source Code</a></li></ul></nav><div class="main"><h1 id="forms_in_pdfkit">Forms in PDFKit</h1>
 <p>Forms are an interactive feature of the PDF format. Forms make it possible to
 add form annotations such as text fields, combo boxes, buttons and actions.
 Before addings forms to a PDF you must call the document <code>initForm()</code> method.</p>
@@ -36,6 +36,9 @@ information on <code>name</code> in the <strong>Field Names</strong> section bel
 <p>The following <code>options</code> are accepted by all form annotation methods:</p>
 <ul>
 <li><code>parent</code> [<em>PDFReference</em>] - Parent field returned by <code>formField</code>.</li>
+<li><code>structParent</code> [<em>PDFStructureElement</em>] - Structure element returned by <code>doc.struct()</code>.
+Use a separate <code>Form</code> element for each widget in a tagged PDF. This is distinct
+from <code>parent</code>, which controls the form field hierarchy.</li>
 <li><code>required</code> [<em>boolean</em>] - The field must have a value by the time the form is submitted.</li>
 <li><code>noExport</code> [<em>boolean</em>] - The field will not be exported if a form is submitted.</li>
 <li><code>readOnly</code> [<em>boolean</em>] - The user may not change the value of the field, and
@@ -44,14 +47,62 @@ computed values.</li>
 <li><code>value</code> [<em>number|string</em>] - The field's value.</li>
 <li><code>defaultValue</code> [<em>number|string</em>] - The default value to which the field
 reverts if a reset-form action is executed.</li>
+<li><code>alternateName</code> [<em>string</em>] - Alternate field name (<code>TU</code>), used as the field's
+accessible name or tooltip. Use a meaningful description, not just the
+internal field name.</li>
 <li><code>backgroundColor</code> - Field background color.</li>
 <li><code>borderColor</code> - Field border color.</li>
 <li><code>fontSize</code> [<em>number</em>] - Sets the font size used in the field appearance string.
-The default, <code>0</code>, means auto sizing.</li>
+The default, <code>0</code>, means auto sizing. An explicit size applies even when the
+field uses the default form font.</li>
+<li><code>hidden</code> [<em>boolean</em>] - Builds the field starting hidden, instead of the
+usual default of visible and printable, for a field an interactive action
+(see <code>onClick</code> below) will reveal later.</li>
 </ul>
 <p>Color options accept an array of RGB values, a hex color, or a named CSS color.
 Method-specific options listed below are accepted in addition to these common
 options.</p>
+<h2 id="field_actions">Field Actions</h2>
+<p>These options are accepted by all form annotation methods. Each takes the
+JavaScript to run when the event occurs, given as a string or as a function:</p>
+<ul>
+<li>
+<p><code>onClick</code> - The mouse button is released inside the field.</p>
+</li>
+<li>
+<p><code>onMouseDown</code> - The mouse button is pressed inside the field.</p>
+</li>
+<li>
+<p><code>onMouseEnter</code> - The cursor enters the field.</p>
+</li>
+<li>
+<p><code>onMouseExit</code> - The cursor leaves the field.</p>
+</li>
+<li>
+<p><code>onFocus</code> - The field receives the input focus.</p>
+</li>
+<li>
+<p><code>onBlur</code> - The field loses the input focus.</p>
+<p>doc.formPushButton('btn1', 10, 200, 100, 30, {
+label: 'Test Button',
+onClick: 'app.alert(&quot;clicked&quot;);'
+});</p>
+</li>
+</ul>
+<p>A function is written into the document as its source text and runs in the
+viewer, not where the document was generated, so it cannot use variables or
+functions from the surrounding program. <code>this</code> is the document, and the
+viewer's own globals, such as <code>app</code>, are in scope:</p>
+<pre><code>doc.formPushButton('btn1', 10, 200, 100, 30, {
+  label: 'Test Button',
+  onClick: function () {
+    app.alert('clicked');
+    this.getField('otherField').value = 'updated from btn1';
+  }
+});
+</code></pre>
+<p>Write the handler with <code>function</code> syntax; an arrow function cannot take the
+<code>this</code> binding.</p>
 <h2 id="text_field_options">Text Field Options</h2>
 <p>These options are accepted by <code>formText</code>:</p>
 <ul>
@@ -123,6 +174,10 @@ doc.formCombo('ch1', 10, y, 100, 20, opts);</p>
 <li>
 <p><code>label</code> [<em>string</em>] - Sets the label text. You can also set an icon, but for
 this you will need to 'expert-up' and dig deeper into the PDF Reference manual.</p>
+</li>
+<li>
+<p><code>onClick</code> [<em>string | function</em>] - JavaScript to run when the button is
+clicked. See <a href="#field-actions">Field Actions</a>.</p>
 <p>var opts = {
 backgroundColor: 'yellow',
 label: 'Test Button'
@@ -348,6 +403,19 @@ attributes when a PDF is first opened. To do this PDFKit always sets the Form di
 <p>Some form documents may not need to generate appearances. This may be the case
 for text Form Annotations that initially have no value. This is not true for
 push button widget annotations. Please test</p>
+<p>With a custom font, a viewer building the appearance this way may show the
+field in a substitute font: the font PDFKit embeds for page content is
+subsetted and addressed by glyph id, which gives the viewer no way to resolve
+the field's text itself. Passing <code>embedFonts</code> to <code>initForm</code> embeds a
+complete, character-addressable copy of each font used in a field, which
+viewers can resolve any text against:</p>
+<pre><code>doc.font('fonts/MyFont.ttf');
+doc.initForm({ embedFonts: true });
+</code></pre>
+<p>That copy holds the whole font rather than the glyphs used so far, so it adds
+roughly the size of the font file to the document, per font. It is off by
+default for that reason, and only affects custom fonts — the standard 14
+fonts are not embedded at all.</p>
 <h2 id="document_javascript">Document JavaScript</h2>
 <p>Many PDF Viewers, aside from Adobe Acrobat Reader, do not implement document
 JavaScript. Even Adobe Readers may not implement document JavaScript where it is

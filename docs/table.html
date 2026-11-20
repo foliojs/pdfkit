@@ -1,4 +1,4 @@
-<!DOCTYPE html><html><head><meta charset="utf-8"><title>Tables in PDFKit</title><link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Source+Code+Pro:400,700|Alegreya:700|Merriweather"><link rel="stylesheet" href="/docs/css/index.css"><link rel="stylesheet" href="/docs/css/github.css"></head><body><nav class="sidebar"><ul><li><a href="/">Home</a></li><li><a href="/docs/../index.html">Documentation</a><ul><li><a href="/docs/getting_started.html">Getting Started </a></li><li><a href="/docs/paper_sizes.html">Paper Sizes</a></li><li><a href="/docs/vector.html">Vector Graphics </a></li><li><a href="/docs/text.html">Text </a></li><li><a href="/docs/images.html">Images </a></li><li><a href="/docs/outline.html">Outlines </a></li><li><a href="/docs/annotations.html">Annotations </a></li><li><a href="/docs/forms.html">Forms </a></li><li><a href="/docs/destinations.html">Destinations</a></li><li><a href="/docs/attachments.html">Attachments </a></li><li><a href="/docs/accessibility.html">Accessibility</a></li><li><a class="selected" href="/docs/table.html">Tables </a><ul><li><a href="#the_basics">The basics</a></li><li><a href="#a_simple_table">A simple table</a></li><li><a href="#defining_column_widths">Defining column widths</a></li><li><a href="#defining_row_heights">Defining row heights</a></li><li><a href="#column/row_spans">Column/row spans</a></li><li><a href="#styling">Styling</a></li><li><a href="#optional_border">Optional border</a></li><li><a href="#table_options">Table options</a></li><li><a href="#cell_options">Cell options</a></li><li><a href="#column_options">Column options</a></li><li><a href="#row_options">Row options</a></li></ul></li><li><a href="/docs/you_made_it.html">You made it!</a></li></ul></li><li><a href="/docs/guide.pdf">PDF Guide</a></li><li><a href="/examples/kitchen-sink.pdf">Example PDF</a></li><li><a href="/examples/browserify/browser.html">Interactive Browser Demo</a></li><li><a href="http://github.com/foliojs/pdfkit">Source Code</a></li></ul></nav><div class="main"><h1 id="tables_in_pdfkit">Tables in PDFKit</h1>
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>Tables in PDFKit</title><link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Source+Code+Pro:400,700|Alegreya:700|Merriweather"><link rel="stylesheet" href="/docs/css/index.css"><link rel="stylesheet" href="/docs/css/github.css"></head><body><nav class="sidebar"><ul><li><a href="/">Home</a></li><li><a href="/docs/../index.html">Documentation</a><ul><li><a href="/docs/getting_started.html">Getting Started </a></li><li><a href="/docs/paper_sizes.html">Paper Sizes</a></li><li><a href="/docs/vector.html">Vector Graphics </a></li><li><a href="/docs/text.html">Text </a></li><li><a href="/docs/images.html">Images </a></li><li><a href="/docs/outline.html">Outlines </a></li><li><a href="/docs/annotations.html">Annotations </a></li><li><a href="/docs/forms.html">Forms </a></li><li><a href="/docs/destinations.html">Destinations</a></li><li><a href="/docs/attachments.html">Attachments </a></li><li><a href="/docs/accessibility.html">Accessibility</a></li><li><a class="selected" href="/docs/table.html">Tables </a><ul><li><a href="#the_basics">The basics</a></li><li><a href="#a_simple_table">A simple table</a></li><li><a href="#defining_column_widths">Defining column widths</a></li><li><a href="#defining_row_heights">Defining row heights</a></li><li><a href="#column/row_spans">Column/row spans</a></li><li><a href="#styling">Styling</a></li><li><a href="#optional_border">Optional border</a></li><li><a href="#table_options">Table options</a></li><li><a href="#cell_options">Cell options</a></li><li><a href="#column_options">Column options</a></li><li><a href="#row_options">Row options</a></li></ul></li><li><a href="/docs/you_made_it.html">You made it!</a></li></ul></li><li><a href="/docs/guide.pdf">PDF Guide</a></li><li><a href="/examples/kitchen-sink.pdf">Example PDF</a></li><li><a href="/examples/playground/dist/index.html">Interactive Browser Demo</a></li><li><a href="http://github.com/foliojs/pdfkit">Source Code</a></li></ul></nav><div class="main"><h1 id="tables_in_pdfkit">Tables in PDFKit</h1>
 <h2 id="the_basics">The basics</h2>
 <p>PDFKit makes adding tables to documents quite simple, and includes many options
 to customize the display of the output.</p>
@@ -292,6 +292,7 @@ is added to the document. This way, any calls to <code>text</code> or <code>tabl
 <li><code>rowStyles</code> - Row definitions of the table. (default <code>*</code>)</li>
 <li><code>defaultStyle</code> - Defaults to apply to every cell</li>
 <li><code>data</code> - The data to render (not required, you can call <code>.row()</code>). This can be an iterable (async or sync)</li>
+<li><code>headerRows</code> - How many rows at the start of the table to repeat at the top of each new page, skipped on a page where the next row would not fit below them (default <code>0</code>)</li>
 <li><code>debug</code> - Whether to show the debug lines for all the cells (default <code>false</code>)</li>
 </ul>
 <h2 id="cell_options">Cell options</h2>
@@ -302,7 +303,13 @@ is added to the document. This way, any calls to <code>text</code> or <code>tabl
 <li><code>padding</code> - The padding for the cell (default <code>0.25em</code>)</li>
 <li><code>border</code> - The border for the cell (default <code>1pt</code>)</li>
 <li><code>borderColor</code> - The border colors for the cell (default <code>black</code>)</li>
-<li><code>font</code> - Font options for the cell</li>
+<li><code>font</code> - Font options for the cell
+<ul>
+<li><code>src</code> - The font to use: the name of a font registered with <code>doc.registerFont()</code>, a standard font name such as <code>Helvetica-Bold</code>, or a font file path or buffer. This is the same as the first argument of <code>doc.font()</code></li>
+<li><code>family</code> - The name of the font to use from a collection (<code>.ttc</code>, <code>.dfont</code>) or variable font given in <code>src</code>, like the second argument of <code>doc.font()</code>. It only applies when there is a <code>src</code> on the cell, its row or its column, so use <code>src</code> for a registered font name</li>
+<li><code>size</code> - The font size</li>
+</ul>
+</li>
 <li><code>backgroundColor</code> - Set the background color of the cell</li>
 <li><code>align</code> - The alignment of the cell text (default <code>{x: 'left', y: 'top'}</code>)</li>
 <li><code>textStroke</code> - The text stroke (default <code>0</code>)</li>
@@ -312,6 +319,16 @@ is added to the document. This way, any calls to <code>text</code> or <code>tabl
 <li><code>textOptions</code> - Sets any text options you wish to provide (such as rotation)</li>
 <li><code>debug</code> - Whether to show the debug lines for the cell (default <code>false</code>)</li>
 </ul>
+<p>A registered font can be used by its name:</p>
+<pre><code>doc.registerFont('Icons', 'fonts/fa-regular-400.ttf');
+
+doc.table({
+  data: [
+    ['Label', { text: '\uf118', font: { src: 'Icons', size: 20 } }]
+  ]
+})
+</code></pre>
+<p>The <code>font</code> of a cell is combined with the <code>font</code> of its row and column. A more specific <code>src</code> also replaces the <code>family</code>, while a <code>family</code> or <code>size</code> on its own refines what is inherited.</p>
 <h2 id="column_options">Column options</h2>
 <p>Extends the <a href="#cell-options">cell options</a> above with:</p>
 <ul>

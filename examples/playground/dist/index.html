@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PDFKit Playground</title>
+    <script type="module" crossorigin src="./assets/index-rSzdGl9f.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-BYn7b0AN.css">
+  </head>
+  <body>
+    <div class="app">
+      <header class="app-header">
+        <div class="app-header-copy">
+          <h1>PDFKit Playground</h1>
+          <p>Edit the JavaScript to update the PDF preview.</p>
+        </div>
+        <a
+          class="github-link"
+          href="https://github.com/foliojs/pdfkit"
+          target="_blank"
+          rel="noreferrer"
+        >
+          <svg aria-hidden="true" viewBox="0 0 24 24">
+            <path
+              d="M12 .7A11.5 11.5 0 0 0 8.36 23.1c.58.1.79-.25.79-.56v-2.2c-3.22.7-3.9-1.37-3.9-1.37-.53-1.34-1.29-1.7-1.29-1.7-1.05-.72.08-.7.08-.7 1.17.08 1.78 1.2 1.78 1.2 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.74-1.55-2.57-.29-5.27-1.28-5.27-5.7 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.47.11-3.06 0 0 .97-.31 3.17 1.18a10.98 10.98 0 0 1 5.77 0c2.2-1.49 3.16-1.18 3.16-1.18.63 1.59.23 2.77.11 3.06.74.81 1.19 1.84 1.19 3.1 0 4.43-2.7 5.4-5.28 5.69.42.36.79 1.06.79 2.14v3.23c0 .31.21.67.8.56A11.5 11.5 0 0 0 12 .7Z"
+            />
+          </svg>
+          <span>View on GitHub</span>
+        </a>
+      </header>
+
+      <main class="workspace">
+        <section class="panel editor-panel" aria-labelledby="editor-heading">
+          <h2 id="editor-heading">JavaScript</h2>
+          <div id="editor"></div>
+          <div
+            id="error-panel"
+            class="error-panel"
+            role="alert"
+            aria-live="assertive"
+            hidden
+          >
+            <strong id="error-title"></strong>
+            <p id="error-message"></p>
+            <details id="error-details">
+              <summary>Stack trace</summary>
+              <pre id="error-stack"></pre>
+            </details>
+          </div>
+        </section>
+
+        <section class="panel preview-panel" aria-labelledby="preview-heading">
+          <h2 id="preview-heading">PDF Preview</h2>
+          <iframe title="Generated PDF preview" id="preview"></iframe>
+        </section>
+      </main>
+    </div>
+
+  </body>
+</html>

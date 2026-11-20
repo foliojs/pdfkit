@@ -1,4 +1,4 @@
-<!DOCTYPE html><html><head><meta charset="utf-8"><title>Text in PDFKit</title><link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Source+Code+Pro:400,700|Alegreya:700|Merriweather"><link rel="stylesheet" href="/docs/css/index.css"><link rel="stylesheet" href="/docs/css/github.css"></head><body><nav class="sidebar"><ul><li><a href="/">Home</a></li><li><a href="/docs/../index.html">Documentation</a><ul><li><a href="/docs/getting_started.html">Getting Started </a></li><li><a href="/docs/paper_sizes.html">Paper Sizes</a></li><li><a href="/docs/vector.html">Vector Graphics </a></li><li><a class="selected" href="/docs/text.html">Text </a><ul><li><a href="#the_basics">The basics</a></li><li><a href="#line_wrapping_and_justification">Line wrapping and justification</a></li><li><a href="#text_styling">Text styling</a></li><li><a href="#text_measurements">Text measurements</a></li><li><a href="#lists">Lists</a></li><li><a href="#rich_text">Rich Text</a></li><li><a href="#fonts">Fonts</a></li></ul></li><li><a href="/docs/images.html">Images </a></li><li><a href="/docs/outline.html">Outlines </a></li><li><a href="/docs/annotations.html">Annotations </a></li><li><a href="/docs/forms.html">Forms </a></li><li><a href="/docs/destinations.html">Destinations</a></li><li><a href="/docs/attachments.html">Attachments </a></li><li><a href="/docs/accessibility.html">Accessibility</a></li><li><a href="/docs/table.html">Tables </a></li><li><a href="/docs/you_made_it.html">You made it!</a></li></ul></li><li><a href="/docs/guide.pdf">PDF Guide</a></li><li><a href="/examples/kitchen-sink.pdf">Example PDF</a></li><li><a href="/examples/browserify/browser.html">Interactive Browser Demo</a></li><li><a href="http://github.com/foliojs/pdfkit">Source Code</a></li></ul></nav><div class="main"><h1 id="text_in_pdfkit">Text in PDFKit</h1>
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>Text in PDFKit</title><link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Source+Code+Pro:400,700|Alegreya:700|Merriweather"><link rel="stylesheet" href="/docs/css/index.css"><link rel="stylesheet" href="/docs/css/github.css"></head><body><nav class="sidebar"><ul><li><a href="/">Home</a></li><li><a href="/docs/../index.html">Documentation</a><ul><li><a href="/docs/getting_started.html">Getting Started </a></li><li><a href="/docs/paper_sizes.html">Paper Sizes</a></li><li><a href="/docs/vector.html">Vector Graphics </a></li><li><a class="selected" href="/docs/text.html">Text </a><ul><li><a href="#the_basics">The basics</a></li><li><a href="#line_wrapping_and_justification">Line wrapping and justification</a></li><li><a href="#text_styling">Text styling</a></li><li><a href="#text_measurements">Text measurements</a></li><li><a href="#lists">Lists</a></li><li><a href="#rich_text">Rich Text</a></li><li><a href="#fonts">Fonts</a></li></ul></li><li><a href="/docs/images.html">Images </a></li><li><a href="/docs/outline.html">Outlines </a></li><li><a href="/docs/annotations.html">Annotations </a></li><li><a href="/docs/forms.html">Forms </a></li><li><a href="/docs/destinations.html">Destinations</a></li><li><a href="/docs/attachments.html">Attachments </a></li><li><a href="/docs/accessibility.html">Accessibility</a></li><li><a href="/docs/table.html">Tables </a></li><li><a href="/docs/you_made_it.html">You made it!</a></li></ul></li><li><a href="/docs/guide.pdf">PDF Guide</a></li><li><a href="/examples/kitchen-sink.pdf">Example PDF</a></li><li><a href="/examples/playground/dist/index.html">Interactive Browser Demo</a></li><li><a href="http://github.com/foliojs/pdfkit">Source Code</a></li></ul></nav><div class="main"><h1 id="text_in_pdfkit">Text in PDFKit</h1>
 <h2 id="the_basics">The basics</h2>
 <p>PDFKit makes adding text to documents quite simple, and includes many options
 to customize the display of the output. Adding text to a document is as simple
@@ -22,6 +22,10 @@ automatically inserts new pages as necessary so you don't have to worry about
 doing that for long pieces of text. PDFKit can also automatically wrap text
 into multiple columns.</p>
 <p>The text will automatically wrap unless you set the <code>lineBreak</code> option to <code>false</code>.
+A line may break wherever the Unicode line breaking rules allow one, which
+includes after a hyphen or a slash inside a word. Set <code>lineBreak</code> to
+<code>'whitespace'</code> to break only at whitespace, a soft hyphen or a zero-width space,
+so that a word such as <code>design-system</code> or a URL moves to the next line whole.
 By default it will wrap to the page margin, but the <code>width</code> option allows
 you to set a different width the text should be wrapped to.
 If you set the <code>height</code> option, the text will be clipped to the number of
@@ -70,7 +74,7 @@ doc.rect(doc.x, 0, 410, doc.y).stroke();
 documents, which can be passed to the <code>text</code> method. They are enumerated
 below.</p>
 <ul>
-<li><code>lineBreak</code> - set to <code>false</code> to disable line wrapping all together</li>
+<li><code>lineBreak</code> - set to <code>false</code> to disable line wrapping all together, or to <code>'whitespace'</code> to break lines only at whitespace, a soft hyphen or a zero-width space, never after a hyphen or a slash inside a word</li>
 <li><code>width</code> - the width that text should be wrapped to (by default, the page width minus the left and right margin)</li>
 <li><code>height</code> - the maximum height that text should be clipped to</li>
 <li><code>rotation</code> - the rotation of the text in degrees (by default 0)</li>
@@ -90,7 +94,9 @@ below.</p>
 <li><code>goTo</code> - go to anchor (shortcut to create an annotation)</li>
 <li><code>destination</code> - create anchor to this text</li>
 <li><code>underline</code> - whether to underline the text</li>
+<li><code>underlineOffset</code> - how far to move the underline down from its default position, in PDF points. A negative value moves it up.</li>
 <li><code>strike</code> - whether to strike out the text</li>
+<li><code>decorationThickness</code> - the thickness of the underline and the strikethrough in PDF points (by default it follows the font size)</li>
 <li><code>oblique</code> - whether to slant the text (angle in degrees or <code>true</code>)</li>
 <li><code>baseline</code> - the vertical alignment of the text with respect to its insertion point (values as <a href="https://www.w3schools.com/tags/canvas_textbaseline.asp">canvas textBaseline</a>)</li>
 <li><code>continued</code> - whether the text segment will be followed immediately by another segment. Useful for changing styling in the middle of a paragraph.</li>
@@ -128,6 +134,7 @@ Lists use the following additional options:</p>
 <li><code>bulletRadius</code></li>
 <li><code>textIndent</code></li>
 <li><code>bulletIndent</code></li>
+<li><code>start</code> - the number the top level of a <code>numbered</code> or <code>lettered</code> list starts counting from, e.g. to carry on after an image. A <code>lettered</code> list counts <code>1</code> as <code>A</code>, so <code>3</code> starts at <code>C</code>. Nested lists still start from the beginning. Defaults to <code>1</code>.</li>
 </ul>
 <h2 id="rich_text">Rich Text</h2>
 <p>As mentioned above, PDFKit supports a simple form of rich text via the <code>continued</code> option.
@@ -164,6 +171,8 @@ option from the first <code>text</code> call is retained by the second call.</p>
 </code></pre>
 <p>Here is the output:</p>
 <p><img src="img/13.png" alt=""></p>
+<p>Note that the <code>center</code> and <code>right</code> alignments are not applied to <code>continued</code> text as a whole:
+each segment is aligned on its own, so the segments of a line can overlap.</p>
 <h2 id="fonts">Fonts</h2>
 <p>The PDF format defines 14 standard fonts that can be used in PDF documents. PDFKit supports each of them out of the box in Node.
 Besides Symbol and Zapf Dingbats this includes 4 styles (regular, bold, italic/oblique, bold+italic) of Helvetica,

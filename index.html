@@ -1,4 +1,4 @@
-<!DOCTYPE html><html><head><meta charset="utf-8"><title>PDFKit</title><link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Source+Code+Pro:400,700|Alegreya:700|Merriweather"><link rel="stylesheet" href="/docs/css/index.css"><link rel="stylesheet" href="/docs/css/github.css"></head><body><nav class="sidebar"><ul><li><a class="selected" href="/">Home</a></li><li><a href="/docs/../index.html">Documentation</a><ul><li><a href="/docs/getting_started.html">Getting Started </a></li><li><a href="/docs/paper_sizes.html">Paper Sizes</a></li><li><a href="/docs/vector.html">Vector Graphics </a></li><li><a href="/docs/text.html">Text </a></li><li><a href="/docs/images.html">Images </a></li><li><a href="/docs/outline.html">Outlines </a></li><li><a href="/docs/annotations.html">Annotations </a></li><li><a href="/docs/forms.html">Forms </a></li><li><a href="/docs/destinations.html">Destinations</a></li><li><a href="/docs/attachments.html">Attachments </a></li><li><a href="/docs/accessibility.html">Accessibility</a></li><li><a href="/docs/table.html">Tables </a></li><li><a href="/docs/you_made_it.html">You made it!</a></li></ul></li><li><a href="/docs/guide.pdf">PDF Guide</a></li><li><a href="/examples/kitchen-sink.pdf">Example PDF</a></li><li><a href="/examples/browserify/browser.html">Interactive Browser Demo</a></li><li><a href="http://github.com/foliojs/pdfkit">Source Code</a></li></ul></nav><div class="main"><h1 id="pdfkit">PDFKit</h1>
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>PDFKit</title><link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Source+Code+Pro:400,700|Alegreya:700|Merriweather"><link rel="stylesheet" href="/docs/css/index.css"><link rel="stylesheet" href="/docs/css/github.css"></head><body><nav class="sidebar"><ul><li><a class="selected" href="/">Home</a></li><li><a href="/docs/../index.html">Documentation</a><ul><li><a href="/docs/getting_started.html">Getting Started </a></li><li><a href="/docs/paper_sizes.html">Paper Sizes</a></li><li><a href="/docs/vector.html">Vector Graphics </a></li><li><a href="/docs/text.html">Text </a></li><li><a href="/docs/images.html">Images </a></li><li><a href="/docs/outline.html">Outlines </a></li><li><a href="/docs/annotations.html">Annotations </a></li><li><a href="/docs/forms.html">Forms </a></li><li><a href="/docs/destinations.html">Destinations</a></li><li><a href="/docs/attachments.html">Attachments </a></li><li><a href="/docs/accessibility.html">Accessibility</a></li><li><a href="/docs/table.html">Tables </a></li><li><a href="/docs/you_made_it.html">You made it!</a></li></ul></li><li><a href="/docs/guide.pdf">PDF Guide</a></li><li><a href="/examples/kitchen-sink.pdf">Example PDF</a></li><li><a href="/examples/playground/dist/index.html">Interactive Browser Demo</a></li><li><a href="http://github.com/foliojs/pdfkit">Source Code</a></li></ul></nav><div class="main"><h1 id="pdfkit">PDFKit</h1>
 <p>A JavaScript PDF generation library for Node and the browser.</p>
 <h2 id="description">Description</h2>
 <p>PDFKit is a PDF document generation library for Node and the browser that makes creating complex, multi-page, printable
@@ -139,6 +139,42 @@ doc.end();
 <p><a href="http://pdfkit.org/demo/out.pdf">The PDF output from this example</a> (with a few additions) shows the power of PDFKit — producing
 complex documents with a very small amount of code. For more, see the <code>demo</code> folder and the
 <a href="http://pdfkit.org/docs/getting_started.html">PDFKit programming guide</a>.</p>
+<h2 id="bundling_for_node">Bundling for Node</h2>
+<p>The Node build loads the metrics of the 14 standard fonts on first use from
+<code>standard-fonts/</code> next to the built file, and PDF/A output reads the sRGB ICC
+profile from <code>data/</code> next to it. Both are resolved relative to the built file
+inside pdfkit's package directory, which a bundle that inlines pdfkit (esbuild,
+rollup, webpack, the AWS CDK's <code>NodejsFunction</code>, ...) does not sit in. Pick one
+of:</p>
+<ul>
+<li>
+<p>Mark <code>pdfkit</code> as external in the bundler and ship <code>node_modules/pdfkit</code> next
+to the bundle. File tracers such as <code>@vercel/nft</code> pick up every file pdfkit
+needs.</p>
+</li>
+<li>
+<p>Copy pdfkit's <code>js/standard-fonts</code> directory next to an ESM bundle, which then
+loads the fonts from there. A CommonJS bundle has no <code>import.meta.url</code> to
+resolve against, so this route is not open to it.</p>
+</li>
+<li>
+<p>Register the standard fonts the document uses before creating it, the same
+way as in the browser:</p>
+<pre><code class="language-javascript">import { PDFDocument, registerStdFonts } from 'pdfkit';
+import Helvetica from 'pdfkit/standard-fonts/Helvetica';
+
+registerStdFonts(Helvetica);
+const doc = new PDFDocument();
+</code></pre>
+<p>Using a standard font that is neither registered nor loadable throws an
+error naming the font. Fonts read from the file system or passed as data are
+not affected.</p>
+</li>
+</ul>
+<p>PDF/A output additionally reads <code>data/sRGB_IEC61966_2_1.icc</code> relative to the
+bundle's <code>import.meta.url</code>: copy pdfkit's <code>js/data</code> directory next to an ESM
+bundle, or register the profile under that URL with <code>registerFile</code>. A CommonJS
+bundle has no <code>import.meta.url</code> and says so when PDF/A output is requested.</p>
 <h2 id="browser_usage">Browser Usage</h2>
 <p>There are three ways to use PDFKit in the browser:</p>
 <ul>
