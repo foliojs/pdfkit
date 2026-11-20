@@ -131,6 +131,7 @@ const generateImages = async function (tokens) {
 
       // create a PDF in memory and run the example
       const doc = new PDFDocument();
+      doc.initForm();
       const f = `img/${imageIndex++}`;
       const chunks = [];
       const pdf = new Promise((resolve, reject) => {
