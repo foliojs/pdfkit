@@ -1,5 +1,11 @@
-var PDFDocument = require('pdfkit');
-var fs = require('fs');
+import fs from 'node:fs';
+import { PDFDocument } from 'pdfkit';
+
+const outputFilePath = new URL('./accessible-links.pdf', import.meta.url);
+
+// font paths need to be resolved to their pathname
+const palatinoFontPath = new URL('./fonts/PalatinoBold.ttf', import.meta.url)
+  .pathname;
 
 // Create a new PDFDocument
 var doc = new PDFDocument({
@@ -14,7 +20,7 @@ var doc = new PDFDocument({
   fontSize: 12,
 });
 
-doc.pipe(fs.createWriteStream('accessible-links.pdf'));
+doc.pipe(fs.createWriteStream(outputFilePath));
 
 // Set some meta data
 doc.info['Title'] = 'Test Document';
@@ -25,7 +31,7 @@ var struct = doc.struct('Document');
 doc.addStructure(struct);
 
 // Register a font name for use later
-doc.registerFont('Palatino', 'fonts/PalatinoBold.ttf');
+doc.registerFont('Palatino', palatinoFontPath);
 
 // Set the font and draw some text
 struct.add(

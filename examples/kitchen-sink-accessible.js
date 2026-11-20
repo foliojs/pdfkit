@@ -1,6 +1,21 @@
-var PDFDocument = require('pdfkit');
-var tiger = require('./tiger');
-var fs = require('fs');
+import fs from 'node:fs';
+import { PDFDocument } from 'pdfkit';
+import tiger from './tiger.js';
+
+const outputFilePath = new URL(
+  './kitchen-sink-accessible.pdf',
+  import.meta.url,
+);
+
+// for image paths, we can use the URL object directly without resolving to pathname
+const pngTestImagePath = new URL('./images/test.png', import.meta.url);
+const jpegTestImagePath = new URL('./images/test.jpeg', import.meta.url);
+
+// font paths need to be resolved to their pathname
+const palatinoFontPath = new URL('./fonts/PalatinoBold.ttf', import.meta.url)
+  .pathname;
+const chalkboardFontPath = new URL('./fonts/Chalkboard.ttc', import.meta.url)
+  .pathname;
 
 // Create a new PDFDocument
 var doc = new PDFDocument({
@@ -12,7 +27,7 @@ var doc = new PDFDocument({
   subset: 'PDF/UA',
 });
 
-doc.pipe(fs.createWriteStream('kitchen-sink-accessible.pdf'));
+doc.pipe(fs.createWriteStream(outputFilePath));
 
 // Set some meta data
 doc.info['Title'] = 'Test Document';
@@ -23,7 +38,7 @@ var struct = doc.struct('Document');
 doc.addStructure(struct);
 
 // Register a font name for use later
-doc.registerFont('Palatino', 'fonts/PalatinoBold.ttf');
+doc.registerFont('Palatino', palatinoFontPath);
 
 // Set the font and draw some text
 struct.add(
@@ -32,7 +47,7 @@ struct.add(
       .font('Palatino')
       .fontSize(25)
       .text('Some text with an embedded font! ', 100, 100);
-  })
+  }),
 );
 
 // Embed some images
@@ -43,7 +58,7 @@ doc.outline.addItem('PNG and JPEG images:'); // add a bookmark for the image sec
 imageSection.add(
   doc.struct('H1', () => {
     doc.fontSize(18).text('PNG and JPEG images: ');
-  })
+  }),
 );
 
 imageSection.add(
@@ -51,30 +66,29 @@ imageSection.add(
     'Figure',
     {
       alt: 'Promotional image of an Apple laptop. ',
-      bbox: [100, 160, 512, 387]
+      bbox: [100, 160, 512, 387],
     },
     () => {
-      doc.image('images/test.png', 100, 160, {
-        width: 412
+      doc.image(pngTestImagePath, 100, 160, {
+        width: 412,
       });
-    }
-  )
+    },
+  ),
 );
 
 imageSection.add(
   doc.struct(
     'Figure',
     {
-      alt:
-        'Photograph of a path flanked by blossoming trees with surrounding hedges. ',
-      bbox: [190, 400, 415, 700]
+      alt: 'Photograph of a path flanked by blossoming trees with surrounding hedges. ',
+      bbox: [190, 400, 415, 700],
     },
     () => {
-      doc.image('images/test.jpeg', 190, 400, {
-        height: 300
+      doc.image(jpegTestImagePath, 190, 400, {
+        height: 300,
       });
-    }
-  )
+    },
+  ),
 );
 
 imageSection.end();
@@ -90,7 +104,7 @@ doc.outline.addItem('Vector graphics:'); // add a bookmark for the vector graphi
 vectorSection.add(
   doc.struct('H1', () => {
     doc.fontSize(25).text('Here are some vector graphics... ', 100, 100);
-  })
+  }),
 );
 
 vectorSection.add(
@@ -98,7 +112,7 @@ vectorSection.add(
     'Figure',
     {
       alt: 'Orange triangle. ',
-      bbox: [100, 150, 200, 250]
+      bbox: [100, 150, 200, 250],
     },
     () => {
       // we set fill color before path construction to comply with ISO 32000-2 Figure 9
@@ -110,8 +124,8 @@ vectorSection.add(
         .lineTo(200, 250)
         .fill()
         .restore();
-    }
-  )
+    },
+  ),
 );
 
 vectorSection.add(
@@ -119,13 +133,13 @@ vectorSection.add(
     'Figure',
     {
       alt: 'Purple circle. ',
-      bbox: [230, 150, 330, 250]
+      bbox: [230, 150, 330, 250],
     },
     () => {
       // we set fill color before path construction to comply with ISO 32000-2 Figure 9
       doc.save().fillColor('#7722FF').circle(280, 200, 50).fill().restore();
-    }
-  )
+    },
+  ),
 );
 
 vectorSection.add(
@@ -133,7 +147,7 @@ vectorSection.add(
     'Figure',
     {
       alt: 'Red star with hollow center. ',
-      bbox: [360, 128, 504, 266]
+      bbox: [360, 128, 504, 266],
     },
     () => {
       // we set fill color before path construction to comply with ISO 32000-2 Figure 9
@@ -147,8 +161,8 @@ vectorSection.add(
         // fill using the even-odd winding rule
         .fill('even-odd')
         .restore();
-    }
-  )
+    },
+  ),
 );
 
 vectorSection.end();
@@ -165,7 +179,7 @@ wrappedSection.add(
       .font('Helvetica', 13)
       // move down 1 line
       .moveDown();
-  })
+  }),
 );
 
 var loremIpsum =
@@ -175,7 +189,7 @@ doc.font('Palatino').text(loremIpsum, {
   align: 'justify',
   indent: 30,
   paragraphGap: 5,
-  structParent: wrappedSection
+  structParent: wrappedSection,
 });
 
 wrappedSection.end();
@@ -194,7 +208,7 @@ tigerSection.add(
       .font('Palatino', 25)
       .text('Rendering some SVG paths...', 100, 100)
       .translate(220, 300);
-  })
+  }),
 );
 
 tigerSection.add(
@@ -202,7 +216,7 @@ tigerSection.add(
     'Figure',
     {
       alt: 'Tiger line art. ',
-      bbox: [30, 140, 540, 680]
+      bbox: [30, 140, 540, 680],
     },
     () => {
       var i, len, part;
@@ -233,8 +247,8 @@ tigerSection.add(
         }
         doc.restore();
       }
-    }
-  )
+    },
+  ),
 );
 
 tigerSection.end();
@@ -253,15 +267,15 @@ linkParagraph.add(
   doc.struct(
     'Link',
     {
-      alt: 'Here is a link! '
+      alt: 'Here is a link! ',
     },
     () => {
       doc.fillColor('blue').text('Here is a link!', 100, 100, {
         link: 'http://google.com/',
-        underline: true
+        underline: true,
       });
-    }
-  )
+    },
+  ),
 );
 
 linkParagraph.end();
@@ -276,7 +290,7 @@ listSection.add(list);
 
 doc
   .fillColor('#000')
-  .font('fonts/Chalkboard.ttc', 'Chalkboard', 16)
+  .font(chalkboardFontPath, 'Chalkboard', 16)
   .list(['One, ', 'Two, ', 'Three. '], 100, 150, { structParent: list });
 
 listSection.end(); // This recursively ends the list as well

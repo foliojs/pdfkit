@@ -1,18 +1,20 @@
-const PDFDocument = require('pdfkit');
-const fs = require('fs');
-const path = require('path');
+import fs from 'node:fs';
+import { PDFDocument } from 'pdfkit';
+
+const outputFilePath = new URL('./attachment.pdf', import.meta.url);
+const pngTestImagePath = new URL('./images/test.png', import.meta.url);
 
 const doc = new PDFDocument({ pdfVersion: '1.4' });
 
-doc.pipe(fs.createWriteStream('attachment.pdf'));
+doc.pipe(fs.createWriteStream(outputFilePath));
 
 doc.info['Title'] = 'Attachment Test';
 
 // add an embedded file from file system
-doc.file(path.join(__dirname, 'images', 'test.png'), {
+doc.file(pngTestImagePath, {
   name: 'test.png',
   type: 'image/png',
-  description: 'this is a test image'
+  description: 'this is a test image',
 });
 
 // add some text
@@ -26,7 +28,7 @@ hover over the paperclip to see its description!`);
 const file = {
   src: Buffer.from('buffered input!'),
   name: 'embedded.txt',
-  creationDate: new Date(2020, 3, 1)
+  creationDate: new Date(2020, 3, 1),
 };
 // then, add the annotation
 doc.fileAnnotation(100, 150, 10, doc.currentLineHeight(), file);
@@ -36,7 +38,7 @@ doc.fileAnnotation(100, 150, 10, doc.currentLineHeight(), file);
 // be aware that some PDF Viewers may not render the icon correctly — or not at all
 doc.fileAnnotation(150, 150, 10, doc.currentLineHeight(), file, {
   Name: 'Paperclip',
-  Contents: 'Paperclip attachment'
+  Contents: 'Paperclip attachment',
 });
 
 doc.end();
