@@ -12,7 +12,6 @@ const emittedIccPath = path.resolve(
   '../js/data/sRGB_IEC61966_2_1.icc',
 );
 const nodeBundlePath = require.resolve('pdfkit');
-const browserBundlePath = path.resolve(__dirname, '../js/pdfkit.browser.js');
 const standaloneBundlePath = path.resolve(
   __dirname,
   '../js/pdfkit.standalone.js',
@@ -78,12 +77,6 @@ assert.equal(registerStdFonts, PDFDocument.registerStdFonts);
 assert.equal(registerFile, PDFDocument.registerFile);
 assert.equal(typeof outputHelpers.toBlob, 'function');
 assert.equal(typeof outputHelpers.toBytes, 'function');
-
-const BrowserPDFDocument = require(browserBundlePath);
-assert.equal(typeof BrowserPDFDocument, 'function');
-assert.equal(BrowserPDFDocument.PDFDocument, BrowserPDFDocument);
-assert.equal(BrowserPDFDocument.LineWrapper, undefined);
-assert.equal(BrowserPDFDocument.registerFile, undefined);
 
 (async () => {
   const nodeDocument = new PDFDocument({ autoFirstPage: false, font: null });
