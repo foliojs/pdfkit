@@ -2,6 +2,8 @@
 
 ### Unreleased
 
+- Fix smooth curves (`S`, `T`) in SVG paths reflecting the control point of an arc or of a curve of the other kind. As the SVG spec says, they now start from the current point there. An arc with a zero radius is now drawn as a straight line instead of nothing
+
 ### [v0.21.0] - 2026-11-19
 
 - Fix gradients whose last stop comes before 1 stretching the stops over the whole gradient. The last color now stays solid from that stop to the end

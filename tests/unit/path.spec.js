@@ -30,6 +30,51 @@ describe('SVG Path', () => {
     });
   });
 
+  describe('smooth curves', () => {
+    test.each([
+      ['M0 0 L20 0 S40 20 60 0', '20 0 40 20 60 0 c'],
+      ['M0 0 C0 20 20 20 20 0 S40 20 60 0', '20 -20 40 20 60 0 c'],
+      // after an arc or a quadratic curve, the first control point is the current point
+      ['M0 0 A10 10 0 0 1 20 0 S40 20 60 0', '20 0 40 20 60 0 c'],
+      ['M0 0 Q10 20 20 0 S40 20 60 0', '20 0 40 20 60 0 c'],
+      ['M0 0 Q10 20 20 0 s20 20 40 0', '20 0 40 20 60 0 c'],
+      // after a cubic curve, the control point of T is the current point
+      ['M0 0 C0 20 20 20 20 0 T60 0', '20 0 33.333333 0 60 0 c'],
+    ])('draws %s with the right control points', (path, curve) => {
+      const docData = logData(document);
+
+      document.path(path).stroke();
+      document.end();
+
+      expect(docData.join('')).toContain(curve);
+    });
+  });
+
+  describe('arcs with a zero radius', () => {
+    test.each(['M0 0 A0 10 0 0 1 20 20', 'M0 0 a10 0 0 0 1 20 20'])(
+      'draws %s as a straight line',
+      (path) => {
+        const docData = logData(document);
+
+        document.path(path).stroke();
+        document.end();
+
+        expect(docData.join('')).toContain('20 20 l');
+      },
+    );
+
+    test('omits arc with coincident start and end points', () => {
+      const docData = logData(document);
+
+      // A0 5 0 0 1 10 10 starts and ends at (10, 10) - must be omitted per SVG spec
+      document.path('M10 10 A0 5 0 0 1 10 10').stroke();
+      document.end();
+
+      // No lineTo should have been emitted for the degenerate arc
+      expect(docData.join('')).not.toContain('10 10 l');
+    });
+  });
+
   describe('arc command flag parsing', () => {
     // Arc command flags (large-arc-flag and sweep-flag) can be chained without separator
     // This is valid per SVG spec and commonly produced by SVGO (SVG optimizer)
