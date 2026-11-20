@@ -1,7 +1,9 @@
 const fs = require('fs');
 const vm = require('vm');
 const MarkdownIt = require('markdown-it');
-const CodeMirror = require('codemirror/addon/runmode/runmode.node');
+const { highlightCode, classHighlighter } = require('@lezer/highlight');
+const { parser } = require('@lezer/javascript');
+
 const { PDFDocument } = require('pdfkit');
 
 const markdown = new MarkdownIt();
@@ -10,11 +12,6 @@ const tableCellPadding = 5;
 const tableFontSize = 9;
 
 process.chdir(__dirname);
-
-// setup code mirror javascript mode
-const filename = require.resolve('codemirror/mode/javascript/javascript');
-const jsMode = fs.readFileSync(filename, 'utf8');
-vm.runInNewContext(jsMode, { CodeMirror });
 
 // style definitions for markdown
 const styles = {
@@ -100,6 +97,31 @@ const colors = {
   special: '#6c71c4',
   default: '#002b36',
 };
+
+const highlightColors = {
+  'tok-atom': colors.atom,
+  'tok-bool': colors.atom,
+  'tok-className': colors.def,
+  'tok-comment': colors.comment,
+  'tok-keyword': colors.keyword,
+  'tok-literal': colors.atom,
+  'tok-meta': colors.meta,
+  'tok-number': colors.number,
+  'tok-operator': colors.operator,
+  'tok-propertyName': colors.property,
+  'tok-punctuation': colors.bracket,
+  'tok-string': colors.string,
+  'tok-string2': colors['string-2'],
+  'tok-typeName': colors.def,
+  'tok-variableName': colors.variable,
+  'tok-variableName2': colors['variable-2'],
+};
+
+const getHighlightColor = (classes) =>
+  classes
+    .split(' ')
+    .map((className) => highlightColors[className])
+    .find(Boolean) || colors.default;
 
 // shared lorem ipsum text so we don't need to copy it into every example
 const lorem =
@@ -202,25 +224,32 @@ class Node {
         this.type = `h${this.attrs.level}`;
         break;
 
-      case 'code_block':
-        // use code mirror to syntax highlight the code block
+      case 'code_block': {
         var code = this.content[0].text;
         this.content = [];
-        CodeMirror.runMode(code, 'javascript', (text, style) => {
-          const color = colors[style] || colors.default;
+
+        const addCodeFragment = (text, classes = '') => {
           const opts = {
-            color,
+            color: getHighlightColor(classes),
             continued: text !== '\n',
           };
+          this.content.push(new Node(['code', opts, text]));
+        };
 
-          return this.content.push(new Node(['code', opts, text]));
-        });
+        highlightCode(
+          code,
+          parser.parse(code),
+          classHighlighter,
+          addCodeFragment,
+          () => addCodeFragment('\n'),
+        );
 
         if (this.content.length) {
           this.content[this.content.length - 1].attrs.continued = false;
         }
         codeBlocks.push(code);
         break;
+      }
 
       case 'img':
         // images are used to generate inline example output
