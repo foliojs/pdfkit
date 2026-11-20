@@ -17,6 +17,83 @@ describe('table', () => {
     expect(table._columnWidths.length).toBe(3);
   });
 
+  describe('column widths', () => {
+    test.each([
+      ['equal stars', ['*', '*'], [256, 256]],
+      ['later minimum', ['*', { minWidth: 450 }], [62, 450]],
+      ['earlier minimum', [{ minWidth: 450 }, '*'], [450, 62]],
+      ['several stars', ['*', '*', { minWidth: 450 }], [31, 31, 450]],
+      ['later maximum', ['*', { maxWidth: 62 }], [450, 62]],
+      [
+        'several maxima can release a minimum',
+        [{ maxWidth: 120 }, { maxWidth: 120 }, { minWidth: 130 }, '*'],
+        [120, 120, 136, 136],
+      ],
+      ['earlier maximum', [{ maxWidth: 62 }, '*'], [62, 450]],
+      [
+        'a maximum raises the share above a minimum',
+        [{ minWidth: 200 }, { maxWidth: 10 }, '*'],
+        [251, 10, 251],
+      ],
+      [
+        'a minimum lowers the share below a maximum',
+        [{ minWidth: 400 }, { maxWidth: 100 }, '*'],
+        [400, 56, 56],
+      ],
+      [
+        'interleaved fixed columns',
+        [40, '*', 50, { minWidth: 300 }, '*'],
+        [40, 61, 50, 300, 61],
+      ],
+      [
+        'fractional widths',
+        [50.5, '*', { minWidth: 300.25 }],
+        [50.5, 161.25, 300.25],
+      ],
+      ['percentage widths', ['25%', '*', { minWidth: '50%' }], [128, 128, 256]],
+      ['exact minima', [{ minWidth: 256 }, { minWidth: 256 }], [256, 256]],
+      ['impossible minima', [{ minWidth: 300 }, { minWidth: 300 }], [300, 300]],
+      ['all stars capped', [{ maxWidth: 100 }, { maxWidth: 200 }], [100, 200]],
+      ['zero maximum is unbounded', ['*', { maxWidth: 0 }], [256, 256]],
+    ])('%s', (_name, columnStyles, expected) => {
+      const document = new PDFDocument({ margin: 50 });
+      const table = document.table({ maxWidth: 512, columnStyles });
+      table.row(columnStyles.map(() => ''));
+
+      expect(table._columnWidths).toHaveLength(expected.length);
+      expected.forEach((width, i) => {
+        expect(table._columnWidths[i]).toBeCloseTo(width, 8);
+        expect(table._columnXPos[i]).toBeCloseTo(
+          50 + expected.slice(0, i).reduce((sum, value) => sum + value, 0),
+          8,
+        );
+      });
+      table.end();
+      document.end();
+    });
+
+    test('uses the allocated columns for spanning cells', () => {
+      const document = new PDFDocument({ margin: 50 });
+      const boundsOfString = vi.spyOn(document, 'boundsOfString');
+      const table = document.table({
+        maxWidth: 512,
+        columnStyles: ['*', '*', { minWidth: 450 }],
+        defaultStyle: { padding: 0 },
+      });
+      table.row([{ text: 'ITEM', colSpan: 2 }, 'TOTAL']);
+
+      expect(table._columnWidths).toEqual([31, 31, 450]);
+      expect(boundsOfString).toHaveBeenCalledWith(
+        'ITEM',
+        0,
+        0,
+        expect.objectContaining({ width: 62 }),
+      );
+      table.end();
+      document.end();
+    });
+  });
+
   describe('font resolution across style levels', () => {
     const REGULAR = 'tests/fonts/Roboto-Regular.ttf';
     const MEDIUM = 'tests/fonts/Roboto-Medium.ttf';
