@@ -189,7 +189,13 @@ quite simple!
 
     doc.addPage()
 
-To add some content every time a page is created, either by calling `addPage()` or automatically, you can use the `pageAdded` event.
+To add some content every time a page is created, either by calling `addPage()` or automatically, you can pass an `onPageAdded` function when creating the document. It is called synchronously each time a page is added and receives the document as its argument, so it can draw on the automatic first page that is added before construction returns (or on the first `addPage()` call when `autoFirstPage: false` is used).
+
+    const doc = new PDFDocument({
+      onPageAdded: doc => doc.text("Page Title")
+    });
+
+For pages added after construction, you can also use the `pageAdded` event directly.
 
     doc.on('pageAdded', () => doc.text("Page Title"));
 

@@ -2,6 +2,7 @@
 
 ### Unreleased
 
+- Add an `onPageAdded` document option, a function called with the document each time a page is added, including the automatic first page that a `pageAdded` listener attached after construction would miss. Fixes #1529
 - Fix smooth curves (`S`, `T`) in SVG paths reflecting the control point of an arc or of a curve of the other kind. As the SVG spec says, they now start from the current point there. An arc with a zero radius is now drawn as a straight line instead of nothing
 
 ### [v0.21.0] - 2026-11-19
