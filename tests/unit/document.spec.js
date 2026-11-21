@@ -1,6 +1,7 @@
 import { vi } from 'vitest';
 import PDFDocument from '../../lib/document';
 import { logData } from './helpers';
+import Helvetica from '../../lib/font/generated/Helvetica';
 
 describe('PDFDocument', () => {
   describe('font option', () => {
@@ -90,6 +91,117 @@ describe('PDFDocument', () => {
     ])('converts %s to %s', (input, expected) => {
       const doc = new PDFDocument({ pageLayout: input });
       expect(doc._root.data.PageLayout).toBe(expected);
+    });
+  });
+
+  describe('pageAdded event', () => {
+    test('feature detection falls back to on() when the base stream has no addListener (browser build)', async () => {
+      vi.resetModules();
+      vi.doMock('#stream', () => import('../../lib/stream/browser.js'));
+      try {
+        const standardFonts = await import('../../lib/font/standard_fonts');
+        standardFonts.registerStdFonts(Helvetica);
+        const { default: BrowserPDFDocument } =
+          await import('../../lib/document');
+        const doc = new BrowserPDFDocument();
+        expect(doc.addListener).toBeUndefined();
+
+        let count = 0;
+        const listener = () => {
+          count++;
+        };
+        if (typeof doc.addListener === 'function')
+          doc.addListener('pageAdded', listener);
+        else doc.on('pageAdded', listener);
+        expect(count).toBe(1);
+
+        doc.addPage();
+        expect(count).toBe(2);
+        doc.end();
+      } finally {
+        vi.doUnmock('#stream');
+        vi.resetModules();
+      }
+    });
+
+    test('fires synchronously for the first page when a listener is attached after construction', () => {
+      const doc = new PDFDocument();
+      const firstPage = doc.page;
+      let pageAtCall;
+      doc.on('pageAdded', () => {
+        pageAtCall = doc.page;
+      });
+
+      expect(pageAtCall).toBe(firstPage);
+      doc.end();
+    });
+
+    test('emits pageAdded for each page in order before end() returns', () => {
+      const doc = new PDFDocument();
+      const firstPage = doc.page;
+      const order = [];
+      doc.on('pageAdded', () => order.push(doc.page));
+      doc.addPage();
+      const secondPage = doc.page;
+      doc.addPage();
+      const thirdPage = doc.page;
+      doc.end();
+      order.push('end');
+
+      expect(order).toEqual([firstPage, secondPage, thirdPage, 'end']);
+    });
+
+    test('does not fire the first-page event for a listener attached after a second addPage', () => {
+      const doc = new PDFDocument();
+      doc.addPage();
+      const listener = vi.fn();
+      doc.on('pageAdded', listener);
+
+      expect(listener).not.toHaveBeenCalled();
+
+      doc.addPage();
+      expect(listener).toHaveBeenCalledTimes(1);
+      doc.end();
+    });
+
+    test('does not fire an extra event with autoFirstPage: false', () => {
+      const doc = new PDFDocument({ autoFirstPage: false });
+      const listener = vi.fn();
+      doc.on('pageAdded', listener);
+
+      expect(listener).not.toHaveBeenCalled();
+
+      doc.addPage();
+      expect(listener).toHaveBeenCalledTimes(1);
+      doc.end();
+    });
+
+    test('once() fires the first-page event exactly once', () => {
+      const doc = new PDFDocument();
+      const listener = vi.fn();
+      doc.once('pageAdded', listener);
+
+      expect(listener).toHaveBeenCalledTimes(1);
+
+      doc.addPage();
+      expect(listener).toHaveBeenCalledTimes(1);
+      doc.end();
+    });
+
+    test('does not re-fire the first-page event for a second listener', () => {
+      const doc = new PDFDocument();
+      const first = vi.fn();
+      const second = vi.fn();
+      doc.on('pageAdded', first);
+      doc.on('pageAdded', second);
+
+      expect(first).toHaveBeenCalledTimes(1);
+      expect(second).not.toHaveBeenCalled();
+
+      doc.addPage();
+      expect(first).toHaveBeenCalledTimes(2);
+      expect(second).toHaveBeenCalledTimes(1);
+      doc.end();
     });
   });
 });
