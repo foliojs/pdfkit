@@ -1,6 +1,7 @@
 import { vi } from 'vitest';
 import PDFDocument from '../../lib/document';
 import { logData } from './helpers';
+import Helvetica from '../../lib/font/generated/Helvetica';
 
 describe('PDFDocument', () => {
   describe('font option', () => {
@@ -90,6 +91,89 @@ describe('PDFDocument', () => {
     ])('converts %s to %s', (input, expected) => {
       const doc = new PDFDocument({ pageLayout: input });
       expect(doc._root.data.PageLayout).toBe(expected);
+    });
+  });
+
+  describe('onPageAdded option', () => {
+    test.each([{}, { autoFirstPage: true }])(
+      'runs once during construction and once per addPage, options %j',
+      (options) => {
+        let pageNumber = 0;
+        const onPageAdded = vi.fn((d) => {
+          pageNumber += 1;
+          d.text(`page ${pageNumber} text`);
+        });
+        const doc = new PDFDocument({
+          bufferPages: true,
+          compress: false,
+          ...options,
+          onPageAdded,
+        });
+        const data = logData(doc);
+
+        expect(onPageAdded).toHaveBeenCalledTimes(1);
+        expect(onPageAdded).toHaveBeenLastCalledWith(doc);
+
+        doc.addPage();
+        expect(onPageAdded).toHaveBeenCalledTimes(2);
+        expect(onPageAdded).toHaveBeenLastCalledWith(doc);
+
+        doc.end();
+        expect(data).toContainText({ text: 'page 1 text' });
+        expect(data).toContainText({ text: 'page 2 text' });
+      },
+    );
+
+    test('runs on the first manual addPage with autoFirstPage: false', () => {
+      const onPageAdded = vi.fn();
+      const doc = new PDFDocument({ autoFirstPage: false, onPageAdded });
+
+      expect(onPageAdded).not.toHaveBeenCalled();
+
+      doc.addPage();
+      expect(onPageAdded).toHaveBeenCalledTimes(1);
+      expect(onPageAdded).toHaveBeenLastCalledWith(doc);
+      doc.end();
+    });
+
+    test('receives the document on the browser stream', async () => {
+      vi.resetModules();
+      vi.doMock('#stream', () => import('../../lib/stream/browser.js'));
+      try {
+        const standardFonts = await import('../../lib/font/standard_fonts');
+        standardFonts.registerStdFonts(Helvetica);
+        const { default: BrowserPDFDocument } =
+          await import('../../lib/document');
+
+        const onPageAdded = vi.fn((d) => d.text('browser first page'));
+        const doc = new BrowserPDFDocument({ compress: false, onPageAdded });
+        const data = logData(doc);
+
+        expect(onPageAdded).toHaveBeenCalledTimes(1);
+        expect(onPageAdded).toHaveBeenLastCalledWith(doc);
+
+        doc.end();
+        expect(data).toContainText({ text: 'browser first page' });
+      } finally {
+        vi.doUnmock('#stream');
+        vi.resetModules();
+      }
+    });
+
+    test('does not change listeners attached after construction', () => {
+      const doc = new PDFDocument();
+      const trace = [];
+      doc.on('pageAdded', () => trace.push('on'));
+      doc.once('pageAdded', () => trace.push('once'));
+
+      expect(trace).toEqual([]);
+
+      doc.addPage();
+      expect(trace).toEqual(['on', 'once']);
+
+      doc.addPage();
+      expect(trace).toEqual(['on', 'once', 'on']);
+      doc.end();
     });
   });
 });
