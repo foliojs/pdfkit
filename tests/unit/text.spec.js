@@ -452,6 +452,26 @@ Q
     });
   });
 
+  describe('boundsOfString', () => {
+    test('measures without adding a page at the bottom of one - #1625', () => {
+      const text = 'lorem ipsum dolor sit amet consectetur adipiscing elit sed';
+      const atTop = new PDFDocument({ compress: false });
+      const expectedHeight = atTop.boundsOfString(text, 20, 20).height;
+
+      const doc = new PDFDocument({ compress: false });
+      doc.text('page 1');
+      const y = doc.page.maxY() - 10;
+      const pageCount = doc._root.data.Pages.data.Count;
+
+      const bounds = doc.boundsOfString(text, 20, y);
+
+      // a measurement reports the size of the text, it does not lay it out
+      expect(doc._root.data.Pages.data.Count).toBe(pageCount);
+      expect(bounds.height).toBeCloseTo(expectedHeight, 6);
+      expect(bounds.y).toBe(y);
+    });
+  });
+
   describe('text with structure parent links', () => {
     beforeEach(() => {
       document = new PDFDocument({
