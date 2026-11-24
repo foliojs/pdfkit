@@ -203,6 +203,9 @@ options:
 - `borderColor` - Field border color.
 - `fontSize` [_number_] - Sets the font size used in the field appearance string.
 
+Numeric values and defaults in text and choice fields are stored as text. For example,
+`value: 0` and `value: '0'` set the same field value.
+
 ### Text Field Formatting
 
 When needing to format the text value of a Form Annotation, the following
