@@ -401,4 +401,56 @@ describe('LineWrapper', () => {
       });
     });
   });
+
+  describe('characters above U+FFFF', () => {
+    const word = '\u{24256}'.repeat(20);
+    const halfCharacter =
+      /[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?<![\uD800-\uDBFF])[\uDC00-\uDFFF]/;
+
+    // Roboto draws each of these characters, and each half of one, as the
+    // same missing glyph, and the character spacing, which counts string
+    // indexes, makes half a character fit where a whole one does not
+    const wrapAtEachWidth = (text, options) => {
+      const results = [];
+      for (let width = 20; width <= 120; width++) {
+        const doc = new PDFDocument({ compress: false, margin: 0 });
+        doc.font('tests/fonts/Roboto-Regular.ttf');
+        const wrapper = new LineWrapper(doc, { width, ...options });
+        const lines = [];
+        wrapper.on('line', (line) => {
+          lines.push(line);
+          doc.y += doc.currentLineHeight(true);
+        });
+        wrapper.wrap(text, { width, ...options });
+        results.push(lines);
+      }
+      return results;
+    };
+
+    test('splits a word wider than the line between two characters', () => {
+      const results = wrapAtEachWidth(word, {
+        characterSpacing: 2,
+        lineBreak: 'whitespace',
+      });
+
+      results.forEach((lines) => {
+        expect(lines.join('')).toBe(word);
+        lines.forEach((line) => expect(line).not.toMatch(halfCharacter));
+      });
+    });
+
+    test('removes whole characters to make room for the ellipsis', () => {
+      const results = wrapAtEachWidth(word + word, {
+        characterSpacing: 2,
+        height: 20,
+        ellipsis: true,
+      });
+
+      results.forEach((lines) => {
+        expect(lines).toHaveLength(1);
+        expect(lines[0]).toMatch(/…$/);
+        expect(lines[0]).not.toMatch(halfCharacter);
+      });
+    });
+  });
 });
