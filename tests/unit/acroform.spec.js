@@ -418,11 +418,23 @@ describe('acroform', () => {
     expect(docData[4]).not.toContain('/Combo');
   });
 
+  test('writes numeric choice values and defaults as PDF text strings', () => {
+    doc.initForm();
+    const docData = logData(doc);
+    doc.formCombo('quantity', 20, 20, 50, 20, {
+      select: ['0', '1'],
+      value: 0,
+      defaultValue: 1,
+    });
+    expect(docData[1]).toContain('/V (0)');
+    expect(docData[1]).toContain('/DV (1)');
+  });
+
   describe('text format', () => {
     test('number', () => {
       const expected = [
         '10 0 obj',
-        '<<\n/FT /Tx\n/V 32.98\n/AA <<\n/K <<\n/S /JavaScript\n' +
+        '<<\n/FT /Tx\n/V (32.98)\n/AA <<\n/K <<\n/S /JavaScript\n' +
           '/JS (AFNumber_Keystroke\\(2,1,"MinusBlack",null,"$",true\\);)\n>>\n' +
           '/F <<\n/S /JavaScript\n/JS (AFNumber_Format\\(2,1,"MinusBlack",null,"$",true\\);)\n>>\n>>\n' +
           '/T (dollars)\n/Subtype /Widget\n/F 4\n/Type /Annot\n/Rect [20 752 70 772]\n/Border [0 0 0]\n/C [0 0 0]\n>>',
