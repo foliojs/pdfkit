@@ -11,6 +11,7 @@ import { fileURLToPath, pathToFileURL } from 'url';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 import { rollup } from 'rollup';
 import Helvetica from '../../lib/font/generated/Helvetica';
+import binary from '../../tools/binary-plugin.mjs';
 
 const rootDir = fileURLToPath(new URL('../..', import.meta.url));
 const iccProfile = readFileSync(
@@ -144,5 +145,57 @@ describe('bundled node build', () => {
         );
       });
     }
+  });
+});
+
+// Bundles the browser build the way a bundler for a runtime such as Cloudflare
+// Workers does: an ES module whose `import.meta.url` is undefined.
+describe('bundled browser build without import.meta.url', () => {
+  let bundleDir;
+  let pdfkit;
+
+  beforeAll(async () => {
+    const cacheDir = path.join(rootDir, 'node_modules/.cache');
+    mkdirSync(cacheDir, { recursive: true });
+    bundleDir = mkdtempSync(path.join(cacheDir, 'pdfkit-browser-bundle-'));
+    writeFileSync(path.join(bundleDir, 'package.json'), '{}\n');
+
+    const bundle = await rollup({
+      input: path.join(rootDir, 'lib/document.browser.js'),
+      external: (id) =>
+        !id.startsWith('.') && !id.startsWith('#') && !path.isAbsolute(id),
+      plugins: [binary('.icc'), nodeResolve({ exportConditions: ['default'] })],
+      onwarn: () => {},
+    });
+
+    const bundleFile = path.join(bundleDir, 'pdfkit.browser.mjs');
+    await bundle.write({
+      file: bundleFile,
+      format: 'es',
+      plugins: [
+        { name: 'no-import-meta', resolveImportMeta: () => 'undefined' },
+      ],
+    });
+    await bundle.close();
+
+    pdfkit = await import(pathToFileURL(bundleFile).href);
+  });
+
+  afterAll(() => {
+    rmSync(bundleDir, { recursive: true, force: true });
+  });
+
+  test('loads', () => {
+    expect(typeof pdfkit.PDFDocument).toBe('function');
+  });
+
+  test('renders PDF/A with the embedded ICC profile', async () => {
+    pdfkit.registerStdFonts(Helvetica);
+
+    const document = new pdfkit.PDFDocument({ subset: 'PDF/A-1' });
+    const output = await render(document);
+
+    expect(output.subarray(0, 5).toString()).toBe('%PDF-');
+    expect(output.toString('latin1')).toContain('/GTS_PDFA1');
   });
 });

@@ -2,6 +2,7 @@
 
 ### Unreleased
 
+- Fix the browser build throwing on import where `import.meta.url` is undefined, as in bundles for Cloudflare Workers. It now registers its embedded sRGB ICC profile under a fixed name instead of a URL. Fixes #1873
 - Fix PDF/UA documents getting the PDF/A-1 `/CIDSet` in their subsetted fonts, which fails PDF/UA-1 validation (veraPDF 7.21.4.2)
 - Write numeric form values and defaults as PDF text strings so viewers can display and reset them
 - Add an `onPageAdded` document option, a function called with the document each time a page is added, including the automatic first page that a `pageAdded` listener attached after construction would miss. Fixes #1529
