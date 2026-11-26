@@ -32,4 +32,28 @@ describe('PDF/UA', () => {
 
     expect(metadata).toContain('pdfuaid:part>1');
   });
+
+  test('font data contains no CIDSet', () => {
+    let options = {
+      autoFirstPage: false,
+      pdfVersion: '1.7',
+      subset: 'PDF/UA',
+      tagged: true,
+    };
+    let doc = new PDFDocument(options);
+    const data = logData(doc);
+    doc.addPage();
+    doc.registerFont('Roboto', 'tests/fonts/Roboto-Regular.ttf');
+    doc.font('Roboto');
+    doc.text('Text');
+    doc.end();
+
+    let fontDescriptor = data.find((v) => {
+      return v.includes('/Type /FontDescriptor');
+    });
+
+    expect(fontDescriptor).not.toBeUndefined();
+
+    expect(fontDescriptor).not.toContain('/CIDSet');
+  });
 });
