@@ -3,6 +3,7 @@ import PDFDocument from '../../lib/document';
 import PDFReference from '../../lib/reference';
 import PNGImage from '../../lib/image/png';
 import fs from 'fs';
+import zlib from 'zlib';
 
 describe('PNGImage', () => {
   let document;
@@ -303,6 +304,21 @@ describe('PNGImage', () => {
       Type: 'XObject',
       Width: 290,
     });
+  });
+
+  test('Pallete indexed transparency 1bit alpha channel', () => {
+    const img = new PNGImage(
+      fs.readFileSync('./tests/images/pallete-transparent-white-1bit.png'),
+      'I1',
+    );
+    img.embed(document);
+
+    // One alpha value per pixel; the pixels of the transparent palette entry
+    // are transparent, and only those
+    const alpha = zlib.inflateSync(img.alphaChannel);
+    expect(alpha.length).toBe(290 * 50);
+    expect(alpha.filter((value) => value === 0).length).toBe(6900);
+    expect(alpha.filter((value) => value === 255).length).toBe(7600);
   });
 
   test('Grayscale', () => {
