@@ -2,6 +2,7 @@
 
 ### Unreleased
 
+- Fix text wrapping cutting a character above U+FFFF, such as an emoji or U+24256, in half when it splits a word wider than the line or shortens a line for the ellipsis. Both halves were drawn as missing glyphs
 - Fix the browser build throwing on import where `import.meta.url` is undefined, as in bundles for Cloudflare Workers. It now registers its embedded sRGB ICC profile under a fixed name instead of a URL. Fixes #1873
 - Fix PDF/UA documents getting the PDF/A-1 `/CIDSet` in their subsetted fonts, which fails PDF/UA-1 validation (veraPDF 7.21.4.2)
 - Write numeric form values and defaults as PDF text strings so viewers can display and reset them
