@@ -401,4 +401,48 @@ describe('LineWrapper', () => {
       });
     });
   });
+  describe('characters outside the BMP', () => {
+    // 𝕆 and the other double-struck letters are surrogate pairs in a JS string
+    const word = '𝔸𝔹ℂ𝔻𝔼𝔽𝔾ℍ𝕀𝕁𝕂𝕃𝕄ℕ𝕆ℙℚℝ𝕊𝕋𝕌𝕍𝕎𝕏𝕐ℤ'.repeat(3);
+    const splitsPair = (line) =>
+      /^[\uDC00-\uDFFF]/.test(line) || /[\uD800-\uDBFF]$/.test(line);
+
+    const wrapLines = (text, options) => {
+      // needs real glyphs: the standard fonts give these no width, and with
+      // .notdef half a pair is as wide as the whole one
+      document.font('examples/fonts/DejaVuSans.ttf');
+      const lines = [];
+      const wrapper = new LineWrapper(document, options);
+      wrapper.on('line', (line) => {
+        lines.push(line);
+        document.y += 10;
+      });
+      wrapper.wrap(text, options);
+      return lines;
+    };
+
+    test.each([17, 23, 31, 47, 60, 75])(
+      'does not split a surrogate pair when it breaks a long word (width %i)',
+      (width) => {
+        const lines = wrapLines(word, { width });
+        expect(lines.length).toBeGreaterThan(1);
+        expect(lines.filter(splitsPair)).toEqual([]);
+        expect(lines.join('')).toBe(word);
+      },
+    );
+
+    test.each([20, 37, 55])(
+      'does not leave half a surrogate pair before the ellipsis (width %i)',
+      (width) => {
+        const lines = wrapLines(`${word} ${word}`, {
+          width,
+          height: 10,
+          ellipsis: true,
+        });
+        expect(lines).toHaveLength(1);
+        expect(lines[0].endsWith('…')).toBe(true);
+        expect(splitsPair(lines[0].slice(0, -1))).toBe(false);
+      },
+    );
+  });
 });
