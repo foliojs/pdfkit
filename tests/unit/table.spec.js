@@ -17,6 +17,19 @@ describe('table', () => {
     expect(table._columnWidths.length).toBe(3);
   });
 
+  test('keeps a kerned name on one line when the cell has enough room', () => {
+    const document = new PDFDocument();
+    document.font('Helvetica').fontSize(11);
+    const fragment = vi.spyOn(document, '_fragment');
+
+    document
+      .table({ columnStyles: [{ width: 160 }] })
+      .row(['Jane Walker'])
+      .end();
+
+    expect(fragment.mock.calls.map(([text]) => text)).toEqual(['Jane Walker']);
+  });
+
   describe('font resolution across style levels', () => {
     const REGULAR = 'tests/fonts/Roboto-Regular.ttf';
     const MEDIUM = 'tests/fonts/Roboto-Medium.ttf';

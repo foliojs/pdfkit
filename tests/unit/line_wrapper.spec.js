@@ -11,6 +11,23 @@ describe('LineWrapper', () => {
     });
   });
 
+  test('wraps a kerned pair of words below its full-line width', () => {
+    document.font('Helvetica').fontSize(11);
+    const text = 'Jane Walker';
+    const width = document.widthOfString(text);
+
+    for (const [available, expected] of [
+      [width, [text]],
+      [width - 0.1, ['Jane ', 'Walker']],
+    ]) {
+      const lines = [];
+      const wrapper = new LineWrapper(document, { width: available });
+      wrapper.on('line', (line) => lines.push(line));
+      wrapper.wrap(text, {});
+      expect(lines).toEqual(expected);
+    }
+  });
+
   describe('negative line width', () => {
     // without a guard the failure is a loop that never returns to the test runner
     const countPages = (options) => {
