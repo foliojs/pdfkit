@@ -24,9 +24,12 @@ assert.equal(PDFDocument.LineWrapper, undefined);
 assert.equal(PDFDocument.registerStdFonts, undefined);
 assert.equal(PDFDocument.registerFile, undefined);
 
+const standardFontsDir = fileURLToPath(
+  new URL('../js/standard-fonts/', import.meta.url),
+);
 const loadedStandardFontModules = () =>
   Object.keys(require.cache).filter((file) =>
-    file.includes('js/standard-fonts'),
+    file.startsWith(standardFontsDir),
   );
 
 assert.deepEqual(loadedStandardFontModules(), []);
